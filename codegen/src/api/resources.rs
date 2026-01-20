@@ -10,7 +10,7 @@ use crate::cli_v1::IncludeMode;
 
 use super::{
     get_schema_name,
-    types::{FieldType, serialize_field_type},
+    types::{FieldType, serialize_field_type, resolve_schema_ref_in_field_type_public},
 };
 
 /// The API operations of the API client we generate.
@@ -58,6 +58,28 @@ pub(crate) fn from_openapi(
 
 pub(crate) fn referenced_components(resources: &Resources) -> impl Iterator<Item = &str> {
     resources.values().flat_map(Resource::referenced_components)
+}
+
+/// Resolve SchemaRef inner types in resources (operation query params).
+/// This allows to_java() and similar methods to properly convert string aliases to their base types.
+pub(crate) fn resolve_schema_refs_in_resources(resources: &mut Resources, string_alias_names: &BTreeSet<String>) {
+    for resource in resources.values_mut() {
+        resolve_schema_refs_in_resource(resource, string_alias_names);
+    }
+}
+
+fn resolve_schema_refs_in_resource(resource: &mut Resource, string_alias_names: &BTreeSet<String>) {
+    // Resolve in subresources
+    for sub in resource.subresources.values_mut() {
+        resolve_schema_refs_in_resource(sub, string_alias_names);
+    }
+
+    // Resolve in operations
+    for op in &mut resource.operations {
+        for param in &mut op.query_params {
+            resolve_schema_ref_in_field_type_public(&mut param.r#type, string_alias_names);
+        }
+    }
 }
 
 fn get_or_insert_resource(resources: &mut Resources, path: Vec<String>) -> &mut Resource {
@@ -157,9 +179,15 @@ pub(crate) struct Operation {
     /// this from the argument list).
     /// Only useful when `request_body_schema_name` is `Some`.
     request_body_all_optional: bool,
-    /// Name of the response body type, if any.
+    /// Name of the response body type, if any (only for JSON responses).
     #[serde(skip_serializing_if = "Option::is_none")]
     response_body_schema_name: Option<String>,
+    /// True if the response is binary (e.g., application/pdf, application/octet-stream).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    response_is_binary: bool,
+    /// True if the response is text (e.g., text/plain, text/html).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    response_is_text: bool,
 }
 
 impl Operation {
@@ -198,25 +226,18 @@ impl Operation {
             return None;
         }
 
-        let mut op_id_parts_iter = op_id.split('.');
-        let version = op_id_parts_iter
-            .next()
-            .expect("split iter always contains at least one item");
-        let Some(op_name) = op_id_parts_iter.next_back() else {
-            tracing::debug!("skipping operation whose ID doesn't contain a period");
-            return None;
-        };
-
-        let res_path: Vec<_> = op_id_parts_iter.map(ToOwned::to_owned).collect();
-        if res_path.is_empty() {
-            tracing::debug!("skipping operation whose ID only contains one period");
-            return None;
-        }
-
-        if version != "v1" {
-            tracing::warn!("found operation whose ID does not begin with v1");
-            return None;
-        }
+        // Use tags as resource name, operation ID as operation name
+        let tag = op.tags.first().cloned().unwrap_or_else(|| {
+            // Derive resource from path: /api/v1/customers -> customers
+            path.split('/')
+                .find(|s| !s.is_empty() && *s != "api" && *s != "v1")
+                .unwrap_or("default")
+                .to_owned()
+        });
+        // Convert tag to resource name (e.g., "checkout-sessions" -> "checkout_sessions")
+        let resource_name = tag.replace('-', "_");
+        let res_path = vec![resource_name];
+        let op_name = op_id.clone();
 
         let mut path_params = Vec::new();
         let mut query_params = Vec::new();
@@ -370,38 +391,42 @@ impl Operation {
             }
         });
 
-        let response_body_schema_name = op.responses.and_then(|r| {
-            assert_eq!(r.default, None);
-            assert!(r.extensions.is_empty());
-            let mut success_responses = r.responses.into_iter().filter(|(st, _)| {
-                match st {
-                    openapi::StatusCode::Code(c) => match c {
-                        0..100 => tracing::error!("invalid status code < 100"),
-                        100..200 => tracing::error!("what is this? status code {c}..."),
-                        200..300 => return true,
-                        300..400 => tracing::error!("what is this? status code {c}..."),
-                        400.. => {}
-                    },
-                    openapi::StatusCode::Range(_) => {
-                        tracing::error!("unsupported status code range");
+        let (response_body_schema_name, response_kind) = op
+            .responses
+            .map(|r| {
+                assert_eq!(r.default, None);
+                assert!(r.extensions.is_empty());
+                let mut success_responses = r.responses.into_iter().filter(|(st, _)| {
+                    match st {
+                        openapi::StatusCode::Code(c) => match c {
+                            0..100 => tracing::error!("invalid status code < 100"),
+                            100..200 => tracing::error!("what is this? status code {c}..."),
+                            200..300 => return true,
+                            300..400 => tracing::error!("what is this? status code {c}..."),
+                            400.. => {}
+                        },
+                        openapi::StatusCode::Range(_) => {
+                            tracing::error!("unsupported status code range");
+                        }
                     }
+
+                    false
+                });
+
+                let (_, resp) = success_responses
+                    .next()
+                    .expect("every operation must have one success response");
+                let (schema_name, kind) = response_body_info(resp);
+                for (_, resp) in success_responses {
+                    let (other_name, other_kind) = response_body_info(resp);
+                    assert_eq!(schema_name, other_name);
+                    assert_eq!(kind, other_kind);
                 }
 
-                false
-            });
+                (schema_name, kind)
+            })
+            .unwrap_or((None, ResponseKind::None));
 
-            let (_, resp) = success_responses
-                .next()
-                .expect("every operation must have one success response");
-            let schema_name = response_body_schema_name(resp);
-            for (_, resp) in success_responses {
-                assert_eq!(schema_name, response_body_schema_name(resp));
-            }
-
-            schema_name
-        });
-
-        let op_name = op_name.to_owned();
         let op = Operation {
             id: op_id,
             name: op_name,
@@ -415,6 +440,8 @@ impl Operation {
             request_body_schema_name,
             request_body_all_optional,
             response_body_schema_name,
+            response_is_binary: response_kind == ResponseKind::Binary,
+            response_is_text: response_kind == ResponseKind::Text,
         };
         Some((res_path, op))
     }
@@ -431,28 +458,113 @@ fn enforce_string_parameter(parameter_data: &openapi::ParameterData) -> anyhow::
     let Schema::Object(obj) = &s.json_schema else {
         bail!("found unexpected `true` schema");
     };
-    if obj.instance_type != Some(InstanceType::String.into()) {
-        bail!("unsupported path parameter type `{:?}`", obj.instance_type);
+
+    // Check for direct string type
+    if obj.instance_type == Some(InstanceType::String.into()) {
+        return Ok(());
     }
 
-    Ok(())
+    // Handle OpenAPI 3.1 type arrays like ["string", "null"]
+    if let Some(schemars::schema::SingleOrVec::Vec(types)) = &obj.instance_type {
+        let has_string = types.contains(&InstanceType::String);
+        let all_string_or_null = types.iter().all(|t| {
+            *t == InstanceType::String || *t == InstanceType::Null
+        });
+        if has_string && all_string_or_null {
+            return Ok(());
+        }
+    }
+
+    // Handle oneOf patterns like: oneOf: [{type: null}, {$ref: ...}] or oneOf: [{type: null}, {type: string}]
+    if let Some(ref subschemas) = obj.subschemas
+        && let Some(ref one_of) = subschemas.one_of
+            && one_of.len() == 2 {
+                for schema in one_of {
+                    if let Schema::Object(inner_obj) = schema {
+                        // Check if this is a null type - skip it
+                        let is_null = match &inner_obj.instance_type {
+                            Some(schemars::schema::SingleOrVec::Single(t)) => **t == InstanceType::Null,
+                            _ => false,
+                        };
+                        if is_null {
+                            continue;
+                        }
+
+                        // Check if this is a string type
+                        if inner_obj.instance_type == Some(InstanceType::String.into()) {
+                            return Ok(());
+                        }
+
+                        // Check if this is a $ref (path params with refs are typically string IDs)
+                        if inner_obj.reference.is_some() {
+                            return Ok(());
+                        }
+                    }
+                }
+            }
+
+    // If instance_type is None but there's a $ref, accept it (typically string IDs)
+    if obj.instance_type.is_none() && obj.reference.is_some() {
+        return Ok(());
+    }
+
+    bail!("unsupported path parameter type `{:?}`", obj.instance_type);
 }
 
-fn response_body_schema_name(resp: ReferenceOr<openapi::Response>) -> Option<String> {
+/// Response body type for code generation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+enum ResponseKind {
+    #[default]
+    None,
+    Json,
+    Binary,
+    Text,
+}
+
+/// Returns (schema_name, response_kind) for a response.
+fn response_body_info(resp: ReferenceOr<openapi::Response>) -> (Option<String>, ResponseKind) {
     match resp {
         ReferenceOr::Item(mut resp_body) => {
             assert!(resp_body.extensions.is_empty());
             if resp_body.content.is_empty() {
-                return None;
+                return (None, ResponseKind::None);
             }
 
-            assert_eq!(resp_body.content.len(), 1);
-            let json_body = resp_body
-                .content
-                .swap_remove("application/json")
-                .expect("should have JSON body");
+            // Check for binary response types
+            let binary_types = [
+                "application/pdf",
+                "application/octet-stream",
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                "application/zip",
+            ];
+            for binary_type in binary_types {
+                if resp_body.content.contains_key(binary_type) {
+                    tracing::info!(content_type = binary_type, "detected binary response");
+                    return (None, ResponseKind::Binary);
+                }
+            }
+
+            // Check for text response types
+            let text_types = ["text/plain", "text/html", "text/csv"];
+            for text_type in text_types {
+                if resp_body.content.contains_key(text_type) {
+                    tracing::info!(content_type = text_type, "detected text response");
+                    return (None, ResponseKind::Text);
+                }
+            }
+
+            // Handle JSON responses
+            let Some(json_body) = resp_body.content.swap_remove("application/json") else {
+                tracing::info!(
+                    content_types = ?resp_body.content.keys().collect::<Vec<_>>(),
+                    "skipping unknown response body type"
+                );
+                return (None, ResponseKind::None);
+            };
             assert!(json_body.extensions.is_empty());
-            match json_body.schema.expect("no json body schema?!").json_schema {
+            let schema_name = match json_body.schema.expect("no json body schema?!").json_schema {
                 Schema::Bool(_) => {
                     tracing::error!("unexpected bool schema");
                     None
@@ -463,11 +575,12 @@ fn response_body_schema_name(resp: ReferenceOr<openapi::Response>) -> Option<Str
                     }
                     get_schema_name(obj.reference.as_deref())
                 }
-            }
+            };
+            (schema_name, ResponseKind::Json)
         }
         ReferenceOr::Reference { .. } => {
             tracing::error!("$ref response bodies are not currently supported");
-            None
+            (None, ResponseKind::None)
         }
     }
 }

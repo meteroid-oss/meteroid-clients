@@ -1,0 +1,6623 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meteroid",
+    "description": "",
+    "license": {
+      "name": "AGPL-3.0-only",
+      "identifier": "AGPL-3.0-only"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/checkout-sessions": {
+      "get": {
+        "tags": [
+          "Checkout Sessions"
+        ],
+        "summary": "List checkout sessions",
+        "operationId": "list_checkout_sessions",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/components/schemas/CustomerId"
+                }
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/components/schemas/CheckoutSessionStatus"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of checkout sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCheckoutSessionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Checkout Sessions"
+        ],
+        "summary": "Create a checkout session",
+        "operationId": "create_checkout_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCheckoutSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/checkout-sessions/{id}": {
+      "get": {
+        "tags": [
+          "Checkout Sessions"
+        ],
+        "summary": "Get a checkout session by ID",
+        "operationId": "get_checkout_session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Checkout session ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Checkout session details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCheckoutSessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/checkout-sessions/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Checkout Sessions"
+        ],
+        "summary": "Cancel a checkout session",
+        "operationId": "cancel_checkout_session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Checkout session ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Checkout session cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelCheckoutSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - session cannot be cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/credit-notes/{credit_note_id}/download": {
+      "get": {
+        "tags": [
+          "Credit Notes"
+        ],
+        "operationId": "download_credit_note_pdf",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "description": "Credit Note ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CreditNoteId"
+            },
+            "example": "cn_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit Note PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Unused dummy struct only used for an OpenAPI definition."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Credit note not found or PDF not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/customers": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "List customers",
+        "description": "List customers with optional pagination and search filtering.",
+        "operationId": "list_customers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Create customer",
+        "operationId": "create_customer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Customer successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Customer already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/customers/{id_or_alias}": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Get customer",
+        "description": "Retrieve a single customer by ID or alias.",
+        "operationId": "get_customer",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "customer ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Update customer",
+        "operationId": "update_customer",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "customer ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Archive a customer",
+        "description": "No linked entity will be deleted. You need to terminate all active subscriptions before archiving a customer, or the call will fail.",
+        "operationId": "archive_customer",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "customer ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Patch customer",
+        "description": "Partially update a customer. Only provided fields will be updated.",
+        "operationId": "patch_customer",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "customer ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/customers/{id_or_alias}/portal-token": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Generate a portal token for a customer",
+        "description": "Generates a JWT token that grants access to the customer portal.\nThe token can be used to access invoices, payment methods, and other portal features.",
+        "operationId": "create_portal_token",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "customer ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portal token generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalTokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/customers/{id_or_alias}/unarchive": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Restore an archived customer",
+        "operationId": "unarchive_customer",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "customer ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/events/ingest": {
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Ingest events",
+        "description": "Ingest usage events for metering and billing purposes.",
+        "operationId": "ingest_events",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestEventsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Events ingested successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestEventsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List invoices",
+        "description": "List invoices with optional filtering by customer, subscription, or status.",
+        "operationId": "list_invoices",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "description": "Filter by customer ID or alias",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subscription_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SubscriptionId"
+            }
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/InvoiceStatus"
+              }
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of invoices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices/{invoice_id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Get invoice",
+        "description": "Retrieve a single invoice with its payment transactions.",
+        "operationId": "get_invoice_by_id",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "description": "Invoice ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/InvoiceId"
+            },
+            "example": "inv_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices/{invoice_id}/download": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Download invoice PDF",
+        "description": "Download the PDF document for an invoice.",
+        "operationId": "download_invoice_pdf",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "description": "Invoice ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/InvoiceId"
+            },
+            "example": "inv_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Unused dummy struct only used for an OpenAPI definition."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found or PDF not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/plans": {
+      "get": {
+        "tags": [
+          "Plan"
+        ],
+        "summary": "List plans",
+        "description": "List plans with optional filtering by product family.",
+        "operationId": "list_plans",
+        "parameters": [
+          {
+            "name": "product_family_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ProductFamilyId"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of plans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/plans/{plan_id}": {
+      "get": {
+        "tags": [
+          "Plan"
+        ],
+        "summary": "Get plan",
+        "description": "Retrieve the details of a specific plan",
+        "operationId": "get_plan_details",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "description": "Plan ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PlanId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Plan details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Plan not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/product_families": {
+      "get": {
+        "tags": [
+          "Product Family"
+        ],
+        "summary": "List product families",
+        "operationId": "list_product_families",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of product families",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductFamilyListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Product Family"
+        ],
+        "summary": "Create product family",
+        "operationId": "create_product_family",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductFamilyCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Customer successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductFamily"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/product_families/{id_or_alias}": {
+      "get": {
+        "tags": [
+          "Product Family"
+        ],
+        "summary": "Get product family",
+        "description": "Retrieve a single product family by ID or alias.",
+        "operationId": "get_product_family_by_id_or_alias",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "product_family ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ProductFamily",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductFamily"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions": {
+      "get": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "List subscriptions",
+        "description": "List subscriptions with optional filtering by customer or plan.",
+        "operationId": "list_subscriptions",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "description": "Filter by customer ID or alias",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "plan_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PlanId"
+            }
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/SubscriptionStatusEnum"
+              }
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of subscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Create subscription",
+        "description": "Create a new subscription for a customer with a specific plan.",
+        "operationId": "create_subscription",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Subscription successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/{id}": {
+      "get": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Get subscription details",
+        "description": "Retrieve detailed information about a subscription including price components and schedules.",
+        "operationId": "subscription_details",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "subscription ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SubscriptionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/{subscription_id}/cancel": {
+      "post": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Cancel subscription",
+        "description": "Cancel a subscription either immediately or at the end of the billing period.",
+        "operationId": "cancel_subscription",
+        "parameters": [
+          {
+            "name": "subscription_id",
+            "in": "path",
+            "description": "Subscription ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SubscriptionId"
+            },
+            "example": "sub_123"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelSubscriptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription canceled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelSubscriptionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddOnId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "add_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CountryCode"
+              }
+            ]
+          },
+          "line1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line2": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "zip_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "AppliedCoupon": {
+        "type": "object",
+        "required": [
+          "id",
+          "coupon_id",
+          "is_active",
+          "created_at"
+        ],
+        "properties": {
+          "applied_amount": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "decimal"
+          },
+          "applied_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "coupon_id": {
+            "$ref": "#/components/schemas/CouponId"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/AppliedCouponId"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "last_applied_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AppliedCouponDetailed": {
+        "type": "object",
+        "required": [
+          "coupon",
+          "applied_coupon"
+        ],
+        "properties": {
+          "applied_coupon": {
+            "$ref": "#/components/schemas/AppliedCoupon"
+          },
+          "coupon": {
+            "$ref": "#/components/schemas/Coupon"
+          }
+        }
+      },
+      "AppliedCouponId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "sub_cou_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "AvailableParameters": {
+        "type": "object",
+        "properties": {
+          "billing_periods": {
+            "type": "object",
+            "description": "Map of component_id -> available billing periods (e.g., \"MONTHLY\", \"ANNUAL\")",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/BillingPeriodEnum"
+              }
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "capacity_thresholds": {
+            "type": "object",
+            "description": "Map of component_id -> available capacity values",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              }
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "slot_components": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of component_ids that support slot parametrization (initial slot count)"
+          }
+        }
+      },
+      "BankAccountId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "ba_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "BillableMetricId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "bm_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "BillingMetricAggregateEnum": {
+        "type": "string",
+        "enum": [
+          "COUNT",
+          "LATEST",
+          "MAX",
+          "MIN",
+          "MEAN",
+          "SUM",
+          "COUNT_DISTINCT"
+        ]
+      },
+      "BillingPeriodEnum": {
+        "type": "string",
+        "enum": [
+          "MONTHLY",
+          "QUARTERLY",
+          "SEMIANNUAL",
+          "ANNUAL"
+        ]
+      },
+      "BillingType": {
+        "type": "string",
+        "enum": [
+          "ADVANCE",
+          "ARREARS"
+        ]
+      },
+      "BillingTypeEnum": {
+        "type": "string",
+        "enum": [
+          "ADVANCE",
+          "ARREARS"
+        ]
+      },
+      "CancelCheckoutSessionResponse": {
+        "type": "object",
+        "required": [
+          "session"
+        ],
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/CheckoutSession"
+          }
+        }
+      },
+      "CancelSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "effective_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "If not provided, the cancellation will be effective at the end of the current billing or committed period."
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CancelSubscriptionResponse": {
+        "type": "object",
+        "required": [
+          "subscription"
+        ],
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/Subscription"
+          }
+        }
+      },
+      "CapacityFee": {
+        "type": "object",
+        "required": [
+          "rate",
+          "included",
+          "overage_rate",
+          "metric_id"
+        ],
+        "properties": {
+          "included": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "overage_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "CapacityPlanFee": {
+        "type": "object",
+        "description": "Capacity-based fee with included committed usage and overage",
+        "required": [
+          "metric_id",
+          "thresholds",
+          "cadence"
+        ],
+        "properties": {
+          "cadence": {
+            "$ref": "#/components/schemas/BillingPeriodEnum"
+          },
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "thresholds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CapacityThreshold"
+            }
+          }
+        }
+      },
+      "CapacityThreshold": {
+        "type": "object",
+        "required": [
+          "included_amount",
+          "price",
+          "per_unit_overage"
+        ],
+        "properties": {
+          "included_amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "per_unit_overage": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          }
+        }
+      },
+      "CheckoutSession": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "plan_version_id",
+          "status",
+          "checkout_type",
+          "created_at"
+        ],
+        "properties": {
+          "billing_day_anchor": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "billing_start_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "checkout_type": {
+            "$ref": "#/components/schemas/CheckoutType"
+          },
+          "checkout_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "coupon_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the session expires. None means the session never expires."
+          },
+          "id": {
+            "$ref": "#/components/schemas/CheckoutSessionId"
+          },
+          "net_terms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "plan_version_id": {
+            "$ref": "#/components/schemas/PlanVersionId"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CheckoutSessionStatus"
+          },
+          "subscription_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SubscriptionId"
+              }
+            ]
+          },
+          "trial_duration_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CheckoutSessionId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "che_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "CheckoutSessionStatus": {
+        "type": "string",
+        "enum": [
+          "CREATED",
+          "AWAITING_PAYMENT",
+          "COMPLETED",
+          "EXPIRED",
+          "CANCELLED"
+        ]
+      },
+      "CheckoutType": {
+        "type": "string",
+        "enum": [
+          "SELF_SERVE",
+          "SUBSCRIPTION_ACTIVATION"
+        ]
+      },
+      "ComponentOverride": {
+        "type": "object",
+        "required": [
+          "component_id",
+          "component"
+        ],
+        "properties": {
+          "component": {
+            "$ref": "#/components/schemas/SubscriptionComponent"
+          },
+          "component_id": {
+            "$ref": "#/components/schemas/PriceComponentId"
+          }
+        }
+      },
+      "ComponentParameterization": {
+        "type": "object",
+        "required": [
+          "component_id",
+          "parameters"
+        ],
+        "properties": {
+          "component_id": {
+            "$ref": "#/components/schemas/PriceComponentId"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/ComponentParameters"
+          }
+        }
+      },
+      "ComponentParameters": {
+        "type": "object",
+        "properties": {
+          "billing_period": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BillingPeriodEnum"
+              }
+            ]
+          },
+          "committed_capacity": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "initial_slot_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "CountryCode": {
+        "type": "string",
+        "format": "CountryCode",
+        "examples": [
+          "US",
+          "GB",
+          "FR"
+        ]
+      },
+      "Coupon": {
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "description",
+          "discount",
+          "reusable",
+          "disabled"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "discount": {
+            "$ref": "#/components/schemas/CouponDiscount"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/CouponId"
+          },
+          "recurring_value": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "redemption_limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "reusable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CouponDiscount": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/PercentageDiscount"
+          },
+          {
+            "$ref": "#/components/schemas/FixedDiscount"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "discriminator",
+          "mapping": {
+            "FIXED": "#/components/schemas/FixedDiscount",
+            "PERCENTAGE": "#/components/schemas/PercentageDiscount"
+          }
+        }
+      },
+      "CouponId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "cou_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "CouponLineItem": {
+        "type": "object",
+        "required": [
+          "coupon_id",
+          "name",
+          "total"
+        ],
+        "properties": {
+          "coupon_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "CreateCheckoutSessionRequest": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "plan_version_id"
+        ],
+        "properties": {
+          "activation_condition": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SubscriptionActivationConditionEnum"
+              }
+            ]
+          },
+          "add_ons": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/CreateSubscriptionAddOn"
+            }
+          },
+          "auto_advance_invoices": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "If false, invoices will stay in Draft until manually reviewed and finalized. Default is true."
+          },
+          "billing_day_anchor": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "billing_start_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "charge_automatically": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Automatically try to charge the customer's configured payment method on finalize. Default is true."
+          },
+          "components": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CreateSubscriptionComponents"
+              }
+            ]
+          },
+          "coupon_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coupon_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CouponId"
+            }
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "expires_in_hours": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Session expiry time in hours. Default is 1 hour for self-serve checkout.",
+            "minimum": 0
+          },
+          "invoice_memo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invoice_threshold": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "decimal"
+          },
+          "metadata": {},
+          "net_terms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "payment_strategy": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PaymentStrategy"
+              }
+            ]
+          },
+          "plan_version_id": {
+            "$ref": "#/components/schemas/PlanVersionId"
+          },
+          "purchase_order": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trial_duration_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CreateCheckoutSessionResponse": {
+        "type": "object",
+        "required": [
+          "session"
+        ],
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/CheckoutSession"
+          }
+        }
+      },
+      "CreateSubscriptionAddOn": {
+        "type": "object",
+        "required": [
+          "add_on_id"
+        ],
+        "properties": {
+          "add_on_id": {
+            "$ref": "#/components/schemas/AddOnId"
+          },
+          "customization": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SubscriptionAddOnCustomization"
+              }
+            ]
+          }
+        }
+      },
+      "CreateSubscriptionComponents": {
+        "type": "object",
+        "properties": {
+          "extra_components": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ExtraComponent"
+            }
+          },
+          "overridden_components": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ComponentOverride"
+            }
+          },
+          "parameterized_components": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ComponentParameterization"
+            }
+          },
+          "remove_components": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PriceComponentId"
+            }
+          }
+        }
+      },
+      "CreditNoteEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreditNoteEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "CreditNoteEventData": {
+        "type": "object",
+        "required": [
+          "credit_note_id",
+          "customer_id",
+          "invoice_id",
+          "status",
+          "currency",
+          "total",
+          "tax_amount",
+          "refunded_amount_cents",
+          "credited_amount_cents",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "credit_note_id": {
+            "$ref": "#/components/schemas/CreditNoteId"
+          },
+          "credited_amount_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "invoice_id": {
+            "$ref": "#/components/schemas/InvoiceId"
+          },
+          "refunded_amount_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CreditNoteStatus"
+          },
+          "tax_amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "CreditNoteId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "crn_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "CreditNoteStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "FINALIZED",
+          "VOIDED"
+        ]
+      },
+      "Currency": {
+        "type": "string",
+        "enum": [
+          "AED",
+          "AFN",
+          "ALL",
+          "AMD",
+          "ANG",
+          "AOA",
+          "ARS",
+          "AUD",
+          "AWG",
+          "AZN",
+          "BAM",
+          "BBD",
+          "BDT",
+          "BGN",
+          "BHD",
+          "BIF",
+          "BMD",
+          "BND",
+          "BOB",
+          "BRL",
+          "BSD",
+          "BTN",
+          "BWP",
+          "BYN",
+          "BZD",
+          "CAD",
+          "CDF",
+          "CHF",
+          "CLP",
+          "CNH",
+          "CNY",
+          "COP",
+          "CRC",
+          "CUC",
+          "CUP",
+          "CVE",
+          "CZK",
+          "DJF",
+          "DKK",
+          "DOP",
+          "DZD",
+          "EGP",
+          "ERN",
+          "ETB",
+          "EUR",
+          "FJD",
+          "FKP",
+          "GBP",
+          "GEL",
+          "GHS",
+          "GIP",
+          "GMD",
+          "GNF",
+          "GTQ",
+          "GYD",
+          "HKD",
+          "HNL",
+          "HRK",
+          "HTG",
+          "HUF",
+          "IDR",
+          "ILS",
+          "INR",
+          "IQD",
+          "IRR",
+          "ISK",
+          "JMD",
+          "JOD",
+          "JPY",
+          "KES",
+          "KGS",
+          "KHR",
+          "KMF",
+          "KPW",
+          "KRW",
+          "KWD",
+          "KYD",
+          "KZT",
+          "LAK",
+          "LBP",
+          "LKR",
+          "LRD",
+          "LSL",
+          "LYD",
+          "MAD",
+          "MDL",
+          "MGA",
+          "MKD",
+          "MMK",
+          "MNT",
+          "MOP",
+          "MRU",
+          "MUR",
+          "MVR",
+          "MWK",
+          "MXN",
+          "MYR",
+          "MZN",
+          "NAD",
+          "NGN",
+          "NIO",
+          "NOK",
+          "NPR",
+          "NZD",
+          "OMR",
+          "PAB",
+          "PEN",
+          "PGK",
+          "PHP",
+          "PKR",
+          "PLN",
+          "PYG",
+          "QAR",
+          "RON",
+          "RSD",
+          "RUB",
+          "RWF",
+          "SAR",
+          "SBD",
+          "SCR",
+          "SDG",
+          "SEK",
+          "SGD",
+          "SHP",
+          "SLL",
+          "SOS",
+          "SRD",
+          "SSP",
+          "STD",
+          "STN",
+          "SVC",
+          "SYP",
+          "SZL",
+          "THB",
+          "TJS",
+          "TMT",
+          "TND",
+          "TOP",
+          "TRY",
+          "TTD",
+          "TWD",
+          "TZS",
+          "UAH",
+          "UGX",
+          "USD",
+          "UYU",
+          "UZS",
+          "VES",
+          "VND",
+          "VUV",
+          "WST",
+          "XAF",
+          "XCD",
+          "XOF",
+          "XPF",
+          "YER",
+          "ZAR",
+          "ZMW",
+          "ZWL"
+        ],
+        "examples": [
+          "EUR"
+        ]
+      },
+      "CustomTaxRate": {
+        "type": "object",
+        "required": [
+          "tax_code",
+          "name",
+          "rate"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "string"
+          },
+          "tax_code": {
+            "type": "string"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "invoicing_emails",
+          "currency",
+          "invoicing_entity_id",
+          "custom_taxes"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bank_account_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BankAccountId"
+              }
+            ]
+          },
+          "billing_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
+          },
+          "billing_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "custom_taxes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomTaxRate"
+            }
+          },
+          "id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "invoicing_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "invoicing_entity_id": {
+            "$ref": "#/components/schemas/InvoicingEntityId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shipping_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ShippingAddress"
+              }
+            ]
+          },
+          "vat_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomerCreateRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "invoicing_emails",
+          "currency",
+          "custom_taxes"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bank_account_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BankAccountId"
+              }
+            ]
+          },
+          "billing_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
+          },
+          "billing_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "custom_taxes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomTaxRate"
+            }
+          },
+          "invoicing_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "invoicing_entity_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/InvoicingEntityId"
+              }
+            ]
+          },
+          "is_tax_exempt": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shipping_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ShippingAddress"
+              }
+            ]
+          },
+          "vat_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomerDetails": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "snapshot_at"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "billing_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "snapshot_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "vat_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomerEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomerEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ],
+        "description": "Event-specific webhook schemas for type-safe webhook payloads"
+      },
+      "CustomerEventData": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "name",
+          "invoicing_emails",
+          "currency"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "billing_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": "string"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "invoicing_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomerId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "cus_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "CustomerListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Customer"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "CustomerPatchRequest": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bank_account_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BankAccountId"
+              }
+            ]
+          },
+          "billing_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
+          },
+          "billing_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Currency"
+              }
+            ]
+          },
+          "custom_taxes": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/CustomTaxRate"
+            }
+          },
+          "invoicing_emails": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "invoicing_entity_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/InvoicingEntityId"
+              }
+            ]
+          },
+          "is_tax_exempt": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shipping_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ShippingAddress"
+              }
+            ]
+          },
+          "vat_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomerPaymentMethodId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "pm_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "CustomerPortalTokenResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "portal_url"
+        ],
+        "properties": {
+          "portal_url": {
+            "type": "string",
+            "description": "Base URL of the customer portal"
+          },
+          "token": {
+            "type": "string",
+            "description": "JWT token for portal access"
+          }
+        }
+      },
+      "CustomerUpdateRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "invoicing_emails",
+          "currency",
+          "invoicing_entity_id",
+          "custom_taxes"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bank_account_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BankAccountId"
+              }
+            ]
+          },
+          "billing_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
+          },
+          "billing_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "custom_taxes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomTaxRate"
+            }
+          },
+          "invoicing_emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "invoicing_entity_id": {
+            "$ref": "#/components/schemas/InvoicingEntityId"
+          },
+          "is_tax_exempt": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shipping_address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ShippingAddress"
+              }
+            ]
+          },
+          "vat_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "BAD_REQUEST",
+          "NOT_FOUND",
+          "CONFLICT",
+          "FORBIDDEN",
+          "UNAUTHORIZED",
+          "INTERNAL_SERVER_ERROR"
+        ]
+      },
+      "Event": {
+        "type": "object",
+        "required": [
+          "event_id",
+          "code",
+          "customer_id",
+          "timestamp"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Either Meteroid's customer_id or an alias"
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        }
+      },
+      "EventId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "evt_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "EventType": {
+        "type": "string",
+        "enum": [
+          "metric.created",
+          "customer.created",
+          "subscription.created",
+          "invoice.created",
+          "invoice.finalized",
+          "invoice.paid",
+          "invoice.voided",
+          "quote.accepted",
+          "quote.converted",
+          "credit_note.created",
+          "credit_note.finalized",
+          "credit_note.voided"
+        ]
+      },
+      "ExtraComponent": {
+        "type": "object",
+        "required": [
+          "component"
+        ],
+        "properties": {
+          "component": {
+            "$ref": "#/components/schemas/SubscriptionComponent"
+          }
+        }
+      },
+      "ExtraRecurringPlanFee": {
+        "type": "object",
+        "description": "Extra recurring fee",
+        "required": [
+          "unit_price",
+          "quantity",
+          "billing_type",
+          "cadence"
+        ],
+        "properties": {
+          "billing_type": {
+            "$ref": "#/components/schemas/BillingType"
+          },
+          "cadence": {
+            "$ref": "#/components/schemas/BillingPeriodEnum"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "unit_price": {
+            "type": "string"
+          }
+        }
+      },
+      "Fee": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RatePlanFee"
+          },
+          {
+            "$ref": "#/components/schemas/SlotPlanFee"
+          },
+          {
+            "$ref": "#/components/schemas/CapacityPlanFee"
+          },
+          {
+            "$ref": "#/components/schemas/UsagePlanFee"
+          },
+          {
+            "$ref": "#/components/schemas/ExtraRecurringPlanFee"
+          },
+          {
+            "$ref": "#/components/schemas/OneTimePlanFee"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "fee_type",
+          "mapping": {
+            "capacity": "#/components/schemas/CapacityPlanFee",
+            "extra_recurring": "#/components/schemas/ExtraRecurringPlanFee",
+            "one_time": "#/components/schemas/OneTimePlanFee",
+            "rate": "#/components/schemas/RatePlanFee",
+            "slot": "#/components/schemas/SlotPlanFee",
+            "usage": "#/components/schemas/UsagePlanFee"
+          }
+        }
+      },
+      "FixedDiscount": {
+        "type": "object",
+        "required": [
+          "currency",
+          "amount"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "GetCheckoutSessionResponse": {
+        "type": "object",
+        "required": [
+          "session"
+        ],
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/CheckoutSession"
+          }
+        }
+      },
+      "IngestEventsRequest": {
+        "type": "object",
+        "required": [
+          "events"
+        ],
+        "properties": {
+          "allow_backfilling": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "allow ingesting events with timestamps more than a day in the past"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          }
+        }
+      },
+      "IngestEventsResponse": {
+        "type": "object",
+        "properties": {
+          "failures": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IngestFailure"
+            }
+          }
+        }
+      },
+      "IngestFailure": {
+        "type": "object",
+        "required": [
+          "event_id",
+          "reason"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "required": [
+          "id",
+          "invoice_number",
+          "status",
+          "customer_id",
+          "currency",
+          "invoice_date",
+          "subtotal",
+          "subtotal_recurring",
+          "tax_amount",
+          "total",
+          "amount_due",
+          "line_items",
+          "tax_breakdown",
+          "transactions",
+          "payment_status",
+          "customer_details",
+          "applied_credits",
+          "coupons",
+          "invoice_type",
+          "net_terms",
+          "created_at"
+        ],
+        "properties": {
+          "amount_due": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "applied_credits": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "coupons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CouponLineItem"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "customer_details": {
+            "$ref": "#/components/schemas/CustomerDetails"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "due_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "finalized_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/InvoiceId"
+          },
+          "invoice_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "invoice_number": {
+            "type": "string"
+          },
+          "invoice_type": {
+            "$ref": "#/components/schemas/InvoiceType"
+          },
+          "line_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLineItem"
+            }
+          },
+          "marked_as_uncollectible_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "memo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "net_terms": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paid_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/InvoicePaymentStatus"
+          },
+          "purchase_order": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/InvoiceStatus"
+          },
+          "subscription_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SubscriptionId"
+              }
+            ]
+          },
+          "subtotal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "subtotal_recurring": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tax_amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tax_breakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxBreakdownItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "voided_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "InvoiceEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InvoiceEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "InvoiceEventData": {
+        "type": "object",
+        "required": [
+          "invoice_id",
+          "customer_id",
+          "status",
+          "currency",
+          "total",
+          "tax_amount",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "invoice_id": {
+            "$ref": "#/components/schemas/InvoiceId"
+          },
+          "status": {
+            "$ref": "#/components/schemas/InvoiceStatus"
+          },
+          "tax_amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "InvoiceId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "inv_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "InvoiceLineItem": {
+        "type": "object",
+        "required": [
+          "name",
+          "amount_total",
+          "start_date",
+          "end_date",
+          "tax_rate",
+          "sub_line_items"
+        ],
+        "properties": {
+          "amount_total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "sub_line_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubLineItem"
+            }
+          },
+          "tax_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "unit_price": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "InvoiceListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Invoice"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "InvoicePaymentStatus": {
+        "type": "string",
+        "enum": [
+          "Unpaid",
+          "PartiallyPaid",
+          "Paid",
+          "Errored"
+        ]
+      },
+      "InvoiceStatus": {
+        "type": "string",
+        "enum": [
+          "Draft",
+          "Finalized",
+          "Uncollectible",
+          "Void"
+        ]
+      },
+      "InvoiceType": {
+        "type": "string",
+        "enum": [
+          "Recurring",
+          "OneOff",
+          "Adjustment",
+          "UsageThreshold"
+        ]
+      },
+      "InvoicingEntityId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "ive_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "ListCheckoutSessionsResponse": {
+        "type": "object",
+        "required": [
+          "sessions"
+        ],
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckoutSession"
+            }
+          }
+        }
+      },
+      "MatrixDimension": {
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "MatrixPlanPricing": {
+        "type": "object",
+        "required": [
+          "rates"
+        ],
+        "properties": {
+          "rates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatrixRow"
+            }
+          }
+        }
+      },
+      "MatrixPricing": {
+        "type": "object",
+        "required": [
+          "rates"
+        ],
+        "properties": {
+          "rates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatrixRow"
+            }
+          }
+        }
+      },
+      "MatrixRow": {
+        "type": "object",
+        "required": [
+          "dimension1",
+          "per_unit_price"
+        ],
+        "properties": {
+          "dimension1": {
+            "$ref": "#/components/schemas/MatrixDimension"
+          },
+          "dimension2": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MatrixDimension"
+              }
+            ]
+          },
+          "per_unit_price": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "MetricDimension": {
+        "type": "object",
+        "required": [
+          "key",
+          "values"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "MetricEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MetricEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "MetricEventData": {
+        "type": "object",
+        "required": [
+          "metric_id",
+          "name",
+          "code",
+          "aggregation_type",
+          "created_at",
+          "product_family_id"
+        ],
+        "properties": {
+          "aggregation_key": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "aggregation_type": {
+            "$ref": "#/components/schemas/BillingMetricAggregateEnum"
+          },
+          "code": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "product_family_id": {
+            "$ref": "#/components/schemas/ProductFamilyId"
+          },
+          "product_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProductId"
+              }
+            ]
+          },
+          "segmentation_matrix": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+              }
+            ]
+          },
+          "unit_conversion_factor": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "unit_conversion_rounding": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/UnitConversionRoundingEnum"
+              }
+            ]
+          },
+          "usage_group_key": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "MetricSegmentationMatrix": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/MetricDimension"
+          },
+          {
+            "type": "object",
+            "required": [
+              "dimension1",
+              "dimension2",
+              "discriminator"
+            ],
+            "properties": {
+              "dimension1": {
+                "$ref": "#/components/schemas/MetricDimension"
+              },
+              "dimension2": {
+                "$ref": "#/components/schemas/MetricDimension"
+              },
+              "discriminator": {
+                "type": "string",
+                "enum": [
+                  "DOUBLE"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "dimension1_key",
+              "dimension2_key",
+              "values",
+              "discriminator"
+            ],
+            "properties": {
+              "dimension1_key": {
+                "type": "string"
+              },
+              "dimension2_key": {
+                "type": "string"
+              },
+              "discriminator": {
+                "type": "string",
+                "enum": [
+                  "LINKED"
+                ]
+              },
+              "values": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "propertyNames": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "discriminator": {
+          "propertyName": "discriminator",
+          "mapping": {
+            "SINGLE": "#/components/schemas/MetricDimension"
+          }
+        }
+      },
+      "OneTimeFee": {
+        "type": "object",
+        "required": [
+          "rate",
+          "quantity"
+        ],
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "OneTimePlanFee": {
+        "type": "object",
+        "description": "One-time fee",
+        "required": [
+          "unit_price",
+          "quantity"
+        ],
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "unit_price": {
+            "type": "string"
+          }
+        }
+      },
+      "PackagePlanPricing": {
+        "type": "object",
+        "required": [
+          "block_size",
+          "rate"
+        ],
+        "properties": {
+          "block_size": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "rate": {
+            "type": "string"
+          }
+        }
+      },
+      "PackagePricing": {
+        "type": "object",
+        "required": [
+          "block_size",
+          "rate"
+        ],
+        "properties": {
+          "block_size": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "PaginationResponse": {
+        "type": "object",
+        "required": [
+          "page",
+          "per_page",
+          "total_items",
+          "total_pages"
+        ],
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "per_page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total_items": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "total_pages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "PaymentMethodInfo": {
+        "type": "object",
+        "required": [
+          "payment_method_type"
+        ],
+        "properties": {
+          "account_number_hint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "card_brand": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "card_last4": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "payment_method_type": {
+            "$ref": "#/components/schemas/PaymentMethodTypeEnum"
+          }
+        }
+      },
+      "PaymentMethodTypeEnum": {
+        "type": "string",
+        "enum": [
+          "Card",
+          "BankTransfer",
+          "Wallet",
+          "Other"
+        ]
+      },
+      "PaymentStatusEnum": {
+        "type": "string",
+        "enum": [
+          "Ready",
+          "Pending",
+          "Settled",
+          "Cancelled",
+          "Failed"
+        ]
+      },
+      "PaymentStrategy": {
+        "type": "string",
+        "enum": [
+          "AUTO",
+          "BANK",
+          "EXTERNAL"
+        ]
+      },
+      "PaymentTransactionId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "pay_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "PaymentTypeEnum": {
+        "type": "string",
+        "enum": [
+          "Payment",
+          "Refund"
+        ]
+      },
+      "PerUnitPlanPricing": {
+        "type": "object",
+        "required": [
+          "rate"
+        ],
+        "properties": {
+          "rate": {
+            "type": "string"
+          }
+        }
+      },
+      "PerUnitPricing": {
+        "type": "object",
+        "required": [
+          "rate"
+        ],
+        "properties": {
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "PercentageDiscount": {
+        "type": "object",
+        "required": [
+          "percentage"
+        ],
+        "properties": {
+          "percentage": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "Plan": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "plan_type",
+          "status",
+          "product_family",
+          "version_id",
+          "version",
+          "currency",
+          "net_terms",
+          "price_components",
+          "available_parameters"
+        ],
+        "properties": {
+          "available_parameters": {
+            "$ref": "#/components/schemas/AvailableParameters"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "$ref": "#/components/schemas/PlanId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "net_terms": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "plan_type": {
+            "$ref": "#/components/schemas/PlanTypeEnum"
+          },
+          "price_components": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PriceComponent"
+            }
+          },
+          "product_family": {
+            "$ref": "#/components/schemas/ProductFamily"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PlanStatusEnum"
+          },
+          "trial": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TrialConfig"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "version_id": {
+            "$ref": "#/components/schemas/PlanVersionId"
+          }
+        }
+      },
+      "PlanId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "plan_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "PlanListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Plan"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "PlanStatusEnum": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "ACTIVE",
+          "INACTIVE",
+          "ARCHIVED"
+        ]
+      },
+      "PlanTypeEnum": {
+        "type": "string",
+        "enum": [
+          "STANDARD",
+          "FREE",
+          "CUSTOM"
+        ]
+      },
+      "PlanVersionId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "plv_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "PriceComponent": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "fee"
+        ],
+        "properties": {
+          "fee": {
+            "$ref": "#/components/schemas/Fee"
+          },
+          "id": {
+            "$ref": "#/components/schemas/PriceComponentId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "product_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProductId"
+              }
+            ]
+          }
+        }
+      },
+      "PriceComponentId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "price_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "ProductFamily": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ProductFamilyId"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductFamilyCreateRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductFamilyId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "pf_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "ProductFamilyListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductFamily"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "ProductId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "prd_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "QuoteEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/QuoteEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "QuoteEventData": {
+        "type": "object",
+        "required": [
+          "quote_id",
+          "customer_id"
+        ],
+        "properties": {
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "quote_id": {
+            "$ref": "#/components/schemas/QuoteId"
+          },
+          "subscription_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SubscriptionId"
+              }
+            ]
+          }
+        }
+      },
+      "QuoteId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "quo_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "RateFee": {
+        "type": "object",
+        "required": [
+          "rate"
+        ],
+        "properties": {
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "RatePlanFee": {
+        "type": "object",
+        "description": "Recurring rate fee (e.g., monthly subscription)",
+        "required": [
+          "rates"
+        ],
+        "properties": {
+          "rates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TermRate"
+            }
+          }
+        }
+      },
+      "RecurringFee": {
+        "type": "object",
+        "required": [
+          "rate",
+          "quantity",
+          "billing_type"
+        ],
+        "properties": {
+          "billing_type": {
+            "$ref": "#/components/schemas/BillingTypeEnum"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "RestErrorResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ShippingAddress": {
+        "type": "object",
+        "required": [
+          "same_as_billing"
+        ],
+        "properties": {
+          "address": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
+          },
+          "same_as_billing": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SlotFee": {
+        "type": "object",
+        "required": [
+          "unit",
+          "unit_rate",
+          "initial_slots"
+        ],
+        "properties": {
+          "initial_slots": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "max_slots": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "min_slots": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unit_rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "SlotPlanFee": {
+        "type": "object",
+        "description": "Slot-based fee (e.g., per-seat pricing)",
+        "required": [
+          "rates",
+          "slot_unit_name"
+        ],
+        "properties": {
+          "minimum_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "quota": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "rates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TermRate"
+            }
+          },
+          "slot_unit_name": {
+            "type": "string"
+          }
+        }
+      },
+      "SubLineItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "total",
+          "quantity",
+          "unit_price"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "unit_price": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "customer_name",
+          "billing_day_anchor",
+          "currency",
+          "plan_id",
+          "plan_name",
+          "plan_version_id",
+          "plan_version",
+          "status",
+          "start_date",
+          "current_period_start",
+          "net_terms",
+          "mrr_cents",
+          "period",
+          "created_at",
+          "auto_advance_invoices",
+          "charge_automatically"
+        ],
+        "properties": {
+          "activated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the subscription was activated (first payment or activation condition met)"
+          },
+          "auto_advance_invoices": {
+            "type": "boolean",
+            "description": "If false, invoices will stay in Draft until manually reviewed and finalized. Default to true."
+          },
+          "billing_day_anchor": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "billing_start_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "When billing started (after any trial period)"
+          },
+          "charge_automatically": {
+            "type": "boolean",
+            "description": "Automatically try to charge the customer's configured payment method on finalize."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the subscription was created"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "current_period_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Current billing period end date"
+          },
+          "current_period_start": {
+            "type": "string",
+            "format": "date",
+            "description": "Current billing period start date"
+          },
+          "customer_alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "When the subscription ends (if set)"
+          },
+          "id": {
+            "$ref": "#/components/schemas/SubscriptionId"
+          },
+          "invoice_memo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Default memo for invoices"
+          },
+          "mrr_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Monthly recurring revenue in cents",
+            "minimum": 0
+          },
+          "net_terms": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Payment terms in days (0 = due on issue)",
+            "minimum": 0
+          },
+          "period": {
+            "$ref": "#/components/schemas/BillingPeriodEnum",
+            "description": "Billing period (monthly, annual, etc.)"
+          },
+          "plan_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plan_id": {
+            "$ref": "#/components/schemas/PlanId"
+          },
+          "plan_name": {
+            "type": "string"
+          },
+          "plan_version": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "plan_version_id": {
+            "$ref": "#/components/schemas/PlanVersionId"
+          },
+          "purchase_order": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "When the subscription contract starts (benefits apply from this date)"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatusEnum"
+          },
+          "trial_duration": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Trial duration in days",
+            "minimum": 0
+          }
+        }
+      },
+      "SubscriptionActivationConditionEnum": {
+        "type": "string",
+        "enum": [
+          "ON_START",
+          "ON_CHECKOUT",
+          "MANUAL"
+        ]
+      },
+      "SubscriptionAddOn": {
+        "type": "object",
+        "required": [
+          "name",
+          "period",
+          "fee"
+        ],
+        "properties": {
+          "add_on_id": {
+            "$ref": "#/components/schemas/AddOnId"
+          },
+          "fee": {
+            "$ref": "#/components/schemas/SubscriptionFee"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/SubscriptionFeeBillingPeriodEnum"
+          }
+        }
+      },
+      "SubscriptionAddOnCustomization": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SubscriptionAddOnOverride"
+          },
+          {
+            "$ref": "#/components/schemas/SubscriptionAddOnParameterization"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "discriminator",
+          "mapping": {
+            "OVERRIDE": "#/components/schemas/SubscriptionAddOnOverride",
+            "PARAMETERIZATION": "#/components/schemas/SubscriptionAddOnParameterization"
+          }
+        }
+      },
+      "SubscriptionAddOnOverride": {
+        "type": "object",
+        "required": [
+          "name",
+          "period",
+          "fee"
+        ],
+        "properties": {
+          "fee": {
+            "$ref": "#/components/schemas/SubscriptionFee"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/SubscriptionFeeBillingPeriodEnum"
+          }
+        }
+      },
+      "SubscriptionAddOnParameterization": {
+        "type": "object",
+        "properties": {
+          "billing_period": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BillingPeriodEnum"
+              }
+            ]
+          },
+          "committed_capacity": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "initial_slot_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "SubscriptionComponent": {
+        "type": "object",
+        "required": [
+          "name",
+          "period",
+          "fee"
+        ],
+        "properties": {
+          "fee": {
+            "$ref": "#/components/schemas/SubscriptionFee"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/SubscriptionFeeBillingPeriodEnum"
+          },
+          "price_component_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PriceComponentId"
+              }
+            ]
+          },
+          "product_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProductId"
+              }
+            ]
+          }
+        }
+      },
+      "SubscriptionCreateRequest": {
+        "type": "object",
+        "required": [
+          "plan_id",
+          "customer_id_or_alias",
+          "start_date",
+          "activation_condition"
+        ],
+        "properties": {
+          "activation_condition": {
+            "$ref": "#/components/schemas/SubscriptionActivationConditionEnum"
+          },
+          "add_ons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateSubscriptionAddOn"
+            }
+          },
+          "auto_advance_invoices": {
+            "type": "boolean"
+          },
+          "billing_day_anchor": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "maximum": 32767,
+            "minimum": 1
+          },
+          "charge_automatically": {
+            "type": "boolean"
+          },
+          "coupon_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "customer_id_or_alias": {
+            "type": "string",
+            "format": "CustomerId or customer alias"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2025-11-01"
+            ]
+          },
+          "invoice_memo": {
+            "type": "string"
+          },
+          "net_terms": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "plan_id": {
+            "$ref": "#/components/schemas/PlanId"
+          },
+          "price_components": {
+            "$ref": "#/components/schemas/CreateSubscriptionComponents"
+          },
+          "purchase_order": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2024-11-01"
+            ]
+          },
+          "trial_days": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SubscriptionDetails": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "customer_name",
+          "billing_day_anchor",
+          "currency",
+          "plan_id",
+          "plan_name",
+          "plan_version_id",
+          "plan_version",
+          "status",
+          "start_date",
+          "current_period_start",
+          "net_terms",
+          "mrr_cents",
+          "period",
+          "created_at",
+          "auto_advance_invoices",
+          "charge_automatically",
+          "components",
+          "add_ons",
+          "applied_coupons"
+        ],
+        "properties": {
+          "activated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the subscription was activated (first payment or activation condition met)"
+          },
+          "add_ons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionAddOn"
+            }
+          },
+          "applied_coupons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppliedCouponDetailed"
+            }
+          },
+          "auto_advance_invoices": {
+            "type": "boolean"
+          },
+          "billing_day_anchor": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "billing_start_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "When billing started (after any trial period)"
+          },
+          "charge_automatically": {
+            "type": "boolean"
+          },
+          "checkout_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionComponent"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the subscription was created"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "current_period_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Current billing period end date"
+          },
+          "current_period_start": {
+            "type": "string",
+            "format": "date",
+            "description": "Current billing period start date"
+          },
+          "customer_alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "When the subscription ends (if set)"
+          },
+          "id": {
+            "$ref": "#/components/schemas/SubscriptionId"
+          },
+          "invoice_memo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Default memo for invoices"
+          },
+          "mrr_cents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Monthly recurring revenue in cents",
+            "minimum": 0
+          },
+          "net_terms": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Payment terms in days (0 = due on issue)",
+            "minimum": 0
+          },
+          "period": {
+            "$ref": "#/components/schemas/BillingPeriodEnum",
+            "description": "Billing period (monthly, annual, etc.)"
+          },
+          "plan_id": {
+            "$ref": "#/components/schemas/PlanId"
+          },
+          "plan_name": {
+            "type": "string"
+          },
+          "plan_version": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "plan_version_id": {
+            "$ref": "#/components/schemas/PlanVersionId"
+          },
+          "purchase_order": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "When the subscription contract starts (benefits apply from this date)"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatusEnum"
+          },
+          "trial_duration": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Trial duration in days",
+            "minimum": 0
+          }
+        }
+      },
+      "SubscriptionEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SubscriptionEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "SubscriptionEventData": {
+        "type": "object",
+        "required": [
+          "subscription_id",
+          "customer_id",
+          "customer_name",
+          "billing_day_anchor",
+          "currency",
+          "start_date",
+          "plan_name",
+          "version",
+          "created_at",
+          "net_terms",
+          "mrr_cents",
+          "period",
+          "status"
+        ],
+        "properties": {
+          "activated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "billing_day_anchor": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "billing_start_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "customer_alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "invoice_memo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invoice_threshold": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mrr_cents": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "net_terms": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "period": {
+            "$ref": "#/components/schemas/BillingPeriodEnum"
+          },
+          "plan_name": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatusEnum"
+          },
+          "subscription_id": {
+            "$ref": "#/components/schemas/SubscriptionId"
+          },
+          "trial_duration": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "SubscriptionFee": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RateFee"
+          },
+          {
+            "$ref": "#/components/schemas/OneTimeFee"
+          },
+          {
+            "$ref": "#/components/schemas/RecurringFee"
+          },
+          {
+            "$ref": "#/components/schemas/CapacityFee"
+          },
+          {
+            "$ref": "#/components/schemas/SlotFee"
+          },
+          {
+            "$ref": "#/components/schemas/UsageFee"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "discriminator",
+          "mapping": {
+            "CAPACITY": "#/components/schemas/CapacityFee",
+            "ONE_TIME": "#/components/schemas/OneTimeFee",
+            "RATE": "#/components/schemas/RateFee",
+            "RECURRING": "#/components/schemas/RecurringFee",
+            "SLOT": "#/components/schemas/SlotFee",
+            "USAGE": "#/components/schemas/UsageFee"
+          }
+        }
+      },
+      "SubscriptionFeeBillingPeriodEnum": {
+        "type": "string",
+        "enum": [
+          "ONE_TIME",
+          "MONTHLY",
+          "QUARTERLY",
+          "SEMIANNUAL",
+          "ANNUAL"
+        ]
+      },
+      "SubscriptionId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "sub_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "SubscriptionListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "SubscriptionStatusEnum": {
+        "type": "string",
+        "enum": [
+          "PENDING_ACTIVATION",
+          "PENDING_CHARGE",
+          "TRIAL_ACTIVE",
+          "ACTIVE",
+          "TRIAL_EXPIRED",
+          "PAUSED",
+          "SUSPENDED",
+          "CANCELLED",
+          "COMPLETED",
+          "SUPERSEDED",
+          "ERRORED"
+        ]
+      },
+      "TaxBreakdownItem": {
+        "type": "object",
+        "required": [
+          "taxable_amount",
+          "tax_amount",
+          "tax_rate",
+          "name"
+        ],
+        "properties": {
+          "exemption_type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TaxExemptionType"
+              }
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "tax_amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "tax_rate": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "taxable_amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "TaxExemptionType": {
+        "type": "string",
+        "enum": [
+          "ReverseCharge",
+          "TaxExempt",
+          "NotRegistered"
+        ]
+      },
+      "TermRate": {
+        "type": "object",
+        "required": [
+          "term",
+          "price"
+        ],
+        "properties": {
+          "price": {
+            "type": "string"
+          },
+          "term": {
+            "$ref": "#/components/schemas/BillingPeriodEnum"
+          }
+        }
+      },
+      "TierRow": {
+        "type": "object",
+        "required": [
+          "first_unit",
+          "rate",
+          "flat_fee",
+          "flat_cap"
+        ],
+        "properties": {
+          "first_unit": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "flat_cap": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "flat_fee": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "TieredPlanPricing": {
+        "type": "object",
+        "required": [
+          "tiers"
+        ],
+        "properties": {
+          "block_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TierRow"
+            }
+          }
+        }
+      },
+      "TieredPricing": {
+        "type": "object",
+        "required": [
+          "tiers"
+        ],
+        "properties": {
+          "block_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TierRow"
+            }
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "required": [
+          "id",
+          "amount",
+          "currency",
+          "status",
+          "payment_type"
+        ],
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "$ref": "#/components/schemas/PaymentTransactionId"
+          },
+          "payment_method_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CustomerPaymentMethodId"
+              }
+            ]
+          },
+          "payment_method_info": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PaymentMethodInfo"
+              }
+            ]
+          },
+          "payment_type": {
+            "$ref": "#/components/schemas/PaymentTypeEnum"
+          },
+          "processed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "provider_transaction_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/PaymentStatusEnum"
+          }
+        }
+      },
+      "TrialConfig": {
+        "type": "object",
+        "required": [
+          "duration_days",
+          "is_free"
+        ],
+        "properties": {
+          "duration_days": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "is_free": {
+            "type": "boolean"
+          },
+          "trialing_plan_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PlanId"
+              }
+            ]
+          }
+        }
+      },
+      "UnitConversionRoundingEnum": {
+        "type": "string",
+        "enum": [
+          "UP",
+          "DOWN",
+          "NEAREST",
+          "NEAREST_HALF",
+          "NEAREST_DECILE",
+          "NONE"
+        ]
+      },
+      "UsageFee": {
+        "type": "object",
+        "required": [
+          "metric_id",
+          "model"
+        ],
+        "properties": {
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "model": {
+            "$ref": "#/components/schemas/UsagePricingModel"
+          }
+        }
+      },
+      "UsagePlanFee": {
+        "type": "object",
+        "description": "Usage-based fee",
+        "required": [
+          "metric_id",
+          "pricing",
+          "cadence"
+        ],
+        "properties": {
+          "cadence": {
+            "$ref": "#/components/schemas/BillingPeriodEnum"
+          },
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/UsagePricingModel"
+          }
+        }
+      },
+      "UsagePricingModel": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/PerUnitPricing"
+          },
+          {
+            "$ref": "#/components/schemas/TieredPricing"
+          },
+          {
+            "$ref": "#/components/schemas/VolumePricing"
+          },
+          {
+            "$ref": "#/components/schemas/PackagePricing"
+          },
+          {
+            "$ref": "#/components/schemas/MatrixPricing"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "discriminator",
+          "mapping": {
+            "MATRIX": "#/components/schemas/MatrixPricing",
+            "PACKAGE": "#/components/schemas/PackagePricing",
+            "PER_UNIT": "#/components/schemas/PerUnitPricing",
+            "TIERED": "#/components/schemas/TieredPricing",
+            "VOLUME": "#/components/schemas/VolumePricing"
+          }
+        }
+      },
+      "VolumePlanPricing": {
+        "type": "object",
+        "required": [
+          "tiers"
+        ],
+        "properties": {
+          "block_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TierRow"
+            }
+          }
+        }
+      },
+      "VolumePricing": {
+        "type": "object",
+        "required": [
+          "tiers"
+        ],
+        "properties": {
+          "block_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": 0
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TierRow"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer_auth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Meteroid",
+      "description": "Meteroid API"
+    }
+  ],
+  "webhooks": {
+    "credit_note.created": {
+      "post": {
+        "summary": "credit_note.created webhook",
+        "description": "A new credit note was created",
+        "operationId": "webhook_credit_note_created",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditNoteEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "credit_note.created",
+                "credit_note_id": "crn_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "DRAFT",
+                "currency": "EUR",
+                "total": 5000,
+                "tax_amount": 1000,
+                "refunded_amount_cents": 0,
+                "credited_amount_cents": 5000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "credit_note.finalized": {
+      "post": {
+        "summary": "credit_note.finalized webhook",
+        "description": "A credit note was finalized",
+        "operationId": "webhook_credit_note_finalized",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditNoteEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "credit_note.finalized",
+                "credit_note_id": "crn_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "DRAFT",
+                "currency": "EUR",
+                "total": 5000,
+                "tax_amount": 1000,
+                "refunded_amount_cents": 0,
+                "credited_amount_cents": 5000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "credit_note.voided": {
+      "post": {
+        "summary": "credit_note.voided webhook",
+        "description": "A credit note was voided",
+        "operationId": "webhook_credit_note_voided",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditNoteEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "credit_note.voided",
+                "credit_note_id": "crn_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "DRAFT",
+                "currency": "EUR",
+                "total": 5000,
+                "tax_amount": 1000,
+                "refunded_amount_cents": 0,
+                "credited_amount_cents": 5000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "customer.created": {
+      "post": {
+        "summary": "customer.created webhook",
+        "description": "A new customer was created",
+        "operationId": "webhook_customer_created",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "customer.created",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "name": "Acme Corporation",
+                "alias": "ACME",
+                "billing_email": "billing@acme.example",
+                "invoicing_emails": [
+                  "invoices@acme.example"
+                ],
+                "phone": "+1-555-0123",
+                "currency": "USD",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "invoice.created": {
+      "post": {
+        "summary": "invoice.created webhook",
+        "description": "A new invoice was created",
+        "operationId": "webhook_invoice_created",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.created",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "Draft",
+                "currency": "EUR",
+                "total": 10000,
+                "tax_amount": 2000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "invoice.finalized": {
+      "post": {
+        "summary": "invoice.finalized webhook",
+        "description": "An invoice was finalized",
+        "operationId": "webhook_invoice_finalized",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.finalized",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "Draft",
+                "currency": "EUR",
+                "total": 10000,
+                "tax_amount": 2000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "invoice.paid": {
+      "post": {
+        "summary": "invoice.paid webhook",
+        "description": "An invoice was paid",
+        "operationId": "webhook_invoice_paid",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.paid",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "Draft",
+                "currency": "EUR",
+                "total": 10000,
+                "tax_amount": 2000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "invoice.voided": {
+      "post": {
+        "summary": "invoice.voided webhook",
+        "description": "An invoice was voided",
+        "operationId": "webhook_invoice_voided",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.voided",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "Draft",
+                "currency": "EUR",
+                "total": 10000,
+                "tax_amount": 2000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "metric.created": {
+      "post": {
+        "summary": "metric.created webhook",
+        "description": "A new billable metric was created",
+        "operationId": "webhook_metric_created",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "metric.created",
+                "metric_id": "bm_7n42DGM5Tflk9n8mt7Fhc7",
+                "name": "Api Calls",
+                "code": "api_calls",
+                "aggregation_type": "COUNT",
+                "created_at": "1970-01-01T00:00:00",
+                "product_family_id": "pf_7n42DGM5Tflk9n8mt7Fhc7",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "quote.accepted": {
+      "post": {
+        "summary": "quote.accepted webhook",
+        "description": "A quote was accepted",
+        "operationId": "webhook_quote_accepted",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "quote.accepted",
+                "quote_id": "quo_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "quote.converted": {
+      "post": {
+        "summary": "quote.converted webhook",
+        "description": "A quote was converted into subscription",
+        "operationId": "webhook_quote_converted",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "quote.converted",
+                "quote_id": "quo_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "subscription.created": {
+      "post": {
+        "summary": "subscription.created webhook",
+        "description": "A new subscription was created",
+        "operationId": "webhook_subscription_created",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "subscription.created",
+                "subscription_id": "sub_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_alias": "ACME",
+                "customer_name": "Acme Corporation",
+                "billing_day_anchor": 1,
+                "currency": "EUR",
+                "start_date": "1970-01-01",
+                "plan_name": "default",
+                "version": 0,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "net_terms": 0,
+                "mrr_cents": 0,
+                "period": "MONTHLY",
+                "status": "PENDING_ACTIVATION",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    }
+  }
+}

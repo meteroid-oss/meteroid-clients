@@ -70,24 +70,25 @@ fn recursively_resolve_type(ty_name: &str, api: &Api) -> Type {
         }
         TypeData::StringEnum { .. } => (),
         TypeData::IntegerEnum { .. } => (),
+        TypeData::StringAlias => (),
         TypeData::StructEnum {
             ref mut fields,
             ref mut repr,
             ..
         } => {
-            match repr {
-                StructEnumRepr::AdjacentlyTagged { variants, .. } => {
-                    for v in variants.iter_mut() {
-                        match &mut v.content {
-                            EnumVariantType::Struct { fields } => {
-                                update_fields(fields, api);
-                            }
-                            EnumVariantType::Ref { schema_ref, inner } => {
-                                if let Some(schema_ref) = schema_ref {
-                                    let inner_ty = recursively_resolve_type(schema_ref, api);
-                                    *inner = Some(inner_ty);
-                                }
-                            }
+            let variants = match repr {
+                StructEnumRepr::AdjacentlyTagged { variants, .. } => variants,
+                StructEnumRepr::InternallyTagged { variants } => variants,
+            };
+            for v in variants.iter_mut() {
+                match &mut v.content {
+                    EnumVariantType::Struct { fields } => {
+                        update_fields(fields, api);
+                    }
+                    EnumVariantType::Ref { schema_ref, inner } => {
+                        if let Some(schema_ref) = schema_ref {
+                            let inner_ty = recursively_resolve_type(schema_ref, api);
+                            *inner = Some(inner_ty);
                         }
                     }
                 }

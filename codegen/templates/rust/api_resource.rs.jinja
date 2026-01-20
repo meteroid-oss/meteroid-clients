@@ -1,6 +1,6 @@
 {#
-    This example template is a simplified version of the one we use in
-    https://github.com/svix/svix-webhooks
+    This example template is a simplified version of the one originally from
+    https://github.com/svix/openapi-codegen
 
     It currently depends on the (non-generated) `crate::error::Result`,
     `crate::Configuration` and `crate::request::Request`
@@ -10,14 +10,12 @@
 // this file is @generated
 {% set resource_type_name = resource.name | to_upper_camel_case -%}
 
-use crate::{
-    error::Result,
-    models::*,
-    Configuration,
-};
+#[allow(unused_imports)]
+use crate::{error::Result, models::*, Configuration};
 
 {% for op in resource.operations -%}
     {% if op | has_query_or_header_params %}
+    #[derive(Default)]
     pub struct {{ resource_type_name }}{{ op.name | to_upper_camel_case }}Options {
         {% for p in op.query_params -%}
             {% set ty = p.type.to_rust() -%}
@@ -66,7 +64,7 @@ impl<'a> {{ resource_type_name }}<'a> {
 
         {# body parameter struct -#}
         {% if op.request_body_schema_name is defined -%}
-            {{ op.request_body_schema_name | to_snake_case }}: {{ op.request_body_schema_name }},
+            {{ op.request_body_schema_name | to_snake_case }}: crate::models::{{ op.request_body_schema_name }},
         {% endif -%}
 
         {# query / header parameter struct -#}
@@ -81,7 +79,7 @@ impl<'a> {{ resource_type_name }}<'a> {
                 options: Option<{{ param_struct_name }}>,
             {%- endif -%}
         {% endif -%}
-    ) -> Result<{{ op.response_body_schema_name | default("()") | replace("_", "") }}> {
+    ) -> Result<{% if op.response_is_binary %}bytes::Bytes{% elif op.response_is_text %}String{% elif op.response_body_schema_name is defined %}crate::models::{{ op.response_body_schema_name }}{% else %}(){% endif %}> {
         {% if has_params -%}
             {# unpack query / header parameter struct -#}
             let {{ param_struct_name }} {
@@ -116,11 +114,20 @@ impl<'a> {{ resource_type_name }}<'a> {
             .with_body_param({{ op.request_body_schema_name | to_snake_case }})
         {% endif -%}
 
-        {% if op.response_body_schema_name is undefined -%}
+        {% if op.response_is_binary -%}
+            .execute_binary(self.cfg)
+            .await
+        {% elif op.response_is_text -%}
+            .execute_text(self.cfg)
+            .await
+        {% elif op.response_body_schema_name is undefined -%}
             .returns_nothing()
-        {% endif -%}
-
             .execute(self.cfg)
             .await
+        {% else -%}
+            .execute(self.cfg)
+            .await
+        {% endif -%}
     }
+    {% endfor %}
 }

@@ -77,7 +77,88 @@ pub(crate) fn from_referenced_components(
         add_type(&c, &mut extra_components);
     }
 
+    // Resolve SchemaRef inner types for string alias detection
+    // This allows to_XXX_typename() methods to check if a reference is to a string alias
+    resolve_schema_refs(&mut types);
+
     types
+}
+
+/// Resolve SchemaRef inner types by looking up the referenced type.
+/// This allows type conversion methods to detect string aliases and return the appropriate type.
+fn resolve_schema_refs(types: &mut Types) {
+    let string_alias_names = collect_string_alias_names(types);
+
+    // Update SchemaRef inner fields for string alias references
+    for ty in types.values_mut() {
+        resolve_schema_refs_in_type(ty, &string_alias_names);
+    }
+}
+
+/// Collect the names of all string alias types.
+pub(crate) fn collect_string_alias_names(types: &Types) -> BTreeSet<String> {
+    types
+        .iter()
+        .filter(|(_, ty)| matches!(ty.data, TypeData::StringAlias))
+        .map(|(name, _)| name.clone())
+        .collect()
+}
+
+/// Resolve a SchemaRef field type if it references a string alias.
+/// This is public so it can be used by the resources module.
+pub(crate) fn resolve_schema_ref_in_field_type_public(field_type: &mut FieldType, string_alias_names: &BTreeSet<String>) {
+    resolve_schema_ref_in_field_type(field_type, string_alias_names);
+}
+
+fn resolve_schema_refs_in_type(ty: &mut Type, string_alias_names: &BTreeSet<String>) {
+    match &mut ty.data {
+        TypeData::Struct { fields } => {
+            for field in fields {
+                resolve_schema_ref_in_field_type(&mut field.r#type, string_alias_names);
+            }
+        }
+        TypeData::StructEnum { fields, repr, .. } => {
+            for field in fields {
+                resolve_schema_ref_in_field_type(&mut field.r#type, string_alias_names);
+            }
+            match repr {
+                StructEnumRepr::AdjacentlyTagged { variants, .. }
+                | StructEnumRepr::InternallyTagged { variants } => {
+                    for variant in variants {
+                        if let EnumVariantType::Struct { fields } = &mut variant.content {
+                            for field in fields {
+                                resolve_schema_ref_in_field_type(&mut field.r#type, string_alias_names);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TypeData::StringEnum { .. } | TypeData::IntegerEnum { .. } | TypeData::StringAlias => {}
+    }
+}
+
+fn resolve_schema_ref_in_field_type(field_type: &mut FieldType, string_alias_names: &BTreeSet<String>) {
+    match field_type {
+        FieldType::SchemaRef { name, inner } => {
+            if string_alias_names.contains(name) && inner.is_none() {
+                // Mark this as a string alias reference
+                *inner = Some(Type {
+                    name: name.clone(),
+                    description: None,
+                    deprecated: false,
+                    data: TypeData::StringAlias,
+                });
+            }
+        }
+        FieldType::List { inner } | FieldType::Set { inner } => {
+            resolve_schema_ref_in_field_type(Arc::make_mut(inner), string_alias_names);
+        }
+        FieldType::Map { value_ty } => {
+            resolve_schema_ref_in_field_type(Arc::make_mut(value_ty), string_alias_names);
+        }
+        _ => {}
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -92,44 +173,88 @@ pub(crate) struct Type {
 
 impl Type {
     pub(crate) fn from_schema(name: String, s: SchemaObject) -> anyhow::Result<Self> {
-        let data = match s.instance_type {
-            Some(SingleOrVec::Single(it)) => match *it {
-                InstanceType::Object => {
-                    let obj = s.object.unwrap_or_default();
-                    TypeData::from_object_schema(*obj, s.subschemas)?
+        let metadata = s.metadata.clone().unwrap_or_default();
+
+        // First check for subschemas (allOf, oneOf) which take precedence over instance_type
+        if let Some(ref subschemas) = s.subschemas {
+            // Handle allOf - merge all schemas into one struct
+            if let Some(ref all_of) = subschemas.all_of {
+                let data = TypeData::from_all_of(all_of)?;
+                return Ok(Self {
+                    name,
+                    description: metadata.description,
+                    deprecated: metadata.deprecated,
+                    data,
+                });
+            }
+
+            // Handle oneOf with discriminator - create a struct enum
+            if let Some(ref one_of) = subschemas.one_of {
+                // Check if this is a discriminated union (has discriminator in extensions)
+                if let Some(discriminator) = s.extensions.get("discriminator") {
+                    let data = TypeData::from_discriminated_oneof(one_of, discriminator)?;
+                    return Ok(Self {
+                        name,
+                        description: metadata.description,
+                        deprecated: metadata.deprecated,
+                        data,
+                    });
                 }
-                InstanceType::Integer => {
-                    let enum_varnames = s
-                        .extensions
-                        .get("x-enum-varnames")
-                        .context("unsupported: integer type without enum varnames")?
-                        .as_array()
-                        .context("unsupported: integer type enum varnames should be a list")?;
-                    let values = s
-                        .enum_values
-                        .context("unsupported: integer type without enum values")?;
-                    if enum_varnames.len() != values.len() {
-                        bail!(
-                            "enum varnames length ({}) does not match values length ({})",
-                            enum_varnames.len(),
-                            values.len()
-                        );
-                    }
-                    TypeData::from_integer_enum(values, enum_varnames)?
-                }
-                InstanceType::String => {
-                    let values = s
-                        .enum_values
-                        .context("unsupported: string type without enum values")?;
-                    TypeData::from_string_enum(values)?
-                }
-                _ => bail!("unsupported type {it:?}"),
-            },
-            Some(SingleOrVec::Vec(_)) => bail!("unsupported: multiple types"),
-            None => bail!("unsupported: no type"),
+            }
+        }
+
+        // Handle OpenAPI 3.1 nullable type arrays like ["object", "null"]
+        let effective_type = match &s.instance_type {
+            Some(SingleOrVec::Vec(types)) => {
+                extract_non_null_type(types)?
+            }
+            Some(SingleOrVec::Single(t)) => Some(*t.clone()),
+            None => None,
         };
 
-        let metadata = s.metadata.unwrap_or_default();
+        let data = match effective_type {
+            Some(InstanceType::Object) => {
+                let obj = s.object.unwrap_or_default();
+                TypeData::from_object_schema(*obj, s.subschemas)?
+            }
+            Some(InstanceType::Integer) => {
+                let enum_varnames = s
+                    .extensions
+                    .get("x-enum-varnames")
+                    .context("unsupported: integer type without enum varnames")?
+                    .as_array()
+                    .context("unsupported: integer type enum varnames should be a list")?;
+                let values = s
+                    .enum_values
+                    .context("unsupported: integer type without enum values")?;
+                if enum_varnames.len() != values.len() {
+                    bail!(
+                        "enum varnames length ({}) does not match values length ({})",
+                        enum_varnames.len(),
+                        values.len()
+                    );
+                }
+                TypeData::from_integer_enum(values, enum_varnames)?
+            }
+            Some(InstanceType::String) => {
+                // String types can be either enums (with enum_values) or simple string types (IDs, etc.)
+                if let Some(values) = s.enum_values {
+                    TypeData::from_string_enum(values)?
+                } else {
+                    // Simple string type (like ID types) - these are just String aliases
+                    // We'll render them as type aliases: pub type CustomerId = String;
+                    TypeData::StringAlias
+                }
+            }
+            Some(it) => bail!("unsupported type {it:?}"),
+            None => {
+                // No type - check if there's a subschema we didn't handle
+                if s.subschemas.is_some() {
+                    bail!("unsupported subschema combination");
+                }
+                bail!("unsupported: no type");
+            }
+        };
 
         Ok(Self {
             name,
@@ -144,6 +269,7 @@ impl Type {
             TypeData::Struct { fields } => fields_referenced_schemas(fields),
             TypeData::StringEnum { .. } => BTreeSet::new(),
             TypeData::IntegerEnum { .. } => BTreeSet::new(),
+            TypeData::StringAlias => BTreeSet::new(),
             TypeData::StructEnum { repr, fields, .. } => {
                 let mut res = repr.referenced_components();
                 res.append(&mut fields_referenced_schemas(fields));
@@ -160,6 +286,66 @@ fn fields_referenced_schemas(fields: &[Field]) -> BTreeSet<&str> {
         .collect()
 }
 
+/// Extract the non-null type from an OpenAPI 3.1 type array like ["string", "null"].
+/// Returns None if the array only contains null or is empty.
+fn extract_non_null_type(types: &[InstanceType]) -> anyhow::Result<Option<InstanceType>> {
+    let non_null_types: Vec<_> = types
+        .iter()
+        .filter(|t| **t != InstanceType::Null)
+        .collect();
+
+    match non_null_types.len() {
+        0 => Ok(None),
+        1 => Ok(Some(*non_null_types[0])),
+        _ => bail!("unsupported: multiple non-null types in type array: {types:?}"),
+    }
+}
+
+/// Extract the non-null schema from an OpenAPI 3.1 oneOf nullable pattern.
+/// Pattern: oneOf: [{type: null}, {actual schema}]
+/// Returns Some((inner_schema, true)) if it's a nullable oneOf, None otherwise.
+fn extract_nullable_oneof(one_of: &[Schema]) -> anyhow::Result<Option<(Schema, bool)>> {
+    if one_of.len() != 2 {
+        // Not a simple nullable pattern, let the caller handle it
+        return Ok(None);
+    }
+
+    let mut null_count = 0;
+    let mut non_null_schema = None;
+
+    for schema in one_of {
+        match schema {
+            Schema::Object(obj) => {
+                // Check if this is a null type
+                let is_null = match &obj.instance_type {
+                    Some(SingleOrVec::Single(t)) => **t == InstanceType::Null,
+                    Some(SingleOrVec::Vec(types)) => {
+                        types.len() == 1 && types[0] == InstanceType::Null
+                    }
+                    None => false,
+                };
+
+                if is_null {
+                    null_count += 1;
+                } else {
+                    non_null_schema = Some(schema.clone());
+                }
+            }
+            Schema::Bool(_) => {
+                // Not a nullable pattern we recognize
+                return Ok(None);
+            }
+        }
+    }
+
+    #[allow(clippy::unnecessary_unwrap)]
+    if null_count == 1 && non_null_schema.is_some() {
+        Ok(Some((non_null_schema.unwrap(), true)))
+    } else {
+        Ok(None)
+    }
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub(crate) enum TypeData {
@@ -172,6 +358,8 @@ pub(crate) enum TypeData {
     IntegerEnum {
         variants: Vec<(String, i64)>,
     },
+    /// A type alias to String (for ID types like CustomerId, InvoiceId, etc.)
+    StringAlias,
     StructEnum {
         /// Name of the field that identifies the variant.
         discriminator_field: String,
@@ -200,7 +388,10 @@ impl TypeData {
             obj.pattern_properties.is_empty(),
             "unsupported: patternProperties"
         );
-        ensure!(obj.property_names.is_none(), "unsupported: propertyNames");
+        // Note: property_names is a JSON Schema validation constraint that limits
+        // property names to a certain format. For code generation, we can safely
+        // ignore it since all JSON object keys are strings anyway.
+        // ensure!(obj.property_names.is_none(), "unsupported: propertyNames");
 
         let fields: Vec<_> = obj
             .properties
@@ -225,6 +416,135 @@ impl TypeData {
         }
 
         Ok(Self::Struct { fields })
+    }
+
+    /// Parse an allOf schema - merges all schemas into a single struct
+    fn from_all_of(all_of: &[Schema]) -> anyhow::Result<Self> {
+        let mut all_fields = Vec::new();
+
+        for schema in all_of {
+            match schema {
+                Schema::Object(obj) => {
+                    // If it's a $ref, we'll get the fields from the referenced schema later
+                    if let Some(ref_name) = &obj.reference {
+                        // For now, we add a field that references this schema
+                        // The actual merging would require resolving the $ref
+                        let schema_name = get_schema_name(Some(ref_name))
+                            .context("invalid $ref in allOf")?;
+                        // We'll flatten this reference - add a special marker field
+                        all_fields.push(Field {
+                            name: format!("__flatten_{}", schema_name.to_lowercase()),
+                            r#type: FieldType::SchemaRef { name: schema_name, inner: None },
+                            default: None,
+                            description: None,
+                            required: true,
+                            nullable: false,
+                            deprecated: false,
+                            example: None,
+                            flatten: true,
+                        });
+                    } else if let Some(ref obj_validation) = obj.object {
+                        // Inline object schema - extract fields directly
+                        for (name, prop_schema) in &obj_validation.properties {
+                            let field = Field::from_schema(
+                                name.clone(),
+                                prop_schema.clone(),
+                                obj_validation.required.contains(name),
+                            ).with_context(|| format!("unsupported field `{name}` in allOf"))?;
+                            all_fields.push(field);
+                        }
+                    }
+                }
+                Schema::Bool(_) => bail!("unsupported bool schema in allOf"),
+            }
+        }
+
+        Ok(Self::Struct { fields: all_fields })
+    }
+
+    /// Parse a oneOf schema with a discriminator - creates a struct enum
+    fn from_discriminated_oneof(one_of: &[Schema], discriminator: &serde_json::Value) -> anyhow::Result<Self> {
+        let discriminator_obj = discriminator.as_object()
+            .context("discriminator should be an object")?;
+
+        let property_name = discriminator_obj.get("propertyName")
+            .and_then(|v| v.as_str())
+            .context("discriminator.propertyName is required")?;
+
+        let mapping = discriminator_obj.get("mapping")
+            .and_then(|v| v.as_object());
+
+        let mut variants = Vec::new();
+
+        for schema in one_of {
+            match schema {
+                Schema::Object(obj) => {
+                    if let Some(ref_str) = &obj.reference {
+                        let schema_name = get_schema_name(Some(ref_str))
+                            .context("invalid $ref in oneOf")?;
+
+                        // Find the discriminator value from the mapping
+                        let discriminator_value = if let Some(map) = mapping {
+                            map.iter()
+                                .find(|(_, v)| v.as_str() == Some(ref_str))
+                                .map(|(k, _)| k.clone())
+                                .unwrap_or_else(|| schema_name.clone())
+                        } else {
+                            schema_name.clone()
+                        };
+
+                        variants.push(SimpleVariant {
+                            name: discriminator_value,
+                            content: EnumVariantType::Ref {
+                                schema_ref: Some(schema_name),
+                                inner: None,
+                            },
+                        });
+                    } else if let Some(ref obj_validation) = obj.object {
+                        // Inline schema - try to extract the discriminator value from properties
+                        let discriminator_value = obj_validation.properties
+                            .get(property_name)
+                            .and_then(|s| {
+                                if let Schema::Object(disc_obj) = s {
+                                    disc_obj.enum_values.as_ref()
+                                        .and_then(|vals| vals.first())
+                                        .and_then(|v| v.as_str())
+                                        .map(|s| s.to_string())
+                                } else {
+                                    None
+                                }
+                            })
+                            .context("inline schema in oneOf must have discriminator enum value")?;
+
+                        // Parse fields from the inline schema (excluding the discriminator)
+                        let fields: Vec<_> = obj_validation.properties.iter()
+                            .filter(|(name, _)| *name != property_name)
+                            .map(|(name, prop_schema)| {
+                                Field::from_schema(
+                                    name.clone(),
+                                    prop_schema.clone(),
+                                    obj_validation.required.contains(name),
+                                ).with_context(|| format!("unsupported field `{name}` in inline oneOf schema"))
+                            })
+                            .collect::<anyhow::Result<_>>()?;
+
+                        variants.push(SimpleVariant {
+                            name: discriminator_value,
+                            content: EnumVariantType::Struct { fields },
+                        });
+                    } else {
+                        bail!("oneOf variant must have either $ref or object properties");
+                    }
+                }
+                Schema::Bool(_) => bail!("unsupported bool schema in oneOf"),
+            }
+        }
+
+        Ok(Self::StructEnum {
+            discriminator_field: property_name.to_string(),
+            repr: StructEnumRepr::InternallyTagged { variants },
+            fields: vec![],
+        })
     }
 
     fn from_string_enum(values: Vec<serde_json::Value>) -> anyhow::Result<TypeData> {
@@ -285,21 +605,29 @@ pub(crate) enum StructEnumRepr {
         /// identify the variant.
         variants: Vec<SimpleVariant>,
     },
+    /// Internally tagged enum - the discriminator is a field inside each variant
+    /// Used for OpenAPI discriminated oneOf patterns like Fee with fee_type discriminator
+    InternallyTagged {
+        /// Enum variants.
+        variants: Vec<SimpleVariant>,
+    },
 }
 
 impl StructEnumRepr {
     fn referenced_components(&self) -> BTreeSet<&str> {
-        match self {
-            StructEnumRepr::AdjacentlyTagged { variants, .. } => variants
-                .iter()
-                .filter_map(|v| match &v.content {
-                    EnumVariantType::Struct { fields } => {
-                        fields.iter().find_map(|f| f.r#type.referenced_schema())
-                    }
-                    EnumVariantType::Ref { schema_ref, .. } => schema_ref.as_deref(),
-                })
-                .collect(),
-        }
+        let variants = match self {
+            StructEnumRepr::AdjacentlyTagged { variants, .. } => variants,
+            StructEnumRepr::InternallyTagged { variants } => variants,
+        };
+        variants
+            .iter()
+            .filter_map(|v| match &v.content {
+                EnumVariantType::Struct { fields } => {
+                    fields.iter().find_map(|f| f.r#type.referenced_schema())
+                }
+                EnumVariantType::Ref { schema_ref, .. } => schema_ref.as_deref(),
+            })
+            .collect()
     }
 }
 
@@ -317,6 +645,9 @@ pub(crate) struct Field {
     deprecated: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     example: Option<serde_json::Value>,
+    /// If true, this field should be flattened (used for allOf merging)
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    flatten: bool,
 }
 
 impl Field {
@@ -328,20 +659,27 @@ impl Field {
         let example = obj.extensions.get("example").cloned();
         let metadata = obj.metadata.clone().unwrap_or_default();
 
-        let nullable = obj
+        // Check for OpenAPI 3.0 style nullable extension
+        let mut nullable = obj
             .extensions
             .get("nullable")
             .and_then(|v| v.as_bool())
             .unwrap_or(false);
+
+        // Handle OpenAPI 3.1 oneOf nullable pattern: oneOf: [{type: null}, {actual type}]
+        let (field_type, is_oneof_nullable) = FieldType::from_schema_object_with_nullable(obj)?;
+        nullable = nullable || is_oneof_nullable;
+
         Ok(Self {
             name,
-            r#type: FieldType::from_schema_object(obj)?,
+            r#type: field_type,
             default: metadata.default,
             description: metadata.description,
             required,
             nullable,
             deprecated: metadata.deprecated,
             example,
+            flatten: false,
         })
     }
 }
@@ -429,102 +767,132 @@ impl FieldType {
     }
 
     fn from_schema_object(obj: SchemaObject) -> anyhow::Result<Self> {
-        let result = match &obj.instance_type {
-            Some(SingleOrVec::Single(ty)) => match **ty {
-                InstanceType::Boolean => Self::Bool,
-                InstanceType::Integer => match obj.format.as_deref() {
-                    Some("int16") => Self::Int16,
-                    Some("uint16") => Self::UInt16,
-                    Some("int32") => Self::Int32,
-                    // FIXME: Why do we have int in the spec?
-                    Some("int" | "int64") => Self::Int64,
-                    // FIXME: Get rid of uint in the spec..
-                    Some("uint" | "uint64") => Self::UInt64,
-                    f => bail!("unsupported integer format: `{f:?}`"),
-                },
-                InstanceType::String => {
-                    // String consts are the only const / enum values we support, for now.
-                    // Early return so we don't hit the checks for these two below.
-                    if let Some(value) = obj.const_value {
-                        let serde_json::Value::String(value) = value else {
-                            bail!("unsupported: non-string constant as field type");
-                        };
-                        return Ok(Self::StringConst { value });
-                    }
-                    if let Some(values) = obj.enum_values {
-                        let Ok([value]): Result<[_; 1], _> = values.try_into() else {
-                            bail!("unsupported: enum as field type");
-                        };
-                        let serde_json::Value::String(value) = value else {
-                            bail!("unsupported: non-string constant as field type");
-                        };
-                        return Ok(Self::StringConst { value });
-                    }
+        let (field_type, _nullable) = Self::from_schema_object_with_nullable(obj)?;
+        Ok(field_type)
+    }
 
-                    match obj.format.as_deref() {
-                        None | Some("color") | Some("email") => Self::String,
-                        Some("date-time") => Self::DateTime,
-                        Some("uri") => Self::Uri,
-                        Some(f) => bail!("unsupported string format: `{f:?}`"),
-                    }
+    /// Parse a schema object, returning the field type and whether it's nullable.
+    /// Handles OpenAPI 3.1 patterns like type arrays and oneOf with null.
+    fn from_schema_object_with_nullable(obj: SchemaObject) -> anyhow::Result<(Self, bool)> {
+        // Check for OpenAPI 3.1 oneOf nullable pattern: oneOf: [{type: null}, {$ref or type}]
+        if let Some(ref subschemas) = obj.subschemas
+            && let Some(ref one_of) = subschemas.one_of
+                && let Some((inner_schema, is_nullable)) = extract_nullable_oneof(one_of)? {
+                    let field_type = Self::from_schema(inner_schema)?;
+                    return Ok((field_type, is_nullable));
                 }
-                InstanceType::Array => {
-                    let array = obj.array.context("array type must have array props")?;
-                    ensure!(array.additional_items.is_none(), "not supported");
-                    let inner = match array.items.context("array type must have items prop")? {
-                        SingleOrVec::Single(ty) => ty,
-                        SingleOrVec::Vec(types) => {
-                            bail!("unsupported multi-typed array parameter: `{types:?}`")
-                        }
-                    };
-                    let inner = Arc::new(Self::from_schema(*inner)?);
-                    if array.unique_items == Some(true) {
-                        Self::Set { inner }
-                    } else {
-                        Self::List { inner }
-                    }
-                }
-                InstanceType::Object => {
-                    let obj = obj
-                        .object
-                        .context("unsupported: object type without further validation")?;
-                    let additional_properties = obj
-                        .additional_properties
-                        .context("unsupported: object field type without additional_properties")?;
 
-                    ensure!(obj.max_properties.is_none(), "unsupported: max_properties");
-                    ensure!(obj.min_properties.is_none(), "unsupported: min_properties");
-                    ensure!(
-                        obj.properties.is_empty(),
-                        "unsupported: properties on field type"
-                    );
-                    ensure!(
-                        obj.pattern_properties.is_empty(),
-                        "unsupported: pattern_properties"
-                    );
-                    ensure!(obj.property_names.is_none(), "unsupported: property_names");
-                    ensure!(
-                        obj.required.is_empty(),
-                        "unsupported: required on field type"
-                    );
-
-                    match *additional_properties {
-                        Schema::Bool(true) => Self::JsonObject,
-                        Schema::Bool(false) => bail!("unsupported `additional_properties: false`"),
-                        Schema::Object(schema_object) => {
-                            let value_ty = Arc::new(Self::from_schema_object(schema_object)?);
-                            Self::Map { value_ty }
-                        }
-                    }
-                }
-                ty => bail!("unsupported type: `{ty:?}`"),
-            },
+        // Handle OpenAPI 3.1 type arrays like ["string", "null"]
+        let (effective_type, is_type_array_nullable) = match &obj.instance_type {
             Some(SingleOrVec::Vec(types)) => {
-                bail!("unsupported multi-typed parameter: `{types:?}`")
+                let has_null = types.contains(&InstanceType::Null);
+                let non_null = extract_non_null_type(types)?;
+                (non_null, has_null)
             }
+            Some(SingleOrVec::Single(t)) => (Some(*t.clone()), false),
+            None => (None, false),
+        };
+
+        let result = match effective_type {
+            Some(InstanceType::Boolean) => Self::Bool,
+            Some(InstanceType::Integer) => match obj.format.as_deref() {
+                Some("int16") => Self::Int16,
+                Some("uint16") => Self::UInt16,
+                Some("int32") => Self::Int32,
+                // FIXME: Why do we have int in the spec?
+                Some("int" | "int64") => Self::Int64,
+                // FIXME: Get rid of uint in the spec..
+                Some("uint" | "uint64") => Self::UInt64,
+                None => Self::Int64, // Default to i64 for integers without format
+                f => bail!("unsupported integer format: `{f:?}`"),
+            },
+            Some(InstanceType::String) => {
+                // String consts are the only const / enum values we support, for now.
+                // Early return so we don't hit the checks for these two below.
+                if let Some(value) = obj.const_value {
+                    let serde_json::Value::String(value) = value else {
+                        bail!("unsupported: non-string constant as field type");
+                    };
+                    return Ok((Self::StringConst { value }, is_type_array_nullable));
+                }
+                if let Some(values) = obj.enum_values {
+                    let Ok([value]): Result<[_; 1], _> = values.try_into() else {
+                        bail!("unsupported: enum as field type");
+                    };
+                    let serde_json::Value::String(value) = value else {
+                        bail!("unsupported: non-string constant as field type");
+                    };
+                    return Ok((Self::StringConst { value }, is_type_array_nullable));
+                }
+
+                match obj.format.as_deref() {
+                    None | Some("color") | Some("email") => Self::String,
+                    Some("date-time") => Self::DateTime,
+                    Some("date") => Self::String, // Date without time, treat as string for now
+                    Some("uri") => Self::Uri,
+                    Some(f) => {
+                        // Unknown formats - treat as string with a warning
+                        tracing::warn!(format = f, "treating unknown string format as String");
+                        Self::String
+                    }
+                }
+            }
+            Some(InstanceType::Array) => {
+                let array = obj.array.context("array type must have array props")?;
+                ensure!(array.additional_items.is_none(), "not supported");
+                let inner = match array.items.context("array type must have items prop")? {
+                    SingleOrVec::Single(ty) => ty,
+                    SingleOrVec::Vec(types) => {
+                        bail!("unsupported multi-typed array parameter: `{types:?}`")
+                    }
+                };
+                let inner = Arc::new(Self::from_schema(*inner)?);
+                if array.unique_items == Some(true) {
+                    Self::Set { inner }
+                } else {
+                    Self::List { inner }
+                }
+            }
+            Some(InstanceType::Object) => {
+                let obj = obj
+                    .object
+                    .context("unsupported: object type without further validation")?;
+                let additional_properties = obj
+                    .additional_properties
+                    .context("unsupported: object field type without additional_properties")?;
+
+                ensure!(obj.max_properties.is_none(), "unsupported: max_properties");
+                ensure!(obj.min_properties.is_none(), "unsupported: min_properties");
+                ensure!(
+                    obj.properties.is_empty(),
+                    "unsupported: properties on field type"
+                );
+                ensure!(
+                    obj.pattern_properties.is_empty(),
+                    "unsupported: pattern_properties"
+                );
+                // Note: property_names is a JSON Schema validation constraint that limits
+                // property names. For code generation, we can safely ignore it.
+                // ensure!(obj.property_names.is_none(), "unsupported: property_names");
+                ensure!(
+                    obj.required.is_empty(),
+                    "unsupported: required on field type"
+                );
+
+                match *additional_properties {
+                    Schema::Bool(true) => Self::JsonObject,
+                    Schema::Bool(false) => bail!("unsupported `additional_properties: false`"),
+                    Schema::Object(schema_object) => {
+                        let value_ty = Arc::new(Self::from_schema_object(schema_object)?);
+                        Self::Map { value_ty }
+                    }
+                }
+            }
+            Some(ty) => bail!("unsupported type: `{ty:?}`"),
             None => match get_schema_name(obj.reference.as_deref()) {
                 Some(name) => Self::SchemaRef { name, inner: None },
-                None => bail!("unsupported type-less parameter"),
+                // Empty schema {} means "any JSON" - treat as JsonObject
+                None => Self::JsonObject,
             },
         };
 
@@ -532,7 +900,7 @@ impl FieldType {
         ensure!(obj.const_value.is_none(), "unsupported const_value");
         ensure!(obj.enum_values.is_none(), "unsupported enum_values");
 
-        Ok(result)
+        Ok((result, is_type_array_nullable))
     }
 
     fn to_csharp_typename(&self) -> Cow<'_, str> {
@@ -649,9 +1017,8 @@ impl FieldType {
     pub(crate) fn referenced_schema(&self) -> Option<&str> {
         match self {
             Self::SchemaRef { name, .. } => {
-                // TODO(10055): the `BackgroundTaskFinishedEvent2` struct has a field with type of `Data`
-                // this corresponds to a `#[serde(untagged)]` enum `svix_server::v1::endpoints::background_tasks::Data`
-                // we should change this server side, but for now I am changing it here
+                // Workaround: the `BackgroundTaskFinishedEvent2` struct has a field with type of `Data`
+                // which corresponds to an untagged enum. We skip this reference for now.
                 if name == "Data" { None } else { Some(name) }
             }
             Self::List { inner: ty } | Self::Set { inner: ty } | Self::Map { value_ty: ty } => {
@@ -698,9 +1065,44 @@ impl FieldType {
             FieldType::Map { value_ty } => {
                 format!("Map<String,{}>", value_ty.to_java_typename()).into()
             }
-            FieldType::SchemaRef { name, .. } => filter_schema_ref(name, "Object"),
+            FieldType::SchemaRef { name, inner } => {
+                // Java doesn't have type aliases, so resolve string alias refs to String
+                if let Some(ty) = inner
+                    && matches!(ty.data, TypeData::StringAlias) {
+                        return "String".into();
+                    }
+                filter_schema_ref(name, "Object")
+            }
             // backwards compat
             FieldType::StringConst { .. } => "TypeEnum".into(),
+        }
+    }
+
+    /// Check if this field type needs an import statement in Java.
+    /// Returns false for primitives, built-in types, and string aliases.
+    fn needs_java_import(&self) -> bool {
+        match self {
+            FieldType::Bool
+            | FieldType::Int16
+            | FieldType::UInt16
+            | FieldType::Int32
+            | FieldType::Int64
+            | FieldType::UInt64
+            | FieldType::String
+            | FieldType::DateTime
+            | FieldType::Uri
+            | FieldType::JsonObject
+            | FieldType::StringConst { .. } => false,
+            FieldType::List { inner } | FieldType::Set { inner } => inner.needs_java_import(),
+            FieldType::Map { value_ty } => value_ty.needs_java_import(),
+            FieldType::SchemaRef { inner, .. } => {
+                // String aliases don't need import - they resolve to String
+                if let Some(ty) = inner {
+                    !matches!(ty.data, TypeData::StringAlias)
+                } else {
+                    true
+                }
+            }
         }
     }
 
@@ -797,6 +1199,10 @@ impl minijinja::value::Object for FieldType {
             "to_java" => {
                 ensure_no_args(args, "to_java")?;
                 Ok(self.to_java_typename().into())
+            }
+            "needs_java_import" => {
+                ensure_no_args(args, "needs_java_import")?;
+                Ok(self.needs_java_import().into())
             }
             "to_ruby" => {
                 ensure_no_args(args, "to_ruby")?;
@@ -946,9 +1352,8 @@ where
 }
 
 fn filter_schema_ref<'a>(name: &'a String, json_obj_typename: &'a str) -> Cow<'a, str> {
-    // TODO(10055): the `BackgroundTaskFinishedEvent2` struct has a field with type of `Data`
-    // this corresponds to a `#[serde(untagged)]` enum `svix_server::v1::endpoints::background_tasks::Data`
-    // we should change this server side, but for now I am changing it here
+    // Workaround: the `BackgroundTaskFinishedEvent2` struct has a field with type of `Data`
+    // which corresponds to an untagged enum. We use json_obj_typename as fallback.
     if name == "Data" {
         json_obj_typename.into()
     } else {

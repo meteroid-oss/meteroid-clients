@@ -1,0 +1,65 @@
+[package]
+name = "meteroid-rs"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Meteroid Billing SDK for Rust"
+repository = "https://github.com/meteroid-oss/meteroid"
+keywords = ["meteroid", "billing", "subscription", "api"]
+categories = ["api-bindings"]
+
+[dependencies]
+# HTTP & Networking
+hyper = { version = "1.7", features = ["client", "http1"] }
+hyper-util = { version = "0.1", features = ["client-legacy", "http1", "tokio"] }
+tower-service = "0.3"
+http-body-util = "0.1"
+bytes = "1"
+
+# HTTP crate versions (aliased for compatibility)
+http1 = { package = "http", version = "1.0" }
+
+# TLS (rustls by default)
+hyper-rustls = { version = "0.27", optional = true, default-features = false, features = ["http1", "tls12", "ring", "native-tokio"] }
+rustls = { version = "0.23", optional = true, default-features = false, features = ["std", "tls12", "ring"] }
+rustls-native-certs = { version = "0.8", optional = true }
+
+# Native TLS (alternative)
+hyper-tls = { version = "0.6", optional = true }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_repr = "0.1"
+
+# Utilities
+url = "2.5"
+percent-encoding = "2.3"
+thiserror = "2.0"
+uuid = { version = "1", features = ["v4"] }
+js_option = "0.1"
+itertools = "0.14"
+rand = "0.9"
+
+# Async runtime
+tokio = { version = "1", features = ["time"] }
+
+# Logging
+tracing = "0.1"
+
+# Webhooks
+standardwebhooks = "1.0"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+wiremock = "0.6"
+
+[features]
+default = ["http1", "rustls-tls"]
+http1 = ["hyper-util/http1", "hyper-rustls?/http1"]
+http2 = ["hyper-util/http2", "hyper-rustls?/http2"]
+rustls-tls = ["dep:hyper-rustls", "dep:rustls", "dep:rustls-native-certs"]
+native-tls = ["dep:hyper-tls"]
+
+[package.metadata.docs.rs]
+all-features = true

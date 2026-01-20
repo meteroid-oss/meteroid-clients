@@ -179,12 +179,17 @@ impl Generator<'_> {
             (None, "cs" | "java" | "kt") => "Summary".to_owned(),
             (None, "ts") => "index".to_owned(),
             (None, "go") => "models".to_owned(),
-            (None, "rb") => "svix".to_owned(),
-            (None, "php") => "Svix".to_owned(),
+            (None, "rb") => "meteroid".to_owned(),
+            (None, "php") => "Meteroid".to_owned(),
             (None, _) => "summary".to_owned(),
         };
 
         let (rendered_data, state) = self.tpl.render_and_return_state(ctx)?;
+
+        // Skip writing file if template output is empty (e.g., string_alias in Java)
+        if rendered_data.trim().is_empty() {
+            return Ok(generated_paths);
+        }
 
         let file_path = match state.get_temp("summary_filename") {
             Some(summary_filename) => self.output_dir.join(summary_filename.as_str().unwrap()),

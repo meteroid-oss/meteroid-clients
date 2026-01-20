@@ -1,0 +1,39 @@
+[global]
+input_files = ["openapi.json"]
+
+[rust]
+extra_mounts = { "rust/.rustfmt.toml" = "/app/.rustfmt.toml" }
+[[rust.task]]
+template = "templates/rust/api_resource.rs.jinja"
+output_dir = "rust/src/api"
+[[rust.task]]
+template = "templates/rust/api_summary.rs.jinja"
+output_dir = "rust/src/api"
+[[rust.task]]
+template = "templates/rust/component_type_summary.rs.jinja"
+output_dir = "rust/src/models"
+[[rust.task]]
+template = "templates/rust/component_type.rs.jinja"
+output_dir = "rust/src/models"
+
+[java]
+[[java.task]]
+template = "templates/java/api_resource.java.jinja"
+output_dir = "java/src/main/java/com/meteroid/api"
+[[java.task]]
+template = "templates/java/operation_options.java.jinja"
+output_dir = "java/src/main/java/com/meteroid/api"
+[[java.task]]
+template = "templates/java/component_type.java.jinja"
+output_dir = "java/src/main/java/com/meteroid/models"
+
+# [typescript]
+# [[typescript.task]]
+# template = "templates/typescript/api_resource.ts.jinja"
+# output_dir = "typescript/src/api"
+# [[typescript.task]]
+# template = "templates/typescript/component_type_summary.ts.jinja"
+# output_dir = "typescript/src/models"
+# [[typescript.task]]
+# template = "templates/typescript/component_type.ts.jinja"
+# output_dir = "typescript/src/models"

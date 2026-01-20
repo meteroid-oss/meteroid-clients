@@ -31,7 +31,7 @@ impl Api {
         excluded_operations: &BTreeSet<String>,
         specified_operations: &BTreeSet<String>,
     ) -> anyhow::Result<Self> {
-        let resources = resources::from_openapi(
+        let mut resources = resources::from_openapi(
             paths,
             &components.schemas,
             include_mode,
@@ -44,6 +44,11 @@ impl Api {
             webhooks,
             include_mode,
         );
+
+        // Resolve string alias references in operation query params
+        // This must happen after types are created so we know which types are string aliases
+        let string_alias_names = types::collect_string_alias_names(&types);
+        resources::resolve_schema_refs_in_resources(&mut resources, &string_alias_names);
 
         Ok(Self { resources, types })
     }
