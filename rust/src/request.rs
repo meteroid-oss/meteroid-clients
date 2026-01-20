@@ -1,4 +1,5 @@
 //! HTTP request building and execution with retry logic.
+#![allow(dead_code)]
 
 use std::{collections::HashMap, time::Duration};
 
@@ -12,7 +13,6 @@ use serde::de::DeserializeOwned;
 
 use crate::{error::Error, Configuration};
 
-#[allow(dead_code)]
 pub(crate) enum Auth {
     None,
     Bearer,

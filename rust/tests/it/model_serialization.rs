@@ -118,7 +118,10 @@ fn test_customer_create_request_serialization() {
 
     assert_eq!(json_value["name"], "Acme Corp");
     assert_eq!(json_value["currency"], "USD");
-    assert_eq!(json_value["invoicing_emails"], json!(["billing@example.com"]));
+    assert_eq!(
+        json_value["invoicing_emails"],
+        json!(["billing@example.com"])
+    );
 
     // Optional fields should not be present when None
     assert!(json_value.get("alias").is_none());
@@ -127,12 +130,8 @@ fn test_customer_create_request_serialization() {
 
 #[test]
 fn test_customer_create_request_with_optional_fields() {
-    let mut request = CustomerCreateRequest::new(
-        Currency::Eur,
-        vec![],
-        vec![],
-        "Test Company".to_string(),
-    );
+    let mut request =
+        CustomerCreateRequest::new(Currency::Eur, vec![], vec![], "Test Company".to_string());
     request.alias = Some("test-alias".to_string());
     request.billing_email = Some("billing@test.com".to_string());
 
@@ -145,9 +144,7 @@ fn test_customer_create_request_with_optional_fields() {
 #[test]
 fn test_fee_tagged_union_serialization() {
     // Test the internally tagged union (discriminator: fee_type)
-    let rate_fee = Fee::Rate(RatePlanFee {
-        rates: vec![],
-    });
+    let rate_fee = Fee::Rate(RatePlanFee { rates: vec![] });
 
     let json_value = serde_json::to_value(&rate_fee).unwrap();
     assert_eq!(json_value["fee_type"], "rate");
@@ -219,5 +216,8 @@ fn test_optional_fields_deserialize_as_some() {
 
     let customer: Customer = serde_json::from_str(json_str).unwrap();
     assert_eq!(customer.alias, Some("my-alias".to_string()));
-    assert_eq!(customer.billing_email, Some("billing@example.com".to_string()));
+    assert_eq!(
+        customer.billing_email,
+        Some("billing@example.com".to_string())
+    );
 }

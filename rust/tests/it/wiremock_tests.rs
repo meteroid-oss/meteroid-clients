@@ -200,10 +200,7 @@ async fn test_idempotency_key_is_sent_for_post_request() {
 async fn test_authorization_header_is_sent() {
     let mock_server = MockServer::start().await;
 
-    let json_body = format!(
-        r#"{{"data":[],"pagination_meta":{}}}"#,
-        pagination_json()
-    );
+    let json_body = format!(r#"{{"data":[],"pagination_meta":{}}}"#, pagination_json());
 
     Mock::given(method("GET"))
         .and(path("/api/v1/customers"))
@@ -231,10 +228,7 @@ async fn test_authorization_header_is_sent() {
 async fn test_user_agent_is_sent() {
     let mock_server = MockServer::start().await;
 
-    let json_body = format!(
-        r#"{{"data":[],"pagination_meta":{}}}"#,
-        pagination_json()
-    );
+    let json_body = format!(r#"{{"data":[],"pagination_meta":{}}}"#, pagination_json());
 
     Mock::given(method("GET"))
         .and(path("/api/v1/customers"))
@@ -282,4 +276,3 @@ async fn test_http_error_handling() {
 
     mock_server.verify().await;
 }
-

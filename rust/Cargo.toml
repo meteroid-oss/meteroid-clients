@@ -22,7 +22,6 @@ http1 = { package = "http", version = "1.0" }
 # TLS (rustls by default)
 hyper-rustls = { version = "0.27", optional = true, default-features = false, features = ["http1", "tls12", "ring", "native-tokio"] }
 rustls = { version = "0.23", optional = true, default-features = false, features = ["std", "tls12", "ring"] }
-rustls-native-certs = { version = "0.8", optional = true }
 
 # Native TLS (alternative)
 hyper-tls = { version = "0.6", optional = true }
@@ -30,22 +29,16 @@ hyper-tls = { version = "0.6", optional = true }
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-serde_repr = "0.1"
 
 # Utilities
 url = "2.5"
 percent-encoding = "2.3"
-thiserror = "2.0"
 uuid = { version = "1", features = ["v4"] }
-js_option = "0.1"
 itertools = "0.14"
 rand = "0.9"
 
 # Async runtime
 tokio = { version = "1", features = ["time"] }
-
-# Logging
-tracing = "0.1"
 
 # Webhooks
 standardwebhooks = "1.0"
@@ -58,7 +51,7 @@ wiremock = "0.6"
 default = ["http1", "rustls-tls"]
 http1 = ["hyper-util/http1", "hyper-rustls?/http1"]
 http2 = ["hyper-util/http2", "hyper-rustls?/http2"]
-rustls-tls = ["dep:hyper-rustls", "dep:rustls", "dep:rustls-native-certs"]
+rustls-tls = ["dep:hyper-rustls", "dep:rustls"]
 native-tls = ["dep:hyper-tls"]
 
 [package.metadata.docs.rs]

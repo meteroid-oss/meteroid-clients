@@ -70,22 +70,15 @@ impl Webhook {
         self.inner.verify(payload, &normalized)
     }
 
-    /// Verify a webhook payload without checking timestamp tolerance.
-    ///
-    /// Use this only for testing or when replaying old webhooks.
-    pub fn verify_ignoring_timestamp(
-        &self,
-        payload: &[u8],
-        headers: &http1::HeaderMap,
-    ) -> Result<(), WebhookError> {
-        let normalized = normalize_headers(headers);
-        self.inner.verify_ignoring_timestamp(payload, &normalized)
-    }
-
     /// Sign a payload and return the signature.
     ///
     /// Returns the signature in the format `v1,<base64-signature>`.
-    pub fn sign(&self, msg_id: &str, timestamp: i64, payload: &[u8]) -> Result<String, WebhookError> {
+    pub fn sign(
+        &self,
+        msg_id: &str,
+        timestamp: i64,
+        payload: &[u8],
+    ) -> Result<String, WebhookError> {
         self.inner.sign(msg_id, timestamp, payload)
     }
 }
@@ -131,7 +124,12 @@ fn normalize_headers(headers: &http1::HeaderMap) -> http1::HeaderMap {
 mod tests {
     use super::*;
 
-    fn make_headers(id_key: &str, sig_key: &str, ts_key: &str, signature: &str) -> http1::HeaderMap {
+    fn make_headers(
+        id_key: &str,
+        sig_key: &str,
+        ts_key: &str,
+        signature: &str,
+    ) -> http1::HeaderMap {
         let mut headers = http1::HeaderMap::new();
         headers.insert(
             http1::HeaderName::try_from(id_key).unwrap(),

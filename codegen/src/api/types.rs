@@ -106,7 +106,10 @@ pub(crate) fn collect_string_alias_names(types: &Types) -> BTreeSet<String> {
 
 /// Resolve a SchemaRef field type if it references a string alias.
 /// This is public so it can be used by the resources module.
-pub(crate) fn resolve_schema_ref_in_field_type_public(field_type: &mut FieldType, string_alias_names: &BTreeSet<String>) {
+pub(crate) fn resolve_schema_ref_in_field_type_public(
+    field_type: &mut FieldType,
+    string_alias_names: &BTreeSet<String>,
+) {
     resolve_schema_ref_in_field_type(field_type, string_alias_names);
 }
 
@@ -127,7 +130,10 @@ fn resolve_schema_refs_in_type(ty: &mut Type, string_alias_names: &BTreeSet<Stri
                     for variant in variants {
                         if let EnumVariantType::Struct { fields } = &mut variant.content {
                             for field in fields {
-                                resolve_schema_ref_in_field_type(&mut field.r#type, string_alias_names);
+                                resolve_schema_ref_in_field_type(
+                                    &mut field.r#type,
+                                    string_alias_names,
+                                );
                             }
                         }
                     }
@@ -138,7 +144,10 @@ fn resolve_schema_refs_in_type(ty: &mut Type, string_alias_names: &BTreeSet<Stri
     }
 }
 
-fn resolve_schema_ref_in_field_type(field_type: &mut FieldType, string_alias_names: &BTreeSet<String>) {
+fn resolve_schema_ref_in_field_type(
+    field_type: &mut FieldType,
+    string_alias_names: &BTreeSet<String>,
+) {
     match field_type {
         FieldType::SchemaRef { name, inner } => {
             if string_alias_names.contains(name) && inner.is_none() {
@@ -205,9 +214,7 @@ impl Type {
 
         // Handle OpenAPI 3.1 nullable type arrays like ["object", "null"]
         let effective_type = match &s.instance_type {
-            Some(SingleOrVec::Vec(types)) => {
-                extract_non_null_type(types)?
-            }
+            Some(SingleOrVec::Vec(types)) => extract_non_null_type(types)?,
             Some(SingleOrVec::Single(t)) => Some(*t.clone()),
             None => None,
         };
@@ -289,10 +296,7 @@ fn fields_referenced_schemas(fields: &[Field]) -> BTreeSet<&str> {
 /// Extract the non-null type from an OpenAPI 3.1 type array like ["string", "null"].
 /// Returns None if the array only contains null or is empty.
 fn extract_non_null_type(types: &[InstanceType]) -> anyhow::Result<Option<InstanceType>> {
-    let non_null_types: Vec<_> = types
-        .iter()
-        .filter(|t| **t != InstanceType::Null)
-        .collect();
+    let non_null_types: Vec<_> = types.iter().filter(|t| **t != InstanceType::Null).collect();
 
     match non_null_types.len() {
         0 => Ok(None),
@@ -429,12 +433,15 @@ impl TypeData {
                     if let Some(ref_name) = &obj.reference {
                         // For now, we add a field that references this schema
                         // The actual merging would require resolving the $ref
-                        let schema_name = get_schema_name(Some(ref_name))
-                            .context("invalid $ref in allOf")?;
+                        let schema_name =
+                            get_schema_name(Some(ref_name)).context("invalid $ref in allOf")?;
                         // We'll flatten this reference - add a special marker field
                         all_fields.push(Field {
                             name: format!("__flatten_{}", schema_name.to_lowercase()),
-                            r#type: FieldType::SchemaRef { name: schema_name, inner: None },
+                            r#type: FieldType::SchemaRef {
+                                name: schema_name,
+                                inner: None,
+                            },
                             default: None,
                             description: None,
                             required: true,
@@ -450,7 +457,8 @@ impl TypeData {
                                 name.clone(),
                                 prop_schema.clone(),
                                 obj_validation.required.contains(name),
-                            ).with_context(|| format!("unsupported field `{name}` in allOf"))?;
+                            )
+                            .with_context(|| format!("unsupported field `{name}` in allOf"))?;
                             all_fields.push(field);
                         }
                     }
@@ -463,16 +471,20 @@ impl TypeData {
     }
 
     /// Parse a oneOf schema with a discriminator - creates a struct enum
-    fn from_discriminated_oneof(one_of: &[Schema], discriminator: &serde_json::Value) -> anyhow::Result<Self> {
-        let discriminator_obj = discriminator.as_object()
+    fn from_discriminated_oneof(
+        one_of: &[Schema],
+        discriminator: &serde_json::Value,
+    ) -> anyhow::Result<Self> {
+        let discriminator_obj = discriminator
+            .as_object()
             .context("discriminator should be an object")?;
 
-        let property_name = discriminator_obj.get("propertyName")
+        let property_name = discriminator_obj
+            .get("propertyName")
             .and_then(|v| v.as_str())
             .context("discriminator.propertyName is required")?;
 
-        let mapping = discriminator_obj.get("mapping")
-            .and_then(|v| v.as_object());
+        let mapping = discriminator_obj.get("mapping").and_then(|v| v.as_object());
 
         let mut variants = Vec::new();
 
@@ -480,8 +492,8 @@ impl TypeData {
             match schema {
                 Schema::Object(obj) => {
                     if let Some(ref_str) = &obj.reference {
-                        let schema_name = get_schema_name(Some(ref_str))
-                            .context("invalid $ref in oneOf")?;
+                        let schema_name =
+                            get_schema_name(Some(ref_str)).context("invalid $ref in oneOf")?;
 
                         // Find the discriminator value from the mapping
                         let discriminator_value = if let Some(map) = mapping {
@@ -502,11 +514,14 @@ impl TypeData {
                         });
                     } else if let Some(ref obj_validation) = obj.object {
                         // Inline schema - try to extract the discriminator value from properties
-                        let discriminator_value = obj_validation.properties
+                        let discriminator_value = obj_validation
+                            .properties
                             .get(property_name)
                             .and_then(|s| {
                                 if let Schema::Object(disc_obj) = s {
-                                    disc_obj.enum_values.as_ref()
+                                    disc_obj
+                                        .enum_values
+                                        .as_ref()
                                         .and_then(|vals| vals.first())
                                         .and_then(|v| v.as_str())
                                         .map(|s| s.to_string())
@@ -517,14 +532,19 @@ impl TypeData {
                             .context("inline schema in oneOf must have discriminator enum value")?;
 
                         // Parse fields from the inline schema (excluding the discriminator)
-                        let fields: Vec<_> = obj_validation.properties.iter()
+                        let fields: Vec<_> = obj_validation
+                            .properties
+                            .iter()
                             .filter(|(name, _)| *name != property_name)
                             .map(|(name, prop_schema)| {
                                 Field::from_schema(
                                     name.clone(),
                                     prop_schema.clone(),
                                     obj_validation.required.contains(name),
-                                ).with_context(|| format!("unsupported field `{name}` in inline oneOf schema"))
+                                )
+                                .with_context(|| {
+                                    format!("unsupported field `{name}` in inline oneOf schema")
+                                })
                             })
                             .collect::<anyhow::Result<_>>()?;
 
@@ -777,10 +797,11 @@ impl FieldType {
         // Check for OpenAPI 3.1 oneOf nullable pattern: oneOf: [{type: null}, {$ref or type}]
         if let Some(ref subschemas) = obj.subschemas
             && let Some(ref one_of) = subschemas.one_of
-                && let Some((inner_schema, is_nullable)) = extract_nullable_oneof(one_of)? {
-                    let field_type = Self::from_schema(inner_schema)?;
-                    return Ok((field_type, is_nullable));
-                }
+            && let Some((inner_schema, is_nullable)) = extract_nullable_oneof(one_of)?
+        {
+            let field_type = Self::from_schema(inner_schema)?;
+            return Ok((field_type, is_nullable));
+        }
 
         // Handle OpenAPI 3.1 type arrays like ["string", "null"]
         let (effective_type, is_type_array_nullable) = match &obj.instance_type {
@@ -1068,9 +1089,10 @@ impl FieldType {
             FieldType::SchemaRef { name, inner } => {
                 // Java doesn't have type aliases, so resolve string alias refs to String
                 if let Some(ty) = inner
-                    && matches!(ty.data, TypeData::StringAlias) {
-                        return "String".into();
-                    }
+                    && matches!(ty.data, TypeData::StringAlias)
+                {
+                    return "String".into();
+                }
                 filter_schema_ref(name, "Object")
             }
             // backwards compat

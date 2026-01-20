@@ -34,7 +34,8 @@ except ImportError:
     exit(1)
 
 # Default image - can be overridden with IMAGE env var
-OPENAPI_CODEGEN_IMAGE = os.getenv("IMAGE", "docker.io/library/meteroid-codegen:latest")
+# For local development, build with: docker build -t meteroid-codegen codegen/
+OPENAPI_CODEGEN_IMAGE = os.getenv("IMAGE", "ghcr.io/meteroid-oss/openapi-codegen:latest")
 DEBUG = os.getenv("DEBUG") is not None
 GREEN = "\033[92m"
 BLUE = "\033[94m"

@@ -127,9 +127,14 @@ impl Meteroid {
         super::CheckoutSessions::new(&self.cfg)
     }
 
+    /// Access the credit notes API.
+    pub fn credit_notes(&self) -> super::CreditNotes<'_> {
+        super::CreditNotes::new(&self.cfg)
+    }
+
     /// Access the customers API.
-    pub fn customers(&self) -> super::Customer<'_> {
-        super::Customer::new(&self.cfg)
+    pub fn customers(&self) -> super::Customers<'_> {
+        super::Customers::new(&self.cfg)
     }
 
     /// Access the events API.
@@ -138,8 +143,8 @@ impl Meteroid {
     }
 
     /// Access the invoices API.
-    pub fn invoices(&self) -> super::Invoice<'_> {
-        super::Invoice::new(&self.cfg)
+    pub fn invoices(&self) -> super::Invoices<'_> {
+        super::Invoices::new(&self.cfg)
     }
 
     /// Access the plans API.

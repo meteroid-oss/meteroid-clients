@@ -10,7 +10,7 @@ use crate::cli_v1::IncludeMode;
 
 use super::{
     get_schema_name,
-    types::{FieldType, serialize_field_type, resolve_schema_ref_in_field_type_public},
+    types::{FieldType, resolve_schema_ref_in_field_type_public, serialize_field_type},
 };
 
 /// The API operations of the API client we generate.
@@ -62,7 +62,10 @@ pub(crate) fn referenced_components(resources: &Resources) -> impl Iterator<Item
 
 /// Resolve SchemaRef inner types in resources (operation query params).
 /// This allows to_java() and similar methods to properly convert string aliases to their base types.
-pub(crate) fn resolve_schema_refs_in_resources(resources: &mut Resources, string_alias_names: &BTreeSet<String>) {
+pub(crate) fn resolve_schema_refs_in_resources(
+    resources: &mut Resources,
+    string_alias_names: &BTreeSet<String>,
+) {
     for resource in resources.values_mut() {
         resolve_schema_refs_in_resource(resource, string_alias_names);
     }
@@ -467,9 +470,9 @@ fn enforce_string_parameter(parameter_data: &openapi::ParameterData) -> anyhow::
     // Handle OpenAPI 3.1 type arrays like ["string", "null"]
     if let Some(schemars::schema::SingleOrVec::Vec(types)) = &obj.instance_type {
         let has_string = types.contains(&InstanceType::String);
-        let all_string_or_null = types.iter().all(|t| {
-            *t == InstanceType::String || *t == InstanceType::Null
-        });
+        let all_string_or_null = types
+            .iter()
+            .all(|t| *t == InstanceType::String || *t == InstanceType::Null);
         if has_string && all_string_or_null {
             return Ok(());
         }
@@ -478,30 +481,31 @@ fn enforce_string_parameter(parameter_data: &openapi::ParameterData) -> anyhow::
     // Handle oneOf patterns like: oneOf: [{type: null}, {$ref: ...}] or oneOf: [{type: null}, {type: string}]
     if let Some(ref subschemas) = obj.subschemas
         && let Some(ref one_of) = subschemas.one_of
-            && one_of.len() == 2 {
-                for schema in one_of {
-                    if let Schema::Object(inner_obj) = schema {
-                        // Check if this is a null type - skip it
-                        let is_null = match &inner_obj.instance_type {
-                            Some(schemars::schema::SingleOrVec::Single(t)) => **t == InstanceType::Null,
-                            _ => false,
-                        };
-                        if is_null {
-                            continue;
-                        }
+        && one_of.len() == 2
+    {
+        for schema in one_of {
+            if let Schema::Object(inner_obj) = schema {
+                // Check if this is a null type - skip it
+                let is_null = match &inner_obj.instance_type {
+                    Some(schemars::schema::SingleOrVec::Single(t)) => **t == InstanceType::Null,
+                    _ => false,
+                };
+                if is_null {
+                    continue;
+                }
 
-                        // Check if this is a string type
-                        if inner_obj.instance_type == Some(InstanceType::String.into()) {
-                            return Ok(());
-                        }
+                // Check if this is a string type
+                if inner_obj.instance_type == Some(InstanceType::String.into()) {
+                    return Ok(());
+                }
 
-                        // Check if this is a $ref (path params with refs are typically string IDs)
-                        if inner_obj.reference.is_some() {
-                            return Ok(());
-                        }
-                    }
+                // Check if this is a $ref (path params with refs are typically string IDs)
+                if inner_obj.reference.is_some() {
+                    return Ok(());
                 }
             }
+        }
+    }
 
     // If instance_type is None but there's a $ref, accept it (typically string IDs)
     if obj.instance_type.is_none() && obj.reference.is_some() {
