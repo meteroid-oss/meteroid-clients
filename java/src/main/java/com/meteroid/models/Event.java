@@ -57,7 +57,7 @@ public class Event {
     }
 
     /**
-     * Either Meteroid's customer_id or an alias
+     * Either Meteroid&#x27;s customer_id or an alias
      *
      * @return customerId
      */

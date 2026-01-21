@@ -115,7 +115,7 @@ public class {{ type.name | to_upper_camel_case }} {
 
     /**
     {% if field.description is defined -%}
-     * {{ field.description }}
+     * {{ field.description | e }}
     {% else -%}
      * Get {{ f_varname }}
     {% endif -%}

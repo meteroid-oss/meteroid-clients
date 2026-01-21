@@ -48,7 +48,8 @@ public class AvailableParameters {
     }
 
     /**
-     * Map of component_id -> available billing periods (e.g., "MONTHLY", "ANNUAL")
+     * Map of component_id -&gt; available billing periods (e.g., &quot;MONTHLY&quot;,
+     * &quot;ANNUAL&quot;)
      *
      * @return billingPeriods
      */
@@ -77,7 +78,7 @@ public class AvailableParameters {
     }
 
     /**
-     * Map of component_id -> available capacity values
+     * Map of component_id -&gt; available capacity values
      *
      * @return capacityThresholds
      */

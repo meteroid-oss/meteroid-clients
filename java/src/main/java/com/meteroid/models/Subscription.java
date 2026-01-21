@@ -179,7 +179,7 @@ public class Subscription {
     }
 
     /**
-     * Automatically try to charge the customer's configured payment method on finalize.
+     * Automatically try to charge the customer&#x27;s configured payment method on finalize.
      *
      * @return chargeAutomatically
      */
