@@ -24,21 +24,20 @@ fn pagination_json() -> &'static str {
 async fn test_list_customers() {
     let mock_server = MockServer::start().await;
 
-    let json_body = format!(
-        r#"{{
+    let json_body = r#"{
             "data": [
-                {{
+                {
                     "id": "cust_123",
                     "name": "Test Customer",
                     "currency": "USD",
                     "custom_taxes": [],
                     "invoicing_emails": [],
                     "invoicing_entity_id": "inv_1"
-                }}
+                }
             ],
-            "pagination_meta": {{"page":0,"per_page":10,"total_items":1,"total_pages":1}}
-        }}"#
-    );
+            "pagination_meta": {"page":0,"per_page":10,"total_items":1,"total_pages":1}
+        }"#
+    .to_string();
 
     Mock::given(method("GET"))
         .and(path("/api/v1/customers"))
@@ -62,9 +61,7 @@ async fn test_list_customers() {
 async fn test_list_customers_with_pagination() {
     let mock_server = MockServer::start().await;
 
-    let json_body = format!(
-        r#"{{"data":[],"pagination_meta":{{"page":2,"per_page":10,"total_items":100,"total_pages":10}}}}"#
-    );
+    let json_body = r#"{"data":[],"pagination_meta":{"page":2,"per_page":10,"total_items":100,"total_pages":10}}"#.to_string();
 
     Mock::given(method("GET"))
         .and(path("/api/v1/customers"))
