@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.meteroid.WebhookTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-01-21T00:41:00.609Z" hostname="fedora" time="0.005">
+<testsuite name="com.meteroid.WebhookTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-01-21T01:00:00.341Z" hostname="fedora" time="0.005">
   <properties/>
   <testcase name="verifyValidPayloadWithStandardHeaders" classname="com.meteroid.WebhookTest" time="0.002"/>
   <testcase name="verifySignatureMismatchThrowsException" classname="com.meteroid.WebhookTest" time="0.001"/>
   <testcase name="verifyMissingTimestampThrowsException" classname="com.meteroid.WebhookTest" time="0.0"/>
   <testcase name="verifySignatureWithDifferentVersionThrowsException" classname="com.meteroid.WebhookTest" time="0.0"/>
   <testcase name="verifyNewTimestampThrowsException" classname="com.meteroid.WebhookTest" time="0.0"/>
-  <testcase name="verifyValidPayloadWithSvixHeaders" classname="com.meteroid.WebhookTest" time="0.001"/>
-  <testcase name="verifyMissingPartsInSignatureThrowsException" classname="com.meteroid.WebhookTest" time="0.0"/>
+  <testcase name="verifyValidPayloadWithSvixHeaders" classname="com.meteroid.WebhookTest" time="0.0"/>
+  <testcase name="verifyMissingPartsInSignatureThrowsException" classname="com.meteroid.WebhookTest" time="0.001"/>
   <testcase name="verifyMissingIdThrowsException" classname="com.meteroid.WebhookTest" time="0.0"/>
   <testcase name="verifyMissingSignatureThrowsException" classname="com.meteroid.WebhookTest" time="0.0"/>
   <testcase name="verifyWebhookSignWorks" classname="com.meteroid.WebhookTest" time="0.0"/>
-  <testcase name="verifySecretWorksWithOrWithoutPrefix" classname="com.meteroid.WebhookTest" time="0.001"/>
+  <testcase name="verifySecretWorksWithOrWithoutPrefix" classname="com.meteroid.WebhookTest" time="0.0"/>
   <testcase name="verifyValidPayloadWithMultipleSignaturesIsValid" classname="com.meteroid.WebhookTest" time="0.0"/>
   <testcase name="verifyOldTimestampThrowsException" classname="com.meteroid.WebhookTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>

@@ -11,7 +11,7 @@ const filesPaths = [
     // Java
     "java/gradle.properties",
     "java/README.md",
-    "java/lib/src/main/java/com/svix/Version.java"
+    "java/src/main/java/com/meteroid/Version.java"
 ];
 
 const rootDir = join(__dirname, "..");
@@ -43,7 +43,7 @@ filesPaths.forEach((relativePath) => {
 })
 
 // Add Changelog Section
-const changelogPath = join(rootDir, "ChangeLog.md");
+const changelogPath = join(rootDir, "CHANGELOG.md");
 const changelogUpdate = readFileSync(changelogPath, 'utf8').replace("# Changelog\n\n## Next", `# Changelog\n\n## Next\n* \n\n## Version ${newVersion}`);
 writeFileSync(changelogPath, changelogUpdate);
 
