@@ -1,6 +1,6 @@
 # meteroid-clients
 
-Libraries to interact with Meteroid's REST API.
+Libraries to interact with [Meteroid's REST API](https://api.meteroid.com/api-docs/openapi.json)
 
 Refer to each SDK's readme for usage.
 
