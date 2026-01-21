@@ -48,93 +48,92 @@ Meteroid meteroid = new Meteroid("your-api-key", options);
 
 ```java
 // List customers
-CustomerListResponse customers = meteroid.getCustomer().listCustomers();
+CustomerListResponse customers = meteroid.getCustomers().listCustomers();
 
 // List with options
-CustomerListCustomersOptions options = new CustomerListCustomersOptions();
-options.page = 1L;
-options.perPage = 20L;
+CustomersListCustomersOptions options = new CustomersListCustomersOptions();
+options.page = 1;
+options.perPage = 20;
 options.search = "acme";
-CustomerListResponse customers = meteroid.getCustomer().listCustomers(options);
+CustomerListResponse customers = meteroid.getCustomers().listCustomers(options);
 
 // Create a customer
 CustomerCreateRequest request = new CustomerCreateRequest()
     .name("Acme Corp")
     .alias("acme-corp")
-    .email("billing@acme.com");
-Customer customer = meteroid.getCustomer().createCustomer(request);
+    .billingEmail("billing@acme.com");
+Customer customer = meteroid.getCustomers().createCustomer(request);
 
 // Get a customer by ID or alias
-Customer customer = meteroid.getCustomer().getCustomer("acme-corp");
+Customer customer = meteroid.getCustomers().getCustomer("acme-corp");
 
 // Update a customer
 CustomerUpdateRequest updateRequest = new CustomerUpdateRequest()
     .name("Acme Corporation");
-Customer updated = meteroid.getCustomer().updateCustomer("acme-corp", updateRequest);
+Customer updated = meteroid.getCustomers().updateCustomer("acme-corp", updateRequest);
 
 // Archive a customer (all subscriptions must be terminated first)
-meteroid.getCustomer().archiveCustomer("acme-corp");
+meteroid.getCustomers().archiveCustomer("acme-corp");
 
 // Generate a customer portal token
-CustomerPortalTokenResponse token = meteroid.getCustomer().createPortalToken("acme-corp");
+CustomerPortalTokenResponse token = meteroid.getCustomers().createPortalToken("acme-corp");
 ```
 
 ### Subscriptions
 
 ```java
 // List subscriptions
-SubscriptionListResponse subscriptions = meteroid.getSubscription().listSubscriptions();
+SubscriptionListResponse subscriptions = meteroid.getSubscriptions().listSubscriptions();
 
 // Create a subscription
 SubscriptionCreateRequest request = new SubscriptionCreateRequest()
-    .customerId("cust_123")
-    .planVersionId("pv_456")
-    .billingDay(1);
-Subscription subscription = meteroid.getSubscription().createSubscription(request);
+    .customerIdOrAlias("cust_123")
+    .planId("plan_456")
+    .billingDayAnchor(1);
+SubscriptionDetails subscription = meteroid.getSubscriptions().createSubscription(request);
 
 // Get subscription details
-SubscriptionDetails details = meteroid.getSubscription().getSubscriptionDetails("sub_789");
+SubscriptionDetails details = meteroid.getSubscriptions().subscriptionDetails("sub_789");
 
 // Cancel a subscription
 CancelSubscriptionRequest cancelRequest = new CancelSubscriptionRequest()
     .reason("Customer requested");
-meteroid.getSubscription().cancelSubscription("sub_789", cancelRequest);
+meteroid.getSubscriptions().cancelSubscription("sub_789", cancelRequest);
 ```
 
 ### Plans
 
 ```java
 // List plans
-PlanListResponse plans = meteroid.getPlan().listPlans();
+PlanListResponse plans = meteroid.getPlans().listPlans();
 
 // Get a plan by ID or alias
-Plan plan = meteroid.getPlan().getPlan("plan_123");
+Plan plan = meteroid.getPlans().getPlanDetails("plan_123");
 ```
 
 ### Invoices
 
 ```java
 // List invoices
-InvoiceListResponse invoices = meteroid.getInvoice().listInvoices();
+InvoiceListResponse invoices = meteroid.getInvoices().listInvoices();
 
 // Get an invoice
-Invoice invoice = meteroid.getInvoice().getInvoice("inv_123");
+Invoice invoice = meteroid.getInvoices().getInvoiceById("inv_123");
 
 // Download invoice as PDF
-byte[] pdfBytes = meteroid.getInvoice().downloadInvoicePdf("inv_123");
+byte[] pdfBytes = meteroid.getInvoices().downloadInvoicePdf("inv_123");
 ```
 
 ### Product Families
 
 ```java
 // List product families
-ProductFamilyListResponse families = meteroid.getProductFamily().listProductFamilies();
+ProductFamilyListResponse families = meteroid.getProductFamilies().listProductFamilies();
 
 // Create a product family
 ProductFamilyCreateRequest request = new ProductFamilyCreateRequest()
-    .name("SaaS Products")
-    .externalId("saas-products");
-ProductFamily family = meteroid.getProductFamily().createProductFamily(request);
+    .name("SaaS Products");
+ProductFamily family = meteroid.getProductFamilies().createProductFamily(request);
 ```
 
 ### Events (Usage Tracking)
@@ -144,9 +143,9 @@ ProductFamily family = meteroid.getProductFamily().createProductFamily(request);
 IngestEventsRequest request = new IngestEventsRequest()
     .events(Arrays.asList(
         new Event()
-            .eventName("api_call")
+            .code("api_call")
             .customerId("cust_123")
-            .timestamp(Instant.now())
+            .timestamp(Instant.now().toString())
             .properties(Map.of("endpoint", "/users", "method", "GET"))
     ));
 IngestEventsResponse response = meteroid.getEvents().ingestEvents(request);
@@ -158,9 +157,7 @@ IngestEventsResponse response = meteroid.getEvents().ingestEvents(request);
 // Create a checkout session
 CreateCheckoutSessionRequest request = new CreateCheckoutSessionRequest()
     .customerId("cust_123")
-    .planId("plan_456")
-    .successUrl("https://example.com/success")
-    .cancelUrl("https://example.com/cancel");
+    .planVersionId("pv_456");
 CreateCheckoutSessionResponse session = meteroid.getCheckoutSessions().createCheckoutSession(request);
 
 // Get a checkout session
@@ -249,7 +246,7 @@ The SDK throws `ApiException` for API errors:
 import com.meteroid.exceptions.ApiException;
 
 try {
-    Customer customer = meteroid.getCustomer().getCustomer("nonexistent");
+    Customer customer = meteroid.getCustomers().getCustomer("nonexistent");
 } catch (ApiException e) {
     System.out.println("Status code: " + e.getCode());
     System.out.println("Error message: " + e.getMessage());
@@ -271,14 +268,7 @@ Meteroid meteroid = new Meteroid("your-api-key", options);
 
 ### Retry Configuration
 
-The SDK automatically retries requests on 5xx server errors. You can customize the retry schedule:
-
-```java
-MeteroidOptions options = new MeteroidOptions();
-// Retry delays in milliseconds (default: 50ms, 100ms, 200ms)
-options.setRetrySchedule(Arrays.asList(100L, 500L, 1000L));
-Meteroid meteroid = new Meteroid("your-api-key", options);
-```
+The SDK automatically retries requests on 5xx server errors with delays of 50ms, 100ms, and 200ms.
 
 ## Building from Source
 
