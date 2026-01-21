@@ -148,18 +148,18 @@ impl Meteroid {
     }
 
     /// Access the plans API.
-    pub fn plans(&self) -> super::Plan<'_> {
-        super::Plan::new(&self.cfg)
+    pub fn plans(&self) -> super::Plans<'_> {
+        super::Plans::new(&self.cfg)
     }
 
     /// Access the product families API.
-    pub fn product_families(&self) -> super::ProductFamily<'_> {
-        super::ProductFamily::new(&self.cfg)
+    pub fn product_families(&self) -> super::ProductFamilies<'_> {
+        super::ProductFamilies::new(&self.cfg)
     }
 
     /// Access the subscriptions API.
-    pub fn subscriptions(&self) -> super::Subscription<'_> {
-        super::Subscription::new(&self.cfg)
+    pub fn subscriptions(&self) -> super::Subscriptions<'_> {
+        super::Subscriptions::new(&self.cfg)
     }
 }
 

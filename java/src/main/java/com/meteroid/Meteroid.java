@@ -31,12 +31,12 @@ import java.util.Map;
 public class Meteroid {
     private final CheckoutSessions checkoutSessions;
     private final CreditNotes creditNotes;
-    private final Customer customer;
+    private final Customers customers;
     private final Events events;
-    private final Invoice invoice;
-    private final Plan plan;
-    private final ProductFamily productFamily;
-    private final Subscription subscription;
+    private final Invoices invoices;
+    private final Plans plans;
+    private final ProductFamilies productFamilies;
+    private final Subscriptions subscriptions;
 
     /**
      * Create a new Meteroid client with default options.
@@ -72,11 +72,11 @@ public class Meteroid {
 
         this.checkoutSessions = new CheckoutSessions(httpClient);
         this.creditNotes = new CreditNotes(httpClient);
-        this.customer = new Customer(httpClient);
+        this.customers = new Customers(httpClient);
         this.events = new Events(httpClient);
-        this.invoice = new Invoice(httpClient);
-        this.plan = new Plan(httpClient);
-        this.productFamily = new ProductFamily(httpClient);
-        this.subscription = new Subscription(httpClient);
+        this.invoices = new Invoices(httpClient);
+        this.plans = new Plans(httpClient);
+        this.productFamilies = new ProductFamilies(httpClient);
+        this.subscriptions = new Subscriptions(httpClient);
     }
 }

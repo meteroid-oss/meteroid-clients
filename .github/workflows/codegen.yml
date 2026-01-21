@@ -25,6 +25,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Pull codegen Docker image
+        run: docker pull ghcr.io/meteroid-oss/openapi-codegen:latest
+
       - name: Regen openapi libs
         run: ./regen_openapi.py
 

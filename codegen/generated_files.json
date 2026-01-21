@@ -5,16 +5,16 @@
         "java/src/main/java/com/meteroid/api/Customers.java",
         "java/src/main/java/com/meteroid/api/Events.java",
         "java/src/main/java/com/meteroid/api/Invoices.java",
-        "java/src/main/java/com/meteroid/api/Plan.java",
-        "java/src/main/java/com/meteroid/api/ProductFamily.java",
-        "java/src/main/java/com/meteroid/api/Subscription.java"
+        "java/src/main/java/com/meteroid/api/Plans.java",
+        "java/src/main/java/com/meteroid/api/ProductFamilies.java",
+        "java/src/main/java/com/meteroid/api/Subscriptions.java"
     ],
     [
         "java/src/main/java/com/meteroid/api/CustomersListCustomersOptions.java",
         "java/src/main/java/com/meteroid/api/InvoicesListInvoicesOptions.java",
-        "java/src/main/java/com/meteroid/api/PlanListPlansOptions.java",
-        "java/src/main/java/com/meteroid/api/ProductFamilyListProductFamiliesOptions.java",
-        "java/src/main/java/com/meteroid/api/SubscriptionListSubscriptionsOptions.java"
+        "java/src/main/java/com/meteroid/api/PlansListPlansOptions.java",
+        "java/src/main/java/com/meteroid/api/ProductFamiliesListProductFamiliesOptions.java",
+        "java/src/main/java/com/meteroid/api/SubscriptionsListSubscriptionsOptions.java"
     ],
     [
         "java/src/main/java/com/meteroid/models/Address.java",
@@ -146,9 +146,9 @@
         "rust/src/api/customers.rs",
         "rust/src/api/events.rs",
         "rust/src/api/invoices.rs",
-        "rust/src/api/plan.rs",
-        "rust/src/api/product_family.rs",
-        "rust/src/api/subscription.rs"
+        "rust/src/api/plans.rs",
+        "rust/src/api/product_families.rs",
+        "rust/src/api/subscriptions.rs"
     ],
     [
         "rust/src/api/mod.rs"

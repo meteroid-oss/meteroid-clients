@@ -75,7 +75,7 @@ public class MeteroidClientTest {
         assertThat(response.name).isEqualTo("Created");
 
         verify(postRequestedFor(urlEqualTo("/api/v1/test"))
-                .withHeader("Content-Type", equalTo("application/json; charset=utf-8"))
+                .withHeader("Content-Type", matching("application/json; charset=(?i)utf-8"))
                 .withHeader("idempotency-key", matching("auto_.*"))
                 .withRequestBody(containing("\"name\":\"New Item\"")));
     }
@@ -210,6 +210,10 @@ public class MeteroidClientTest {
     // Test helper classes
     public static class TestRequest {
         public String name;
+
+        public String getName() {
+            return name;
+        }
     }
 
     public static class TestResponse {

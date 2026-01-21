@@ -77,8 +77,6 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates(GROUP, POM_ARTIFACT_ID, VERSION_NAME)
-
     pom {
         name = POM_NAME
         description = POM_DESCRIPTION

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Implementation-Title: meteroid
+Implementation-Version: 0.1.1
+Implementation-Vendor: Meteroid (https://meteroid.com)
+Bundle-SymbolicName: meteroid
+Export-Package: com.meteroid,com.meteroid.models,com.meteroid.api,com.me
+ teroid.exceptions
+

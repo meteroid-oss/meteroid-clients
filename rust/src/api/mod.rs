@@ -6,9 +6,9 @@ mod credit_notes;
 mod customers;
 mod events;
 mod invoices;
-mod plan;
-mod product_family;
-mod subscription;
+mod plans;
+mod product_families;
+mod subscriptions;
 
 pub use self::{
     checkout_sessions::CheckoutSessions,
@@ -17,7 +17,7 @@ pub use self::{
     customers::{Customers, CustomersListCustomersOptions},
     events::Events,
     invoices::{Invoices, InvoicesListInvoicesOptions},
-    plan::{Plan, PlanListPlansOptions},
-    product_family::{ProductFamily, ProductFamilyListProductFamiliesOptions},
-    subscription::{Subscription, SubscriptionListSubscriptionsOptions},
+    plans::{Plans, PlansListPlansOptions},
+    product_families::{ProductFamilies, ProductFamiliesListProductFamiliesOptions},
+    subscriptions::{Subscriptions, SubscriptionsListSubscriptionsOptions},
 };

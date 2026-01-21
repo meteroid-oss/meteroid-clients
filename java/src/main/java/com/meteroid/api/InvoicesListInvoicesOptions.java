@@ -1,6 +1,8 @@
 // this file is @generated
 package com.meteroid.api;
 
+import com.meteroid.models.InvoiceStatus;
+
 import lombok.Data;
 
 import java.util.List;

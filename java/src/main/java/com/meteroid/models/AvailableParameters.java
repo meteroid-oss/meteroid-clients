@@ -37,7 +37,8 @@ public class AvailableParameters {
         return this;
     }
 
-    public AvailableParameters putBillingPeriodsItem(String key, String billingPeriodsItem) {
+    public AvailableParameters putBillingPeriodsItem(
+            String key, List<BillingPeriodEnum> billingPeriodsItem) {
         if (this.billingPeriods == null) {
             this.billingPeriods = new HashMap<>();
         }
@@ -66,7 +67,7 @@ public class AvailableParameters {
     }
 
     public AvailableParameters putCapacityThresholdsItem(
-            String key, String capacityThresholdsItem) {
+            String key, List<Long> capacityThresholdsItem) {
         if (this.capacityThresholds == null) {
             this.capacityThresholds = new HashMap<>();
         }
