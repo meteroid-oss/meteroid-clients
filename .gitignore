@@ -13,5 +13,9 @@ composer.lock
 # Rust
 target/
 
+# Java
+/java/build/
+.gradle/
+
 # Codegen script
 /.codegen-tmp/
