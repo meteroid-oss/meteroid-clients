@@ -49,7 +49,7 @@ The SDK provides access to the following Meteroid API resources:
 
 ```rust
 use meteroid::api::Meteroid;
-use meteroid::models::CustomerCreateRequest;
+use meteroid_rs::models::CustomerCreateRequest;
 
 let client = Meteroid::new("your-api-key".to_string(), None);
 
@@ -100,7 +100,7 @@ std::fs::write("invoice.pdf", &pdf_bytes)?;
 
 ```rust
 use meteroid::api::Meteroid;
-use meteroid::models::IngestEventRequest;
+use meteroid_rs::models::IngestEventRequest;
 
 let client = Meteroid::new("your-api-key".to_string(), None);
 

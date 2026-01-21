@@ -1,4 +1,4 @@
-use meteroid::api::{CustomerListCustomersOptions, Meteroid, MeteroidOptions};
+use meteroid_rs::api::{CustomersListCustomersOptions, Meteroid, MeteroidOptions};
 
 use wiremock::{
     matchers::{header, method, path, query_param},
@@ -78,7 +78,7 @@ async fn test_list_customers_with_pagination() {
     let client = create_test_client(mock_server.uri());
     let response = client
         .customers()
-        .list_customers(Some(CustomerListCustomersOptions {
+        .list_customers(Some(CustomersListCustomersOptions {
             page: Some(2),
             per_page: Some(10),
             ..Default::default()
@@ -114,8 +114,8 @@ async fn test_create_customer() {
 
     let client = create_test_client(mock_server.uri());
 
-    let request = meteroid::models::CustomerCreateRequest::new(
-        meteroid::models::Currency::Usd,
+    let request = meteroid_rs::models::CustomerCreateRequest::new(
+        meteroid_rs::models::Currency::Usd,
         vec![],
         vec!["billing@new.com".to_string()],
         "New Customer".to_string(),
@@ -171,8 +171,8 @@ async fn test_idempotency_key_is_sent_for_post_request() {
 
     let client = create_test_client(mock_server.uri());
 
-    let request = meteroid::models::CustomerCreateRequest::new(
-        meteroid::models::Currency::Usd,
+    let request = meteroid_rs::models::CustomerCreateRequest::new(
+        meteroid_rs::models::Currency::Usd,
         vec![],
         vec![],
         "New Customer".to_string(),

@@ -6,9 +6,9 @@
 //! # Example
 //!
 //! ```no_run
-//! use meteroid::webhooks::Webhook;
+//! use meteroid_rs::webhooks::Webhook;
 //!
-//! fn verify_webhook(payload: &[u8], headers: &http1::HeaderMap) -> Result<(), meteroid::webhooks::WebhookError> {
+//! fn verify_webhook(payload: &[u8], headers: &http1::HeaderMap) -> Result<(), meteroid_rs::webhooks::WebhookError> {
 //!     let secret = "whsec_your_webhook_secret";
 //!     let wh = Webhook::new(secret)?;
 //!     wh.verify(payload, headers)?;

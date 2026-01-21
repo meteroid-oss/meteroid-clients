@@ -5,10 +5,10 @@
 //! # Example
 //!
 //! ```no_run
-//! use meteroid::api::{Meteroid, MeteroidOptions};
+//! use meteroid_rs::api::{Meteroid, MeteroidOptions};
 //!
 //! #[tokio::main]
-//! async fn main() -> Result<(), meteroid::error::Error> {
+//! async fn main() -> Result<(), meteroid_rs::error::Error> {
 //!     let client = Meteroid::new("your-api-key".to_string(), None);
 //!
 //!     // List customers

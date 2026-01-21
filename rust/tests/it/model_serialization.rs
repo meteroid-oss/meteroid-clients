@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::de::DeserializeOwned;
 use serde_json::json;
 
-use meteroid::models::{
+use meteroid_rs::models::{
     Currency, Customer, CustomerCreateRequest, CustomerListResponse, Fee, InvoiceStatus,
     PaginationResponse, RatePlanFee,
 };

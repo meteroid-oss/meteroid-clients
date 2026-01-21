@@ -60,9 +60,9 @@ impl Default for MeteroidOptions {
 /// # Example
 ///
 /// ```no_run
-/// use meteroid::api::{Meteroid, MeteroidOptions};
+/// use meteroid_rs::api::{Meteroid, MeteroidOptions};
 ///
-/// # async fn example() -> Result<(), meteroid::error::Error> {
+/// # async fn example() -> Result<(), meteroid_rs::error::Error> {
 /// let client = Meteroid::new("your-api-key".to_string(), None);
 ///
 /// // Access API resources
