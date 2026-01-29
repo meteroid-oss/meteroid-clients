@@ -287,3 +287,5 @@ impl<T: std::fmt::Display> QueryParamValue for Vec<T> {
         self.iter().format(",").to_string()
     }
 }
+
+impl_query_param_value!(crate::models::CheckoutSessionStatus);
