@@ -4,20 +4,20 @@ Official Rust SDK for the [Meteroid](https://meteroid.com) billing API.
 
 ## Installation
 
-Add `meteroid` to your `Cargo.toml`:
+Add `meteroid-rs` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-meteroid = "0.1"
+meteroid-rs = "0.19"
 ```
 
 ## Quick Start
 
 ```rust
-use meteroid::api::{Meteroid, MeteroidOptions};
+use meteroid_rs::api::{Meteroid, MeteroidOptions};
 
 #[tokio::main]
-async fn main() -> Result<(), meteroid::error::Error> {
+async fn main() -> Result<(), meteroid_rs::error::Error> {
     // Create a client with your API key
     let client = Meteroid::new("your-api-key".to_string(), None);
 
@@ -48,7 +48,7 @@ The SDK provides access to the following Meteroid API resources:
 ### Creating a Customer
 
 ```rust
-use meteroid::api::Meteroid;
+use meteroid_rs::api::Meteroid;
 use meteroid_rs::models::CustomerCreateRequest;
 
 let client = Meteroid::new("your-api-key".to_string(), None);
@@ -66,14 +66,15 @@ println!("Created customer: {}", customer.id);
 ### Listing Customers with Pagination
 
 ```rust
-use meteroid::api::{Meteroid, CustomerListCustomersOptions};
+use meteroid_rs::api::{Meteroid, CustomersListCustomersOptions};
 
 let client = Meteroid::new("your-api-key".to_string(), None);
 
-let customers = client.customers().list_customers(Some(CustomerListCustomersOptions {
+let customers = client.customers().list_customers(Some(CustomersListCustomersOptions {
     page: Some(0),
     per_page: Some(10),
     search: Some("acme".to_string()),
+    ..Default::default()
 })).await?;
 
 for customer in customers.data {
@@ -84,7 +85,7 @@ for customer in customers.data {
 ### Downloading an Invoice PDF
 
 ```rust
-use meteroid::api::Meteroid;
+use meteroid_rs::api::Meteroid;
 
 let client = Meteroid::new("your-api-key".to_string(), None);
 
@@ -99,19 +100,25 @@ std::fs::write("invoice.pdf", &pdf_bytes)?;
 ### Sending Usage Events
 
 ```rust
-use meteroid::api::Meteroid;
-use meteroid_rs::models::IngestEventRequest;
+use meteroid_rs::api::Meteroid;
+use meteroid_rs::models::{IngestEventsRequest, Event};
+use std::collections::HashMap;
 
 let client = Meteroid::new("your-api-key".to_string(), None);
 
-client.events().ingest_event(IngestEventRequest {
-    event_name: "api_call".to_string(),
-    customer_id: "customer_id".to_string(),
-    properties: serde_json::json!({
-        "endpoint": "/api/v1/users",
-        "method": "GET"
-    }),
-    ..Default::default()
+let mut properties = HashMap::new();
+properties.insert("endpoint".to_string(), "/api/v1/users".to_string());
+properties.insert("method".to_string(), "GET".to_string());
+
+client.events().ingest_events(IngestEventsRequest {
+    events: vec![Event {
+        code: "api_call".to_string(),
+        customer_id: "customer_id".to_string(),
+        event_id: "unique_event_id".to_string(),
+        timestamp: "2024-01-15T10:30:00Z".to_string(),
+        properties: Some(properties),
+    }],
+    allow_backfilling: None,
 }).await?;
 ```
 
@@ -122,8 +129,7 @@ client.events().ingest_event(IngestEventRequest {
 For self-hosted Meteroid instances:
 
 ```rust
-use meteroid::api::{Meteroid, MeteroidOptions};
-use std::time::Duration;
+use meteroid_rs::api::{Meteroid, MeteroidOptions};
 
 let options = MeteroidOptions {
     server_url: Some("https://your-meteroid-instance.com".to_string()),
@@ -136,7 +142,7 @@ let client = Meteroid::new("your-api-key".to_string(), Some(options));
 ### Timeout and Retries
 
 ```rust
-use meteroid::api::{Meteroid, MeteroidOptions};
+use meteroid_rs::api::{Meteroid, MeteroidOptions};
 use std::time::Duration;
 
 let options = MeteroidOptions {
@@ -151,7 +157,7 @@ let client = Meteroid::new("your-api-key".to_string(), Some(options));
 ### Custom Retry Schedule
 
 ```rust
-use meteroid::api::{Meteroid, MeteroidOptions};
+use meteroid_rs::api::{Meteroid, MeteroidOptions};
 use std::time::Duration;
 
 let options = MeteroidOptions {
@@ -179,20 +185,20 @@ let client = Meteroid::new("your-api-key".to_string(), Some(options));
 
 ```toml
 [dependencies]
-meteroid = { version = "0.1", default-features = false, features = ["native-tls", "http1"] }
+meteroid-rs = { version = "0.19", default-features = false, features = ["native-tls", "http1"] }
 ```
 
 ## Error Handling
 
-All API methods return `Result<T, meteroid::error::Error>`. The `Error` type provides detailed information about what went wrong:
+All API methods return `Result<T, meteroid_rs::error::Error>`. The `Error` type provides detailed information about what went wrong:
 
 ```rust
-use meteroid::api::Meteroid;
-use meteroid::error::Error;
+use meteroid_rs::api::Meteroid;
+use meteroid_rs::error::Error;
 
 let client = Meteroid::new("your-api-key".to_string(), None);
 
-match client.customers().get_customer_by_id("invalid-id".to_string()).await {
+match client.customers().get_customer("invalid-id".to_string()).await {
     Ok(customer) => println!("Found: {}", customer.name),
     Err(Error::Http(e)) => {
         println!("HTTP error {}: {}", e.status, e.body.message);
@@ -206,7 +212,7 @@ match client.customers().get_customer_by_id("invalid-id".to_string()).await {
 The `Meteroid` client is both `Send` and `Sync`, making it safe to share across threads:
 
 ```rust
-use meteroid::api::Meteroid;
+use meteroid_rs::api::Meteroid;
 use std::sync::Arc;
 
 let client = Arc::new(Meteroid::new("your-api-key".to_string(), None));
