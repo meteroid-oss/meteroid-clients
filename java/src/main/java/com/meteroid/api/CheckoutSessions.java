@@ -2,6 +2,7 @@
 package com.meteroid.api;
 
 import com.meteroid.MeteroidHttpClient;
+import com.meteroid.Utils;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.CancelCheckoutSessionResponse;
 import com.meteroid.models.CreateCheckoutSessionRequest;
@@ -21,13 +22,22 @@ public class CheckoutSessions {
     }
 
     /** */
+    public ListCheckoutSessionsResponse listCheckoutSessions() throws IOException, ApiException {
+
+        return this.listCheckoutSessions(new CheckoutSessionsListCheckoutSessionsOptions());
+    }
+
+    /** */
     public ListCheckoutSessionsResponse listCheckoutSessions(
-            final String customerId, final String status) throws IOException, ApiException {
-        HttpUrl.Builder url =
-                this.client
-                        .newUrlBuilder()
-                        .encodedPath(
-                                String.format("/api/v1/checkout-sessions", customerId, status));
+            final CheckoutSessionsListCheckoutSessionsOptions options)
+            throws IOException, ApiException {
+        HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/checkout-sessions");
+        if (options.customerId != null) {
+            url.addQueryParameter("customer_id", Utils.serializeQueryParam(options.customerId));
+        }
+        if (options.status != null) {
+            url.addQueryParameter("status", Utils.serializeQueryParam(options.status));
+        }
         return this.client.executeRequest(
                 "GET", url.build(), null, null, ListCheckoutSessionsResponse.class);
     }

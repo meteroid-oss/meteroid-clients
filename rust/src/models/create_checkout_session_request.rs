@@ -3,16 +3,11 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     coupon_id::CouponId, create_subscription_add_on::CreateSubscriptionAddOn,
-    create_subscription_components::CreateSubscriptionComponents, customer_id::CustomerId,
-    payment_strategy::PaymentStrategy, plan_version_id::PlanVersionId,
-    subscription_activation_condition_enum::SubscriptionActivationConditionEnum,
+    create_subscription_components::CreateSubscriptionComponents, plan_version_id::PlanVersionId,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct CreateCheckoutSessionRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub activation_condition: Option<SubscriptionActivationConditionEnum>,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub add_ons: Option<Vec<CreateSubscriptionAddOn>>,
 
@@ -39,7 +34,8 @@ pub struct CreateCheckoutSessionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coupon_ids: Option<Vec<CouponId>>,
 
-    pub customer_id: CustomerId,
+    /// Customer ID or alias
+    pub customer_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<String>,
@@ -60,9 +56,6 @@ pub struct CreateCheckoutSessionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub net_terms: Option<i32>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub payment_strategy: Option<PaymentStrategy>,
-
     pub plan_version_id: PlanVersionId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,9 +66,8 @@ pub struct CreateCheckoutSessionRequest {
 }
 
 impl CreateCheckoutSessionRequest {
-    pub fn new(customer_id: CustomerId, plan_version_id: PlanVersionId) -> Self {
+    pub fn new(customer_id: String, plan_version_id: PlanVersionId) -> Self {
         Self {
-            activation_condition: None,
             add_ons: None,
             auto_advance_invoices: None,
             billing_day_anchor: None,
@@ -91,7 +83,6 @@ impl CreateCheckoutSessionRequest {
             invoice_threshold: None,
             metadata: None,
             net_terms: None,
-            payment_strategy: None,
             plan_version_id,
             purchase_order: None,
             trial_duration_days: None,

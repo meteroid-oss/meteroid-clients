@@ -1,6 +1,6 @@
 [package]
 name = "meteroid-rs"
-version = "0.19.6"
+version = "0.20.0"
 edition = "2021"
 license = "MIT"
 description = "Meteroid Billing SDK for Rust"

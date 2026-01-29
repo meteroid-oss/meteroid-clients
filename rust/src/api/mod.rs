@@ -11,7 +11,7 @@ mod product_families;
 mod subscriptions;
 
 pub use self::{
-    checkout_sessions::CheckoutSessions,
+    checkout_sessions::{CheckoutSessions, CheckoutSessionsListCheckoutSessionsOptions},
     client::{Meteroid, MeteroidOptions},
     credit_notes::CreditNotes,
     customers::{Customers, CustomersListCustomersOptions},

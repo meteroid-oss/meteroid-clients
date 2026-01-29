@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     billable_metric_id::BillableMetricId, billing_period_enum::BillingPeriodEnum,
-    usage_pricing_model::UsagePricingModel,
+    plan_usage_pricing_model::PlanUsagePricingModel,
 };
 
 /// Usage-based fee
@@ -13,14 +13,14 @@ pub struct UsagePlanFee {
 
     pub metric_id: BillableMetricId,
 
-    pub pricing: UsagePricingModel,
+    pub pricing: PlanUsagePricingModel,
 }
 
 impl UsagePlanFee {
     pub fn new(
         cadence: BillingPeriodEnum,
         metric_id: BillableMetricId,
-        pricing: UsagePricingModel,
+        pricing: PlanUsagePricingModel,
     ) -> Self {
         Self {
             cadence,

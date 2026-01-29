@@ -75,6 +75,7 @@ pub mod invoice_type;
 pub mod invoicing_entity_id;
 pub mod list_checkout_sessions_response;
 pub mod matrix_dimension;
+pub mod matrix_plan_pricing;
 pub mod matrix_pricing;
 pub mod matrix_row;
 pub mod metric_dimension;
@@ -83,14 +84,15 @@ pub mod metric_event_data;
 pub mod metric_segmentation_matrix;
 pub mod one_time_fee;
 pub mod one_time_plan_fee;
+pub mod package_plan_pricing;
 pub mod package_pricing;
 pub mod pagination_response;
 pub mod payment_method_info;
 pub mod payment_method_type_enum;
 pub mod payment_status_enum;
-pub mod payment_strategy;
 pub mod payment_transaction_id;
 pub mod payment_type_enum;
+pub mod per_unit_plan_pricing;
 pub mod per_unit_pricing;
 pub mod percentage_discount;
 pub mod plan;
@@ -98,6 +100,7 @@ pub mod plan_id;
 pub mod plan_list_response;
 pub mod plan_status_enum;
 pub mod plan_type_enum;
+pub mod plan_usage_pricing_model;
 pub mod plan_version_id;
 pub mod price_component;
 pub mod price_component_id;
@@ -136,6 +139,7 @@ pub mod tax_breakdown_item;
 pub mod tax_exemption_type;
 pub mod term_rate;
 pub mod tier_row;
+pub mod tiered_plan_pricing;
 pub mod tiered_pricing;
 pub mod transaction;
 pub mod trial_config;
@@ -143,6 +147,7 @@ pub mod unit_conversion_rounding_enum;
 pub mod usage_fee;
 pub mod usage_plan_fee;
 pub mod usage_pricing_model;
+pub mod volume_plan_pricing;
 pub mod volume_pricing;
 // Manual types for error handling
 pub mod http_error_out;
@@ -189,17 +194,19 @@ pub use self::{
     invoice_payment_status::InvoicePaymentStatus, invoice_status::InvoiceStatus,
     invoice_type::InvoiceType, invoicing_entity_id::InvoicingEntityId,
     list_checkout_sessions_response::ListCheckoutSessionsResponse,
-    matrix_dimension::MatrixDimension, matrix_pricing::MatrixPricing, matrix_row::MatrixRow,
-    metric_dimension::MetricDimension, metric_event::MetricEvent,
-    metric_event_data::MetricEventData, metric_segmentation_matrix::MetricSegmentationMatrix,
-    one_time_fee::OneTimeFee, one_time_plan_fee::OneTimePlanFee, package_pricing::PackagePricing,
-    pagination_response::PaginationResponse, payment_method_info::PaymentMethodInfo,
-    payment_method_type_enum::PaymentMethodTypeEnum, payment_status_enum::PaymentStatusEnum,
-    payment_strategy::PaymentStrategy, payment_transaction_id::PaymentTransactionId,
-    payment_type_enum::PaymentTypeEnum, per_unit_pricing::PerUnitPricing,
-    percentage_discount::PercentageDiscount, plan::Plan, plan_id::PlanId,
-    plan_list_response::PlanListResponse, plan_status_enum::PlanStatusEnum,
-    plan_type_enum::PlanTypeEnum, plan_version_id::PlanVersionId, price_component::PriceComponent,
+    matrix_dimension::MatrixDimension, matrix_plan_pricing::MatrixPlanPricing,
+    matrix_pricing::MatrixPricing, matrix_row::MatrixRow, metric_dimension::MetricDimension,
+    metric_event::MetricEvent, metric_event_data::MetricEventData,
+    metric_segmentation_matrix::MetricSegmentationMatrix, one_time_fee::OneTimeFee,
+    one_time_plan_fee::OneTimePlanFee, package_plan_pricing::PackagePlanPricing,
+    package_pricing::PackagePricing, pagination_response::PaginationResponse,
+    payment_method_info::PaymentMethodInfo, payment_method_type_enum::PaymentMethodTypeEnum,
+    payment_status_enum::PaymentStatusEnum, payment_transaction_id::PaymentTransactionId,
+    payment_type_enum::PaymentTypeEnum, per_unit_plan_pricing::PerUnitPlanPricing,
+    per_unit_pricing::PerUnitPricing, percentage_discount::PercentageDiscount, plan::Plan,
+    plan_id::PlanId, plan_list_response::PlanListResponse, plan_status_enum::PlanStatusEnum,
+    plan_type_enum::PlanTypeEnum, plan_usage_pricing_model::PlanUsagePricingModel,
+    plan_version_id::PlanVersionId, price_component::PriceComponent,
     price_component_id::PriceComponentId, product_family::ProductFamily,
     product_family_create_request::ProductFamilyCreateRequest, product_family_id::ProductFamilyId,
     product_family_list_response::ProductFamilyListResponse, product_id::ProductId,
@@ -220,10 +227,11 @@ pub use self::{
     subscription_id::SubscriptionId, subscription_list_response::SubscriptionListResponse,
     subscription_status_enum::SubscriptionStatusEnum, tax_breakdown_item::TaxBreakdownItem,
     tax_exemption_type::TaxExemptionType, term_rate::TermRate, tier_row::TierRow,
-    tiered_pricing::TieredPricing, transaction::Transaction, trial_config::TrialConfig,
+    tiered_plan_pricing::TieredPlanPricing, tiered_pricing::TieredPricing,
+    transaction::Transaction, trial_config::TrialConfig,
     unit_conversion_rounding_enum::UnitConversionRoundingEnum, usage_fee::UsageFee,
     usage_plan_fee::UsagePlanFee, usage_pricing_model::UsagePricingModel,
-    volume_pricing::VolumePricing,
+    volume_plan_pricing::VolumePlanPricing, volume_pricing::VolumePricing,
 };
 
 // Manual types re-exports

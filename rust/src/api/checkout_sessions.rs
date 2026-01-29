@@ -2,6 +2,13 @@
 #[allow(unused_imports)]
 use crate::{error::Result, models::*, Configuration};
 
+#[derive(Default)]
+pub struct CheckoutSessionsListCheckoutSessionsOptions {
+    pub customer_id: Option<CustomerId>,
+
+    pub status: Option<CheckoutSessionStatus>,
+}
+
 pub struct CheckoutSessions<'a> {
     cfg: &'a Configuration,
 }
@@ -13,12 +20,16 @@ impl<'a> CheckoutSessions<'a> {
 
     pub async fn list_checkout_sessions(
         &self,
-        customer_id: String,
-        status: String,
+        options: Option<CheckoutSessionsListCheckoutSessionsOptions>,
     ) -> Result<crate::models::ListCheckoutSessionsResponse> {
+        let CheckoutSessionsListCheckoutSessionsOptions {
+            customer_id,
+            status,
+        } = options.unwrap_or_default();
+
         crate::request::Request::new(http1::Method::GET, "/api/v1/checkout-sessions")
-            .with_path_param("customer_id", customer_id)
-            .with_path_param("status", status)
+            .with_optional_query_param("customer_id", customer_id)
+            .with_optional_query_param("status", status)
             .execute(self.cfg)
             .await
     }

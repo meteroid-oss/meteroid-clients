@@ -21,7 +21,7 @@ public class UsagePlanFee {
     @JsonProperty("metric_id")
     private String metricId;
 
-    @JsonProperty private UsagePricingModel pricing;
+    @JsonProperty private PlanUsagePricingModel pricing;
 
     public UsagePlanFee() {}
 
@@ -63,7 +63,7 @@ public class UsagePlanFee {
         this.metricId = metricId;
     }
 
-    public UsagePlanFee pricing(UsagePricingModel pricing) {
+    public UsagePlanFee pricing(PlanUsagePricingModel pricing) {
         this.pricing = pricing;
         return this;
     }
@@ -74,11 +74,11 @@ public class UsagePlanFee {
      * @return pricing
      */
     @javax.annotation.Nonnull
-    public UsagePricingModel getPricing() {
+    public PlanUsagePricingModel getPricing() {
         return pricing;
     }
 
-    public void setPricing(UsagePricingModel pricing) {
+    public void setPricing(PlanUsagePricingModel pricing) {
         this.pricing = pricing;
     }
 

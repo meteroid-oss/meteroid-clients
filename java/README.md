@@ -12,7 +12,7 @@ Official Java SDK for the [Meteroid](https://meteroid.com) billing platform.
 
 ```groovy
 dependencies {
-    implementation 'com.meteroid:meteroid-java:0.19.6'
+    implementation 'com.meteroid:meteroid-java:0.20.0'
 }
 ```
 
@@ -22,7 +22,7 @@ dependencies {
 <dependency>
     <groupId>com.meteroid</groupId>
     <artifactId>meteroid-java</artifactId>
-    <version>0.19.6</version>
+    <version>0.20.0</version>
 </dependency>
 ```
 

@@ -19,9 +19,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class CreateCheckoutSessionRequest {
-    @JsonProperty("activation_condition")
-    private SubscriptionActivationConditionEnum activationCondition;
-
     @JsonProperty("add_ons")
     private List<CreateSubscriptionAddOn> addOns;
 
@@ -65,9 +62,6 @@ public class CreateCheckoutSessionRequest {
     @JsonProperty("net_terms")
     private Integer netTerms;
 
-    @JsonProperty("payment_strategy")
-    private PaymentStrategy paymentStrategy;
-
     @JsonProperty("plan_version_id")
     private String planVersionId;
 
@@ -78,26 +72,6 @@ public class CreateCheckoutSessionRequest {
     private Integer trialDurationDays;
 
     public CreateCheckoutSessionRequest() {}
-
-    public CreateCheckoutSessionRequest activationCondition(
-            SubscriptionActivationConditionEnum activationCondition) {
-        this.activationCondition = activationCondition;
-        return this;
-    }
-
-    /**
-     * Get activationCondition
-     *
-     * @return activationCondition
-     */
-    @javax.annotation.Nullable
-    public SubscriptionActivationConditionEnum getActivationCondition() {
-        return activationCondition;
-    }
-
-    public void setActivationCondition(SubscriptionActivationConditionEnum activationCondition) {
-        this.activationCondition = activationCondition;
-    }
 
     public CreateCheckoutSessionRequest addOns(List<CreateSubscriptionAddOn> addOns) {
         this.addOns = addOns;
@@ -276,7 +250,7 @@ public class CreateCheckoutSessionRequest {
     }
 
     /**
-     * Get customerId
+     * Customer ID or alias
      *
      * @return customerId
      */
@@ -401,25 +375,6 @@ public class CreateCheckoutSessionRequest {
 
     public void setNetTerms(Integer netTerms) {
         this.netTerms = netTerms;
-    }
-
-    public CreateCheckoutSessionRequest paymentStrategy(PaymentStrategy paymentStrategy) {
-        this.paymentStrategy = paymentStrategy;
-        return this;
-    }
-
-    /**
-     * Get paymentStrategy
-     *
-     * @return paymentStrategy
-     */
-    @javax.annotation.Nullable
-    public PaymentStrategy getPaymentStrategy() {
-        return paymentStrategy;
-    }
-
-    public void setPaymentStrategy(PaymentStrategy paymentStrategy) {
-        this.paymentStrategy = paymentStrategy;
     }
 
     public CreateCheckoutSessionRequest planVersionId(String planVersionId) {
