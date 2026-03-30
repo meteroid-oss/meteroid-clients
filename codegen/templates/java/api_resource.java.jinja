@@ -155,6 +155,29 @@ public class {{ resource_type_name }} {
             null
             {% endif -%}
         );
+        {% elif op.request_body_is_form -%}
+        {% if res_type != "void" %}return{% endif %}  this.client.executeFormRequest(
+            "{{ op.method | upper }}",
+            url.build(),
+            {# headers -#}
+            {% if op.header_params | length > 0 -%}
+            Headers.of(headers),
+            {% else -%}
+            null,
+            {% endif -%}
+            {# request body -#}
+            {% if op.request_body_schema_name is defined -%}
+            {{ req_body_field_name }},
+            {% else -%}
+            null,
+            {% endif -%}
+            {# response body class -#}
+            {% if op.response_body_schema_name is defined -%}
+            {{ res_type }}.class
+            {% else -%}
+            null
+            {% endif -%}
+        );
         {% else -%}
         {% if res_type != "void" %}return{% endif %}  this.client.executeRequest(
             "{{ op.method | upper }}",

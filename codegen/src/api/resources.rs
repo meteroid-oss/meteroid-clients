@@ -182,6 +182,9 @@ pub(crate) struct Operation {
     /// this from the argument list).
     /// Only useful when `request_body_schema_name` is `Some`.
     request_body_all_optional: bool,
+    /// True if the request body is application/x-www-form-urlencoded instead of JSON.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    request_body_is_form: bool,
     /// Name of the response body type, if any (only for JSON responses).
     #[serde(skip_serializing_if = "Option::is_none")]
     response_body_schema_name: Option<String>,
@@ -329,7 +332,7 @@ impl Operation {
                         unimplemented!("reference")
                     }
                     ReferenceOr::Item(body) => {
-                        if let Some(mt) = body.content.get("application/json") {
+                        if let Some(mt) = body.content.get("application/json").or_else(|| body.content.get("application/x-www-form-urlencoded")) {
                             match mt.schema.as_ref().map(|so| &so.json_schema) {
                                 Some(Schema::Object(schemars::schema::SchemaObject {
                                     object: Some(ov),
@@ -365,17 +368,23 @@ impl Operation {
             })
             .unwrap_or_default();
 
+        let mut request_body_is_form = false;
         let request_body_schema_name = op.request_body.and_then(|b| match b {
             ReferenceOr::Item(mut req_body) => {
                 assert!(req_body.required);
                 assert!(req_body.extensions.is_empty());
                 assert_eq!(req_body.content.len(), 1);
-                let json_body = req_body
+                let is_form = req_body.content.contains_key("application/x-www-form-urlencoded");
+                let body = req_body
                     .content
                     .swap_remove("application/json")
-                    .expect("should have JSON body");
-                assert!(json_body.extensions.is_empty());
-                match json_body.schema.expect("no json body schema?!").json_schema {
+                    .or_else(|| req_body.content.swap_remove("application/x-www-form-urlencoded"))
+                    .expect("should have JSON or form-urlencoded body");
+                if is_form {
+                    request_body_is_form = true;
+                }
+                assert!(body.extensions.is_empty());
+                match body.schema.expect("no body schema?!").json_schema {
                     Schema::Bool(_) => {
                         tracing::error!("unexpected bool schema");
                         None
@@ -442,6 +451,7 @@ impl Operation {
             query_params,
             request_body_schema_name,
             request_body_all_optional,
+            request_body_is_form,
             response_body_schema_name,
             response_is_binary: response_kind == ResponseKind::Binary,
             response_is_text: response_kind == ResponseKind::Text,
