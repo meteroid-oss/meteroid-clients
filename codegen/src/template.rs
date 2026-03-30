@@ -34,13 +34,12 @@ pub fn populate_env(
     env.add_filter("to_rust_ident", |s: Cow<'_, str>| {
         let s = s.to_snake_case();
         match s.as_str() {
-            "as" | "break" | "const" | "continue" | "crate" | "else" | "enum"
-            | "extern" | "false" | "fn" | "for" | "if" | "impl" | "in" | "let"
-            | "loop" | "match" | "mod" | "move" | "mut" | "pub" | "ref" | "return"
-            | "self" | "Self" | "static" | "struct" | "super" | "trait" | "true"
-            | "type" | "unsafe" | "use" | "where" | "while" | "async" | "await"
-            | "dyn" | "abstract" | "become" | "box" | "do" | "final" | "macro"
-            | "override" | "priv" | "typeof" | "unsized" | "virtual" | "yield"
+            "as" | "break" | "const" | "continue" | "crate" | "else" | "enum" | "extern"
+            | "false" | "fn" | "for" | "if" | "impl" | "in" | "let" | "loop" | "match" | "mod"
+            | "move" | "mut" | "pub" | "ref" | "return" | "self" | "Self" | "static" | "struct"
+            | "super" | "trait" | "true" | "type" | "unsafe" | "use" | "where" | "while"
+            | "async" | "await" | "dyn" | "abstract" | "become" | "box" | "do" | "final"
+            | "macro" | "override" | "priv" | "typeof" | "unsized" | "virtual" | "yield"
             | "try" => format!("r#{s}"),
             _ => s,
         }

@@ -332,7 +332,11 @@ impl Operation {
                         unimplemented!("reference")
                     }
                     ReferenceOr::Item(body) => {
-                        if let Some(mt) = body.content.get("application/json").or_else(|| body.content.get("application/x-www-form-urlencoded")) {
+                        if let Some(mt) = body
+                            .content
+                            .get("application/json")
+                            .or_else(|| body.content.get("application/x-www-form-urlencoded"))
+                        {
                             match mt.schema.as_ref().map(|so| &so.json_schema) {
                                 Some(Schema::Object(schemars::schema::SchemaObject {
                                     object: Some(ov),
@@ -374,11 +378,17 @@ impl Operation {
                 assert!(req_body.required);
                 assert!(req_body.extensions.is_empty());
                 assert_eq!(req_body.content.len(), 1);
-                let is_form = req_body.content.contains_key("application/x-www-form-urlencoded");
+                let is_form = req_body
+                    .content
+                    .contains_key("application/x-www-form-urlencoded");
                 let body = req_body
                     .content
                     .swap_remove("application/json")
-                    .or_else(|| req_body.content.swap_remove("application/x-www-form-urlencoded"))
+                    .or_else(|| {
+                        req_body
+                            .content
+                            .swap_remove("application/x-www-form-urlencoded")
+                    })
                     .expect("should have JSON or form-urlencoded body");
                 if is_form {
                     request_body_is_form = true;
