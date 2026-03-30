@@ -31,6 +31,19 @@ pub fn populate_env(
         s.to_shouty_snake_case()
     });
     env.add_filter("to_snake_case", |s: Cow<'_, str>| s.to_snake_case());
+    env.add_filter("to_rust_ident", |s: Cow<'_, str>| {
+        let s = s.to_snake_case();
+        match s.as_str() {
+            "as" | "break" | "const" | "continue" | "crate" | "else" | "enum" | "extern"
+            | "false" | "fn" | "for" | "if" | "impl" | "in" | "let" | "loop" | "match" | "mod"
+            | "move" | "mut" | "pub" | "ref" | "return" | "self" | "Self" | "static" | "struct"
+            | "super" | "trait" | "true" | "type" | "unsafe" | "use" | "where" | "while"
+            | "async" | "await" | "dyn" | "abstract" | "become" | "box" | "do" | "final"
+            | "macro" | "override" | "priv" | "typeof" | "unsized" | "virtual" | "yield"
+            | "try" => format!("r#{s}"),
+            _ => s,
+        }
+    });
     env.add_filter("to_lower_camel_case", |s: Cow<'_, str>| {
         s.to_lower_camel_case()
     });

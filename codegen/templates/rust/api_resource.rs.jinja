@@ -23,7 +23,7 @@ use crate::{error::Result, models::*, Configuration};
             {% if p.description is defined -%}
                 {{ p.description | to_doc_comment(style="rust") }}
             {% endif -%}
-            pub {{ p.name | to_snake_case }}: {{ ty }},
+            pub {{ p.name | to_rust_ident }}: {{ ty }},
         {% endfor -%}
         {% for p in op.header_params -%}
             {% set ty = "String" -%}
@@ -31,7 +31,7 @@ use crate::{error::Result, models::*, Configuration};
             {% if p.description is defined -%}
                 {{ p.description | to_doc_comment(style="rust") }}
             {% endif -%}
-            pub {{ p.name | to_snake_case }}: {{ ty }},
+            pub {{ p.name | to_rust_ident }}: {{ ty }},
         {% endfor -%}
     }
     {% endif %}
@@ -83,8 +83,8 @@ impl<'a> {{ resource_type_name }}<'a> {
         {% if has_params -%}
             {# unpack query / header parameter struct -#}
             let {{ param_struct_name }} {
-                {% for p in op.query_params %}{{ p.name | to_snake_case }},{% endfor %}
-                {% for p in op.header_params %}{{ p.name | to_snake_case }},{% endfor %}
+                {% for p in op.query_params %}{{ p.name | to_rust_ident }},{% endfor %}
+                {% for p in op.header_params %}{{ p.name | to_rust_ident }},{% endfor %}
             } = options
             {%- if not has_required_params %}.unwrap_or_default(){% endif -%}
             ;
@@ -103,15 +103,19 @@ impl<'a> {{ resource_type_name }}<'a> {
             {%- else -%}
                 .with_optional_query_param
             {%- endif -%}
-            ("{{ p.name }}", {{ p.name | to_snake_case }})
+            ("{{ p.name }}", {{ p.name | to_rust_ident }})
         {% endfor -%}
 
         {% for p in op.header_params -%}
-            .with_optional_header_param("{{ p.name }}", {{ p.name | to_snake_case }})
+            .with_optional_header_param("{{ p.name }}", {{ p.name | to_rust_ident }})
         {% endfor -%}
 
         {% if op.request_body_schema_name is defined -%}
+            {% if op.request_body_is_form -%}
+            .with_form_body_param({{ op.request_body_schema_name | to_snake_case }})
+            {% else -%}
             .with_body_param({{ op.request_body_schema_name | to_snake_case }})
+            {% endif -%}
         {% endif -%}
 
         {% if op.response_is_binary -%}
