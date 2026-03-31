@@ -13,7 +13,7 @@ import lombok.*;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "discriminator",
+        property = "type",
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = PriceEntry.Existing.class, name = "EXISTING"),
@@ -23,7 +23,7 @@ import lombok.*;
 @EqualsAndHashCode
 public abstract class PriceEntry {
     /** Get the discriminator value identifying this variant. */
-    public abstract String getDiscriminator();
+    public abstract String getType();
 
     /**
      * Convert an instance of PriceEntry to a JSON string.
@@ -64,7 +64,7 @@ public abstract class PriceEntry {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "EXISTING";
         }
 
@@ -99,7 +99,7 @@ public abstract class PriceEntry {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "NEW";
         }
 

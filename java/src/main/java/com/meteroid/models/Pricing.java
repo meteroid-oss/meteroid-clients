@@ -13,7 +13,7 @@ import lombok.*;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "discriminator",
+        property = "type",
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Pricing.Rate.class, name = "RATE"),
@@ -27,7 +27,7 @@ import lombok.*;
 @EqualsAndHashCode
 public abstract class Pricing {
     /** Get the discriminator value identifying this variant. */
-    public abstract String getDiscriminator();
+    public abstract String getType();
 
     /**
      * Convert an instance of Pricing to a JSON string.
@@ -68,7 +68,7 @@ public abstract class Pricing {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "RATE";
         }
 
@@ -103,7 +103,7 @@ public abstract class Pricing {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "SLOT";
         }
 
@@ -138,7 +138,7 @@ public abstract class Pricing {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "CAPACITY";
         }
 
@@ -173,7 +173,7 @@ public abstract class Pricing {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "USAGE";
         }
 
@@ -208,7 +208,7 @@ public abstract class Pricing {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "EXTRA_RECURRING";
         }
 
@@ -243,7 +243,7 @@ public abstract class Pricing {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "ONE_TIME";
         }
 

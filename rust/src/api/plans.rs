@@ -3,6 +3,29 @@
 use crate::{error::Result, models::*, Configuration};
 
 #[derive(Default)]
+pub struct PlansListPlansOptions {
+    pub product_family_id: Option<ProductFamilyId>,
+
+    /// Search by plan name
+    pub search: Option<String>,
+
+    /// Filter by plan status (can be repeated)
+    pub status: Option<Vec<String>>,
+
+    /// Filter by plan type (can be repeated)
+    pub plan_type: Option<Vec<String>>,
+
+    /// Sort order. Format: `column.direction`. Allowed columns: `name`, `status`, `plan_type`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
+    pub order_by: Option<String>,
+
+    /// Page number (0-indexed)
+    pub page: Option<i32>,
+
+    /// Number of items per page
+    pub per_page: Option<i32>,
+}
+
+#[derive(Default)]
 pub struct PlansGetPlanDetailsOptions {
     /// Filter by version: "draft", a version number, or omitted for active
     pub version: Option<String>,
@@ -24,6 +47,32 @@ pub struct Plans<'a> {
 impl<'a> Plans<'a> {
     pub(super) fn new(cfg: &'a Configuration) -> Self {
         Self { cfg }
+    }
+
+    pub async fn list_plans(
+        &self,
+        options: Option<PlansListPlansOptions>,
+    ) -> Result<crate::models::PlanListResponse> {
+        let PlansListPlansOptions {
+            product_family_id,
+            search,
+            status,
+            plan_type,
+            order_by,
+            page,
+            per_page,
+        } = options.unwrap_or_default();
+
+        crate::request::Request::new(http1::Method::GET, "/api/v1/plans")
+            .with_optional_query_param("product_family_id", product_family_id)
+            .with_optional_query_param("search", search)
+            .with_optional_query_param("status", status)
+            .with_optional_query_param("plan_type", plan_type)
+            .with_optional_query_param("order_by", order_by)
+            .with_optional_query_param("page", page)
+            .with_optional_query_param("per_page", per_page)
+            .execute(self.cfg)
+            .await
     }
 
     /// Create a new plan with components and pricing. Set `status` to `ACTIVE` to

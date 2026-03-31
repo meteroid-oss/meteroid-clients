@@ -1,7 +1,7 @@
 // this file is @generated
 use serde::{Deserialize, Serialize};
 
-use super::{coupon_discount_rest::CouponDiscountRest, plan_id::PlanId};
+use super::{coupon_discount::CouponDiscount, plan_id::PlanId};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct UpdateCouponRequest {
@@ -9,7 +9,7 @@ pub struct UpdateCouponRequest {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub discount: Option<CouponDiscountRest>,
+    pub discount: Option<CouponDiscount>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plan_ids: Option<Vec<PlanId>>,

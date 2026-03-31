@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use super::{existing_price_ref::ExistingPriceRef, price_input::PriceInput};
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(tag = "discriminator")]
+#[serde(tag = "type")]
 pub enum PriceEntry {
     #[serde(rename = "EXISTING")]
     Existing(ExistingPriceRef),

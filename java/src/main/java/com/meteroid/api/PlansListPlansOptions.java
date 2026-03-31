@@ -1,9 +1,6 @@
 // this file is @generated
 package com.meteroid.api;
 
-import com.meteroid.models.PlanStatusEnum;
-import com.meteroid.models.PlanTypeEnum;
-
 import lombok.Data;
 
 import java.util.List;
@@ -16,10 +13,10 @@ public class PlansListPlansOptions {
     String search;
 
     /** Filter by plan status (can be repeated) */
-    List<PlanStatusEnum> status;
+    List<String> status;
 
     /** Filter by plan type (can be repeated) */
-    List<PlanTypeEnum> planType;
+    List<String> planType;
 
     /**
      * Sort order. Format: `column.direction`. Allowed columns: `name`, `status`, `plan_type`,

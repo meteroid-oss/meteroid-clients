@@ -1,7 +1,6 @@
 // This file is @generated
 package com.meteroid.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -11,13 +10,10 @@ import com.meteroid.Utils;
 
 import lombok.*;
 
-import java.util.List;
-import java.util.Map;
-
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "discriminator",
+        property = "type",
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = MetricSegmentationMatrix.Single.class, name = "SINGLE"),
@@ -28,7 +24,7 @@ import java.util.Map;
 @EqualsAndHashCode
 public abstract class MetricSegmentationMatrix {
     /** Get the discriminator value identifying this variant. */
-    public abstract String getDiscriminator();
+    public abstract String getType();
 
     /**
      * Convert an instance of MetricSegmentationMatrix to a JSON string.
@@ -70,7 +66,7 @@ public abstract class MetricSegmentationMatrix {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "SINGLE";
         }
 
@@ -90,115 +86,70 @@ public abstract class MetricSegmentationMatrix {
     /**
      * Variant: DOUBLE
      *
-     * <p>Inline struct variant with its own fields.
+     * <p>This variant wraps DoubleSegmentationMatrix.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
     @JsonTypeName("DOUBLE")
     public static class Double extends MetricSegmentationMatrix {
-        @JsonProperty private MetricDimension dimension1;
-        @JsonProperty private MetricDimension dimension2;
+        @JsonUnwrapped private DoubleSegmentationMatrix data;
 
         public Double() {}
 
+        public Double(DoubleSegmentationMatrix data) {
+            this.data = data;
+        }
+
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "DOUBLE";
         }
 
+        /** Get the wrapped data for this variant. */
         @javax.annotation.Nonnull
-        public MetricDimension getDimension1() {
-            return dimension1;
+        public DoubleSegmentationMatrix getData() {
+            return data;
         }
 
-        public Double dimension1(MetricDimension dimension1) {
-            this.dimension1 = dimension1;
+        /** Set the wrapped data for this variant. */
+        public Double data(DoubleSegmentationMatrix data) {
+            this.data = data;
             return this;
-        }
-
-        public void setDimension1(MetricDimension dimension1) {
-            this.dimension1 = dimension1;
-        }
-
-        @javax.annotation.Nonnull
-        public MetricDimension getDimension2() {
-            return dimension2;
-        }
-
-        public Double dimension2(MetricDimension dimension2) {
-            this.dimension2 = dimension2;
-            return this;
-        }
-
-        public void setDimension2(MetricDimension dimension2) {
-            this.dimension2 = dimension2;
         }
     }
 
     /**
      * Variant: LINKED
      *
-     * <p>Inline struct variant with its own fields.
+     * <p>This variant wraps LinkedSegmentationMatrix.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
     @JsonTypeName("LINKED")
     public static class Linked extends MetricSegmentationMatrix {
-        @JsonProperty("dimension1_key")
-        private String dimension1Key;
-
-        @JsonProperty("dimension2_key")
-        private String dimension2Key;
-
-        @JsonProperty private Map<String, List<String>> values;
+        @JsonUnwrapped private LinkedSegmentationMatrix data;
 
         public Linked() {}
 
+        public Linked(LinkedSegmentationMatrix data) {
+            this.data = data;
+        }
+
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "LINKED";
         }
 
+        /** Get the wrapped data for this variant. */
         @javax.annotation.Nonnull
-        public String getDimension1Key() {
-            return dimension1Key;
+        public LinkedSegmentationMatrix getData() {
+            return data;
         }
 
-        public Linked dimension1Key(String dimension1Key) {
-            this.dimension1Key = dimension1Key;
+        /** Set the wrapped data for this variant. */
+        public Linked data(LinkedSegmentationMatrix data) {
+            this.data = data;
             return this;
-        }
-
-        public void setDimension1Key(String dimension1Key) {
-            this.dimension1Key = dimension1Key;
-        }
-
-        @javax.annotation.Nonnull
-        public String getDimension2Key() {
-            return dimension2Key;
-        }
-
-        public Linked dimension2Key(String dimension2Key) {
-            this.dimension2Key = dimension2Key;
-            return this;
-        }
-
-        public void setDimension2Key(String dimension2Key) {
-            this.dimension2Key = dimension2Key;
-        }
-
-        @javax.annotation.Nonnull
-        public Map<String, List<String>> getValues() {
-            return values;
-        }
-
-        public Linked values(Map<String, List<String>> values) {
-            this.values = values;
-            return this;
-        }
-
-        public void setValues(Map<String, List<String>> values) {
-            this.values = values;
         }
     }
 }

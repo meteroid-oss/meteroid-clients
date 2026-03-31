@@ -38,6 +38,8 @@ public class Meteroid {
 
     private final CheckoutSessions checkoutSessions;
 
+    private final Connect connect;
+
     private final Coupons coupons;
 
     private final CreditNotes creditNotes;
@@ -49,6 +51,10 @@ public class Meteroid {
     private final Invoices invoices;
 
     private final Metrics metrics;
+
+    private final OAuth oAuth;
+
+    private final OAuthApps oAuthApps;
 
     private final Plans plans;
 
@@ -95,6 +101,8 @@ public class Meteroid {
 
         this.checkoutSessions = new CheckoutSessions(httpClient);
 
+        this.connect = new Connect(httpClient);
+
         this.coupons = new Coupons(httpClient);
 
         this.creditNotes = new CreditNotes(httpClient);
@@ -106,6 +114,10 @@ public class Meteroid {
         this.invoices = new Invoices(httpClient);
 
         this.metrics = new Metrics(httpClient);
+
+        this.oAuth = new OAuth(httpClient);
+
+        this.oAuthApps = new OAuthApps(httpClient);
 
         this.plans = new Plans(httpClient);
 

@@ -7,7 +7,7 @@ use super::{
 };
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(tag = "discriminator")]
+#[serde(tag = "type")]
 pub enum UsagePricingModel {
     #[serde(rename = "PER_UNIT")]
     PerUnit(PerUnitPricing),

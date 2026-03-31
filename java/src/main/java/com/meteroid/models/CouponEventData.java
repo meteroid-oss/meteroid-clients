@@ -28,7 +28,7 @@ public class CouponEventData {
 
     @JsonProperty private String description;
     @JsonProperty private Boolean disabled;
-    @JsonProperty private CouponDiscountRest discount;
+    @JsonProperty private CouponDiscount discount;
 
     @JsonProperty("expires_at")
     private OffsetDateTime expiresAt;
@@ -138,7 +138,7 @@ public class CouponEventData {
         this.disabled = disabled;
     }
 
-    public CouponEventData discount(CouponDiscountRest discount) {
+    public CouponEventData discount(CouponDiscount discount) {
         this.discount = discount;
         return this;
     }
@@ -149,11 +149,11 @@ public class CouponEventData {
      * @return discount
      */
     @javax.annotation.Nonnull
-    public CouponDiscountRest getDiscount() {
+    public CouponDiscount getDiscount() {
         return discount;
     }
 
-    public void setDiscount(CouponDiscountRest discount) {
+    public void setDiscount(CouponDiscount discount) {
         this.discount = discount;
     }
 

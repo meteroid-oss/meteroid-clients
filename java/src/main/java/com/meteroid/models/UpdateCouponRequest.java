@@ -20,7 +20,7 @@ import java.util.List;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class UpdateCouponRequest {
     @JsonProperty private String description;
-    @JsonProperty private CouponDiscountRest discount;
+    @JsonProperty private CouponDiscount discount;
 
     @JsonProperty("plan_ids")
     private List<String> planIds;
@@ -46,7 +46,7 @@ public class UpdateCouponRequest {
         this.description = description;
     }
 
-    public UpdateCouponRequest discount(CouponDiscountRest discount) {
+    public UpdateCouponRequest discount(CouponDiscount discount) {
         this.discount = discount;
         return this;
     }
@@ -57,11 +57,11 @@ public class UpdateCouponRequest {
      * @return discount
      */
     @javax.annotation.Nullable
-    public CouponDiscountRest getDiscount() {
+    public CouponDiscount getDiscount() {
         return discount;
     }
 
-    public void setDiscount(CouponDiscountRest discount) {
+    public void setDiscount(CouponDiscount discount) {
         this.discount = discount;
     }
 

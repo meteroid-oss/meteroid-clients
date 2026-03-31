@@ -3,6 +3,19 @@
 use crate::{error::Result, models::*, Configuration};
 
 #[derive(Default)]
+pub struct BatchJobsListBatchJobsOptions {
+    pub job_type: Option<String>,
+
+    pub status: Option<Vec<String>>,
+
+    /// Page number (0-indexed)
+    pub page: Option<i32>,
+
+    /// Number of items per page
+    pub per_page: Option<i32>,
+}
+
+#[derive(Default)]
 pub struct BatchJobsListBatchJobFailuresOptions {
     pub chunk_id: Option<BatchJobChunkId>,
 
@@ -18,6 +31,27 @@ pub struct BatchJobs<'a> {
 impl<'a> BatchJobs<'a> {
     pub(super) fn new(cfg: &'a Configuration) -> Self {
         Self { cfg }
+    }
+
+    /// List batch jobs with optional filtering by type and status.
+    pub async fn list_batch_jobs(
+        &self,
+        options: Option<BatchJobsListBatchJobsOptions>,
+    ) -> Result<crate::models::BatchJobListResponse> {
+        let BatchJobsListBatchJobsOptions {
+            job_type,
+            status,
+            page,
+            per_page,
+        } = options.unwrap_or_default();
+
+        crate::request::Request::new(http1::Method::GET, "/api/v1/batch-jobs")
+            .with_optional_query_param("job_type", job_type)
+            .with_optional_query_param("status", status)
+            .with_optional_query_param("page", page)
+            .with_optional_query_param("per_page", per_page)
+            .execute(self.cfg)
+            .await
     }
 
     /// Retrieve a single batch job with its chunks and failures.

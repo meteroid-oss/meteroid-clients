@@ -8,7 +8,7 @@ use super::{
 };
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(tag = "discriminator")]
+#[serde(tag = "type")]
 pub enum Pricing {
     #[serde(rename = "RATE")]
     Rate(RatePricing),

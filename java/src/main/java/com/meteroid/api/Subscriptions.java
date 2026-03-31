@@ -2,11 +2,13 @@
 package com.meteroid.api;
 
 import com.meteroid.MeteroidHttpClient;
+import com.meteroid.Utils;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.CancelSubscriptionRequest;
 import com.meteroid.models.CancelSubscriptionResponse;
 import com.meteroid.models.SubscriptionCreateRequest;
 import com.meteroid.models.SubscriptionDetails;
+import com.meteroid.models.SubscriptionListResponse;
 import com.meteroid.models.SubscriptionUpdateRequest;
 import com.meteroid.models.SubscriptionUpdateResponse;
 
@@ -19,6 +21,38 @@ public class Subscriptions {
 
     public Subscriptions(MeteroidHttpClient client) {
         this.client = client;
+    }
+
+    /** List subscriptions with optional filtering by customer or plan. */
+    public SubscriptionListResponse listSubscriptions() throws IOException, ApiException {
+
+        return this.listSubscriptions(new SubscriptionsListSubscriptionsOptions());
+    }
+
+    /** List subscriptions with optional filtering by customer or plan. */
+    public SubscriptionListResponse listSubscriptions(
+            final SubscriptionsListSubscriptionsOptions options) throws IOException, ApiException {
+        HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/subscriptions");
+        if (options.customerId != null) {
+            url.addQueryParameter("customer_id", options.customerId);
+        }
+        if (options.planId != null) {
+            url.addQueryParameter("plan_id", Utils.serializeQueryParam(options.planId));
+        }
+        if (options.statuses != null) {
+            url.addQueryParameter("statuses", Utils.serializeQueryParam(options.statuses));
+        }
+        if (options.orderBy != null) {
+            url.addQueryParameter("order_by", options.orderBy);
+        }
+        if (options.page != null) {
+            url.addQueryParameter("page", Utils.serializeQueryParam(options.page));
+        }
+        if (options.perPage != null) {
+            url.addQueryParameter("per_page", Utils.serializeQueryParam(options.perPage));
+        }
+        return this.client.executeRequest(
+                "GET", url.build(), null, null, SubscriptionListResponse.class);
     }
 
     /** Create a new subscription for a customer with a specific plan. */

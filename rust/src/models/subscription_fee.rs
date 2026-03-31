@@ -7,7 +7,7 @@ use super::{
 };
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(tag = "discriminator")]
+#[serde(tag = "type")]
 pub enum SubscriptionFee {
     #[serde(rename = "RATE")]
     Rate(RateFee),

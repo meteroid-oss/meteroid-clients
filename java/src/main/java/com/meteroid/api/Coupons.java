@@ -2,8 +2,10 @@
 package com.meteroid.api;
 
 import com.meteroid.MeteroidHttpClient;
+import com.meteroid.Utils;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.Coupon;
+import com.meteroid.models.CouponListResponse;
 import com.meteroid.models.CreateCouponRequest;
 import com.meteroid.models.UpdateCouponRequest;
 
@@ -16,6 +18,34 @@ public class Coupons {
 
     public Coupons(MeteroidHttpClient client) {
         this.client = client;
+    }
+
+    /** */
+    public CouponListResponse listCoupons() throws IOException, ApiException {
+
+        return this.listCoupons(new CouponsListCouponsOptions());
+    }
+
+    /** */
+    public CouponListResponse listCoupons(final CouponsListCouponsOptions options)
+            throws IOException, ApiException {
+        HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/coupons");
+        if (options.search != null) {
+            url.addQueryParameter("search", options.search);
+        }
+        if (options.filter != null) {
+            url.addQueryParameter("filter", Utils.serializeQueryParam(options.filter));
+        }
+        if (options.orderBy != null) {
+            url.addQueryParameter("order_by", options.orderBy);
+        }
+        if (options.page != null) {
+            url.addQueryParameter("page", Utils.serializeQueryParam(options.page));
+        }
+        if (options.perPage != null) {
+            url.addQueryParameter("per_page", Utils.serializeQueryParam(options.perPage));
+        }
+        return this.client.executeRequest("GET", url.build(), null, null, CouponListResponse.class);
     }
 
     /** */

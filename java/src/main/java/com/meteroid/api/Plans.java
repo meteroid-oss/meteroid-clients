@@ -7,6 +7,7 @@ import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.CreatePlanRequest;
 import com.meteroid.models.PatchPlanRequest;
 import com.meteroid.models.Plan;
+import com.meteroid.models.PlanListResponse;
 import com.meteroid.models.PlanVersionListResponse;
 import com.meteroid.models.ReplacePlanRequest;
 
@@ -19,6 +20,41 @@ public class Plans {
 
     public Plans(MeteroidHttpClient client) {
         this.client = client;
+    }
+
+    /** */
+    public PlanListResponse listPlans() throws IOException, ApiException {
+
+        return this.listPlans(new PlansListPlansOptions());
+    }
+
+    /** */
+    public PlanListResponse listPlans(final PlansListPlansOptions options)
+            throws IOException, ApiException {
+        HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/plans");
+        if (options.productFamilyId != null) {
+            url.addQueryParameter(
+                    "product_family_id", Utils.serializeQueryParam(options.productFamilyId));
+        }
+        if (options.search != null) {
+            url.addQueryParameter("search", options.search);
+        }
+        if (options.status != null) {
+            url.addQueryParameter("status", Utils.serializeQueryParam(options.status));
+        }
+        if (options.planType != null) {
+            url.addQueryParameter("plan_type", Utils.serializeQueryParam(options.planType));
+        }
+        if (options.orderBy != null) {
+            url.addQueryParameter("order_by", options.orderBy);
+        }
+        if (options.page != null) {
+            url.addQueryParameter("page", Utils.serializeQueryParam(options.page));
+        }
+        if (options.perPage != null) {
+            url.addQueryParameter("per_page", Utils.serializeQueryParam(options.perPage));
+        }
+        return this.client.executeRequest("GET", url.build(), null, null, PlanListResponse.class);
     }
 
     /**

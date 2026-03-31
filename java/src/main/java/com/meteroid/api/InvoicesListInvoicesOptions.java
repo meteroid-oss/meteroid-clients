@@ -1,8 +1,6 @@
 // this file is @generated
 package com.meteroid.api;
 
-import com.meteroid.models.InvoiceStatus;
-
 import lombok.Data;
 
 import java.util.List;
@@ -13,7 +11,7 @@ public class InvoicesListInvoicesOptions {
     String customerId;
 
     String subscriptionId;
-    List<InvoiceStatus> statuses;
+    List<String> statuses;
 
     /**
      * Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`,

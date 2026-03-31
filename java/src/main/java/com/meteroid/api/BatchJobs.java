@@ -6,6 +6,7 @@ import com.meteroid.Utils;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.BatchJobDetailResponse;
 import com.meteroid.models.BatchJobFailuresResponse;
+import com.meteroid.models.BatchJobListResponse;
 
 import okhttp3.HttpUrl;
 
@@ -16,6 +17,32 @@ public class BatchJobs {
 
     public BatchJobs(MeteroidHttpClient client) {
         this.client = client;
+    }
+
+    /** List batch jobs with optional filtering by type and status. */
+    public BatchJobListResponse listBatchJobs() throws IOException, ApiException {
+
+        return this.listBatchJobs(new BatchJobsListBatchJobsOptions());
+    }
+
+    /** List batch jobs with optional filtering by type and status. */
+    public BatchJobListResponse listBatchJobs(final BatchJobsListBatchJobsOptions options)
+            throws IOException, ApiException {
+        HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/batch-jobs");
+        if (options.jobType != null) {
+            url.addQueryParameter("job_type", Utils.serializeQueryParam(options.jobType));
+        }
+        if (options.status != null) {
+            url.addQueryParameter("status", Utils.serializeQueryParam(options.status));
+        }
+        if (options.page != null) {
+            url.addQueryParameter("page", Utils.serializeQueryParam(options.page));
+        }
+        if (options.perPage != null) {
+            url.addQueryParameter("per_page", Utils.serializeQueryParam(options.perPage));
+        }
+        return this.client.executeRequest(
+                "GET", url.build(), null, null, BatchJobListResponse.class);
     }
 
     /** Retrieve a single batch job with its chunks and failures. */

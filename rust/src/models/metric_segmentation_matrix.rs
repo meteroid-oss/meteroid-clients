@@ -1,24 +1,20 @@
 // this file is @generated
 use serde::{Deserialize, Serialize};
 
-use super::metric_dimension::MetricDimension;
+use super::{
+    double_segmentation_matrix::DoubleSegmentationMatrix,
+    linked_segmentation_matrix::LinkedSegmentationMatrix, metric_dimension::MetricDimension,
+};
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(tag = "discriminator")]
+#[serde(tag = "type")]
 pub enum MetricSegmentationMatrix {
     #[serde(rename = "SINGLE")]
     Single(MetricDimension),
     #[serde(rename = "DOUBLE")]
-    Double {
-        dimension1: MetricDimension,
-        dimension2: MetricDimension,
-    },
+    Double(DoubleSegmentationMatrix),
     #[serde(rename = "LINKED")]
-    Linked {
-        dimension1_key: String,
-        dimension2_key: String,
-        values: std::collections::HashMap<String, Vec<String>>,
-    },
+    Linked(LinkedSegmentationMatrix),
 }
 
 impl Default for MetricSegmentationMatrix {

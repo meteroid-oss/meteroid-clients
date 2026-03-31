@@ -13,7 +13,7 @@ import lombok.*;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "fee_type",
+        property = "type",
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = ProductFeeStructure.Rate.class, name = "RATE"),
@@ -27,7 +27,7 @@ import lombok.*;
 @EqualsAndHashCode
 public abstract class ProductFeeStructure {
     /** Get the discriminator value identifying this variant. */
-    public abstract String getFeeType();
+    public abstract String getType();
 
     /**
      * Convert an instance of ProductFeeStructure to a JSON string.
@@ -68,7 +68,7 @@ public abstract class ProductFeeStructure {
         }
 
         @java.lang.Override
-        public String getFeeType() {
+        public String getType() {
             return "RATE";
         }
 
@@ -103,7 +103,7 @@ public abstract class ProductFeeStructure {
         }
 
         @java.lang.Override
-        public String getFeeType() {
+        public String getType() {
             return "SLOT";
         }
 
@@ -138,7 +138,7 @@ public abstract class ProductFeeStructure {
         }
 
         @java.lang.Override
-        public String getFeeType() {
+        public String getType() {
             return "CAPACITY";
         }
 
@@ -173,7 +173,7 @@ public abstract class ProductFeeStructure {
         }
 
         @java.lang.Override
-        public String getFeeType() {
+        public String getType() {
             return "USAGE";
         }
 
@@ -208,7 +208,7 @@ public abstract class ProductFeeStructure {
         }
 
         @java.lang.Override
-        public String getFeeType() {
+        public String getType() {
             return "EXTRA_RECURRING";
         }
 
@@ -243,7 +243,7 @@ public abstract class ProductFeeStructure {
         }
 
         @java.lang.Override
-        public String getFeeType() {
+        public String getType() {
             return "ONE_TIME";
         }
 

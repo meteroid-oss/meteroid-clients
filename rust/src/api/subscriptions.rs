@@ -2,6 +2,25 @@
 #[allow(unused_imports)]
 use crate::{error::Result, models::*, Configuration};
 
+#[derive(Default)]
+pub struct SubscriptionsListSubscriptionsOptions {
+    /// Filter by customer ID or alias
+    pub customer_id: Option<String>,
+
+    pub plan_id: Option<PlanId>,
+
+    pub statuses: Option<Vec<String>>,
+
+    /// Sort order. Format: `column.direction`. Allowed columns: `customer_name`, `plan_name`, `mrr_cents`, `billing_start_date`, `end_date`, `status`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
+    pub order_by: Option<String>,
+
+    /// Page number (0-indexed)
+    pub page: Option<i32>,
+
+    /// Number of items per page
+    pub per_page: Option<i32>,
+}
+
 pub struct Subscriptions<'a> {
     cfg: &'a Configuration,
 }
@@ -9,6 +28,31 @@ pub struct Subscriptions<'a> {
 impl<'a> Subscriptions<'a> {
     pub(super) fn new(cfg: &'a Configuration) -> Self {
         Self { cfg }
+    }
+
+    /// List subscriptions with optional filtering by customer or plan.
+    pub async fn list_subscriptions(
+        &self,
+        options: Option<SubscriptionsListSubscriptionsOptions>,
+    ) -> Result<crate::models::SubscriptionListResponse> {
+        let SubscriptionsListSubscriptionsOptions {
+            customer_id,
+            plan_id,
+            statuses,
+            order_by,
+            page,
+            per_page,
+        } = options.unwrap_or_default();
+
+        crate::request::Request::new(http1::Method::GET, "/api/v1/subscriptions")
+            .with_optional_query_param("customer_id", customer_id)
+            .with_optional_query_param("plan_id", plan_id)
+            .with_optional_query_param("statuses", statuses)
+            .with_optional_query_param("order_by", order_by)
+            .with_optional_query_param("page", page)
+            .with_optional_query_param("per_page", per_page)
+            .execute(self.cfg)
+            .await
     }
 
     /// Create a new subscription for a customer with a specific plan.

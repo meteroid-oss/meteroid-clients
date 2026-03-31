@@ -13,7 +13,7 @@ import lombok.*;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "discriminator",
+        property = "type",
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(
@@ -27,7 +27,7 @@ import lombok.*;
 @EqualsAndHashCode
 public abstract class SubscriptionAddOnCustomization {
     /** Get the discriminator value identifying this variant. */
-    public abstract String getDiscriminator();
+    public abstract String getType();
 
     /**
      * Convert an instance of SubscriptionAddOnCustomization to a JSON string.
@@ -69,7 +69,7 @@ public abstract class SubscriptionAddOnCustomization {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "PRICE_OVERRIDE";
         }
 
@@ -104,7 +104,7 @@ public abstract class SubscriptionAddOnCustomization {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "PARAMETERIZATION";
         }
 

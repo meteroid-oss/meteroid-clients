@@ -1,8 +1,6 @@
 // this file is @generated
 package com.meteroid.api;
 
-import com.meteroid.models.SubscriptionStatusEnum;
-
 import lombok.Data;
 
 import java.util.List;
@@ -13,7 +11,7 @@ public class SubscriptionsListSubscriptionsOptions {
     String customerId;
 
     String planId;
-    List<SubscriptionStatusEnum> statuses;
+    List<String> statuses;
 
     /**
      * Sort order. Format: `column.direction`. Allowed columns: `customer_name`, `plan_name`,

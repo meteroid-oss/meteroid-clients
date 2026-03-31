@@ -22,7 +22,7 @@ import java.util.List;
 public class CreateCouponRequest {
     @JsonProperty private String code;
     @JsonProperty private String description;
-    @JsonProperty private CouponDiscountRest discount;
+    @JsonProperty private CouponDiscount discount;
 
     @JsonProperty("expires_at")
     private OffsetDateTime expiresAt;
@@ -78,7 +78,7 @@ public class CreateCouponRequest {
         this.description = description;
     }
 
-    public CreateCouponRequest discount(CouponDiscountRest discount) {
+    public CreateCouponRequest discount(CouponDiscount discount) {
         this.discount = discount;
         return this;
     }
@@ -89,11 +89,11 @@ public class CreateCouponRequest {
      * @return discount
      */
     @javax.annotation.Nonnull
-    public CouponDiscountRest getDiscount() {
+    public CouponDiscount getDiscount() {
         return discount;
     }
 
-    public void setDiscount(CouponDiscountRest discount) {
+    public void setDiscount(CouponDiscount discount) {
         this.discount = discount;
     }
 

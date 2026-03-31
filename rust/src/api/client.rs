@@ -136,6 +136,11 @@ impl Meteroid {
         super::CheckoutSessions::new(&self.cfg)
     }
 
+    /// Access the connect API.
+    pub fn connect(&self) -> super::Connect<'_> {
+        super::Connect::new(&self.cfg)
+    }
+
     /// Access the coupons API.
     pub fn coupons(&self) -> super::Coupons<'_> {
         super::Coupons::new(&self.cfg)
@@ -164,6 +169,16 @@ impl Meteroid {
     /// Access the metrics API.
     pub fn metrics(&self) -> super::Metrics<'_> {
         super::Metrics::new(&self.cfg)
+    }
+
+    /// Access the o auth API.
+    pub fn o_auth(&self) -> super::OAuth<'_> {
+        super::OAuth::new(&self.cfg)
+    }
+
+    /// Access the o auth apps API.
+    pub fn o_auth_apps(&self) -> super::OAuthApps<'_> {
+        super::OAuthApps::new(&self.cfg)
     }
 
     /// Access the plans API.

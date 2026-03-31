@@ -13,7 +13,7 @@ import lombok.*;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "discriminator",
+        property = "type",
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = UsagePricingModel.PerUnit.class, name = "PER_UNIT"),
@@ -26,7 +26,7 @@ import lombok.*;
 @EqualsAndHashCode
 public abstract class UsagePricingModel {
     /** Get the discriminator value identifying this variant. */
-    public abstract String getDiscriminator();
+    public abstract String getType();
 
     /**
      * Convert an instance of UsagePricingModel to a JSON string.
@@ -67,7 +67,7 @@ public abstract class UsagePricingModel {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "PER_UNIT";
         }
 
@@ -102,7 +102,7 @@ public abstract class UsagePricingModel {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "TIERED";
         }
 
@@ -137,7 +137,7 @@ public abstract class UsagePricingModel {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "VOLUME";
         }
 
@@ -172,7 +172,7 @@ public abstract class UsagePricingModel {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "PACKAGE";
         }
 
@@ -207,7 +207,7 @@ public abstract class UsagePricingModel {
         }
 
         @java.lang.Override
-        public String getDiscriminator() {
+        public String getType() {
             return "MATRIX";
         }
 

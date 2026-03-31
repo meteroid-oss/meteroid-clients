@@ -1,7 +1,7 @@
 // this file is @generated
 use serde::{Deserialize, Serialize};
 
-use super::{coupon_discount_rest::CouponDiscountRest, coupon_id::CouponId};
+use super::{coupon_discount::CouponDiscount, coupon_id::CouponId};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct CouponEventData {
@@ -15,7 +15,7 @@ pub struct CouponEventData {
 
     pub disabled: bool,
 
-    pub discount: CouponDiscountRest,
+    pub discount: CouponDiscount,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<String>,
@@ -36,7 +36,7 @@ impl CouponEventData {
         created_at: String,
         description: String,
         disabled: bool,
-        discount: CouponDiscountRest,
+        discount: CouponDiscount,
         reusable: bool,
     ) -> Self {
         Self {
