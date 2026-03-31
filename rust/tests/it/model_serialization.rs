@@ -41,11 +41,11 @@ fn test_currency_display() {
 
 #[test]
 fn test_invoice_status_serialization() {
-    assert_eq!(json!(InvoiceStatus::Draft), json!("Draft"));
-    assert_eq!(json!(InvoiceStatus::Finalized), json!("Finalized"));
-    assert_eq!(json!(InvoiceStatus::Void), json!("Void"));
+    assert_eq!(json!(InvoiceStatus::Draft), json!("DRAFT"));
+    assert_eq!(json!(InvoiceStatus::Finalized), json!("FINALIZED"));
+    assert_eq!(json!(InvoiceStatus::Void), json!("VOID"));
 
-    let draft: InvoiceStatus = serde_json::from_str(r#""Draft""#).unwrap();
+    let draft: InvoiceStatus = serde_json::from_str(r#""DRAFT""#).unwrap();
     assert_eq!(draft, InvoiceStatus::Draft);
 }
 
@@ -147,13 +147,13 @@ fn test_fee_tagged_union_serialization() {
     let rate_fee = Fee::Rate(RatePlanFee { rates: vec![] });
 
     let json_value = serde_json::to_value(&rate_fee).unwrap();
-    assert_eq!(json_value["fee_type"], "rate");
+    assert_eq!(json_value["fee_type"], "RATE");
 }
 
 #[test]
 fn test_fee_tagged_union_deserialization() {
     let json_str = r#"{
-        "fee_type": "rate",
+        "fee_type": "RATE",
         "rates": []
     }"#;
 

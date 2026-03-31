@@ -5,7 +5,8 @@ use super::{fee::Fee, price_component_id::PriceComponentId, product_id::ProductI
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct PriceComponent {
-    pub fee: Fee,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fee: Option<Fee>,
 
     pub id: PriceComponentId,
 
@@ -16,9 +17,9 @@ pub struct PriceComponent {
 }
 
 impl PriceComponent {
-    pub fn new(fee: Fee, id: PriceComponentId, name: String) -> Self {
+    pub fn new(id: PriceComponentId, name: String) -> Self {
         Self {
-            fee,
+            fee: None,
             id,
             name,
             product_id: None,

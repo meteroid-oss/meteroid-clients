@@ -1,14 +1,27 @@
 // this file is @generated
 #![allow(clippy::too_many_arguments)]
 
+pub mod add_on;
+pub mod add_on_event;
+pub mod add_on_event_data;
 pub mod add_on_id;
+pub mod add_on_list_response;
 pub mod address;
 pub mod applied_coupon;
 pub mod applied_coupon_detailed;
 pub mod applied_coupon_id;
 pub mod available_parameters;
 pub mod bank_account_id;
+pub mod bank_transfer_payment_method_config;
+pub mod batch_job_chunk_id;
+pub mod batch_job_detail_response;
+pub mod batch_job_failures_response;
+pub mod batch_job_id;
+pub mod batch_job_item_failure_response;
+pub mod batch_job_status;
+pub mod batch_job_type;
 pub mod billable_metric_id;
+pub mod billing_config;
 pub mod billing_metric_aggregate_enum;
 pub mod billing_period_enum;
 pub mod billing_type;
@@ -17,7 +30,9 @@ pub mod cancel_checkout_session_response;
 pub mod cancel_subscription_request;
 pub mod cancel_subscription_response;
 pub mod capacity_fee;
+pub mod capacity_fee_structure;
 pub mod capacity_plan_fee;
+pub mod capacity_pricing;
 pub mod capacity_threshold;
 pub mod checkout_session;
 pub mod checkout_session_id;
@@ -29,10 +44,20 @@ pub mod component_parameters;
 pub mod country_code;
 pub mod coupon;
 pub mod coupon_discount;
+pub mod coupon_discount_rest;
+pub mod coupon_event;
+pub mod coupon_event_data;
+pub mod coupon_fixed_discount;
 pub mod coupon_id;
 pub mod coupon_line_item;
+pub mod coupon_percentage_discount;
+pub mod create_add_on_request;
 pub mod create_checkout_session_request;
 pub mod create_checkout_session_response;
+pub mod create_coupon_request;
+pub mod create_metric_request;
+pub mod create_plan_request;
+pub mod create_product_request;
 pub mod create_subscription_add_on;
 pub mod create_subscription_components;
 pub mod credit_note_event;
@@ -55,11 +80,18 @@ pub mod customer_update_request;
 pub mod event;
 pub mod event_id;
 pub mod event_type;
+pub mod existing_price_ref;
+pub mod existing_product_ref;
+pub mod external_payment_method_config;
 pub mod extra_component;
+pub mod extra_recurring_billing_type_enum;
+pub mod extra_recurring_fee_structure;
 pub mod extra_recurring_plan_fee;
+pub mod extra_recurring_pricing;
 pub mod fee;
 pub mod fixed_discount;
 pub mod get_checkout_session_response;
+pub mod grouped_usage;
 pub mod ingest_events_request;
 pub mod ingest_events_response;
 pub mod ingest_failure;
@@ -68,27 +100,37 @@ pub mod invoice_event;
 pub mod invoice_event_data;
 pub mod invoice_id;
 pub mod invoice_line_item;
-pub mod invoice_list_response;
 pub mod invoice_payment_status;
 pub mod invoice_status;
 pub mod invoice_type;
 pub mod invoicing_entity_id;
-pub mod list_checkout_sessions_response;
 pub mod matrix_dimension;
 pub mod matrix_plan_pricing;
 pub mod matrix_pricing;
 pub mod matrix_row;
+pub mod metric;
 pub mod metric_dimension;
 pub mod metric_event;
 pub mod metric_event_data;
+pub mod metric_list_response;
 pub mod metric_segmentation_matrix;
+pub mod metric_summary;
+pub mod metric_usage;
+pub mod new_product_ref;
 pub mod one_time_fee;
+pub mod one_time_fee_structure;
 pub mod one_time_plan_fee;
+pub mod one_time_pricing;
+pub mod online_method_config;
+pub mod online_methods_config;
+pub mod online_payment_method_config;
 pub mod package_plan_pricing;
 pub mod package_pricing;
 pub mod pagination_response;
+pub mod patch_plan_request;
 pub mod payment_method_info;
 pub mod payment_method_type_enum;
+pub mod payment_methods_config;
 pub mod payment_status_enum;
 pub mod payment_transaction_id;
 pub mod payment_type_enum;
@@ -96,35 +138,59 @@ pub mod per_unit_plan_pricing;
 pub mod per_unit_pricing;
 pub mod percentage_discount;
 pub mod plan;
+pub mod plan_add_on_input;
+pub mod plan_event;
+pub mod plan_event_data;
 pub mod plan_id;
-pub mod plan_list_response;
 pub mod plan_status_enum;
 pub mod plan_type_enum;
 pub mod plan_usage_pricing_model;
 pub mod plan_version_id;
+pub mod plan_version_list_response;
+pub mod plan_version_summary;
 pub mod price_component;
 pub mod price_component_id;
+pub mod price_component_input;
+pub mod price_entry;
+pub mod price_id;
+pub mod price_input;
+pub mod pricing;
+pub mod product;
+pub mod product_event;
+pub mod product_event_data;
 pub mod product_family;
 pub mod product_family_create_request;
 pub mod product_family_id;
 pub mod product_family_list_response;
+pub mod product_fee_structure;
+pub mod product_fee_type_enum;
 pub mod product_id;
+pub mod product_list_response;
+pub mod product_ref;
 pub mod quote_event;
 pub mod quote_event_data;
 pub mod quote_id;
 pub mod rate_fee;
+pub mod rate_fee_structure;
 pub mod rate_plan_fee;
+pub mod rate_pricing;
 pub mod recurring_fee;
+pub mod replace_plan_request;
 pub mod shipping_address;
+pub mod slot_downgrade_policy_enum;
 pub mod slot_fee;
+pub mod slot_fee_structure;
 pub mod slot_plan_fee;
+pub mod slot_pricing;
+pub mod slot_upgrade_policy_enum;
 pub mod sub_line_item;
 pub mod subscription;
 pub mod subscription_activation_condition_enum;
 pub mod subscription_add_on;
 pub mod subscription_add_on_customization;
-pub mod subscription_add_on_override;
+pub mod subscription_add_on_id;
 pub mod subscription_add_on_parameterization;
+pub mod subscription_add_on_price_override;
 pub mod subscription_component;
 pub mod subscription_create_request;
 pub mod subscription_details;
@@ -133,8 +199,9 @@ pub mod subscription_event_data;
 pub mod subscription_fee;
 pub mod subscription_fee_billing_period_enum;
 pub mod subscription_id;
-pub mod subscription_list_response;
 pub mod subscription_status_enum;
+pub mod subscription_update_request;
+pub mod subscription_update_response;
 pub mod tax_breakdown_item;
 pub mod tax_exemption_type;
 pub mod term_rate;
@@ -143,10 +210,19 @@ pub mod tiered_plan_pricing;
 pub mod tiered_pricing;
 pub mod transaction;
 pub mod trial_config;
+pub mod unit_conversion;
 pub mod unit_conversion_rounding_enum;
+pub mod update_add_on_request;
+pub mod update_coupon_request;
+pub mod update_metric_request;
+pub mod update_product_request;
 pub mod usage_fee;
+pub mod usage_fee_structure;
+pub mod usage_model_enum;
 pub mod usage_plan_fee;
+pub mod usage_pricing;
 pub mod usage_pricing_model;
+pub mod usage_response;
 pub mod volume_plan_pricing;
 pub mod volume_pricing;
 // Manual types for error handling
@@ -155,24 +231,36 @@ pub mod http_validation_error;
 pub mod validation_error;
 
 pub use self::{
-    add_on_id::AddOnId, address::Address, applied_coupon::AppliedCoupon,
+    add_on::AddOn, add_on_event::AddOnEvent, add_on_event_data::AddOnEventData, add_on_id::AddOnId,
+    add_on_list_response::AddOnListResponse, address::Address, applied_coupon::AppliedCoupon,
     applied_coupon_detailed::AppliedCouponDetailed, applied_coupon_id::AppliedCouponId,
     available_parameters::AvailableParameters, bank_account_id::BankAccountId,
-    billable_metric_id::BillableMetricId,
-    billing_metric_aggregate_enum::BillingMetricAggregateEnum,
+    bank_transfer_payment_method_config::BankTransferPaymentMethodConfig,
+    batch_job_chunk_id::BatchJobChunkId, batch_job_detail_response::BatchJobDetailResponse,
+    batch_job_failures_response::BatchJobFailuresResponse, batch_job_id::BatchJobId,
+    batch_job_item_failure_response::BatchJobItemFailureResponse, batch_job_status::BatchJobStatus,
+    batch_job_type::BatchJobType, billable_metric_id::BillableMetricId,
+    billing_config::BillingConfig, billing_metric_aggregate_enum::BillingMetricAggregateEnum,
     billing_period_enum::BillingPeriodEnum, billing_type::BillingType,
     billing_type_enum::BillingTypeEnum,
     cancel_checkout_session_response::CancelCheckoutSessionResponse,
     cancel_subscription_request::CancelSubscriptionRequest,
     cancel_subscription_response::CancelSubscriptionResponse, capacity_fee::CapacityFee,
-    capacity_plan_fee::CapacityPlanFee, capacity_threshold::CapacityThreshold,
+    capacity_fee_structure::CapacityFeeStructure, capacity_plan_fee::CapacityPlanFee,
+    capacity_pricing::CapacityPricing, capacity_threshold::CapacityThreshold,
     checkout_session::CheckoutSession, checkout_session_id::CheckoutSessionId,
     checkout_session_status::CheckoutSessionStatus, checkout_type::CheckoutType,
     component_override::ComponentOverride, component_parameterization::ComponentParameterization,
     component_parameters::ComponentParameters, country_code::CountryCode, coupon::Coupon,
-    coupon_discount::CouponDiscount, coupon_id::CouponId, coupon_line_item::CouponLineItem,
+    coupon_discount::CouponDiscount, coupon_discount_rest::CouponDiscountRest,
+    coupon_event::CouponEvent, coupon_event_data::CouponEventData,
+    coupon_fixed_discount::CouponFixedDiscount, coupon_id::CouponId,
+    coupon_line_item::CouponLineItem, coupon_percentage_discount::CouponPercentageDiscount,
+    create_add_on_request::CreateAddOnRequest,
     create_checkout_session_request::CreateCheckoutSessionRequest,
     create_checkout_session_response::CreateCheckoutSessionResponse,
+    create_coupon_request::CreateCouponRequest, create_metric_request::CreateMetricRequest,
+    create_plan_request::CreatePlanRequest, create_product_request::CreateProductRequest,
     create_subscription_add_on::CreateSubscriptionAddOn,
     create_subscription_components::CreateSubscriptionComponents,
     credit_note_event::CreditNoteEvent, credit_note_event_data::CreditNoteEventData,
@@ -184,53 +272,79 @@ pub use self::{
     customer_payment_method_id::CustomerPaymentMethodId,
     customer_portal_token_response::CustomerPortalTokenResponse,
     customer_update_request::CustomerUpdateRequest, event::Event, event_id::EventId,
-    event_type::EventType, extra_component::ExtraComponent,
-    extra_recurring_plan_fee::ExtraRecurringPlanFee, fee::Fee, fixed_discount::FixedDiscount,
-    get_checkout_session_response::GetCheckoutSessionResponse,
+    event_type::EventType, existing_price_ref::ExistingPriceRef,
+    existing_product_ref::ExistingProductRef,
+    external_payment_method_config::ExternalPaymentMethodConfig, extra_component::ExtraComponent,
+    extra_recurring_billing_type_enum::ExtraRecurringBillingTypeEnum,
+    extra_recurring_fee_structure::ExtraRecurringFeeStructure,
+    extra_recurring_plan_fee::ExtraRecurringPlanFee,
+    extra_recurring_pricing::ExtraRecurringPricing, fee::Fee, fixed_discount::FixedDiscount,
+    get_checkout_session_response::GetCheckoutSessionResponse, grouped_usage::GroupedUsage,
     ingest_events_request::IngestEventsRequest, ingest_events_response::IngestEventsResponse,
     ingest_failure::IngestFailure, invoice::Invoice, invoice_event::InvoiceEvent,
     invoice_event_data::InvoiceEventData, invoice_id::InvoiceId,
-    invoice_line_item::InvoiceLineItem, invoice_list_response::InvoiceListResponse,
-    invoice_payment_status::InvoicePaymentStatus, invoice_status::InvoiceStatus,
-    invoice_type::InvoiceType, invoicing_entity_id::InvoicingEntityId,
-    list_checkout_sessions_response::ListCheckoutSessionsResponse,
-    matrix_dimension::MatrixDimension, matrix_plan_pricing::MatrixPlanPricing,
-    matrix_pricing::MatrixPricing, matrix_row::MatrixRow, metric_dimension::MetricDimension,
-    metric_event::MetricEvent, metric_event_data::MetricEventData,
-    metric_segmentation_matrix::MetricSegmentationMatrix, one_time_fee::OneTimeFee,
-    one_time_plan_fee::OneTimePlanFee, package_plan_pricing::PackagePlanPricing,
-    package_pricing::PackagePricing, pagination_response::PaginationResponse,
+    invoice_line_item::InvoiceLineItem, invoice_payment_status::InvoicePaymentStatus,
+    invoice_status::InvoiceStatus, invoice_type::InvoiceType,
+    invoicing_entity_id::InvoicingEntityId, matrix_dimension::MatrixDimension,
+    matrix_plan_pricing::MatrixPlanPricing, matrix_pricing::MatrixPricing, matrix_row::MatrixRow,
+    metric::Metric, metric_dimension::MetricDimension, metric_event::MetricEvent,
+    metric_event_data::MetricEventData, metric_list_response::MetricListResponse,
+    metric_segmentation_matrix::MetricSegmentationMatrix, metric_summary::MetricSummary,
+    metric_usage::MetricUsage, new_product_ref::NewProductRef, one_time_fee::OneTimeFee,
+    one_time_fee_structure::OneTimeFeeStructure, one_time_plan_fee::OneTimePlanFee,
+    one_time_pricing::OneTimePricing, online_method_config::OnlineMethodConfig,
+    online_methods_config::OnlineMethodsConfig,
+    online_payment_method_config::OnlinePaymentMethodConfig,
+    package_plan_pricing::PackagePlanPricing, package_pricing::PackagePricing,
+    pagination_response::PaginationResponse, patch_plan_request::PatchPlanRequest,
     payment_method_info::PaymentMethodInfo, payment_method_type_enum::PaymentMethodTypeEnum,
-    payment_status_enum::PaymentStatusEnum, payment_transaction_id::PaymentTransactionId,
-    payment_type_enum::PaymentTypeEnum, per_unit_plan_pricing::PerUnitPlanPricing,
-    per_unit_pricing::PerUnitPricing, percentage_discount::PercentageDiscount, plan::Plan,
-    plan_id::PlanId, plan_list_response::PlanListResponse, plan_status_enum::PlanStatusEnum,
-    plan_type_enum::PlanTypeEnum, plan_usage_pricing_model::PlanUsagePricingModel,
-    plan_version_id::PlanVersionId, price_component::PriceComponent,
-    price_component_id::PriceComponentId, product_family::ProductFamily,
+    payment_methods_config::PaymentMethodsConfig, payment_status_enum::PaymentStatusEnum,
+    payment_transaction_id::PaymentTransactionId, payment_type_enum::PaymentTypeEnum,
+    per_unit_plan_pricing::PerUnitPlanPricing, per_unit_pricing::PerUnitPricing,
+    percentage_discount::PercentageDiscount, plan::Plan, plan_add_on_input::PlanAddOnInput,
+    plan_event::PlanEvent, plan_event_data::PlanEventData, plan_id::PlanId,
+    plan_status_enum::PlanStatusEnum, plan_type_enum::PlanTypeEnum,
+    plan_usage_pricing_model::PlanUsagePricingModel, plan_version_id::PlanVersionId,
+    plan_version_list_response::PlanVersionListResponse, plan_version_summary::PlanVersionSummary,
+    price_component::PriceComponent, price_component_id::PriceComponentId,
+    price_component_input::PriceComponentInput, price_entry::PriceEntry, price_id::PriceId,
+    price_input::PriceInput, pricing::Pricing, product::Product, product_event::ProductEvent,
+    product_event_data::ProductEventData, product_family::ProductFamily,
     product_family_create_request::ProductFamilyCreateRequest, product_family_id::ProductFamilyId,
-    product_family_list_response::ProductFamilyListResponse, product_id::ProductId,
+    product_family_list_response::ProductFamilyListResponse,
+    product_fee_structure::ProductFeeStructure, product_fee_type_enum::ProductFeeTypeEnum,
+    product_id::ProductId, product_list_response::ProductListResponse, product_ref::ProductRef,
     quote_event::QuoteEvent, quote_event_data::QuoteEventData, quote_id::QuoteId,
-    rate_fee::RateFee, rate_plan_fee::RatePlanFee, recurring_fee::RecurringFee,
-    shipping_address::ShippingAddress, slot_fee::SlotFee, slot_plan_fee::SlotPlanFee,
-    sub_line_item::SubLineItem, subscription::Subscription,
+    rate_fee::RateFee, rate_fee_structure::RateFeeStructure, rate_plan_fee::RatePlanFee,
+    rate_pricing::RatePricing, recurring_fee::RecurringFee,
+    replace_plan_request::ReplacePlanRequest, shipping_address::ShippingAddress,
+    slot_downgrade_policy_enum::SlotDowngradePolicyEnum, slot_fee::SlotFee,
+    slot_fee_structure::SlotFeeStructure, slot_plan_fee::SlotPlanFee, slot_pricing::SlotPricing,
+    slot_upgrade_policy_enum::SlotUpgradePolicyEnum, sub_line_item::SubLineItem,
+    subscription::Subscription,
     subscription_activation_condition_enum::SubscriptionActivationConditionEnum,
     subscription_add_on::SubscriptionAddOn,
     subscription_add_on_customization::SubscriptionAddOnCustomization,
-    subscription_add_on_override::SubscriptionAddOnOverride,
+    subscription_add_on_id::SubscriptionAddOnId,
     subscription_add_on_parameterization::SubscriptionAddOnParameterization,
+    subscription_add_on_price_override::SubscriptionAddOnPriceOverride,
     subscription_component::SubscriptionComponent,
     subscription_create_request::SubscriptionCreateRequest,
     subscription_details::SubscriptionDetails, subscription_event::SubscriptionEvent,
     subscription_event_data::SubscriptionEventData, subscription_fee::SubscriptionFee,
     subscription_fee_billing_period_enum::SubscriptionFeeBillingPeriodEnum,
-    subscription_id::SubscriptionId, subscription_list_response::SubscriptionListResponse,
-    subscription_status_enum::SubscriptionStatusEnum, tax_breakdown_item::TaxBreakdownItem,
+    subscription_id::SubscriptionId, subscription_status_enum::SubscriptionStatusEnum,
+    subscription_update_request::SubscriptionUpdateRequest,
+    subscription_update_response::SubscriptionUpdateResponse, tax_breakdown_item::TaxBreakdownItem,
     tax_exemption_type::TaxExemptionType, term_rate::TermRate, tier_row::TierRow,
     tiered_plan_pricing::TieredPlanPricing, tiered_pricing::TieredPricing,
-    transaction::Transaction, trial_config::TrialConfig,
-    unit_conversion_rounding_enum::UnitConversionRoundingEnum, usage_fee::UsageFee,
-    usage_plan_fee::UsagePlanFee, usage_pricing_model::UsagePricingModel,
+    transaction::Transaction, trial_config::TrialConfig, unit_conversion::UnitConversion,
+    unit_conversion_rounding_enum::UnitConversionRoundingEnum,
+    update_add_on_request::UpdateAddOnRequest, update_coupon_request::UpdateCouponRequest,
+    update_metric_request::UpdateMetricRequest, update_product_request::UpdateProductRequest,
+    usage_fee::UsageFee, usage_fee_structure::UsageFeeStructure, usage_model_enum::UsageModelEnum,
+    usage_plan_fee::UsagePlanFee, usage_pricing::UsagePricing,
+    usage_pricing_model::UsagePricingModel, usage_response::UsageResponse,
     volume_plan_pricing::VolumePlanPricing, volume_pricing::VolumePricing,
 };
 

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.meteroid.Utils.ToQueryParam;
 
 public enum InvoiceStatus implements ToQueryParam {
-    DRAFT("Draft"),
-    FINALIZED("Finalized"),
-    UNCOLLECTIBLE("Uncollectible"),
-    VOID("Void");
+    DRAFT("DRAFT"),
+    FINALIZED("FINALIZED"),
+    UNCOLLECTIBLE("UNCOLLECTIBLE"),
+    VOID("VOID");
     private final String value;
 
     InvoiceStatus(String value) {

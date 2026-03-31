@@ -49,6 +49,9 @@ public class SubscriptionCreateRequest {
     @JsonProperty("net_terms")
     private Integer netTerms;
 
+    @JsonProperty("payment_methods_config")
+    private PaymentMethodsConfig paymentMethodsConfig;
+
     @JsonProperty("plan_id")
     private String planId;
 
@@ -57,6 +60,9 @@ public class SubscriptionCreateRequest {
 
     @JsonProperty("purchase_order")
     private String purchaseOrder;
+
+    @JsonProperty("skip_past_invoices")
+    private Boolean skipPastInvoices;
 
     @JsonProperty("start_date")
     private String startDate;
@@ -277,6 +283,26 @@ public class SubscriptionCreateRequest {
         this.netTerms = netTerms;
     }
 
+    public SubscriptionCreateRequest paymentMethodsConfig(
+            PaymentMethodsConfig paymentMethodsConfig) {
+        this.paymentMethodsConfig = paymentMethodsConfig;
+        return this;
+    }
+
+    /**
+     * Payment methods configuration. If not specified, inherits from the invoicing entity.
+     *
+     * @return paymentMethodsConfig
+     */
+    @javax.annotation.Nullable
+    public PaymentMethodsConfig getPaymentMethodsConfig() {
+        return paymentMethodsConfig;
+    }
+
+    public void setPaymentMethodsConfig(PaymentMethodsConfig paymentMethodsConfig) {
+        this.paymentMethodsConfig = paymentMethodsConfig;
+    }
+
     public SubscriptionCreateRequest planId(String planId) {
         this.planId = planId;
         return this;
@@ -332,6 +358,26 @@ public class SubscriptionCreateRequest {
 
     public void setPurchaseOrder(String purchaseOrder) {
         this.purchaseOrder = purchaseOrder;
+    }
+
+    public SubscriptionCreateRequest skipPastInvoices(Boolean skipPastInvoices) {
+        this.skipPastInvoices = skipPastInvoices;
+        return this;
+    }
+
+    /**
+     * Migration mode: when true with a past start_date, skip creating invoices for past cycles. The
+     * subscription will be set to the current billing period with correct cycle_index.
+     *
+     * @return skipPastInvoices
+     */
+    @javax.annotation.Nullable
+    public Boolean getSkipPastInvoices() {
+        return skipPastInvoices;
+    }
+
+    public void setSkipPastInvoices(Boolean skipPastInvoices) {
+        this.skipPastInvoices = skipPastInvoices;
     }
 
     public SubscriptionCreateRequest startDate(String startDate) {

@@ -30,6 +30,9 @@ public class ProductFamilies {
             final ProductFamiliesListProductFamiliesOptions options)
             throws IOException, ApiException {
         HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/product_families");
+        if (options.orderBy != null) {
+            url.addQueryParameter("order_by", options.orderBy);
+        }
         if (options.page != null) {
             url.addQueryParameter("page", Utils.serializeQueryParam(options.page));
         }

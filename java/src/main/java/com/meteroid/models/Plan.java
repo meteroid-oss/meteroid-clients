@@ -23,6 +23,9 @@ public class Plan {
     @JsonProperty("available_parameters")
     private AvailableParameters availableParameters;
 
+    @JsonProperty("billing_cycles")
+    private Integer billingCycles;
+
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
@@ -34,6 +37,9 @@ public class Plan {
     @JsonProperty("net_terms")
     private Integer netTerms;
 
+    @JsonProperty("period_start_day")
+    private Integer periodStartDay;
+
     @JsonProperty("plan_type")
     private PlanTypeEnum planType;
 
@@ -42,6 +48,9 @@ public class Plan {
 
     @JsonProperty("product_family")
     private ProductFamily productFamily;
+
+    @JsonProperty("self_service_rank")
+    private Integer selfServiceRank;
 
     @JsonProperty private PlanStatusEnum status;
     @JsonProperty private TrialConfig trial;
@@ -69,6 +78,25 @@ public class Plan {
 
     public void setAvailableParameters(AvailableParameters availableParameters) {
         this.availableParameters = availableParameters;
+    }
+
+    public Plan billingCycles(Integer billingCycles) {
+        this.billingCycles = billingCycles;
+        return this;
+    }
+
+    /**
+     * Get billingCycles
+     *
+     * @return billingCycles
+     */
+    @javax.annotation.Nullable
+    public Integer getBillingCycles() {
+        return billingCycles;
+    }
+
+    public void setBillingCycles(Integer billingCycles) {
+        this.billingCycles = billingCycles;
     }
 
     public Plan createdAt(OffsetDateTime createdAt) {
@@ -185,6 +213,25 @@ public class Plan {
         this.netTerms = netTerms;
     }
 
+    public Plan periodStartDay(Integer periodStartDay) {
+        this.periodStartDay = periodStartDay;
+        return this;
+    }
+
+    /**
+     * Get periodStartDay
+     *
+     * @return periodStartDay
+     */
+    @javax.annotation.Nullable
+    public Integer getPeriodStartDay() {
+        return periodStartDay;
+    }
+
+    public void setPeriodStartDay(Integer periodStartDay) {
+        this.periodStartDay = periodStartDay;
+    }
+
     public Plan planType(PlanTypeEnum planType) {
         this.planType = planType;
         return this;
@@ -249,6 +296,25 @@ public class Plan {
 
     public void setProductFamily(ProductFamily productFamily) {
         this.productFamily = productFamily;
+    }
+
+    public Plan selfServiceRank(Integer selfServiceRank) {
+        this.selfServiceRank = selfServiceRank;
+        return this;
+    }
+
+    /**
+     * Get selfServiceRank
+     *
+     * @return selfServiceRank
+     */
+    @javax.annotation.Nullable
+    public Integer getSelfServiceRank() {
+        return selfServiceRank;
+    }
+
+    public void setSelfServiceRank(Integer selfServiceRank) {
+        this.selfServiceRank = selfServiceRank;
     }
 
     public Plan status(PlanStatusEnum status) {

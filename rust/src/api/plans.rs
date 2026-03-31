@@ -3,9 +3,13 @@
 use crate::{error::Result, models::*, Configuration};
 
 #[derive(Default)]
-pub struct PlansListPlansOptions {
-    pub product_family_id: Option<ProductFamilyId>,
+pub struct PlansGetPlanDetailsOptions {
+    /// Filter by version: "draft", a version number, or omitted for active
+    pub version: Option<String>,
+}
 
+#[derive(Default)]
+pub struct PlansListPlanVersionsOptions {
     /// Page number (0-indexed)
     pub page: Option<i32>,
 
@@ -22,29 +26,98 @@ impl<'a> Plans<'a> {
         Self { cfg }
     }
 
-    /// List plans with optional filtering by product family.
-    pub async fn list_plans(
+    /// Create a new plan with components and pricing. Set `status` to `ACTIVE` to
+    /// publish immediately, or `DRAFT` to stage for review.
+    pub async fn create_plan(
         &self,
-        options: Option<PlansListPlansOptions>,
-    ) -> Result<crate::models::PlanListResponse> {
-        let PlansListPlansOptions {
-            product_family_id,
-            page,
-            per_page,
-        } = options.unwrap_or_default();
-
-        crate::request::Request::new(http1::Method::GET, "/api/v1/plans")
-            .with_optional_query_param("product_family_id", product_family_id)
-            .with_optional_query_param("page", page)
-            .with_optional_query_param("per_page", per_page)
+        create_plan_request: crate::models::CreatePlanRequest,
+    ) -> Result<crate::models::Plan> {
+        crate::request::Request::new(http1::Method::POST, "/api/v1/plans")
+            .with_body_param(create_plan_request)
             .execute(self.cfg)
             .await
     }
 
-    /// Retrieve the details of a specific plan
-    pub async fn get_plan_details(&self, plan_id: String) -> Result<crate::models::Plan> {
+    /// Retrieve a specific plan. Use `?version=draft` for the draft version,
+    /// `?version=2` for a specific version number, or omit for the active version.
+    pub async fn get_plan_details(
+        &self,
+        plan_id: String,
+        options: Option<PlansGetPlanDetailsOptions>,
+    ) -> Result<crate::models::Plan> {
+        let PlansGetPlanDetailsOptions { version } = options.unwrap_or_default();
+
         crate::request::Request::new(http1::Method::GET, "/api/v1/plans/{plan_id}")
             .with_path_param("plan_id", plan_id)
+            .with_optional_query_param("version", version)
+            .execute(self.cfg)
+            .await
+    }
+
+    /// Full replacement of a plan's version. On a draft plan, updates in-place.
+    /// On a published plan, creates a new version. Set `status` to `DRAFT` to
+    /// stage as a new draft without publishing.
+    pub async fn replace_plan(
+        &self,
+        plan_id: String,
+        replace_plan_request: crate::models::ReplacePlanRequest,
+    ) -> Result<crate::models::Plan> {
+        crate::request::Request::new(http1::Method::PUT, "/api/v1/plans/{plan_id}")
+            .with_path_param("plan_id", plan_id)
+            .with_body_param(replace_plan_request)
+            .execute(self.cfg)
+            .await
+    }
+
+    /// Partially update plan-level fields (name, description, self_service_rank).
+    /// Does not modify version-level configuration or components.
+    pub async fn patch_plan(
+        &self,
+        plan_id: String,
+        patch_plan_request: crate::models::PatchPlanRequest,
+    ) -> Result<crate::models::Plan> {
+        crate::request::Request::new(http1::Method::PATCH, "/api/v1/plans/{plan_id}")
+            .with_path_param("plan_id", plan_id)
+            .with_body_param(patch_plan_request)
+            .execute(self.cfg)
+            .await
+    }
+
+    pub async fn archive_plan(&self, plan_id: String) -> Result<()> {
+        crate::request::Request::new(http1::Method::POST, "/api/v1/plans/{plan_id}/archive")
+            .with_path_param("plan_id", plan_id)
+            .returns_nothing()
+            .execute(self.cfg)
+            .await
+    }
+
+    /// Publishes the current draft version, making it the active version.
+    pub async fn publish_plan(&self, plan_id: String) -> Result<crate::models::Plan> {
+        crate::request::Request::new(http1::Method::POST, "/api/v1/plans/{plan_id}/publish")
+            .with_path_param("plan_id", plan_id)
+            .execute(self.cfg)
+            .await
+    }
+
+    pub async fn unarchive_plan(&self, plan_id: String) -> Result<()> {
+        crate::request::Request::new(http1::Method::POST, "/api/v1/plans/{plan_id}/unarchive")
+            .with_path_param("plan_id", plan_id)
+            .returns_nothing()
+            .execute(self.cfg)
+            .await
+    }
+
+    pub async fn list_plan_versions(
+        &self,
+        plan_id: String,
+        options: Option<PlansListPlanVersionsOptions>,
+    ) -> Result<crate::models::PlanVersionListResponse> {
+        let PlansListPlanVersionsOptions { page, per_page } = options.unwrap_or_default();
+
+        crate::request::Request::new(http1::Method::GET, "/api/v1/plans/{plan_id}/versions")
+            .with_path_param("plan_id", plan_id)
+            .with_optional_query_param("page", page)
+            .with_optional_query_param("per_page", per_page)
             .execute(self.cfg)
             .await
     }

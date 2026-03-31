@@ -1,3 +1,4 @@
+// this file is @generated
 package com.meteroid;
 
 import com.meteroid.api.*;
@@ -14,6 +15,7 @@ import java.util.Map;
  * <p>This class provides access to all Meteroid API resources through a fluent interface.
  *
  * <p>Example usage:
+ *
  * <pre>{@code
  * // Initialize with API key
  * Meteroid meteroid = new Meteroid("your-api-key");
@@ -29,14 +31,34 @@ import java.util.Map;
  */
 @Getter
 public class Meteroid {
+
+    private final AddOns addOns;
+
+    private final BatchJobs batchJobs;
+
     private final CheckoutSessions checkoutSessions;
+
+    private final Coupons coupons;
+
     private final CreditNotes creditNotes;
+
     private final Customers customers;
+
     private final Events events;
+
     private final Invoices invoices;
+
+    private final Metrics metrics;
+
     private final Plans plans;
+
     private final ProductFamilies productFamilies;
+
+    private final Products products;
+
     private final Subscriptions subscriptions;
+
+    private final Usage usage;
 
     /**
      * Create a new Meteroid client with default options.
@@ -59,24 +81,40 @@ public class Meteroid {
             throw new IllegalArgumentException("Invalid server URL: " + options.getServerUrl());
         }
 
-        Map<String, String> defaultHeaders = Map.of(
-                "User-Agent", "meteroid-java/" + Version.VERSION,
-                "Authorization", "Bearer " + apiKey
-        );
+        Map<String, String> defaultHeaders =
+                Map.of(
+                        "User-Agent", "meteroid-java/" + Version.VERSION,
+                        "Authorization", "Bearer " + apiKey);
 
-        MeteroidHttpClient httpClient = new MeteroidHttpClient(
-                parsedUrl,
-                defaultHeaders,
-                options.getRetrySchedule()
-        );
+        MeteroidHttpClient httpClient =
+                new MeteroidHttpClient(parsedUrl, defaultHeaders, options.getRetrySchedule());
+
+        this.addOns = new AddOns(httpClient);
+
+        this.batchJobs = new BatchJobs(httpClient);
 
         this.checkoutSessions = new CheckoutSessions(httpClient);
+
+        this.coupons = new Coupons(httpClient);
+
         this.creditNotes = new CreditNotes(httpClient);
+
         this.customers = new Customers(httpClient);
+
         this.events = new Events(httpClient);
+
         this.invoices = new Invoices(httpClient);
+
+        this.metrics = new Metrics(httpClient);
+
         this.plans = new Plans(httpClient);
+
         this.productFamilies = new ProductFamilies(httpClient);
+
+        this.products = new Products(httpClient);
+
         this.subscriptions = new Subscriptions(httpClient);
+
+        this.usage = new Usage(httpClient);
     }
 }

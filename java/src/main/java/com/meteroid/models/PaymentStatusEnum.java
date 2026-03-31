@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.meteroid.Utils.ToQueryParam;
 
 public enum PaymentStatusEnum implements ToQueryParam {
-    READY("Ready"),
-    PENDING("Pending"),
-    SETTLED("Settled"),
-    CANCELLED("Cancelled"),
-    FAILED("Failed");
+    READY("READY"),
+    PENDING("PENDING"),
+    SETTLED("SETTLED"),
+    CANCELLED("CANCELLED"),
+    FAILED("FAILED");
     private final String value;
 
     PaymentStatusEnum(String value) {

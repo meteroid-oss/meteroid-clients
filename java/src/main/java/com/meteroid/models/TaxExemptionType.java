@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.meteroid.Utils.ToQueryParam;
 
 public enum TaxExemptionType implements ToQueryParam {
-    REVERSE_CHARGE("ReverseCharge"),
-    TAX_EXEMPT("TaxExempt"),
-    NOT_REGISTERED("NotRegistered");
+    REVERSE_CHARGE("REVERSE_CHARGE"),
+    TAX_EXEMPT("TAX_EXEMPT"),
+    NOT_REGISTERED("NOT_REGISTERED");
     private final String value;
 
     TaxExemptionType(String value) {

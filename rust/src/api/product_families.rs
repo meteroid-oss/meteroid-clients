@@ -4,6 +4,9 @@ use crate::{error::Result, models::*, Configuration};
 
 #[derive(Default)]
 pub struct ProductFamiliesListProductFamiliesOptions {
+    /// Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
+    pub order_by: Option<String>,
+
     /// Page number (0-indexed)
     pub page: Option<i32>,
 
@@ -27,12 +30,14 @@ impl<'a> ProductFamilies<'a> {
         options: Option<ProductFamiliesListProductFamiliesOptions>,
     ) -> Result<crate::models::ProductFamilyListResponse> {
         let ProductFamiliesListProductFamiliesOptions {
+            order_by,
             page,
             per_page,
             search,
         } = options.unwrap_or_default();
 
         crate::request::Request::new(http1::Method::GET, "/api/v1/product_families")
+            .with_optional_query_param("order_by", order_by)
             .with_optional_query_param("page", page)
             .with_optional_query_param("per_page", per_page)
             .with_optional_query_param("search", search)

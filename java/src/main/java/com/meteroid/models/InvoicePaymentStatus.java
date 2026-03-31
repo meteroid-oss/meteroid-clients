@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.meteroid.Utils.ToQueryParam;
 
 public enum InvoicePaymentStatus implements ToQueryParam {
-    UNPAID("Unpaid"),
-    PARTIALLY_PAID("PartiallyPaid"),
-    PAID("Paid"),
-    ERRORED("Errored");
+    UNPAID("UNPAID"),
+    PARTIALLY_PAID("PARTIALLY_PAID"),
+    PAID("PAID"),
+    ERRORED("ERRORED");
     private final String value;
 
     InvoicePaymentStatus(String value) {

@@ -16,27 +16,71 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class ExtraComponent {
-    @JsonProperty private SubscriptionComponent component;
+    @JsonProperty private String name;
+
+    @JsonProperty("price_entry")
+    private PriceEntry priceEntry;
+
+    @JsonProperty("product_ref")
+    private ProductRef productRef;
 
     public ExtraComponent() {}
 
-    public ExtraComponent component(SubscriptionComponent component) {
-        this.component = component;
+    public ExtraComponent name(String name) {
+        this.name = name;
         return this;
     }
 
     /**
-     * Get component
+     * Get name
      *
-     * @return component
+     * @return name
      */
     @javax.annotation.Nonnull
-    public SubscriptionComponent getComponent() {
-        return component;
+    public String getName() {
+        return name;
     }
 
-    public void setComponent(SubscriptionComponent component) {
-        this.component = component;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ExtraComponent priceEntry(PriceEntry priceEntry) {
+        this.priceEntry = priceEntry;
+        return this;
+    }
+
+    /**
+     * Get priceEntry
+     *
+     * @return priceEntry
+     */
+    @javax.annotation.Nonnull
+    public PriceEntry getPriceEntry() {
+        return priceEntry;
+    }
+
+    public void setPriceEntry(PriceEntry priceEntry) {
+        this.priceEntry = priceEntry;
+    }
+
+    public ExtraComponent productRef(ProductRef productRef) {
+        this.productRef = productRef;
+        return this;
+    }
+
+    /**
+     * Get productRef
+     *
+     * @return productRef
+     */
+    @javax.annotation.Nonnull
+    public ProductRef getProductRef() {
+        return productRef;
+    }
+
+    public void setProductRef(ProductRef productRef) {
+        this.productRef = productRef;
     }
 
     /**

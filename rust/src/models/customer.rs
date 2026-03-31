@@ -2,8 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    address::Address, bank_account_id::BankAccountId, currency::Currency,
-    custom_tax_rate::CustomTaxRate, customer_id::CustomerId,
+    address::Address, currency::Currency, custom_tax_rate::CustomTaxRate, customer_id::CustomerId,
     invoicing_entity_id::InvoicingEntityId, shipping_address::ShippingAddress,
 };
 
@@ -13,13 +12,13 @@ pub struct Customer {
     pub alias: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bank_account_id: Option<BankAccountId>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_address: Option<Address>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_email: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub connected_account_id: Option<String>,
 
     pub currency: Currency,
 
@@ -54,9 +53,9 @@ impl Customer {
     ) -> Self {
         Self {
             alias: None,
-            bank_account_id: None,
             billing_address: None,
             billing_email: None,
+            connected_account_id: None,
             currency,
             custom_taxes,
             id,

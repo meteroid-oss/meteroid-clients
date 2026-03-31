@@ -21,14 +21,14 @@ import java.util.List;
 public class CustomerCreateRequest {
     @JsonProperty private String alias;
 
-    @JsonProperty("bank_account_id")
-    private String bankAccountId;
-
     @JsonProperty("billing_address")
     private Address billingAddress;
 
     @JsonProperty("billing_email")
     private String billingEmail;
+
+    @JsonProperty("connected_account_id")
+    private String connectedAccountId;
 
     @JsonProperty private Currency currency;
 
@@ -74,25 +74,6 @@ public class CustomerCreateRequest {
         this.alias = alias;
     }
 
-    public CustomerCreateRequest bankAccountId(String bankAccountId) {
-        this.bankAccountId = bankAccountId;
-        return this;
-    }
-
-    /**
-     * Get bankAccountId
-     *
-     * @return bankAccountId
-     */
-    @javax.annotation.Nullable
-    public String getBankAccountId() {
-        return bankAccountId;
-    }
-
-    public void setBankAccountId(String bankAccountId) {
-        this.bankAccountId = bankAccountId;
-    }
-
     public CustomerCreateRequest billingAddress(Address billingAddress) {
         this.billingAddress = billingAddress;
         return this;
@@ -129,6 +110,25 @@ public class CustomerCreateRequest {
 
     public void setBillingEmail(String billingEmail) {
         this.billingEmail = billingEmail;
+    }
+
+    public CustomerCreateRequest connectedAccountId(String connectedAccountId) {
+        this.connectedAccountId = connectedAccountId;
+        return this;
+    }
+
+    /**
+     * Get connectedAccountId
+     *
+     * @return connectedAccountId
+     */
+    @javax.annotation.Nullable
+    public String getConnectedAccountId() {
+        return connectedAccountId;
+    }
+
+    public void setConnectedAccountId(String connectedAccountId) {
+        this.connectedAccountId = connectedAccountId;
     }
 
     public CustomerCreateRequest currency(Currency currency) {

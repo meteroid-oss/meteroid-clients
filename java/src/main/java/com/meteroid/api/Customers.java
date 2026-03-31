@@ -32,6 +32,9 @@ public class Customers {
     public CustomerListResponse listCustomers(final CustomersListCustomersOptions options)
             throws IOException, ApiException {
         HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/customers");
+        if (options.orderBy != null) {
+            url.addQueryParameter("order_by", options.orderBy);
+        }
         if (options.page != null) {
             url.addQueryParameter("page", Utils.serializeQueryParam(options.page));
         }

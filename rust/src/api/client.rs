@@ -1,3 +1,4 @@
+// this file is @generated
 //! Meteroid API client.
 
 use std::{sync::Arc, time::Duration};
@@ -120,11 +121,24 @@ impl Meteroid {
         Self { cfg }
     }
 
-    // Resource accessors - these are generated based on the API
+    /// Access the add ons API.
+    pub fn add_ons(&self) -> super::AddOns<'_> {
+        super::AddOns::new(&self.cfg)
+    }
+
+    /// Access the batch jobs API.
+    pub fn batch_jobs(&self) -> super::BatchJobs<'_> {
+        super::BatchJobs::new(&self.cfg)
+    }
 
     /// Access the checkout sessions API.
     pub fn checkout_sessions(&self) -> super::CheckoutSessions<'_> {
         super::CheckoutSessions::new(&self.cfg)
+    }
+
+    /// Access the coupons API.
+    pub fn coupons(&self) -> super::Coupons<'_> {
+        super::Coupons::new(&self.cfg)
     }
 
     /// Access the credit notes API.
@@ -147,6 +161,11 @@ impl Meteroid {
         super::Invoices::new(&self.cfg)
     }
 
+    /// Access the metrics API.
+    pub fn metrics(&self) -> super::Metrics<'_> {
+        super::Metrics::new(&self.cfg)
+    }
+
     /// Access the plans API.
     pub fn plans(&self) -> super::Plans<'_> {
         super::Plans::new(&self.cfg)
@@ -157,9 +176,19 @@ impl Meteroid {
         super::ProductFamilies::new(&self.cfg)
     }
 
+    /// Access the products API.
+    pub fn products(&self) -> super::Products<'_> {
+        super::Products::new(&self.cfg)
+    }
+
     /// Access the subscriptions API.
     pub fn subscriptions(&self) -> super::Subscriptions<'_> {
         super::Subscriptions::new(&self.cfg)
+    }
+
+    /// Access the usage API.
+    pub fn usage(&self) -> super::Usage<'_> {
+        super::Usage::new(&self.cfg)
     }
 }
 

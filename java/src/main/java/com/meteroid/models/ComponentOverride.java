@@ -16,31 +16,15 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class ComponentOverride {
-    @JsonProperty private SubscriptionComponent component;
-
     @JsonProperty("component_id")
     private String componentId;
 
+    @JsonProperty private String name;
+
+    @JsonProperty("price_entry")
+    private PriceEntry priceEntry;
+
     public ComponentOverride() {}
-
-    public ComponentOverride component(SubscriptionComponent component) {
-        this.component = component;
-        return this;
-    }
-
-    /**
-     * Get component
-     *
-     * @return component
-     */
-    @javax.annotation.Nonnull
-    public SubscriptionComponent getComponent() {
-        return component;
-    }
-
-    public void setComponent(SubscriptionComponent component) {
-        this.component = component;
-    }
 
     public ComponentOverride componentId(String componentId) {
         this.componentId = componentId;
@@ -59,6 +43,44 @@ public class ComponentOverride {
 
     public void setComponentId(String componentId) {
         this.componentId = componentId;
+    }
+
+    public ComponentOverride name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return name
+     */
+    @javax.annotation.Nonnull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ComponentOverride priceEntry(PriceEntry priceEntry) {
+        this.priceEntry = priceEntry;
+        return this;
+    }
+
+    /**
+     * Get priceEntry
+     *
+     * @return priceEntry
+     */
+    @javax.annotation.Nonnull
+    public PriceEntry getPriceEntry() {
+        return priceEntry;
+    }
+
+    public void setPriceEntry(PriceEntry priceEntry) {
+        this.priceEntry = priceEntry;
     }
 
     /**

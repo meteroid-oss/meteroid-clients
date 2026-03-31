@@ -5,6 +5,12 @@ import lombok.Data;
 
 @Data
 public class ProductFamiliesListProductFamiliesOptions {
+    /**
+     * Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction:
+     * `asc` or `desc`. Default: `created_at.desc`.
+     */
+    String orderBy;
+
     /** Page number (0-indexed) */
     Integer page;
 

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.meteroid.Utils.ToQueryParam;
 
 public enum PaymentTypeEnum implements ToQueryParam {
-    PAYMENT("Payment"),
-    REFUND("Refund");
+    PAYMENT("PAYMENT"),
+    REFUND("REFUND");
     private final String value;
 
     PaymentTypeEnum(String value) {

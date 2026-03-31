@@ -11,6 +11,9 @@ pub struct CreateSubscriptionAddOn {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub customization: Option<SubscriptionAddOnCustomization>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quantity: Option<i32>,
 }
 
 impl CreateSubscriptionAddOn {
@@ -18,6 +21,7 @@ impl CreateSubscriptionAddOn {
         Self {
             add_on_id,
             customization: None,
+            quantity: None,
         }
     }
 }

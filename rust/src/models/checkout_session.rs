@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     checkout_session_id::CheckoutSessionId, checkout_session_status::CheckoutSessionStatus,
-    checkout_type::CheckoutType, customer_id::CustomerId, plan_version_id::PlanVersionId,
+    checkout_type::CheckoutType, customer_id::CustomerId,
+    payment_methods_config::PaymentMethodsConfig, plan_version_id::PlanVersionId,
     subscription_id::SubscriptionId,
 };
 
@@ -41,6 +42,9 @@ pub struct CheckoutSession {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub net_terms: Option<i32>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_methods_config: Option<PaymentMethodsConfig>,
+
     pub plan_version_id: PlanVersionId,
 
     pub status: CheckoutSessionStatus,
@@ -73,6 +77,7 @@ impl CheckoutSession {
             expires_at: None,
             id,
             net_terms: None,
+            payment_methods_config: None,
             plan_version_id,
             status,
             subscription_id: None,

@@ -93,6 +93,72 @@ public class MeteroidHttpClient {
     }
 
     /**
+     * Execute a request with application/x-www-form-urlencoded body.
+     */
+    public <Req, Res> Res executeFormRequest(
+            String method, HttpUrl url, Headers headers, Req reqBody, Class<Res> responseClass)
+            throws ApiException, IOException {
+        Request.Builder reqBuilder = new Request.Builder().url(url);
+
+        // Handle form-urlencoded request body
+        String formBody = "";
+        if (reqBody != null) {
+            Map<String, Object> fields = objectMapper.convertValue(reqBody, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+            FormBody.Builder formBuilder = new FormBody.Builder();
+            for (Map.Entry<String, Object> entry : fields.entrySet()) {
+                if (entry.getValue() != null) {
+                    formBuilder.add(entry.getKey(), String.valueOf(entry.getValue()));
+                }
+            }
+            RequestBody body = formBuilder.build();
+            formBody = fields.toString();
+            reqBuilder.method(method, body);
+        } else {
+            reqBuilder.method(method, null);
+        }
+
+        // Add default headers
+        defaultHeaders.forEach(reqBuilder::addHeader);
+
+        String idempotencyKey = headers == null ? null : headers.get("idempotency-key");
+        if ((idempotencyKey == null || idempotencyKey.isEmpty()) && "POST".equals(method.toUpperCase())) {
+                reqBuilder.addHeader("idempotency-key", "auto_" + UUID.randomUUID().toString());
+        }
+
+        // Add custom headers if present
+        if (headers != null) {
+            headers.forEach(pair -> reqBuilder.addHeader(pair.getFirst(), pair.getSecond()));
+        }
+
+        reqBuilder.addHeader(
+                "x-meteroid-req-id",
+                String.valueOf(ThreadLocalRandom.current().nextLong(0, Long.MAX_VALUE)));
+
+        Request request = reqBuilder.build();
+        Response response = executeRequestWithRetry(request, formBody);
+
+        if (response.body() == null) {
+            throw new ApiException("Body is null", response.code(), "");
+        }
+
+        String bodyString = response.body().string();
+
+        if (response.code() == 204) {
+            return null;
+        }
+
+        if (response.code() >= 200 && response.code() < 300) {
+            if (responseClass == null) {
+                return null;
+            }
+            return objectMapper.readValue(bodyString, responseClass);
+        }
+
+        throw new ApiException(
+                "Non 200 status code: `" + response.code() + "`", response.code(), bodyString);
+    }
+
+    /**
      * Execute a request that returns binary data (e.g., PDF downloads).
      */
     public <Req> byte[] executeBinaryRequest(

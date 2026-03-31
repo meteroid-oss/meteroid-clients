@@ -62,6 +62,9 @@ public class CreateCheckoutSessionRequest {
     @JsonProperty("net_terms")
     private Integer netTerms;
 
+    @JsonProperty("payment_methods_config")
+    private PaymentMethodsConfig paymentMethodsConfig;
+
     @JsonProperty("plan_version_id")
     private String planVersionId;
 
@@ -375,6 +378,26 @@ public class CreateCheckoutSessionRequest {
 
     public void setNetTerms(Integer netTerms) {
         this.netTerms = netTerms;
+    }
+
+    public CreateCheckoutSessionRequest paymentMethodsConfig(
+            PaymentMethodsConfig paymentMethodsConfig) {
+        this.paymentMethodsConfig = paymentMethodsConfig;
+        return this;
+    }
+
+    /**
+     * Get paymentMethodsConfig
+     *
+     * @return paymentMethodsConfig
+     */
+    @javax.annotation.Nullable
+    public PaymentMethodsConfig getPaymentMethodsConfig() {
+        return paymentMethodsConfig;
+    }
+
+    public void setPaymentMethodsConfig(PaymentMethodsConfig paymentMethodsConfig) {
+        this.paymentMethodsConfig = paymentMethodsConfig;
     }
 
     public CreateCheckoutSessionRequest planVersionId(String planVersionId) {

@@ -24,6 +24,9 @@ output_dir = "java/src/main/java/com/meteroid/api"
 template = "templates/java/operation_options.java.jinja"
 output_dir = "java/src/main/java/com/meteroid/api"
 [[java.task]]
+template = "templates/java/api_summary.java.jinja"
+output_dir = "java/src/main/java/com/meteroid"
+[[java.task]]
 template = "templates/java/component_type.java.jinja"
 output_dir = "java/src/main/java/com/meteroid/models"
 

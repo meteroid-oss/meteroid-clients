@@ -8,22 +8,22 @@ use serde::{Deserialize, Serialize};
 )]
 pub enum TaxExemptionType {
     #[default]
-    #[serde(rename = "ReverseCharge")]
+    #[serde(rename = "REVERSE_CHARGE")]
     ReverseCharge,
 
-    #[serde(rename = "TaxExempt")]
+    #[serde(rename = "TAX_EXEMPT")]
     TaxExempt,
 
-    #[serde(rename = "NotRegistered")]
+    #[serde(rename = "NOT_REGISTERED")]
     NotRegistered,
 }
 
 impl fmt::Display for TaxExemptionType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match self {
-            Self::ReverseCharge => "ReverseCharge",
-            Self::TaxExempt => "TaxExempt",
-            Self::NotRegistered => "NotRegistered",
+            Self::ReverseCharge => "REVERSE_CHARGE",
+            Self::TaxExempt => "TAX_EXEMPT",
+            Self::NotRegistered => "NOT_REGISTERED",
         };
         f.write_str(value)
     }

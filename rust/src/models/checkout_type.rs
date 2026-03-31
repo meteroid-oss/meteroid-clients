@@ -13,6 +13,12 @@ pub enum CheckoutType {
 
     #[serde(rename = "SUBSCRIPTION_ACTIVATION")]
     SubscriptionActivation,
+
+    #[serde(rename = "PLAN_CHANGE")]
+    PlanChange,
+
+    #[serde(rename = "ADDON_PURCHASE")]
+    AddonPurchase,
 }
 
 impl fmt::Display for CheckoutType {
@@ -20,6 +26,8 @@ impl fmt::Display for CheckoutType {
         let value = match self {
             Self::SelfServe => "SELF_SERVE",
             Self::SubscriptionActivation => "SUBSCRIPTION_ACTIVATION",
+            Self::PlanChange => "PLAN_CHANGE",
+            Self::AddonPurchase => "ADDON_PURCHASE",
         };
         f.write_str(value)
     }

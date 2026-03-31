@@ -28,6 +28,7 @@ pub(crate) struct Request {
     path_params: HashMap<&'static str, String>,
     header_params: HashMap<&'static str, String>,
     serialized_body: Option<String>,
+    body_is_form: bool,
 }
 
 impl Request {
@@ -40,11 +41,18 @@ impl Request {
             header_params: HashMap::new(),
             serialized_body: None,
             no_return_type: false,
+            body_is_form: false,
         }
     }
 
     pub fn with_body_param<T: serde::Serialize>(mut self, param: T) -> Self {
         self.serialized_body = Some(serde_json::to_string(&param).unwrap());
+        self
+    }
+
+    pub fn with_form_body_param<T: serde::Serialize>(mut self, param: T) -> Self {
+        self.serialized_body = Some(serde_urlencoded::to_string(&param).unwrap());
+        self.body_is_form = true;
         self
     }
 
@@ -220,7 +228,12 @@ impl Request {
 
         let mut request = if let Some(body) = self.serialized_body {
             let req_headers = req_builder.headers_mut().unwrap();
-            req_headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+            let content_type = if self.body_is_form {
+                "application/x-www-form-urlencoded"
+            } else {
+                "application/json"
+            };
+            req_headers.insert(CONTENT_TYPE, HeaderValue::from_static(content_type));
             req_headers.insert(CONTENT_LENGTH, body.len().into());
             req_builder.body(Full::from(body)).map_err(Error::generic)?
         } else {
@@ -287,5 +300,3 @@ impl<T: std::fmt::Display> QueryParamValue for Vec<T> {
         self.iter().format(",").to_string()
     }
 }
-
-impl_query_param_value!(crate::models::CheckoutSessionStatus);

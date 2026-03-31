@@ -8,26 +8,26 @@ use serde::{Deserialize, Serialize};
 )]
 pub enum InvoiceStatus {
     #[default]
-    #[serde(rename = "Draft")]
+    #[serde(rename = "DRAFT")]
     Draft,
 
-    #[serde(rename = "Finalized")]
+    #[serde(rename = "FINALIZED")]
     Finalized,
 
-    #[serde(rename = "Uncollectible")]
+    #[serde(rename = "UNCOLLECTIBLE")]
     Uncollectible,
 
-    #[serde(rename = "Void")]
+    #[serde(rename = "VOID")]
     Void,
 }
 
 impl fmt::Display for InvoiceStatus {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match self {
-            Self::Draft => "Draft",
-            Self::Finalized => "Finalized",
-            Self::Uncollectible => "Uncollectible",
-            Self::Void => "Void",
+            Self::Draft => "DRAFT",
+            Self::Finalized => "FINALIZED",
+            Self::Uncollectible => "UNCOLLECTIBLE",
+            Self::Void => "VOID",
         };
         f.write_str(value)
     }

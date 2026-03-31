@@ -3,9 +3,10 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     applied_coupon_detailed::AppliedCouponDetailed, billing_period_enum::BillingPeriodEnum,
-    currency::Currency, customer_id::CustomerId, plan_id::PlanId, plan_version_id::PlanVersionId,
-    subscription_add_on::SubscriptionAddOn, subscription_component::SubscriptionComponent,
-    subscription_id::SubscriptionId, subscription_status_enum::SubscriptionStatusEnum,
+    currency::Currency, customer_id::CustomerId, payment_methods_config::PaymentMethodsConfig,
+    plan_id::PlanId, plan_version_id::PlanVersionId, subscription_add_on::SubscriptionAddOn,
+    subscription_component::SubscriptionComponent, subscription_id::SubscriptionId,
+    subscription_status_enum::SubscriptionStatusEnum,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -71,6 +72,9 @@ pub struct SubscriptionDetails {
 
     /// Payment terms in days (0 = due on issue)
     pub net_terms: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_methods_config: Option<PaymentMethodsConfig>,
 
     /// Billing period (monthly, annual, etc.)
     pub period: BillingPeriodEnum,
@@ -142,6 +146,7 @@ impl SubscriptionDetails {
             invoice_memo: None,
             mrr_cents,
             net_terms,
+            payment_methods_config: None,
             period,
             plan_id,
             plan_name,

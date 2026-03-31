@@ -8,26 +8,26 @@ use serde::{Deserialize, Serialize};
 )]
 pub enum InvoicePaymentStatus {
     #[default]
-    #[serde(rename = "Unpaid")]
+    #[serde(rename = "UNPAID")]
     Unpaid,
 
-    #[serde(rename = "PartiallyPaid")]
+    #[serde(rename = "PARTIALLY_PAID")]
     PartiallyPaid,
 
-    #[serde(rename = "Paid")]
+    #[serde(rename = "PAID")]
     Paid,
 
-    #[serde(rename = "Errored")]
+    #[serde(rename = "ERRORED")]
     Errored,
 }
 
 impl fmt::Display for InvoicePaymentStatus {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match self {
-            Self::Unpaid => "Unpaid",
-            Self::PartiallyPaid => "PartiallyPaid",
-            Self::Paid => "Paid",
-            Self::Errored => "Errored",
+            Self::Unpaid => "UNPAID",
+            Self::PartiallyPaid => "PARTIALLY_PAID",
+            Self::Paid => "PAID",
+            Self::Errored => "ERRORED",
         };
         f.write_str(value)
     }

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.meteroid.Utils.ToQueryParam;
 
 public enum PaymentMethodTypeEnum implements ToQueryParam {
-    CARD("Card"),
-    BANK_TRANSFER("BankTransfer"),
-    WALLET("Wallet"),
-    OTHER("Other");
+    CARD("CARD"),
+    BANK_TRANSFER("BANK_TRANSFER"),
+    WALLET("WALLET"),
+    OTHER("OTHER");
     private final String value;
 
     PaymentMethodTypeEnum(String value) {

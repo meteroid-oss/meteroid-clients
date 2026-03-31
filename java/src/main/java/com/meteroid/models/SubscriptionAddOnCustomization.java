@@ -16,7 +16,9 @@ import lombok.*;
         property = "discriminator",
         visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = SubscriptionAddOnCustomization.Override.class, name = "OVERRIDE"),
+    @JsonSubTypes.Type(
+            value = SubscriptionAddOnCustomization.PriceOverride.class,
+            name = "PRICE_OVERRIDE"),
     @JsonSubTypes.Type(
             value = SubscriptionAddOnCustomization.Parameterization.class,
             name = "PARAMETERIZATION")
@@ -50,35 +52,35 @@ public abstract class SubscriptionAddOnCustomization {
 
     // Variant classes
     /**
-     * Variant: OVERRIDE
+     * Variant: PRICE_OVERRIDE
      *
-     * <p>This variant wraps SubscriptionAddOnOverride.
+     * <p>This variant wraps SubscriptionAddOnPriceOverride.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @JsonTypeName("OVERRIDE")
-    public static class Override extends SubscriptionAddOnCustomization {
-        @JsonUnwrapped private SubscriptionAddOnOverride data;
+    @JsonTypeName("PRICE_OVERRIDE")
+    public static class PriceOverride extends SubscriptionAddOnCustomization {
+        @JsonUnwrapped private SubscriptionAddOnPriceOverride data;
 
-        public Override() {}
+        public PriceOverride() {}
 
-        public Override(SubscriptionAddOnOverride data) {
+        public PriceOverride(SubscriptionAddOnPriceOverride data) {
             this.data = data;
         }
 
         @java.lang.Override
         public String getDiscriminator() {
-            return "OVERRIDE";
+            return "PRICE_OVERRIDE";
         }
 
         /** Get the wrapped data for this variant. */
         @javax.annotation.Nonnull
-        public SubscriptionAddOnOverride getData() {
+        public SubscriptionAddOnPriceOverride getData() {
             return data;
         }
 
         /** Set the wrapped data for this variant. */
-        public Override data(SubscriptionAddOnOverride data) {
+        public PriceOverride data(SubscriptionAddOnPriceOverride data) {
             this.data = data;
             return this;
         }

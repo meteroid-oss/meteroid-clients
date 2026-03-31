@@ -15,6 +15,13 @@ public class SubscriptionsListSubscriptionsOptions {
     String planId;
     List<SubscriptionStatusEnum> statuses;
 
+    /**
+     * Sort order. Format: `column.direction`. Allowed columns: `customer_name`, `plan_name`,
+     * `mrr_cents`, `billing_start_date`, `end_date`, `status`, `created_at`. Direction: `asc` or
+     * `desc`. Default: `created_at.desc`.
+     */
+    String orderBy;
+
     /** Page number (0-indexed) */
     Integer page;
 

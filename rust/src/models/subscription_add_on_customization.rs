@@ -2,21 +2,21 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    subscription_add_on_override::SubscriptionAddOnOverride,
     subscription_add_on_parameterization::SubscriptionAddOnParameterization,
+    subscription_add_on_price_override::SubscriptionAddOnPriceOverride,
 };
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(tag = "discriminator")]
 pub enum SubscriptionAddOnCustomization {
-    #[serde(rename = "OVERRIDE")]
-    Override(SubscriptionAddOnOverride),
+    #[serde(rename = "PRICE_OVERRIDE")]
+    PriceOverride(SubscriptionAddOnPriceOverride),
     #[serde(rename = "PARAMETERIZATION")]
     Parameterization(SubscriptionAddOnParameterization),
 }
 
 impl Default for SubscriptionAddOnCustomization {
     fn default() -> Self {
-        Self::Override(SubscriptionAddOnOverride::default())
+        Self::PriceOverride(SubscriptionAddOnPriceOverride::default())
     }
 }

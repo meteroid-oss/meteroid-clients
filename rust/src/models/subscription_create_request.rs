@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     create_subscription_add_on::CreateSubscriptionAddOn,
-    create_subscription_components::CreateSubscriptionComponents, plan_id::PlanId,
+    create_subscription_components::CreateSubscriptionComponents,
+    payment_methods_config::PaymentMethodsConfig, plan_id::PlanId,
     subscription_activation_condition_enum::SubscriptionActivationConditionEnum,
 };
 
@@ -37,6 +38,10 @@ pub struct SubscriptionCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub net_terms: Option<i32>,
 
+    /// Payment methods configuration. If not specified, inherits from the invoicing entity.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_methods_config: Option<PaymentMethodsConfig>,
+
     pub plan_id: PlanId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,6 +49,11 @@ pub struct SubscriptionCreateRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub purchase_order: Option<String>,
+
+    /// Migration mode: when true with a past start_date, skip creating invoices for past cycles.
+    /// The subscription will be set to the current billing period with correct cycle_index.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub skip_past_invoices: Option<bool>,
 
     pub start_date: String,
 
@@ -72,9 +82,11 @@ impl SubscriptionCreateRequest {
             end_date: None,
             invoice_memo: None,
             net_terms: None,
+            payment_methods_config: None,
             plan_id,
             price_components: None,
             purchase_order: None,
+            skip_past_invoices: None,
             start_date,
             trial_days: None,
             version: None,

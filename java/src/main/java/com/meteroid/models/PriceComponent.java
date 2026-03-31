@@ -35,7 +35,7 @@ public class PriceComponent {
      *
      * @return fee
      */
-    @javax.annotation.Nonnull
+    @javax.annotation.Nullable
     public Fee getFee() {
         return fee;
     }

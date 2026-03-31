@@ -8,30 +8,30 @@ use serde::{Deserialize, Serialize};
 )]
 pub enum PaymentStatusEnum {
     #[default]
-    #[serde(rename = "Ready")]
+    #[serde(rename = "READY")]
     Ready,
 
-    #[serde(rename = "Pending")]
+    #[serde(rename = "PENDING")]
     Pending,
 
-    #[serde(rename = "Settled")]
+    #[serde(rename = "SETTLED")]
     Settled,
 
-    #[serde(rename = "Cancelled")]
+    #[serde(rename = "CANCELLED")]
     Cancelled,
 
-    #[serde(rename = "Failed")]
+    #[serde(rename = "FAILED")]
     Failed,
 }
 
 impl fmt::Display for PaymentStatusEnum {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match self {
-            Self::Ready => "Ready",
-            Self::Pending => "Pending",
-            Self::Settled => "Settled",
-            Self::Cancelled => "Cancelled",
-            Self::Failed => "Failed",
+            Self::Ready => "READY",
+            Self::Pending => "PENDING",
+            Self::Settled => "SETTLED",
+            Self::Cancelled => "CANCELLED",
+            Self::Failed => "FAILED",
         };
         f.write_str(value)
     }

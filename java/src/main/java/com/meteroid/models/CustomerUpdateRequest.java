@@ -21,9 +21,6 @@ import java.util.List;
 public class CustomerUpdateRequest {
     @JsonProperty private String alias;
 
-    @JsonProperty("bank_account_id")
-    private String bankAccountId;
-
     @JsonProperty("billing_address")
     private Address billingAddress;
 
@@ -72,25 +69,6 @@ public class CustomerUpdateRequest {
 
     public void setAlias(String alias) {
         this.alias = alias;
-    }
-
-    public CustomerUpdateRequest bankAccountId(String bankAccountId) {
-        this.bankAccountId = bankAccountId;
-        return this;
-    }
-
-    /**
-     * Get bankAccountId
-     *
-     * @return bankAccountId
-     */
-    @javax.annotation.Nullable
-    public String getBankAccountId() {
-        return bankAccountId;
-    }
-
-    public void setBankAccountId(String bankAccountId) {
-        this.bankAccountId = bankAccountId;
     }
 
     public CustomerUpdateRequest billingAddress(Address billingAddress) {

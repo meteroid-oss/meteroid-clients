@@ -16,7 +16,21 @@ public enum EventType implements ToQueryParam {
     QUOTE_CONVERTED("quote.converted"),
     CREDIT_NOTE_CREATED("credit_note.created"),
     CREDIT_NOTE_FINALIZED("credit_note.finalized"),
-    CREDIT_NOTE_VOIDED("credit_note.voided");
+    CREDIT_NOTE_VOIDED("credit_note.voided"),
+    PLAN_CREATED("plan.created"),
+    PLAN_PUBLISHED("plan.published"),
+    PLAN_ARCHIVED("plan.archived"),
+    PRODUCT_CREATED("product.created"),
+    PRODUCT_UPDATED("product.updated"),
+    PRODUCT_ARCHIVED("product.archived"),
+    METRIC_UPDATED("metric.updated"),
+    METRIC_ARCHIVED("metric.archived"),
+    COUPON_CREATED("coupon.created"),
+    COUPON_UPDATED("coupon.updated"),
+    COUPON_ARCHIVED("coupon.archived"),
+    ADDON_CREATED("addon.created"),
+    ADDON_UPDATED("addon.updated"),
+    ADDON_ARCHIVED("addon.archived");
     private final String value;
 
     EventType(String value) {

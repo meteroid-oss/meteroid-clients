@@ -15,14 +15,16 @@ import lombok.ToString;
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class SubscriptionAddOnOverride {
-    @JsonProperty private SubscriptionFee fee;
+public class PriceComponentInput {
+    @JsonProperty private Fee fee;
     @JsonProperty private String name;
-    @JsonProperty private SubscriptionFeeBillingPeriodEnum period;
 
-    public SubscriptionAddOnOverride() {}
+    @JsonProperty("product_id")
+    private String productId;
 
-    public SubscriptionAddOnOverride fee(SubscriptionFee fee) {
+    public PriceComponentInput() {}
+
+    public PriceComponentInput fee(Fee fee) {
         this.fee = fee;
         return this;
     }
@@ -33,15 +35,15 @@ public class SubscriptionAddOnOverride {
      * @return fee
      */
     @javax.annotation.Nonnull
-    public SubscriptionFee getFee() {
+    public Fee getFee() {
         return fee;
     }
 
-    public void setFee(SubscriptionFee fee) {
+    public void setFee(Fee fee) {
         this.fee = fee;
     }
 
-    public SubscriptionAddOnOverride name(String name) {
+    public PriceComponentInput name(String name) {
         this.name = name;
         return this;
     }
@@ -60,40 +62,39 @@ public class SubscriptionAddOnOverride {
         this.name = name;
     }
 
-    public SubscriptionAddOnOverride period(SubscriptionFeeBillingPeriodEnum period) {
-        this.period = period;
+    public PriceComponentInput productId(String productId) {
+        this.productId = productId;
         return this;
     }
 
     /**
-     * Get period
+     * Get productId
      *
-     * @return period
+     * @return productId
      */
-    @javax.annotation.Nonnull
-    public SubscriptionFeeBillingPeriodEnum getPeriod() {
-        return period;
+    @javax.annotation.Nullable
+    public String getProductId() {
+        return productId;
     }
 
-    public void setPeriod(SubscriptionFeeBillingPeriodEnum period) {
-        this.period = period;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     /**
-     * Create an instance of SubscriptionAddOnOverride given an JSON string
+     * Create an instance of PriceComponentInput given an JSON string
      *
      * @param jsonString JSON string
-     * @return An instance of SubscriptionAddOnOverride
+     * @return An instance of PriceComponentInput
      * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     SubscriptionAddOnOverride
+     *     PriceComponentInput
      */
-    public static SubscriptionAddOnOverride fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, SubscriptionAddOnOverride.class);
+    public static PriceComponentInput fromJson(String jsonString) throws JsonProcessingException {
+        return Utils.getObjectMapper().readValue(jsonString, PriceComponentInput.class);
     }
 
     /**
-     * Convert an instance of SubscriptionAddOnOverride to an JSON string
+     * Convert an instance of PriceComponentInput to an JSON string
      *
      * @return JSON string
      */

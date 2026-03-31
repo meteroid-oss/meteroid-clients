@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     coupon_id::CouponId, create_subscription_add_on::CreateSubscriptionAddOn,
-    create_subscription_components::CreateSubscriptionComponents, plan_version_id::PlanVersionId,
+    create_subscription_components::CreateSubscriptionComponents,
+    payment_methods_config::PaymentMethodsConfig, plan_version_id::PlanVersionId,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -56,6 +57,9 @@ pub struct CreateCheckoutSessionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub net_terms: Option<i32>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_methods_config: Option<PaymentMethodsConfig>,
+
     pub plan_version_id: PlanVersionId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -83,6 +87,7 @@ impl CreateCheckoutSessionRequest {
             invoice_threshold: None,
             metadata: None,
             net_terms: None,
+            payment_methods_config: None,
             plan_version_id,
             purchase_order: None,
             trial_duration_days: None,

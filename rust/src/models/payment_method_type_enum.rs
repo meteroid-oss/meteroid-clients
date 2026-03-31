@@ -8,26 +8,26 @@ use serde::{Deserialize, Serialize};
 )]
 pub enum PaymentMethodTypeEnum {
     #[default]
-    #[serde(rename = "Card")]
+    #[serde(rename = "CARD")]
     Card,
 
-    #[serde(rename = "BankTransfer")]
+    #[serde(rename = "BANK_TRANSFER")]
     BankTransfer,
 
-    #[serde(rename = "Wallet")]
+    #[serde(rename = "WALLET")]
     Wallet,
 
-    #[serde(rename = "Other")]
+    #[serde(rename = "OTHER")]
     Other,
 }
 
 impl fmt::Display for PaymentMethodTypeEnum {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match self {
-            Self::Card => "Card",
-            Self::BankTransfer => "BankTransfer",
-            Self::Wallet => "Wallet",
-            Self::Other => "Other",
+            Self::Card => "CARD",
+            Self::BankTransfer => "BANK_TRANSFER",
+            Self::Wallet => "WALLET",
+            Self::Other => "OTHER",
         };
         f.write_str(value)
     }

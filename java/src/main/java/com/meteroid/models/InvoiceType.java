@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.meteroid.Utils.ToQueryParam;
 
 public enum InvoiceType implements ToQueryParam {
-    RECURRING("Recurring"),
-    ONE_OFF("OneOff"),
-    ADJUSTMENT("Adjustment"),
-    USAGE_THRESHOLD("UsageThreshold");
+    RECURRING("RECURRING"),
+    ONE_OFF("ONE_OFF"),
+    ADJUSTMENT("ADJUSTMENT"),
+    USAGE_THRESHOLD("USAGE_THRESHOLD");
     private final String value;
 
     InvoiceType(String value) {

@@ -4,6 +4,9 @@ use crate::{error::Result, models::*, Configuration};
 
 #[derive(Default)]
 pub struct CustomersListCustomersOptions {
+    /// Sort order. Format: `column.direction`. Allowed columns: `name`, `email`, `alias`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
+    pub order_by: Option<String>,
+
     /// Page number (0-indexed)
     pub page: Option<i32>,
 
@@ -30,6 +33,7 @@ impl<'a> Customers<'a> {
         options: Option<CustomersListCustomersOptions>,
     ) -> Result<crate::models::CustomerListResponse> {
         let CustomersListCustomersOptions {
+            order_by,
             page,
             per_page,
             search,
@@ -37,6 +41,7 @@ impl<'a> Customers<'a> {
         } = options.unwrap_or_default();
 
         crate::request::Request::new(http1::Method::GET, "/api/v1/customers")
+            .with_optional_query_param("order_by", order_by)
             .with_optional_query_param("page", page)
             .with_optional_query_param("per_page", per_page)
             .with_optional_query_param("search", search)

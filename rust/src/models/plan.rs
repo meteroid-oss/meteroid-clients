@@ -11,6 +11,9 @@ use super::{
 pub struct Plan {
     pub available_parameters: AvailableParameters,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub billing_cycles: Option<i32>,
+
     pub created_at: String,
 
     pub currency: String,
@@ -24,11 +27,17 @@ pub struct Plan {
 
     pub net_terms: i32,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_start_day: Option<i32>,
+
     pub plan_type: PlanTypeEnum,
 
     pub price_components: Vec<PriceComponent>,
 
     pub product_family: ProductFamily,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub self_service_rank: Option<i32>,
 
     pub status: PlanStatusEnum,
 
@@ -57,15 +66,18 @@ impl Plan {
     ) -> Self {
         Self {
             available_parameters,
+            billing_cycles: None,
             created_at,
             currency,
             description: None,
             id,
             name,
             net_terms,
+            period_start_day: None,
             plan_type,
             price_components,
             product_family,
+            self_service_rank: None,
             status,
             trial: None,
             version,

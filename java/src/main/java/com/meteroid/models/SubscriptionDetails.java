@@ -80,6 +80,9 @@ public class SubscriptionDetails {
     @JsonProperty("net_terms")
     private Integer netTerms;
 
+    @JsonProperty("payment_methods_config")
+    private PaymentMethodsConfig paymentMethodsConfig;
+
     @JsonProperty private BillingPeriodEnum period;
 
     @JsonProperty("plan_id")
@@ -531,6 +534,25 @@ public class SubscriptionDetails {
 
     public void setNetTerms(Integer netTerms) {
         this.netTerms = netTerms;
+    }
+
+    public SubscriptionDetails paymentMethodsConfig(PaymentMethodsConfig paymentMethodsConfig) {
+        this.paymentMethodsConfig = paymentMethodsConfig;
+        return this;
+    }
+
+    /**
+     * Get paymentMethodsConfig
+     *
+     * @return paymentMethodsConfig
+     */
+    @javax.annotation.Nullable
+    public PaymentMethodsConfig getPaymentMethodsConfig() {
+        return paymentMethodsConfig;
+    }
+
+    public void setPaymentMethodsConfig(PaymentMethodsConfig paymentMethodsConfig) {
+        this.paymentMethodsConfig = paymentMethodsConfig;
     }
 
     public SubscriptionDetails period(BillingPeriodEnum period) {

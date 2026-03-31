@@ -2,22 +2,6 @@
 #[allow(unused_imports)]
 use crate::{error::Result, models::*, Configuration};
 
-#[derive(Default)]
-pub struct SubscriptionsListSubscriptionsOptions {
-    /// Filter by customer ID or alias
-    pub customer_id: Option<String>,
-
-    pub plan_id: Option<PlanId>,
-
-    pub statuses: Option<Vec<SubscriptionStatusEnum>>,
-
-    /// Page number (0-indexed)
-    pub page: Option<i32>,
-
-    /// Number of items per page
-    pub per_page: Option<i32>,
-}
-
 pub struct Subscriptions<'a> {
     cfg: &'a Configuration,
 }
@@ -25,29 +9,6 @@ pub struct Subscriptions<'a> {
 impl<'a> Subscriptions<'a> {
     pub(super) fn new(cfg: &'a Configuration) -> Self {
         Self { cfg }
-    }
-
-    /// List subscriptions with optional filtering by customer or plan.
-    pub async fn list_subscriptions(
-        &self,
-        options: Option<SubscriptionsListSubscriptionsOptions>,
-    ) -> Result<crate::models::SubscriptionListResponse> {
-        let SubscriptionsListSubscriptionsOptions {
-            customer_id,
-            plan_id,
-            statuses,
-            page,
-            per_page,
-        } = options.unwrap_or_default();
-
-        crate::request::Request::new(http1::Method::GET, "/api/v1/subscriptions")
-            .with_optional_query_param("customer_id", customer_id)
-            .with_optional_query_param("plan_id", plan_id)
-            .with_optional_query_param("statuses", statuses)
-            .with_optional_query_param("page", page)
-            .with_optional_query_param("per_page", per_page)
-            .execute(self.cfg)
-            .await
     }
 
     /// Create a new subscription for a customer with a specific plan.
@@ -64,12 +25,31 @@ impl<'a> Subscriptions<'a> {
     /// Retrieve detailed information about a subscription including price components and schedules.
     pub async fn subscription_details(
         &self,
-        id: String,
+        subscription_id: String,
     ) -> Result<crate::models::SubscriptionDetails> {
-        crate::request::Request::new(http1::Method::GET, "/api/v1/subscriptions/{id}")
-            .with_path_param("id", id)
-            .execute(self.cfg)
-            .await
+        crate::request::Request::new(
+            http1::Method::GET,
+            "/api/v1/subscriptions/{subscription_id}",
+        )
+        .with_path_param("subscription_id", subscription_id)
+        .execute(self.cfg)
+        .await
+    }
+
+    /// Update subscription settings like payment configuration, billing options, etc.
+    pub async fn update_subscription(
+        &self,
+        subscription_id: String,
+        subscription_update_request: crate::models::SubscriptionUpdateRequest,
+    ) -> Result<crate::models::SubscriptionUpdateResponse> {
+        crate::request::Request::new(
+            http1::Method::PATCH,
+            "/api/v1/subscriptions/{subscription_id}",
+        )
+        .with_path_param("subscription_id", subscription_id)
+        .with_body_param(subscription_update_request)
+        .execute(self.cfg)
+        .await
     }
 
     /// Cancel a subscription either immediately or at the end of the billing period.

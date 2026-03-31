@@ -20,8 +20,10 @@ public class SubscriptionAddOn {
     private String addOnId;
 
     @JsonProperty private SubscriptionFee fee;
+    @JsonProperty private String id;
     @JsonProperty private String name;
     @JsonProperty private SubscriptionFeeBillingPeriodEnum period;
+    @JsonProperty private Integer quantity;
 
     public SubscriptionAddOn() {}
 
@@ -63,6 +65,25 @@ public class SubscriptionAddOn {
         this.fee = fee;
     }
 
+    public SubscriptionAddOn id(String id) {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * Get id
+     *
+     * @return id
+     */
+    @javax.annotation.Nullable
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public SubscriptionAddOn name(String name) {
         this.name = name;
         return this;
@@ -99,6 +120,25 @@ public class SubscriptionAddOn {
 
     public void setPeriod(SubscriptionFeeBillingPeriodEnum period) {
         this.period = period;
+    }
+
+    public SubscriptionAddOn quantity(Integer quantity) {
+        this.quantity = quantity;
+        return this;
+    }
+
+    /**
+     * Get quantity
+     *
+     * @return quantity
+     */
+    @javax.annotation.Nonnull
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     /**

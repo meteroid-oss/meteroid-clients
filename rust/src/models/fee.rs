@@ -10,17 +10,17 @@ use super::{
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(tag = "fee_type")]
 pub enum Fee {
-    #[serde(rename = "rate")]
+    #[serde(rename = "RATE")]
     Rate(RatePlanFee),
-    #[serde(rename = "slot")]
+    #[serde(rename = "SLOT")]
     Slot(SlotPlanFee),
-    #[serde(rename = "capacity")]
+    #[serde(rename = "CAPACITY")]
     Capacity(CapacityPlanFee),
-    #[serde(rename = "usage")]
+    #[serde(rename = "USAGE")]
     Usage(UsagePlanFee),
-    #[serde(rename = "extra_recurring")]
+    #[serde(rename = "EXTRA_RECURRING")]
     ExtraRecurring(ExtraRecurringPlanFee),
-    #[serde(rename = "one_time")]
+    #[serde(rename = "ONE_TIME")]
     OneTime(OneTimePlanFee),
 }
 

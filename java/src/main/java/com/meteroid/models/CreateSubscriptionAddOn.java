@@ -20,6 +20,7 @@ public class CreateSubscriptionAddOn {
     private String addOnId;
 
     @JsonProperty private SubscriptionAddOnCustomization customization;
+    @JsonProperty private Integer quantity;
 
     public CreateSubscriptionAddOn() {}
 
@@ -59,6 +60,25 @@ public class CreateSubscriptionAddOn {
 
     public void setCustomization(SubscriptionAddOnCustomization customization) {
         this.customization = customization;
+    }
+
+    public CreateSubscriptionAddOn quantity(Integer quantity) {
+        this.quantity = quantity;
+        return this;
+    }
+
+    /**
+     * Get quantity
+     *
+     * @return quantity
+     */
+    @javax.annotation.Nullable
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     /**

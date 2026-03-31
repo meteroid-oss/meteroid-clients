@@ -6,7 +6,9 @@ import com.meteroid.Utils.ToQueryParam;
 
 public enum CheckoutType implements ToQueryParam {
     SELF_SERVE("SELF_SERVE"),
-    SUBSCRIPTION_ACTIVATION("SUBSCRIPTION_ACTIVATION");
+    SUBSCRIPTION_ACTIVATION("SUBSCRIPTION_ACTIVATION"),
+    PLAN_CHANGE("PLAN_CHANGE"),
+    ADDON_PURCHASE("ADDON_PURCHASE");
     private final String value;
 
     CheckoutType(String value) {

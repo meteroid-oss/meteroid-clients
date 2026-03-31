@@ -16,12 +16,12 @@ import lombok.*;
         property = "fee_type",
         visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Fee.Rate.class, name = "rate"),
-    @JsonSubTypes.Type(value = Fee.Slot.class, name = "slot"),
-    @JsonSubTypes.Type(value = Fee.Capacity.class, name = "capacity"),
-    @JsonSubTypes.Type(value = Fee.Usage.class, name = "usage"),
-    @JsonSubTypes.Type(value = Fee.ExtraRecurring.class, name = "extra_recurring"),
-    @JsonSubTypes.Type(value = Fee.OneTime.class, name = "one_time")
+    @JsonSubTypes.Type(value = Fee.Rate.class, name = "RATE"),
+    @JsonSubTypes.Type(value = Fee.Slot.class, name = "SLOT"),
+    @JsonSubTypes.Type(value = Fee.Capacity.class, name = "CAPACITY"),
+    @JsonSubTypes.Type(value = Fee.Usage.class, name = "USAGE"),
+    @JsonSubTypes.Type(value = Fee.ExtraRecurring.class, name = "EXTRA_RECURRING"),
+    @JsonSubTypes.Type(value = Fee.OneTime.class, name = "ONE_TIME")
 })
 @ToString
 @EqualsAndHashCode
@@ -51,13 +51,13 @@ public abstract class Fee {
 
     // Variant classes
     /**
-     * Variant: rate
+     * Variant: RATE
      *
      * <p>This variant wraps RatePlanFee.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @JsonTypeName("rate")
+    @JsonTypeName("RATE")
     public static class Rate extends Fee {
         @JsonUnwrapped private RatePlanFee data;
 
@@ -69,7 +69,7 @@ public abstract class Fee {
 
         @java.lang.Override
         public String getFeeType() {
-            return "rate";
+            return "RATE";
         }
 
         /** Get the wrapped data for this variant. */
@@ -86,13 +86,13 @@ public abstract class Fee {
     }
 
     /**
-     * Variant: slot
+     * Variant: SLOT
      *
      * <p>This variant wraps SlotPlanFee.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @JsonTypeName("slot")
+    @JsonTypeName("SLOT")
     public static class Slot extends Fee {
         @JsonUnwrapped private SlotPlanFee data;
 
@@ -104,7 +104,7 @@ public abstract class Fee {
 
         @java.lang.Override
         public String getFeeType() {
-            return "slot";
+            return "SLOT";
         }
 
         /** Get the wrapped data for this variant. */
@@ -121,13 +121,13 @@ public abstract class Fee {
     }
 
     /**
-     * Variant: capacity
+     * Variant: CAPACITY
      *
      * <p>This variant wraps CapacityPlanFee.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @JsonTypeName("capacity")
+    @JsonTypeName("CAPACITY")
     public static class Capacity extends Fee {
         @JsonUnwrapped private CapacityPlanFee data;
 
@@ -139,7 +139,7 @@ public abstract class Fee {
 
         @java.lang.Override
         public String getFeeType() {
-            return "capacity";
+            return "CAPACITY";
         }
 
         /** Get the wrapped data for this variant. */
@@ -156,13 +156,13 @@ public abstract class Fee {
     }
 
     /**
-     * Variant: usage
+     * Variant: USAGE
      *
      * <p>This variant wraps UsagePlanFee.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @JsonTypeName("usage")
+    @JsonTypeName("USAGE")
     public static class Usage extends Fee {
         @JsonUnwrapped private UsagePlanFee data;
 
@@ -174,7 +174,7 @@ public abstract class Fee {
 
         @java.lang.Override
         public String getFeeType() {
-            return "usage";
+            return "USAGE";
         }
 
         /** Get the wrapped data for this variant. */
@@ -191,13 +191,13 @@ public abstract class Fee {
     }
 
     /**
-     * Variant: extra_recurring
+     * Variant: EXTRA_RECURRING
      *
      * <p>This variant wraps ExtraRecurringPlanFee.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @JsonTypeName("extra_recurring")
+    @JsonTypeName("EXTRA_RECURRING")
     public static class ExtraRecurring extends Fee {
         @JsonUnwrapped private ExtraRecurringPlanFee data;
 
@@ -209,7 +209,7 @@ public abstract class Fee {
 
         @java.lang.Override
         public String getFeeType() {
-            return "extra_recurring";
+            return "EXTRA_RECURRING";
         }
 
         /** Get the wrapped data for this variant. */
@@ -226,13 +226,13 @@ public abstract class Fee {
     }
 
     /**
-     * Variant: one_time
+     * Variant: ONE_TIME
      *
      * <p>This variant wraps OneTimePlanFee.
      */
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @JsonTypeName("one_time")
+    @JsonTypeName("ONE_TIME")
     public static class OneTime extends Fee {
         @JsonUnwrapped private OneTimePlanFee data;
 
@@ -244,7 +244,7 @@ public abstract class Fee {
 
         @java.lang.Override
         public String getFeeType() {
-            return "one_time";
+            return "ONE_TIME";
         }
 
         /** Get the wrapped data for this variant. */

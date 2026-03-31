@@ -15,6 +15,13 @@ public class InvoicesListInvoicesOptions {
     String subscriptionId;
     List<InvoiceStatus> statuses;
 
+    /**
+     * Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`,
+     * `amount`, `invoice_date`, `status`, `payment_status`. Direction: `asc` or `desc`. Default:
+     * `invoice_date.desc`.
+     */
+    String orderBy;
+
     /** Page number (0-indexed) */
     Integer page;
 
