@@ -143,17 +143,17 @@ fn test_customer_create_request_with_optional_fields() {
 
 #[test]
 fn test_fee_tagged_union_serialization() {
-    // Test the internally tagged union (discriminator: fee_type)
+    // Test the internally tagged union (discriminator: type)
     let rate_fee = Fee::Rate(RatePlanFee { rates: vec![] });
 
     let json_value = serde_json::to_value(&rate_fee).unwrap();
-    assert_eq!(json_value["fee_type"], "RATE");
+    assert_eq!(json_value["type"], "RATE");
 }
 
 #[test]
 fn test_fee_tagged_union_deserialization() {
     let json_str = r#"{
-        "fee_type": "RATE",
+        "type": "RATE",
         "rates": []
     }"#;
 
