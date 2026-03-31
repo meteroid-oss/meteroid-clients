@@ -768,6 +768,11 @@ pub(crate) enum FieldType {
     StringConst {
         value: String,
     },
+
+    /// An inline string enum (for query parameters).
+    StringEnum {
+        values: Vec<String>,
+    },
 }
 
 impl FieldType {
@@ -837,13 +842,28 @@ impl FieldType {
                     return Ok((Self::StringConst { value }, is_type_array_nullable));
                 }
                 if let Some(values) = obj.enum_values {
-                    let Ok([value]): Result<[_; 1], _> = values.try_into() else {
-                        bail!("unsupported: enum as field type");
-                    };
-                    let serde_json::Value::String(value) = value else {
-                        bail!("unsupported: non-string constant as field type");
-                    };
-                    return Ok((Self::StringConst { value }, is_type_array_nullable));
+                    // Single-value enum: treat as a string constant (discriminator)
+                    if values.len() == 1 {
+                        let serde_json::Value::String(value) = values.into_iter().next().unwrap()
+                        else {
+                            bail!("unsupported: non-string constant as field type");
+                        };
+                        return Ok((Self::StringConst { value }, is_type_array_nullable));
+                    }
+                    // Multi-value enum: inline string enum (e.g., query param filters)
+                    let string_values: Vec<String> = values
+                        .into_iter()
+                        .map(|v| match v {
+                            serde_json::Value::String(s) => Ok(s),
+                            _ => bail!("unsupported: non-string value in enum"),
+                        })
+                        .collect::<anyhow::Result<_>>()?;
+                    return Ok((
+                        Self::StringEnum {
+                            values: string_values,
+                        },
+                        is_type_array_nullable,
+                    ));
                 }
 
                 match obj.format.as_deref() {
@@ -943,7 +963,7 @@ impl FieldType {
                 format!("List<{}>", inner.to_csharp_typename()).into()
             }
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "Object"),
-            Self::StringConst { .. } => "string".into(),
+            Self::StringConst { .. } | Self::StringEnum { .. } => "string".into(),
         }
     }
 
@@ -963,7 +983,7 @@ impl FieldType {
                 format!("[]{}", inner.to_go_typename()).into()
             }
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "map[string]any"),
-            Self::StringConst { .. } => "string".into(),
+            Self::StringConst { .. } | Self::StringEnum { .. } => "string".into(),
         }
     }
 
@@ -984,7 +1004,7 @@ impl FieldType {
             Self::List { inner } => format!("List<{}>", inner.to_kotlin_typename()).into(),
             Self::Set { inner } => format!("Set<{}>", inner.to_kotlin_typename()).into(),
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "Map<String,Any>"),
-            Self::StringConst { .. } => "String".into(),
+            Self::StringConst { .. } | Self::StringEnum { .. } => "String".into(),
         }
     }
 
@@ -1004,7 +1024,7 @@ impl FieldType {
                 format!("{{ [key: string]: {} }}", value_ty.to_js_typename()).into()
             }
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "any"),
-            Self::StringConst { .. } => "string".into(),
+            Self::StringConst { .. } | Self::StringEnum { .. } => "string".into(),
         }
     }
 
@@ -1031,7 +1051,7 @@ impl FieldType {
             )
             .into(),
             Self::SchemaRef { name,.. } => filter_schema_ref(name, "serde_json::Value"),
-            Self::StringConst { .. } => "String".into()
+            Self::StringConst { .. } | Self::StringEnum { .. } => "String".into(),
         }
     }
 
@@ -1064,7 +1084,7 @@ impl FieldType {
             Self::Map { value_ty } => {
                 format!("t.Dict[str, {}]", value_ty.to_python_typename()).into()
             }
-            Self::StringConst { .. } => "str".into(),
+            Self::StringConst { .. } | Self::StringEnum { .. } => "str".into(),
         }
     }
 
@@ -1097,6 +1117,7 @@ impl FieldType {
             }
             // backwards compat
             FieldType::StringConst { .. } => "TypeEnum".into(),
+            FieldType::StringEnum { .. } => "String".into(),
         }
     }
 
@@ -1114,7 +1135,8 @@ impl FieldType {
             | FieldType::DateTime
             | FieldType::Uri
             | FieldType::JsonObject
-            | FieldType::StringConst { .. } => false,
+            | FieldType::StringConst { .. }
+            | FieldType::StringEnum { .. } => false,
             FieldType::List { inner } | FieldType::Set { inner } => inner.needs_java_import(),
             FieldType::Map { value_ty } => value_ty.needs_java_import(),
             FieldType::SchemaRef { inner, .. } => {
@@ -1152,6 +1174,7 @@ impl FieldType {
             | FieldType::Uri
             | FieldType::JsonObject
             | FieldType::StringConst { .. }
+            | FieldType::StringEnum { .. }
             | FieldType::SchemaRef { .. } => self.to_php_typename(),
             FieldType::Set { inner } | FieldType::List { inner } => {
                 format!("list<{}>", inner.to_phpdoc_typename()).into()
@@ -1170,7 +1193,10 @@ impl FieldType {
             | FieldType::UInt64
             | FieldType::Int32
             | FieldType::Int64 => "int".into(),
-            FieldType::Uri | FieldType::StringConst { .. } | FieldType::String => "string".into(),
+            FieldType::Uri
+            | FieldType::StringConst { .. }
+            | FieldType::StringEnum { .. }
+            | FieldType::String => "string".into(),
             FieldType::DateTime => r#"\DateTimeImmutable"#.into(),
 
             FieldType::JsonObject
@@ -1285,7 +1311,8 @@ impl minijinja::value::Object for FieldType {
                     | F::Set { .. }
                     | F::Map { .. }
                     | F::SchemaRef { .. }
-                    | F::StringConst { .. } => false,
+                    | F::StringConst { .. }
+                    | F::StringEnum { .. } => false,
                 };
                 Ok(is_int_or_uint.into())
             }
