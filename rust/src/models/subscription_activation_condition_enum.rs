@@ -28,3 +28,9 @@ impl fmt::Display for SubscriptionActivationConditionEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for SubscriptionActivationConditionEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

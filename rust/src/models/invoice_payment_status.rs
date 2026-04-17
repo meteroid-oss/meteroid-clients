@@ -32,3 +32,9 @@ impl fmt::Display for InvoicePaymentStatus {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for InvoicePaymentStatus {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

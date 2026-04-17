@@ -6,7 +6,7 @@ use crate::{error::Result, models::*, Configuration};
 pub struct CheckoutSessionsListCheckoutSessionsOptions {
     pub customer_id: Option<CustomerId>,
 
-    pub status: Option<String>,
+    pub status: Option<CheckoutSessionStatus>,
 }
 
 pub struct CheckoutSessions<'a> {

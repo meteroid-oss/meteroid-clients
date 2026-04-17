@@ -1,12 +1,14 @@
 // this file is @generated
 package com.meteroid.api;
 
+import com.meteroid.models.CouponFilter;
+
 import lombok.Data;
 
 @Data
 public class CouponsListCouponsOptions {
     String search;
-    String filter;
+    CouponFilter filter;
 
     /**
      * Sort order. Format: `column.direction`. Allowed columns: `code`, `created_at`, `expires_at`.

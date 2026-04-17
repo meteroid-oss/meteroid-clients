@@ -9,7 +9,7 @@ pub struct SubscriptionsListSubscriptionsOptions {
 
     pub plan_id: Option<PlanId>,
 
-    pub statuses: Option<Vec<String>>,
+    pub statuses: Option<Vec<SubscriptionStatusEnum>>,
 
     /// Sort order. Format: `column.direction`. Allowed columns: `customer_name`, `plan_name`, `mrr_cents`, `billing_start_date`, `end_date`, `status`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
     pub order_by: Option<String>,

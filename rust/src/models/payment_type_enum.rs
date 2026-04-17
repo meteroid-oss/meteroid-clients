@@ -24,3 +24,9 @@ impl fmt::Display for PaymentTypeEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for PaymentTypeEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

@@ -10,10 +10,10 @@ pub struct PlansListPlansOptions {
     pub search: Option<String>,
 
     /// Filter by plan status (can be repeated)
-    pub status: Option<Vec<String>>,
+    pub status: Option<Vec<PlanStatusEnum>>,
 
     /// Filter by plan type (can be repeated)
-    pub plan_type: Option<Vec<String>>,
+    pub plan_type: Option<Vec<PlanTypeEnum>>,
 
     /// Sort order. Format: `column.direction`. Allowed columns: `name`, `status`, `plan_type`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
     pub order_by: Option<String>,

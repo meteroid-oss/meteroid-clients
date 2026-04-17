@@ -60,3 +60,9 @@ impl fmt::Display for SubscriptionStatusEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for SubscriptionStatusEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

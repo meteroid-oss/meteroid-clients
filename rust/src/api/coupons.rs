@@ -6,7 +6,7 @@ use crate::{error::Result, models::*, Configuration};
 pub struct CouponsListCouponsOptions {
     pub search: Option<String>,
 
-    pub filter: Option<String>,
+    pub filter: Option<CouponFilter>,
 
     /// Sort order. Format: `column.direction`. Allowed columns: `code`, `created_at`, `expires_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
     pub order_by: Option<String>,

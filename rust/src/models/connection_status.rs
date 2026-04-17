@@ -33,3 +33,9 @@ impl fmt::Display for ConnectionStatus {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for ConnectionStatus {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

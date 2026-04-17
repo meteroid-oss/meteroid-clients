@@ -25,3 +25,9 @@ impl fmt::Display for OnboardingMode {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for OnboardingMode {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

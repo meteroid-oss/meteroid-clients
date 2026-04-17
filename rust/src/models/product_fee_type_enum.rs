@@ -40,3 +40,9 @@ impl fmt::Display for ProductFeeTypeEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for ProductFeeTypeEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

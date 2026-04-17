@@ -652,3 +652,9 @@ impl fmt::Display for Currency {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for Currency {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

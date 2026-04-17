@@ -28,3 +28,9 @@ impl fmt::Display for TaxExemptionType {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for TaxExemptionType {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

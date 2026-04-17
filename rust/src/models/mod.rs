@@ -53,6 +53,7 @@ pub mod coupon;
 pub mod coupon_discount;
 pub mod coupon_event;
 pub mod coupon_event_data;
+pub mod coupon_filter;
 pub mod coupon_id;
 pub mod coupon_line_item;
 pub mod coupon_list_response;
@@ -286,7 +287,7 @@ pub use self::{
     connected_accounts_response::ConnectedAccountsResponse, connection_status::ConnectionStatus,
     connection_type::ConnectionType, country_code::CountryCode, coupon::Coupon,
     coupon_discount::CouponDiscount, coupon_event::CouponEvent, coupon_event_data::CouponEventData,
-    coupon_id::CouponId, coupon_line_item::CouponLineItem,
+    coupon_filter::CouponFilter, coupon_id::CouponId, coupon_line_item::CouponLineItem,
     coupon_list_response::CouponListResponse, create_add_on_request::CreateAddOnRequest,
     create_checkout_session_request::CreateCheckoutSessionRequest,
     create_checkout_session_response::CreateCheckoutSessionResponse,

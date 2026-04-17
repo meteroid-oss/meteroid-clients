@@ -1,14 +1,17 @@
 // this file is @generated
 package com.meteroid.api;
 
+import com.meteroid.models.BatchJobStatus;
+import com.meteroid.models.BatchJobType;
+
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class BatchJobsListBatchJobsOptions {
-    String jobType;
-    List<String> status;
+    BatchJobType jobType;
+    List<BatchJobStatus> status;
 
     /** Page number (0-indexed) */
     Integer page;

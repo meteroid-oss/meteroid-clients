@@ -36,3 +36,9 @@ impl fmt::Display for CheckoutSessionStatus {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for CheckoutSessionStatus {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

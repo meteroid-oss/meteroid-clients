@@ -24,3 +24,9 @@ impl fmt::Display for BillingType {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for BillingType {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}
