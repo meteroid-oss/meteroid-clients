@@ -25,3 +25,9 @@ impl fmt::Display for ConnectionType {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for ConnectionType {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

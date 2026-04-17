@@ -20,3 +20,9 @@ impl fmt::Display for SlotUpgradePolicyEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for SlotUpgradePolicyEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

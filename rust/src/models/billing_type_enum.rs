@@ -24,3 +24,9 @@ impl fmt::Display for BillingTypeEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for BillingTypeEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

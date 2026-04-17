@@ -28,3 +28,9 @@ impl fmt::Display for CreditNoteStatus {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for CreditNoteStatus {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

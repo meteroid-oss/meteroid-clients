@@ -28,3 +28,9 @@ impl fmt::Display for PlanTypeEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for PlanTypeEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

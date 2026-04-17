@@ -24,3 +24,9 @@ impl fmt::Display for ExtraRecurringBillingTypeEnum {
         f.write_str(value)
     }
 }
+
+impl crate::request::QueryParamValue for ExtraRecurringBillingTypeEnum {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}
