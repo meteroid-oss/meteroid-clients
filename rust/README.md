@@ -33,15 +33,15 @@ async fn main() -> Result<(), meteroid_rs::error::Error> {
 
 The SDK provides access to the following Meteroid API resources:
 
-| Resource | Description |
-|----------|-------------|
-| `client.customers()` | Manage customers |
-| `client.subscriptions()` | Manage subscriptions |
-| `client.invoices()` | Access invoices and download PDFs |
-| `client.plans()` | List available plans |
-| `client.product_families()` | Manage product families |
-| `client.events()` | Send usage events |
-| `client.checkout_sessions()` | Create checkout sessions |
+| Resource                     | Description                       |
+| ---------------------------- | --------------------------------- |
+| `client.customers()`         | Manage customers                  |
+| `client.subscriptions()`     | Manage subscriptions              |
+| `client.invoices()`          | Access invoices and download PDFs |
+| `client.plans()`             | List available plans              |
+| `client.product_families()`  | Manage product families           |
+| `client.events()`            | Send usage events                 |
+| `client.checkout_sessions()` | Create checkout sessions          |
 
 ## Examples
 
@@ -174,18 +174,18 @@ let client = Meteroid::new("your-api-key".to_string(), Some(options));
 
 ## Cargo Features
 
-| Feature | Description | Default |
-|---------|-------------|---------|
-| `rustls-tls` | Use rustls for TLS | Yes |
-| `native-tls` | Use native OS TLS (OpenSSL on Linux) | No |
-| `http1` | HTTP/1.1 support | Yes |
-| `http2` | HTTP/2 support | No |
+| Feature      | Description                          | Default |
+| ------------ | ------------------------------------ | ------- |
+| `rustls-tls` | Use rustls for TLS                   | Yes     |
+| `native-tls` | Use native OS TLS (OpenSSL on Linux) | No      |
+| `http1`      | HTTP/1.1 support                     | Yes     |
+| `http2`      | HTTP/2 support                       | No      |
 
 ### Using Native TLS
 
 ```toml
 [dependencies]
-meteroid-rs = { version = "0.19", default-features = false, features = ["native-tls", "http1"] }
+meteroid-rs = { version = "0.21.1", default-features = false, features = ["native-tls", "http1"] }
 ```
 
 ## Error Handling

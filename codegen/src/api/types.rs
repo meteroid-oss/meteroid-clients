@@ -1,6 +1,6 @@
 use std::{
     borrow::Cow,
-    collections::{BTreeMap, BTreeSet},
+    collections::{BTreeMap, BTreeSet, btree_map},
     sync::Arc,
 };
 
@@ -14,9 +14,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::cli_v1::IncludeMode;
 
+use heck::ToUpperCamelCase as _;
+
 use super::{
     get_schema_name,
-    resources::{self, Resources},
+    resources::{self, Resource, Resources},
 };
 
 /// Named types referenced by API operations.
@@ -170,9 +172,197 @@ fn resolve_schema_ref_in_field_type(
     }
 }
 
+/// Promote every inline `FieldType::StringEnum` into a named top-level
+/// `TypeData::StringEnum` and rewrite the field to `FieldType::SchemaRef`.
+///
+/// Name selection:
+/// - If an existing top-level string enum has exactly the same values, reuse it.
+/// - Else, use the schema `title` if present.
+/// - Else, derive from context: `{parent}_{field}` (or `..._item` / `..._value`
+///   when promoted through a List/Set/Map), converted to UpperCamelCase.
+///
+/// After this pass, `FieldType::StringEnum` must not appear anywhere; the render
+/// methods treat it as `unreachable!`.
+pub(crate) fn promote_inline_enums(
+    types: &mut Types,
+    resources: &mut Resources,
+) -> anyhow::Result<()> {
+    // Snapshot existing top-level string enums keyed by their value set, so we
+    // can reuse them instead of generating duplicates (e.g. the subscription
+    // `statuses` filter reuses the existing `SubscriptionStatusEnum`).
+    let existing_by_values: BTreeMap<Vec<String>, String> = types
+        .iter()
+        .filter_map(|(name, ty)| match &ty.data {
+            TypeData::StringEnum { values } => Some((values.clone(), name.clone())),
+            _ => None,
+        })
+        .collect();
+
+    let mut new_types: BTreeMap<String, Type> = BTreeMap::new();
+
+    for (type_name, ty) in types.iter_mut() {
+        match &mut ty.data {
+            TypeData::Struct { fields } => {
+                for field in fields {
+                    let base = format!("{}_{}", type_name, field.name);
+                    promote_field_type(
+                        &mut field.r#type,
+                        &base,
+                        &existing_by_values,
+                        &mut new_types,
+                    )?;
+                }
+            }
+            TypeData::StructEnum { fields, repr, .. } => {
+                for field in fields {
+                    let base = format!("{}_{}", type_name, field.name);
+                    promote_field_type(
+                        &mut field.r#type,
+                        &base,
+                        &existing_by_values,
+                        &mut new_types,
+                    )?;
+                }
+                let variants = match repr {
+                    StructEnumRepr::AdjacentlyTagged { variants, .. }
+                    | StructEnumRepr::InternallyTagged { variants } => variants,
+                };
+                for variant in variants {
+                    if let EnumVariantType::Struct { fields } = &mut variant.content {
+                        for field in fields {
+                            let base = format!("{}_{}_{}", type_name, variant.name, field.name);
+                            promote_field_type(
+                                &mut field.r#type,
+                                &base,
+                                &existing_by_values,
+                                &mut new_types,
+                            )?;
+                        }
+                    }
+                }
+            }
+            TypeData::StringEnum { .. } | TypeData::IntegerEnum { .. } | TypeData::StringAlias => {}
+        }
+    }
+
+    for resource in resources.values_mut() {
+        promote_inline_enums_in_resource(resource, &existing_by_values, &mut new_types)?;
+    }
+
+    for (name, ty) in new_types {
+        match types.entry(name) {
+            btree_map::Entry::Vacant(e) => {
+                e.insert(ty);
+            }
+            btree_map::Entry::Occupied(e) => {
+                if *e.get() != ty {
+                    bail!(
+                        "promoted inline enum `{}` collides with an existing type of different shape",
+                        e.key()
+                    );
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn promote_inline_enums_in_resource(
+    resource: &mut Resource,
+    existing_by_values: &BTreeMap<Vec<String>, String>,
+    new_types: &mut BTreeMap<String, Type>,
+) -> anyhow::Result<()> {
+    for sub in resource.subresources.values_mut() {
+        promote_inline_enums_in_resource(sub, existing_by_values, new_types)?;
+    }
+    for op in &mut resource.operations {
+        let op_id = op.id.clone();
+        for param in &mut op.query_params {
+            let base = format!("{}_{}", op_id, param.name);
+            promote_field_type(&mut param.r#type, &base, existing_by_values, new_types)?;
+        }
+    }
+    Ok(())
+}
+
+fn promote_field_type(
+    ft: &mut FieldType,
+    base_name: &str,
+    existing_by_values: &BTreeMap<Vec<String>, String>,
+    new_types: &mut BTreeMap<String, Type>,
+) -> anyhow::Result<()> {
+    match ft {
+        FieldType::StringEnum { values, title } => {
+            let values = std::mem::take(values);
+            if let Some(existing_name) = existing_by_values.get(&values) {
+                *ft = FieldType::SchemaRef {
+                    name: existing_name.clone(),
+                    inner: None,
+                };
+                return Ok(());
+            }
+            let name = match title.take() {
+                Some(t) => t.to_upper_camel_case(),
+                None => base_name.to_upper_camel_case(),
+            };
+            let promoted = Type {
+                name: name.clone(),
+                description: None,
+                deprecated: false,
+                data: TypeData::StringEnum {
+                    values: values.clone(),
+                },
+            };
+            match new_types.entry(name.clone()) {
+                btree_map::Entry::Vacant(e) => {
+                    e.insert(promoted);
+                }
+                btree_map::Entry::Occupied(e) => {
+                    if *e.get() != promoted {
+                        bail!(
+                            "promoted inline enum `{name}` has conflicting value sets at different call sites"
+                        );
+                    }
+                }
+            }
+            *ft = FieldType::SchemaRef { name, inner: None };
+        }
+        FieldType::List { inner } | FieldType::Set { inner } => {
+            promote_field_type(
+                Arc::make_mut(inner),
+                &format!("{base_name}_item"),
+                existing_by_values,
+                new_types,
+            )?;
+        }
+        FieldType::Map { value_ty } => {
+            promote_field_type(
+                Arc::make_mut(value_ty),
+                &format!("{base_name}_value"),
+                existing_by_values,
+                new_types,
+            )?;
+        }
+        FieldType::Bool
+        | FieldType::Int16
+        | FieldType::UInt16
+        | FieldType::Int32
+        | FieldType::Int64
+        | FieldType::UInt64
+        | FieldType::String
+        | FieldType::DateTime
+        | FieldType::Uri
+        | FieldType::JsonObject
+        | FieldType::SchemaRef { .. }
+        | FieldType::StringConst { .. } => {}
+    }
+    Ok(())
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub(crate) struct Type {
-    name: String,
+    pub(crate) name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     deprecated: bool,
@@ -653,7 +843,7 @@ impl StructEnumRepr {
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub(crate) struct Field {
-    name: String,
+    pub(crate) name: String,
     #[serde(serialize_with = "serialize_field_type")]
     pub r#type: FieldType,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -769,9 +959,13 @@ pub(crate) enum FieldType {
         value: String,
     },
 
-    /// An inline string enum (for query parameters).
+    /// An inline string enum that will be promoted to a named top-level type
+    /// by `promote_inline_enums`. Should never reach the render stage.
     StringEnum {
         values: Vec<String>,
+        /// Title from the OpenAPI schema, used as the promoted type name when set.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        title: Option<String>,
     },
 }
 
@@ -850,7 +1044,8 @@ impl FieldType {
                         };
                         return Ok((Self::StringConst { value }, is_type_array_nullable));
                     }
-                    // Multi-value enum: inline string enum (e.g., query param filters)
+                    // Multi-value enum: inline string enum. Promoted to a named top-level
+                    // type by `promote_inline_enums` after parsing.
                     let string_values: Vec<String> = values
                         .into_iter()
                         .map(|v| match v {
@@ -858,9 +1053,11 @@ impl FieldType {
                             _ => bail!("unsupported: non-string value in enum"),
                         })
                         .collect::<anyhow::Result<_>>()?;
+                    let title = obj.metadata.as_ref().and_then(|m| m.title.clone());
                     return Ok((
                         Self::StringEnum {
                             values: string_values,
+                            title,
                         },
                         is_type_array_nullable,
                     ));
@@ -963,7 +1160,8 @@ impl FieldType {
                 format!("List<{}>", inner.to_csharp_typename()).into()
             }
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "Object"),
-            Self::StringConst { .. } | Self::StringEnum { .. } => "string".into(),
+            Self::StringConst { .. } => "string".into(),
+            Self::StringEnum { .. } => unreachable_inline_enum(),
         }
     }
 
@@ -983,7 +1181,8 @@ impl FieldType {
                 format!("[]{}", inner.to_go_typename()).into()
             }
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "map[string]any"),
-            Self::StringConst { .. } | Self::StringEnum { .. } => "string".into(),
+            Self::StringConst { .. } => "string".into(),
+            Self::StringEnum { .. } => unreachable_inline_enum(),
         }
     }
 
@@ -1004,7 +1203,8 @@ impl FieldType {
             Self::List { inner } => format!("List<{}>", inner.to_kotlin_typename()).into(),
             Self::Set { inner } => format!("Set<{}>", inner.to_kotlin_typename()).into(),
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "Map<String,Any>"),
-            Self::StringConst { .. } | Self::StringEnum { .. } => "String".into(),
+            Self::StringConst { .. } => "String".into(),
+            Self::StringEnum { .. } => unreachable_inline_enum(),
         }
     }
 
@@ -1024,7 +1224,8 @@ impl FieldType {
                 format!("{{ [key: string]: {} }}", value_ty.to_js_typename()).into()
             }
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "any"),
-            Self::StringConst { .. } | Self::StringEnum { .. } => "string".into(),
+            Self::StringConst { .. } => "string".into(),
+            Self::StringEnum { .. } => unreachable_inline_enum(),
         }
     }
 
@@ -1051,7 +1252,8 @@ impl FieldType {
             )
             .into(),
             Self::SchemaRef { name,.. } => filter_schema_ref(name, "serde_json::Value"),
-            Self::StringConst { .. } | Self::StringEnum { .. } => "String".into(),
+            Self::StringConst { .. } => "String".into(),
+            Self::StringEnum { .. } => unreachable_inline_enum(),
         }
     }
 
@@ -1084,7 +1286,8 @@ impl FieldType {
             Self::Map { value_ty } => {
                 format!("t.Dict[str, {}]", value_ty.to_python_typename()).into()
             }
-            Self::StringConst { .. } | Self::StringEnum { .. } => "str".into(),
+            Self::StringConst { .. } => "str".into(),
+            Self::StringEnum { .. } => unreachable_inline_enum(),
         }
     }
 
@@ -1117,7 +1320,7 @@ impl FieldType {
             }
             // backwards compat
             FieldType::StringConst { .. } => "TypeEnum".into(),
-            FieldType::StringEnum { .. } => "String".into(),
+            FieldType::StringEnum { .. } => unreachable_inline_enum(),
         }
     }
 
@@ -1135,8 +1338,8 @@ impl FieldType {
             | FieldType::DateTime
             | FieldType::Uri
             | FieldType::JsonObject
-            | FieldType::StringConst { .. }
-            | FieldType::StringEnum { .. } => false,
+            | FieldType::StringConst { .. } => false,
+            FieldType::StringEnum { .. } => unreachable_inline_enum(),
             FieldType::List { inner } | FieldType::Set { inner } => inner.needs_java_import(),
             FieldType::Map { value_ty } => value_ty.needs_java_import(),
             FieldType::SchemaRef { inner, .. } => {
@@ -1174,8 +1377,8 @@ impl FieldType {
             | FieldType::Uri
             | FieldType::JsonObject
             | FieldType::StringConst { .. }
-            | FieldType::StringEnum { .. }
             | FieldType::SchemaRef { .. } => self.to_php_typename(),
+            FieldType::StringEnum { .. } => unreachable_inline_enum(),
             FieldType::Set { inner } | FieldType::List { inner } => {
                 format!("list<{}>", inner.to_phpdoc_typename()).into()
             }
@@ -1193,10 +1396,8 @@ impl FieldType {
             | FieldType::UInt64
             | FieldType::Int32
             | FieldType::Int64 => "int".into(),
-            FieldType::Uri
-            | FieldType::StringConst { .. }
-            | FieldType::StringEnum { .. }
-            | FieldType::String => "string".into(),
+            FieldType::Uri | FieldType::StringConst { .. } | FieldType::String => "string".into(),
+            FieldType::StringEnum { .. } => unreachable_inline_enum(),
             FieldType::DateTime => r#"\DateTimeImmutable"#.into(),
 
             FieldType::JsonObject
@@ -1311,8 +1512,8 @@ impl minijinja::value::Object for FieldType {
                     | F::Set { .. }
                     | F::Map { .. }
                     | F::SchemaRef { .. }
-                    | F::StringConst { .. }
-                    | F::StringEnum { .. } => false,
+                    | F::StringConst { .. } => false,
+                    F::StringEnum { .. } => unreachable_inline_enum(),
                 };
                 Ok(is_int_or_uint.into())
             }
@@ -1408,4 +1609,10 @@ fn filter_schema_ref<'a>(name: &'a String, json_obj_typename: &'a str) -> Cow<'a
     } else {
         name.clone().into()
     }
+}
+
+#[cold]
+#[inline(never)]
+fn unreachable_inline_enum() -> ! {
+    panic!("FieldType::StringEnum must be promoted by promote_inline_enums before rendering")
 }

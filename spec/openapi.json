@@ -4,8 +4,8 @@
     "title": "meteroid",
     "description": "",
     "license": {
-      "name": "LicenseRef-Proprietary",
-      "identifier": "LicenseRef-Proprietary"
+      "name": "AGPL-3.0-only",
+      "identifier": "AGPL-3.0-only"
     },
     "version": "0.1.0"
   },
@@ -466,6 +466,7 @@
             "required": false,
             "schema": {
               "type": "string",
+              "title": "BatchJobTypeFilter",
               "enum": [
                 "EVENT_CSV_IMPORT",
                 "CUSTOMER_CSV_IMPORT",
@@ -482,6 +483,7 @@
               "type": "array",
               "items": {
                 "type": "string",
+                "title": "BatchJobStatusFilter",
                 "enum": [
                   "PENDING",
                   "CHUNKING",
@@ -773,6 +775,7 @@
             "required": false,
             "schema": {
               "type": "string",
+              "title": "CheckoutSessionStatusFilter",
               "enum": [
                 "CREATED",
                 "AWAITING_PAYMENT",
@@ -1070,260 +1073,6 @@
         ]
       }
     },
-    "/api/v1/connected-accounts": {
-      "get": {
-        "tags": [
-          "Connect"
-        ],
-        "summary": "List connected accounts",
-        "description": "List all connected accounts for this platform.",
-        "operationId": "list_connected_accounts",
-        "responses": {
-          "200": {
-            "description": "List of connected accounts",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectedAccountsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "Connect"
-        ],
-        "summary": "Create connected account",
-        "description": "Create a new connected account (Express flow). Returns the account\nand an onboarding link for the user to complete setup.",
-        "operationId": "create_connected_account",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateConnectedAccountRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Connected account created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectedAccount"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "409": {
-            "description": "Account already exists"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/connected-accounts/{id}": {
-      "get": {
-        "tags": [
-          "Connect"
-        ],
-        "summary": "Get connected account",
-        "description": "Retrieve a connected account by ID.",
-        "operationId": "get_connected_account",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Connected account ID",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ConnectedAccountId"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Connected account",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectedAccount"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Connect"
-        ],
-        "summary": "Disconnect account",
-        "description": "Revoke a connected account. All associated tokens are invalidated.",
-        "operationId": "disconnect_account",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Connected account ID",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ConnectedAccountId"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Disconnected"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/connected-accounts/{id}/onboarding": {
-      "post": {
-        "tags": [
-          "Connect"
-        ],
-        "summary": "Create onboarding link",
-        "description": "Generate a new onboarding link for a connected account. Any existing\nunused link is invalidated. The link expires after a configured duration.",
-        "operationId": "create_onboarding_link",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Connected account ID",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ConnectedAccountId"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOnboardingLinkRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Onboarding link created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OnboardingLinkResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      }
-    },
     "/api/v1/coupons": {
       "get": {
         "tags": [
@@ -1346,6 +1095,7 @@
             "required": false,
             "schema": {
               "type": "string",
+              "title": "CouponFilter",
               "enum": [
                 "ALL",
                 "ACTIVE",
@@ -2739,6 +2489,7 @@
               "type": "array",
               "items": {
                 "type": "string",
+                "title": "InvoiceStatusFilter",
                 "enum": [
                   "DRAFT",
                   "FINALIZED",
@@ -3424,409 +3175,6 @@
         ]
       }
     },
-    "/api/v1/oauth-apps": {
-      "get": {
-        "tags": [
-          "OAuth Apps"
-        ],
-        "summary": "List OAuth apps",
-        "description": "List all OAuth applications registered for this platform.",
-        "operationId": "list_oauth_apps",
-        "responses": {
-          "200": {
-            "description": "List of OAuth apps",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuthAppsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "OAuth Apps"
-        ],
-        "summary": "Create OAuth app",
-        "description": "Register a new OAuth application. Returns the app with its client secret\n(only shown once).",
-        "operationId": "create_oauth_app",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOAuthAppRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "OAuth app created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuthAppWithSecret"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "409": {
-            "description": "Duplicate app name"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/oauth-apps/{id}": {
-      "get": {
-        "tags": [
-          "OAuth Apps"
-        ],
-        "summary": "Get OAuth app",
-        "description": "Retrieve an OAuth application by ID.",
-        "operationId": "get_oauth_app",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "OAuth app ID",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/OAuthAppId"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OAuth app",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuthApp"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "OAuth Apps"
-        ],
-        "summary": "Delete OAuth app",
-        "description": "Delete an OAuth application and revoke all associated tokens.",
-        "operationId": "delete_oauth_app",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "OAuth app ID",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/OAuthAppId"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/oauth-apps/{id}/rotate": {
-      "post": {
-        "tags": [
-          "OAuth Apps"
-        ],
-        "summary": "Rotate client secret",
-        "description": "Generate a new client secret for an OAuth app. The old secret is\nimmediately invalidated.",
-        "operationId": "rotate_client_secret",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "OAuth app ID",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/OAuthAppId"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Rotated secret",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RotatedSecret"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer_auth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/oauth/introspect": {
-      "post": {
-        "tags": [
-          "OAuth"
-        ],
-        "summary": "Introspect token",
-        "description": "Token introspection endpoint (RFC 7662). Requires client credentials\nvia HTTP Basic auth.",
-        "operationId": "introspect_endpoint",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/IntrospectionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Introspection response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TokenIntrospectionResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid client credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuthErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/oauth/revoke": {
-      "post": {
-        "tags": [
-          "OAuth"
-        ],
-        "summary": "Revoke token",
-        "description": "Token revocation endpoint (RFC 7009). Always returns 200 per spec.\nRequires client credentials via HTTP Basic auth.",
-        "operationId": "revoke_endpoint",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/RevocationRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Token revoked (or was already invalid)"
-          },
-          "401": {
-            "description": "Invalid client credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuthErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/oauth/token": {
-      "post": {
-        "tags": [
-          "OAuth"
-        ],
-        "summary": "Exchange tokens",
-        "description": "OAuth 2.0 token endpoint. Supports two grant types:\n- `authorization_code`: Exchange an authorization code for tokens\n- `refresh_token`: Refresh an access token\n\nAuthenticate via HTTP Basic auth (`client_id:client_secret`) or body parameters.",
-        "operationId": "token_endpoint",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/TokenRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Token response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TokenResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuthErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid client credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuthErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too many requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/plans": {
       "get": {
         "tags": [
@@ -3861,6 +3209,7 @@
               "type": "array",
               "items": {
                 "type": "string",
+                "title": "PlanStatusFilter",
                 "enum": [
                   "DRAFT",
                   "ACTIVE",
@@ -3879,6 +3228,7 @@
               "type": "array",
               "items": {
                 "type": "string",
+                "title": "PlanTypeFilter",
                 "enum": [
                   "STANDARD",
                   "FREE",
@@ -5235,6 +4585,7 @@
               "type": "array",
               "items": {
                 "type": "string",
+                "title": "SubscriptionStatusFilter",
                 "enum": [
                   "PENDING_ACTIVATION",
                   "PENDING_CHARGE",
@@ -6961,150 +6312,6 @@
           }
         }
       },
-      "ConnectedAccount": {
-        "type": "object",
-        "description": "A connected account (relationship between platform and connected org)",
-        "required": [
-          "id",
-          "platform_organization_id",
-          "connection_type",
-          "status",
-          "onboarding_mode",
-          "created_at"
-        ],
-        "properties": {
-          "connected_organization_id": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/OrganizationId",
-                "description": "For express accounts in pending status, this may be None until onboarding completes"
-              }
-            ]
-          },
-          "connected_tenant_id": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/TenantId",
-                "description": "Tenant ID for express accounts (single-tenant). None for standard accounts (use tenant header)."
-              }
-            ]
-          },
-          "connection_type": {
-            "$ref": "#/components/schemas/ConnectionType"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "$ref": "#/components/schemas/ConnectedAccountId"
-          },
-          "metadata": {},
-          "onboarding_completed_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "onboarding_mode": {
-            "$ref": "#/components/schemas/OnboardingMode"
-          },
-          "pending_country": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/CountryCode",
-                "description": "Country code for the organization to be created (express flow only)"
-              }
-            ]
-          },
-          "pending_email": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Email of the user being invited (express flow only)"
-          },
-          "pending_organization_name": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Name of the organization to be created (express flow only)"
-          },
-          "platform_customer_id": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/CustomerId"
-              }
-            ]
-          },
-          "platform_organization_id": {
-            "$ref": "#/components/schemas/OrganizationId"
-          },
-          "revoked_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "status": {
-            "$ref": "#/components/schemas/ConnectionStatus"
-          }
-        }
-      },
-      "ConnectedAccountId": {
-        "type": "string",
-        "format": "MeteroidId",
-        "examples": [
-          "cacc_7n42DGM5Tflk9n8mt7Fhc7"
-        ]
-      },
-      "ConnectedAccountsResponse": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ConnectedAccount"
-            }
-          }
-        }
-      },
-      "ConnectionStatus": {
-        "type": "string",
-        "description": "Status of a connected account",
-        "enum": [
-          "pending",
-          "active",
-          "revoked",
-          "suspended"
-        ]
-      },
-      "ConnectionType": {
-        "type": "string",
-        "description": "Type of connection between platform and connected account",
-        "enum": [
-          "standard",
-          "express"
-        ]
-      },
       "CountryCode": {
         "type": "string",
         "format": "CountryCode",
@@ -7495,39 +6702,6 @@
           }
         }
       },
-      "CreateConnectedAccountRequest": {
-        "type": "object",
-        "required": [
-          "connected_organization_id"
-        ],
-        "properties": {
-          "connected_organization_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "connection_type": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/ConnectionType"
-              }
-            ]
-          },
-          "metadata": {},
-          "platform_customer_id": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/CustomerId"
-              }
-            ]
-          }
-        }
-      },
       "CreateCouponRequest": {
         "type": "object",
         "required": [
@@ -7647,44 +6821,6 @@
               "string",
               "null"
             ]
-          }
-        }
-      },
-      "CreateOAuthAppRequest": {
-        "type": "object",
-        "required": [
-          "name",
-          "redirect_uris"
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "redirect_uris": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "scopes": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "CreateOnboardingLinkRequest": {
-        "type": "object",
-        "required": [
-          "redirect_url"
-        ],
-        "properties": {
-          "redirect_url": {
-            "type": "string"
           }
         }
       },
@@ -9001,19 +8137,6 @@
           }
         }
       },
-      "IntrospectionRequest": {
-        "type": "object",
-        "description": "Token introspection request",
-        "required": [
-          "token"
-        ],
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "The token to introspect"
-          }
-        }
-      },
       "Invoice": {
         "type": "object",
         "required": [
@@ -9838,166 +8961,6 @@
           }
         }
       },
-      "OAuthApp": {
-        "type": "object",
-        "description": "An OAuth application registered by a platform",
-        "required": [
-          "id",
-          "organization_id",
-          "name",
-          "client_id",
-          "client_secret_hint",
-          "redirect_uris",
-          "scopes",
-          "is_active",
-          "created_at"
-        ],
-        "properties": {
-          "client_id": {
-            "type": "string"
-          },
-          "client_secret_hint": {
-            "type": "string"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "$ref": "#/components/schemas/OAuthAppId"
-          },
-          "is_active": {
-            "type": "boolean"
-          },
-          "name": {
-            "type": "string"
-          },
-          "organization_id": {
-            "$ref": "#/components/schemas/OrganizationId"
-          },
-          "redirect_uris": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "scopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "updated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          }
-        }
-      },
-      "OAuthAppId": {
-        "type": "string",
-        "format": "MeteroidId",
-        "examples": [
-          "app_7n42DGM5Tflk9n8mt7Fhc7"
-        ]
-      },
-      "OAuthAppWithSecret": {
-        "type": "object",
-        "description": "Result of creating an OAuth app (includes the plain-text secret)",
-        "required": [
-          "app",
-          "client_secret"
-        ],
-        "properties": {
-          "app": {
-            "$ref": "#/components/schemas/OAuthApp"
-          },
-          "client_secret": {
-            "type": "string"
-          }
-        }
-      },
-      "OAuthAppsResponse": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OAuthApp"
-            }
-          }
-        }
-      },
-      "OAuthErrorCode": {
-        "type": "string",
-        "description": "OAuth 2.0 error codes as per RFC 6749",
-        "enum": [
-          "invalid_request",
-          "unauthorized_client",
-          "access_denied",
-          "unsupported_response_type",
-          "invalid_scope",
-          "server_error",
-          "temporarily_unavailable",
-          "invalid_grant",
-          "invalid_client",
-          "unsupported_grant_type"
-        ]
-      },
-      "OAuthErrorResponse": {
-        "type": "object",
-        "description": "OAuth 2.0 error response as per RFC 6749 Section 5.2",
-        "required": [
-          "error"
-        ],
-        "properties": {
-          "error": {
-            "$ref": "#/components/schemas/OAuthErrorCode"
-          },
-          "error_description": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "error_uri": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
-        }
-      },
-      "OnboardingLinkResponse": {
-        "type": "object",
-        "description": "Result of creating an onboarding link",
-        "required": [
-          "url",
-          "expires_at"
-        ],
-        "properties": {
-          "expires_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "url": {
-            "type": "string"
-          }
-        }
-      },
-      "OnboardingMode": {
-        "type": "string",
-        "description": "Onboarding mode for connected accounts",
-        "enum": [
-          "express",
-          "full"
-        ]
-      },
       "OneTimeFee": {
         "type": "object",
         "required": [
@@ -10106,13 +9069,6 @@
             ]
           }
         }
-      },
-      "OrganizationId": {
-        "type": "string",
-        "format": "MeteroidId",
-        "examples": [
-          "org_7n42DGM5Tflk9n8mt7Fhc7"
-        ]
       },
       "PackagePlanPricing": {
         "type": "object",
@@ -11237,42 +10193,6 @@
             "$ref": "#/components/schemas/ErrorCode"
           },
           "message": {
-            "type": "string"
-          }
-        }
-      },
-      "RevocationRequest": {
-        "type": "object",
-        "description": "Token revocation request",
-        "required": [
-          "token"
-        ],
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "The token to revoke"
-          },
-          "token_type_hint": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Optional hint about the token type (access_token or refresh_token)"
-          }
-        }
-      },
-      "RotatedSecret": {
-        "type": "object",
-        "description": "Result of rotating a client secret",
-        "required": [
-          "client_secret",
-          "client_secret_hint"
-        ],
-        "properties": {
-          "client_secret": {
-            "type": "string"
-          },
-          "client_secret_hint": {
             "type": "string"
           }
         }
@@ -12409,13 +11329,6 @@
           "NOT_REGISTERED"
         ]
       },
-      "TenantId": {
-        "type": "string",
-        "format": "MeteroidId",
-        "examples": [
-          "ten_7n42DGM5Tflk9n8mt7Fhc7"
-        ]
-      },
       "TermRate": {
         "type": "object",
         "required": [
@@ -12500,144 +11413,6 @@
             "items": {
               "$ref": "#/components/schemas/TierRow"
             }
-          }
-        }
-      },
-      "TokenIntrospectionResponse": {
-        "type": "object",
-        "description": "Token introspection response as per RFC 7662",
-        "required": [
-          "active"
-        ],
-        "properties": {
-          "active": {
-            "type": "boolean"
-          },
-          "client_id": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "exp": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int64"
-          },
-          "iat": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int64"
-          },
-          "scope": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "sub": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "token_type": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
-        }
-      },
-      "TokenRequest": {
-        "type": "object",
-        "description": "Token request (from POST body, application/x-www-form-urlencoded)",
-        "required": [
-          "grant_type"
-        ],
-        "properties": {
-          "client_id": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Client ID (if not using HTTP Basic auth)"
-          },
-          "client_secret": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Client secret (if not using HTTP Basic auth)"
-          },
-          "code": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Authorization code (for authorization_code grant)"
-          },
-          "code_verifier": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "PKCE code verifier (for authorization_code grant with PKCE)"
-          },
-          "grant_type": {
-            "type": "string",
-            "description": "Grant type: \"authorization_code\" or \"refresh_token\""
-          },
-          "redirect_uri": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Redirect URI (for authorization_code grant, must match the one used in /authorize)"
-          },
-          "refresh_token": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Refresh token (for refresh_token grant)"
-          }
-        }
-      },
-      "TokenResponse": {
-        "type": "object",
-        "description": "Token response as per OAuth 2.0 spec",
-        "required": [
-          "access_token",
-          "token_type",
-          "expires_in"
-        ],
-        "properties": {
-          "access_token": {
-            "type": "string"
-          },
-          "expires_in": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "refresh_token": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "scope": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "token_type": {
-            "type": "string"
           }
         }
       },
@@ -13075,20 +11850,8 @@
   },
   "tags": [
     {
-      "name": "Connect",
-      "description": "Manage connected accounts (Express & Standard)"
-    },
-    {
       "name": "Meteroid",
       "description": "Meteroid API"
-    },
-    {
-      "name": "OAuth",
-      "description": "OAuth 2.0 token endpoints (public, client-credentials auth)"
-    },
-    {
-      "name": "OAuth Apps",
-      "description": "Manage OAuth applications for Connect integrations"
     }
   ],
   "webhooks": {

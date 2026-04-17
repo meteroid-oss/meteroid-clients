@@ -38,12 +38,18 @@ impl Api {
             excluded_operations,
             specified_operations,
         )?;
-        let types = types::from_referenced_components(
+        let mut types = types::from_referenced_components(
             &resources,
             &mut components.schemas,
             webhooks,
             include_mode,
         );
+
+        // Promote inline enums (e.g. array-of-enum query params) to named
+        // top-level types so generated SDKs get real enum types instead of
+        // `Vec<String>`. Must run before we collect string alias names, since
+        // promotion may add new `SchemaRef`s that need resolving.
+        types::promote_inline_enums(&mut types, &mut resources)?;
 
         // Resolve string alias references in operation query params
         // This must happen after types are created so we know which types are string aliases

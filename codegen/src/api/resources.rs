@@ -174,7 +174,7 @@ pub(crate) struct Operation {
     /// Only string-typed parameters are currently supported.
     header_params: Vec<HeaderParam>,
     /// Query parameters.
-    query_params: Vec<QueryParam>,
+    pub(crate) query_params: Vec<QueryParam>,
     /// Name of the request body type, if any.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) request_body_schema_name: Option<String>,
@@ -616,11 +616,11 @@ struct HeaderParam {
 }
 
 #[derive(Deserialize, Serialize)]
-struct QueryParam {
-    name: String,
+pub(crate) struct QueryParam {
+    pub(crate) name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     required: bool,
     #[serde(serialize_with = "serialize_field_type")]
-    r#type: FieldType,
+    pub(crate) r#type: FieldType,
 }
