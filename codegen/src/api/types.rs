@@ -151,16 +151,15 @@ fn resolve_schema_ref_in_field_type(
     string_alias_names: &BTreeSet<String>,
 ) {
     match field_type {
-        FieldType::SchemaRef { name, inner } => {
-            if string_alias_names.contains(name) && inner.is_none() {
-                // Mark this as a string alias reference
-                *inner = Some(Type {
-                    name: name.clone(),
-                    description: None,
-                    deprecated: false,
-                    data: TypeData::StringAlias,
-                });
-            }
+        FieldType::SchemaRef { name, inner }
+            if string_alias_names.contains(name) && inner.is_none() =>
+        {
+            *inner = Some(Type {
+                name: name.clone(),
+                description: None,
+                deprecated: false,
+                data: TypeData::StringAlias,
+            });
         }
         FieldType::List { inner } | FieldType::Set { inner } => {
             resolve_schema_ref_in_field_type(Arc::make_mut(inner), string_alias_names);
