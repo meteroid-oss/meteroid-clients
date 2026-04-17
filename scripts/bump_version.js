@@ -8,6 +8,7 @@ const filesPaths = [
     versionFilePath, 
     // Rust Client
     "rust/Cargo.toml",
+    "rust/README.md",
     // Java
     "java/gradle.properties",
     "java/README.md",

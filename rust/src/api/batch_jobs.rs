@@ -4,9 +4,9 @@ use crate::{error::Result, models::*, Configuration};
 
 #[derive(Default)]
 pub struct BatchJobsListBatchJobsOptions {
-    pub job_type: Option<String>,
+    pub job_type: Option<BatchJobType>,
 
-    pub status: Option<Vec<String>>,
+    pub status: Option<Vec<BatchJobStatus>>,
 
     /// Page number (0-indexed)
     pub page: Option<i32>,

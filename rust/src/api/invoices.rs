@@ -9,7 +9,7 @@ pub struct InvoicesListInvoicesOptions {
 
     pub subscription_id: Option<SubscriptionId>,
 
-    pub statuses: Option<Vec<String>>,
+    pub statuses: Option<Vec<InvoiceStatus>>,
 
     /// Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`, `amount`, `invoice_date`, `status`, `payment_status`. Direction: `asc` or `desc`. Default: `invoice_date.desc`.
     pub order_by: Option<String>,

@@ -43,27 +43,20 @@ pub mod checkout_type;
 pub mod component_override;
 pub mod component_parameterization;
 pub mod component_parameters;
-pub mod connected_account;
-pub mod connected_account_id;
-pub mod connected_accounts_response;
-pub mod connection_status;
-pub mod connection_type;
 pub mod country_code;
 pub mod coupon;
 pub mod coupon_discount;
 pub mod coupon_event;
 pub mod coupon_event_data;
+pub mod coupon_filter;
 pub mod coupon_id;
 pub mod coupon_line_item;
 pub mod coupon_list_response;
 pub mod create_add_on_request;
 pub mod create_checkout_session_request;
 pub mod create_checkout_session_response;
-pub mod create_connected_account_request;
 pub mod create_coupon_request;
 pub mod create_metric_request;
-pub mod create_o_auth_app_request;
-pub mod create_onboarding_link_request;
 pub mod create_plan_request;
 pub mod create_product_request;
 pub mod create_subscription_add_on;
@@ -104,7 +97,6 @@ pub mod grouped_usage;
 pub mod ingest_events_request;
 pub mod ingest_events_response;
 pub mod ingest_failure;
-pub mod introspection_request;
 pub mod invoice;
 pub mod invoice_event;
 pub mod invoice_event_data;
@@ -130,12 +122,6 @@ pub mod metric_segmentation_matrix;
 pub mod metric_summary;
 pub mod metric_usage;
 pub mod new_product_ref;
-pub mod o_auth_app;
-pub mod o_auth_app_id;
-pub mod o_auth_app_with_secret;
-pub mod o_auth_apps_response;
-pub mod onboarding_link_response;
-pub mod onboarding_mode;
 pub mod one_time_fee;
 pub mod one_time_fee_structure;
 pub mod one_time_plan_fee;
@@ -143,7 +129,6 @@ pub mod one_time_pricing;
 pub mod online_method_config;
 pub mod online_methods_config;
 pub mod online_payment_method_config;
-pub mod organization_id;
 pub mod package_plan_pricing;
 pub mod package_pricing;
 pub mod pagination_response;
@@ -197,8 +182,6 @@ pub mod rate_plan_fee;
 pub mod rate_pricing;
 pub mod recurring_fee;
 pub mod replace_plan_request;
-pub mod revocation_request;
-pub mod rotated_secret;
 pub mod shipping_address;
 pub mod slot_downgrade_policy_enum;
 pub mod slot_fee;
@@ -228,14 +211,10 @@ pub mod subscription_update_request;
 pub mod subscription_update_response;
 pub mod tax_breakdown_item;
 pub mod tax_exemption_type;
-pub mod tenant_id;
 pub mod term_rate;
 pub mod tier_row;
 pub mod tiered_plan_pricing;
 pub mod tiered_pricing;
-pub mod token_introspection_response;
-pub mod token_request;
-pub mod token_response;
 pub mod transaction;
 pub mod trial_config;
 pub mod unit_conversion;
@@ -281,19 +260,13 @@ pub use self::{
     checkout_session::CheckoutSession, checkout_session_id::CheckoutSessionId,
     checkout_session_status::CheckoutSessionStatus, checkout_type::CheckoutType,
     component_override::ComponentOverride, component_parameterization::ComponentParameterization,
-    component_parameters::ComponentParameters, connected_account::ConnectedAccount,
-    connected_account_id::ConnectedAccountId,
-    connected_accounts_response::ConnectedAccountsResponse, connection_status::ConnectionStatus,
-    connection_type::ConnectionType, country_code::CountryCode, coupon::Coupon,
+    component_parameters::ComponentParameters, country_code::CountryCode, coupon::Coupon,
     coupon_discount::CouponDiscount, coupon_event::CouponEvent, coupon_event_data::CouponEventData,
-    coupon_id::CouponId, coupon_line_item::CouponLineItem,
+    coupon_filter::CouponFilter, coupon_id::CouponId, coupon_line_item::CouponLineItem,
     coupon_list_response::CouponListResponse, create_add_on_request::CreateAddOnRequest,
     create_checkout_session_request::CreateCheckoutSessionRequest,
     create_checkout_session_response::CreateCheckoutSessionResponse,
-    create_connected_account_request::CreateConnectedAccountRequest,
     create_coupon_request::CreateCouponRequest, create_metric_request::CreateMetricRequest,
-    create_o_auth_app_request::CreateOAuthAppRequest,
-    create_onboarding_link_request::CreateOnboardingLinkRequest,
     create_plan_request::CreatePlanRequest, create_product_request::CreateProductRequest,
     create_subscription_add_on::CreateSubscriptionAddOn,
     create_subscription_components::CreateSubscriptionComponents,
@@ -316,8 +289,8 @@ pub use self::{
     extra_recurring_pricing::ExtraRecurringPricing, fee::Fee, fixed_discount::FixedDiscount,
     get_checkout_session_response::GetCheckoutSessionResponse, grouped_usage::GroupedUsage,
     ingest_events_request::IngestEventsRequest, ingest_events_response::IngestEventsResponse,
-    ingest_failure::IngestFailure, introspection_request::IntrospectionRequest, invoice::Invoice,
-    invoice_event::InvoiceEvent, invoice_event_data::InvoiceEventData, invoice_id::InvoiceId,
+    ingest_failure::IngestFailure, invoice::Invoice, invoice_event::InvoiceEvent,
+    invoice_event_data::InvoiceEventData, invoice_id::InvoiceId,
     invoice_line_item::InvoiceLineItem, invoice_list_response::InvoiceListResponse,
     invoice_payment_status::InvoicePaymentStatus, invoice_status::InvoiceStatus,
     invoice_type::InvoiceType, invoicing_entity_id::InvoicingEntityId,
@@ -328,14 +301,11 @@ pub use self::{
     metric_dimension::MetricDimension, metric_event::MetricEvent,
     metric_event_data::MetricEventData, metric_list_response::MetricListResponse,
     metric_segmentation_matrix::MetricSegmentationMatrix, metric_summary::MetricSummary,
-    metric_usage::MetricUsage, new_product_ref::NewProductRef, o_auth_app::OAuthApp,
-    o_auth_app_id::OAuthAppId, o_auth_app_with_secret::OAuthAppWithSecret,
-    o_auth_apps_response::OAuthAppsResponse, onboarding_link_response::OnboardingLinkResponse,
-    onboarding_mode::OnboardingMode, one_time_fee::OneTimeFee,
+    metric_usage::MetricUsage, new_product_ref::NewProductRef, one_time_fee::OneTimeFee,
     one_time_fee_structure::OneTimeFeeStructure, one_time_plan_fee::OneTimePlanFee,
     one_time_pricing::OneTimePricing, online_method_config::OnlineMethodConfig,
     online_methods_config::OnlineMethodsConfig,
-    online_payment_method_config::OnlinePaymentMethodConfig, organization_id::OrganizationId,
+    online_payment_method_config::OnlinePaymentMethodConfig,
     package_plan_pricing::PackagePlanPricing, package_pricing::PackagePricing,
     pagination_response::PaginationResponse, patch_plan_request::PatchPlanRequest,
     payment_method_info::PaymentMethodInfo, payment_method_type_enum::PaymentMethodTypeEnum,
@@ -358,8 +328,7 @@ pub use self::{
     quote_event::QuoteEvent, quote_event_data::QuoteEventData, quote_id::QuoteId,
     rate_fee::RateFee, rate_fee_structure::RateFeeStructure, rate_plan_fee::RatePlanFee,
     rate_pricing::RatePricing, recurring_fee::RecurringFee,
-    replace_plan_request::ReplacePlanRequest, revocation_request::RevocationRequest,
-    rotated_secret::RotatedSecret, shipping_address::ShippingAddress,
+    replace_plan_request::ReplacePlanRequest, shipping_address::ShippingAddress,
     slot_downgrade_policy_enum::SlotDowngradePolicyEnum, slot_fee::SlotFee,
     slot_fee_structure::SlotFeeStructure, slot_plan_fee::SlotPlanFee, slot_pricing::SlotPricing,
     slot_upgrade_policy_enum::SlotUpgradePolicyEnum, sub_line_item::SubLineItem,
@@ -379,11 +348,10 @@ pub use self::{
     subscription_status_enum::SubscriptionStatusEnum,
     subscription_update_request::SubscriptionUpdateRequest,
     subscription_update_response::SubscriptionUpdateResponse, tax_breakdown_item::TaxBreakdownItem,
-    tax_exemption_type::TaxExemptionType, tenant_id::TenantId, term_rate::TermRate,
-    tier_row::TierRow, tiered_plan_pricing::TieredPlanPricing, tiered_pricing::TieredPricing,
-    token_introspection_response::TokenIntrospectionResponse, token_request::TokenRequest,
-    token_response::TokenResponse, transaction::Transaction, trial_config::TrialConfig,
-    unit_conversion::UnitConversion, unit_conversion_rounding_enum::UnitConversionRoundingEnum,
+    tax_exemption_type::TaxExemptionType, term_rate::TermRate, tier_row::TierRow,
+    tiered_plan_pricing::TieredPlanPricing, tiered_pricing::TieredPricing,
+    transaction::Transaction, trial_config::TrialConfig, unit_conversion::UnitConversion,
+    unit_conversion_rounding_enum::UnitConversionRoundingEnum,
     update_add_on_request::UpdateAddOnRequest, update_coupon_request::UpdateCouponRequest,
     update_metric_request::UpdateMetricRequest, update_product_request::UpdateProductRequest,
     usage_fee::UsageFee, usage_fee_structure::UsageFeeStructure, usage_model_enum::UsageModelEnum,
