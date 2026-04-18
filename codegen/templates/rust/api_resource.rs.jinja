@@ -98,7 +98,10 @@ impl<'a> {{ resource_type_name }}<'a> {
         {% endfor -%}
 
         {% for p in op.query_params -%}
-            {% set is_exploded_list = (p.type.is_list() or p.type.is_set()) and p.explode -%}
+            {# `explode` defaults to true for OpenAPI `style: form`, and may be missing
+               entirely when the codegen binary predates the `explode` IR field. -#}
+            {% set explode = p.explode | default(true) -%}
+            {% set is_exploded_list = (p.type.is_list() or p.type.is_set()) and explode -%}
             {% if p.required and is_exploded_list -%}
                 .with_exploded_query_param
             {%- elif p.required -%}

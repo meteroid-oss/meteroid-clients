@@ -119,8 +119,11 @@ public class {{ resource_type_name }} {
         {# query params -#}
         {% for p in op.query_params -%}
         {% set field = p.name | to_lower_camel_case -%}
+        {# `explode` defaults to true for OpenAPI `style: form`, and may be missing
+           entirely when the codegen binary predates the `explode` IR field. -#}
+        {% set explode = p.explode | default(true) -%}
         if (options.{{ field }} != null) {
-            {% if (p.type.is_list() or p.type.is_set()) and p.explode -%}
+            {% if (p.type.is_list() or p.type.is_set()) and explode -%}
             Utils.addExplodedQueryParameter(url, "{{ p.name }}", options.{{ field }});
             {% else -%}
             url.addQueryParameter("{{ p.name }}",
