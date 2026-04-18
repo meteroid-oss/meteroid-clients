@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import okhttp3.HttpUrl;
+
 public class Utils {
     private static boolean isEnum(Object v) {
         return v != null && v.getClass().isEnum();
@@ -41,6 +43,16 @@ public class Utils {
                             .collect(Collectors.joining(","));
         } else {
             return v.toString();
+        }
+    }
+
+    /**
+     * Append a collection as repeated query parameters, one entry per item
+     * (OpenAPI {@code explode=true} behavior, e.g. {@code ?tag=a&tag=b}).
+     */
+    public static void addExplodedQueryParameter(HttpUrl.Builder url, String name, Iterable<?> values) {
+        for (Object item : values) {
+            url.addQueryParameter(name, serializeQueryParam(item));
         }
     }
 

@@ -40,7 +40,7 @@ public class Subscriptions {
             url.addQueryParameter("plan_id", Utils.serializeQueryParam(options.planId));
         }
         if (options.statuses != null) {
-            url.addQueryParameter("statuses", Utils.serializeQueryParam(options.statuses));
+            Utils.addExplodedQueryParameter(url, "statuses", options.statuses);
         }
         if (options.orderBy != null) {
             url.addQueryParameter("order_by", options.orderBy);

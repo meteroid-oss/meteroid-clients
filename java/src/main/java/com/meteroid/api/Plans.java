@@ -40,10 +40,10 @@ public class Plans {
             url.addQueryParameter("search", options.search);
         }
         if (options.status != null) {
-            url.addQueryParameter("status", Utils.serializeQueryParam(options.status));
+            Utils.addExplodedQueryParameter(url, "status", options.status);
         }
         if (options.planType != null) {
-            url.addQueryParameter("plan_type", Utils.serializeQueryParam(options.planType));
+            Utils.addExplodedQueryParameter(url, "plan_type", options.planType);
         }
         if (options.orderBy != null) {
             url.addQueryParameter("order_by", options.orderBy);

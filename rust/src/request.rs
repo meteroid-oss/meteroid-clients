@@ -23,7 +23,7 @@ pub(crate) enum Auth {
 pub(crate) struct Request {
     method: http1::Method,
     path: &'static str,
-    query_params: HashMap<&'static str, String>,
+    query_params: Vec<(&'static str, String)>,
     no_return_type: bool,
     path_params: HashMap<&'static str, String>,
     header_params: HashMap<&'static str, String>,
@@ -36,7 +36,7 @@ impl Request {
         Request {
             method,
             path,
-            query_params: HashMap::new(),
+            query_params: Vec::new(),
             path_params: HashMap::new(),
             header_params: HashMap::new(),
             serialized_body: None,
@@ -68,7 +68,7 @@ impl Request {
     }
 
     pub fn with_query_param(mut self, basename: &'static str, param: impl QueryParamValue) -> Self {
-        self.query_params.insert(basename, param.encode());
+        self.query_params.push((basename, param.encode()));
         self
     }
 
@@ -78,7 +78,35 @@ impl Request {
         param: Option<T>,
     ) -> Self {
         if let Some(value) = param {
-            self.query_params.insert(basename, value.encode());
+            self.query_params.push((basename, value.encode()));
+        }
+        self
+    }
+
+    /// Append an array value as repeated query parameters (OpenAPI `explode=true`).
+    ///
+    /// E.g. `with_exploded_query_param("tag", vec!["a", "b"])` renders as
+    /// `?tag=a&tag=b`.
+    pub fn with_exploded_query_param<T: std::fmt::Display>(
+        mut self,
+        basename: &'static str,
+        params: Vec<T>,
+    ) -> Self {
+        for value in params {
+            self.query_params.push((basename, value.to_string()));
+        }
+        self
+    }
+
+    pub fn with_optional_exploded_query_param<T: std::fmt::Display>(
+        mut self,
+        basename: &'static str,
+        params: Option<Vec<T>>,
+    ) -> Self {
+        if let Some(values) = params {
+            for value in values {
+                self.query_params.push((basename, value.to_string()));
+            }
         }
         self
     }

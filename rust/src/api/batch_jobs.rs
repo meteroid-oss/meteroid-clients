@@ -47,7 +47,7 @@ impl<'a> BatchJobs<'a> {
 
         crate::request::Request::new(http1::Method::GET, "/api/v1/batch-jobs")
             .with_optional_query_param("job_type", job_type)
-            .with_optional_query_param("status", status)
+            .with_optional_exploded_query_param("status", status)
             .with_optional_query_param("page", page)
             .with_optional_query_param("per_page", per_page)
             .execute(self.cfg)

@@ -306,11 +306,17 @@ impl Operation {
                         }
                     };
 
+                    // For `style: form`, OpenAPI's default is `explode: true` — arrays are
+                    // serialized as repeated parameters (e.g. `?tags=a&tags=b`). When
+                    // `explode: false`, arrays are comma-joined (e.g. `?tags=a,b`).
+                    let explode = parameter_data.explode.unwrap_or(true);
+
                     query_params.push(QueryParam {
                         name,
                         description: parameter_data.description,
                         required: parameter_data.required,
                         r#type,
+                        explode,
                     });
                 }
                 ReferenceOr::Item(parameter) => {
@@ -623,4 +629,13 @@ pub(crate) struct QueryParam {
     required: bool,
     #[serde(serialize_with = "serialize_field_type")]
     pub(crate) r#type: FieldType,
+    /// Whether array values are exploded into repeated query parameters
+    /// (`?tags=a&tags=b`) or comma-joined (`?tags=a,b`). Defaults to `true`
+    /// per OpenAPI's `style: form` default.
+    #[serde(default = "default_explode")]
+    pub(crate) explode: bool,
+}
+
+fn default_explode() -> bool {
+    true
 }
