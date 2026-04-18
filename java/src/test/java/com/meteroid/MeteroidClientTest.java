@@ -6,7 +6,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+import com.meteroid.api.BatchJobsListBatchJobsOptions;
 import com.meteroid.exceptions.ApiException;
+import com.meteroid.models.BatchJobStatus;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
@@ -17,6 +20,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -190,6 +194,35 @@ public class MeteroidClientTest {
         byte[] response = client.executeBinaryRequest("GET", url, null, null);
 
         assertThat(response).isEqualTo(pdfContent);
+    }
+
+    @Test
+    public void testListQueryParamIsExploded() throws IOException, ApiException {
+        // `status` on /api/v1/batch-jobs is an array query parameter with no explicit
+        // `explode` in the spec, which means it defaults to `explode: true`. The
+        // client should emit one `status=...` pair per value instead of comma-joining.
+        stubFor(get(urlPathEqualTo("/api/v1/batch-jobs"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"data\":[],\"pagination_meta\":{\"page\":0,\"per_page\":10,\"total_items\":0,\"total_pages\":0}}")));
+
+        MeteroidOptions opts = new MeteroidOptions();
+        opts.setServerUrl("http://localhost:" + wireMockRule.port());
+        Meteroid meteroid = new Meteroid("test-api-key", opts);
+
+        BatchJobsListBatchJobsOptions queryOptions = new BatchJobsListBatchJobsOptions();
+        queryOptions.setStatus(List.of(BatchJobStatus.CHUNKING, BatchJobStatus.PROCESSING));
+        meteroid.getBatchJobs().listBatchJobs(queryOptions);
+
+        List<LoggedRequest> requests = findAll(getRequestedFor(urlPathEqualTo("/api/v1/batch-jobs")));
+        assertThat(requests).hasSize(1);
+        String url = requests.get(0).getUrl();
+        assertThat(url).contains("status=CHUNKING");
+        assertThat(url).contains("status=PROCESSING");
+        // Explode=true: values are separate pairs, never comma-joined.
+        assertThat(url).doesNotContain("CHUNKING,PROCESSING");
+        assertThat(url).doesNotContain("CHUNKING%2CPROCESSING");
     }
 
     @Test

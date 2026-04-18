@@ -47,7 +47,7 @@ impl<'a> Subscriptions<'a> {
         crate::request::Request::new(http1::Method::GET, "/api/v1/subscriptions")
             .with_optional_query_param("customer_id", customer_id)
             .with_optional_query_param("plan_id", plan_id)
-            .with_optional_query_param("statuses", statuses)
+            .with_optional_exploded_query_param("statuses", statuses)
             .with_optional_query_param("order_by", order_by)
             .with_optional_query_param("page", page)
             .with_optional_query_param("per_page", per_page)

@@ -33,7 +33,7 @@ public class BatchJobs {
             url.addQueryParameter("job_type", Utils.serializeQueryParam(options.jobType));
         }
         if (options.status != null) {
-            url.addQueryParameter("status", Utils.serializeQueryParam(options.status));
+            Utils.addExplodedQueryParameter(url, "status", options.status);
         }
         if (options.page != null) {
             url.addQueryParameter("page", Utils.serializeQueryParam(options.page));

@@ -98,8 +98,13 @@ impl<'a> {{ resource_type_name }}<'a> {
         {% endfor -%}
 
         {% for p in op.query_params -%}
-            {% if p.required -%}
+            {% set is_exploded_list = (p.type.is_list() or p.type.is_set()) and p.explode -%}
+            {% if p.required and is_exploded_list -%}
+                .with_exploded_query_param
+            {%- elif p.required -%}
                 .with_query_param
+            {%- elif is_exploded_list -%}
+                .with_optional_exploded_query_param
             {%- else -%}
                 .with_optional_query_param
             {%- endif -%}

@@ -1,4 +1,7 @@
-use meteroid_rs::api::{CustomersListCustomersOptions, Meteroid, MeteroidOptions};
+use meteroid_rs::api::{
+    BatchJobsListBatchJobsOptions, CustomersListCustomersOptions, Meteroid, MeteroidOptions,
+};
+use meteroid_rs::models::BatchJobStatus;
 
 use wiremock::{
     matchers::{header, method, path, query_param},
@@ -243,6 +246,50 @@ async fn test_user_agent_is_sent() {
         .get("user-agent")
         .expect("user-agent should be present");
     assert!(user_agent.to_str().unwrap().starts_with("meteroid-rust/"));
+
+    mock_server.verify().await;
+}
+
+#[tokio::test]
+async fn test_list_query_param_is_exploded() {
+    // `status` on /api/v1/batch-jobs is an array query parameter with no explicit
+    // `explode` in the spec, which means it defaults to `explode: true` for
+    // `style: form`. The client should emit one `status=...` pair per value
+    // (e.g. `?status=CHUNKING&status=PROCESSING`) instead of a comma-joined list.
+    let mock_server = MockServer::start().await;
+
+    let json_body =
+        r#"{"data":[],"pagination_meta":{"page":0,"per_page":10,"total_items":0,"total_pages":0}}"#;
+
+    Mock::given(method("GET"))
+        .and(path("/api/v1/batch-jobs"))
+        .and(query_param("status", "CHUNKING"))
+        .and(query_param("status", "PROCESSING"))
+        .respond_with(ResponseTemplate::new(200).set_body_string(json_body))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    let client = create_test_client(mock_server.uri());
+    client
+        .batch_jobs()
+        .list_batch_jobs(Some(BatchJobsListBatchJobsOptions {
+            status: Some(vec![BatchJobStatus::Chunking, BatchJobStatus::Processing]),
+            ..Default::default()
+        }))
+        .await
+        .unwrap();
+
+    let requests = mock_server.received_requests().await.unwrap();
+    assert_eq!(requests.len(), 1);
+    let query = requests[0].url.query().unwrap_or("");
+    // Explode=true: no comma-joined value should appear.
+    assert!(
+        !query.contains("CHUNKING,PROCESSING") && !query.contains("CHUNKING%2CPROCESSING"),
+        "expected repeated `status=...` pairs, got `{query}`"
+    );
+    assert!(query.contains("status=CHUNKING"));
+    assert!(query.contains("status=PROCESSING"));
 
     mock_server.verify().await;
 }
