@@ -261,10 +261,11 @@ async fn test_list_query_param_is_exploded() {
     let json_body =
         r#"{"data":[],"pagination_meta":{"page":0,"per_page":10,"total_items":0,"total_pages":0}}"#;
 
+    // Match any request to the path so the test focuses on URL-shape assertions
+    // made against the received request below, not wiremock's matcher semantics
+    // for multi-valued query params.
     Mock::given(method("GET"))
         .and(path("/api/v1/batch-jobs"))
-        .and(query_param("status", "CHUNKING"))
-        .and(query_param("status", "PROCESSING"))
         .respond_with(ResponseTemplate::new(200).set_body_string(json_body))
         .expect(1)
         .mount(&mock_server)
@@ -282,14 +283,21 @@ async fn test_list_query_param_is_exploded() {
 
     let requests = mock_server.received_requests().await.unwrap();
     assert_eq!(requests.len(), 1);
-    let query = requests[0].url.query().unwrap_or("");
-    // Explode=true: no comma-joined value should appear.
-    assert!(
-        !query.contains("CHUNKING,PROCESSING") && !query.contains("CHUNKING%2CPROCESSING"),
-        "expected repeated `status=...` pairs, got `{query}`"
+    let pairs: Vec<(String, String)> = requests[0]
+        .url
+        .query_pairs()
+        .map(|(k, v)| (k.into_owned(), v.into_owned()))
+        .collect();
+    let statuses: Vec<&str> = pairs
+        .iter()
+        .filter(|(k, _)| k == "status")
+        .map(|(_, v)| v.as_str())
+        .collect();
+    assert_eq!(
+        statuses,
+        vec!["CHUNKING", "PROCESSING"],
+        "expected two repeated `status` pairs, got pairs {pairs:?}"
     );
-    assert!(query.contains("status=CHUNKING"));
-    assert!(query.contains("status=PROCESSING"));
 
     mock_server.verify().await;
 }
