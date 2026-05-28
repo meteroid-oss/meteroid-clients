@@ -350,6 +350,7 @@ fn promote_field_type(
         | FieldType::Int64
         | FieldType::UInt64
         | FieldType::String
+        | FieldType::Decimal
         | FieldType::DateTime
         | FieldType::Uri
         | FieldType::JsonObject
@@ -928,6 +929,7 @@ pub(crate) enum FieldType {
     Int64,
     UInt64,
     String,
+    Decimal,
     DateTime,
     Uri,
     /// A JSON object with arbitrary field values.
@@ -1064,6 +1066,7 @@ impl FieldType {
 
                 match obj.format.as_deref() {
                     None | Some("color") | Some("email") => Self::String,
+                    Some("decimal") => Self::Decimal,
                     Some("date-time") => Self::DateTime,
                     Some("date") => Self::String, // Date without time, treat as string for now
                     Some("uri") => Self::Uri,
@@ -1149,6 +1152,7 @@ impl FieldType {
             Self::UInt16 => "ushort".into(),
             Self::UInt64 => "ulong".into(),
             Self::String => "string".into(),
+            Self::Decimal => "decimal".into(),
             Self::DateTime => "DateTime".into(),
             Self::Uri => "string".into(),
             Self::JsonObject => "Object".into(),
@@ -1172,7 +1176,7 @@ impl FieldType {
             Self::Int64 => "int64".into(),
             Self::UInt16 => "uint16".into(),
             Self::UInt64 => "uint64".into(),
-            Self::Uri | Self::String => "string".into(),
+            Self::Uri | Self::String | Self::Decimal => "string".into(),
             Self::DateTime => "time.Time".into(),
             Self::JsonObject => "map[string]any".into(),
             Self::Map { value_ty } => format!("map[string]{}", value_ty.to_go_typename()).into(),
@@ -1194,6 +1198,7 @@ impl FieldType {
             Self::Int64 => "Long".into(),
             Self::UInt64 => "ULong".into(),
             Self::Uri | Self::String => "String".into(),
+            Self::Decimal => "java.math.BigDecimal".into(),
             Self::DateTime => "Instant".into(),
             Self::Map { value_ty } => {
                 format!("Map<String,{}>", value_ty.to_kotlin_typename()).into()
@@ -1210,7 +1215,7 @@ impl FieldType {
     fn to_js_typename(&self) -> Cow<'_, str> {
         match self {
             Self::Bool => "boolean".into(),
-            Self::Int16 | Self::UInt16 | Self::Int32 | Self::Int64 | Self::UInt64 => {
+            Self::Int16 | Self::UInt16 | Self::Int32 | Self::Int64 | Self::UInt64 | Self::Decimal => {
                 "number".into()
             }
             Self::String | Self::Uri => "string".into(),
@@ -1238,6 +1243,7 @@ impl FieldType {
             Self::Int64 | Self::UInt64 => "i32".into(),
             // FIXME: Do we want a separate type for Uri?
             Self::Uri | Self::String => "String".into(),
+            Self::Decimal => "rust_decimal::Decimal".into(),
             // FIXME: Depends on those chrono imports being in scope, not that great..
             Self::DateTime => "DateTime<Utc>".into(),
             Self::JsonObject => "serde_json::Value".into(),
@@ -1275,6 +1281,7 @@ impl FieldType {
             Self::Bool => "bool".into(),
             Self::Int16 | Self::UInt16 | Self::Int32 | Self::Int64 | Self::UInt64 => "int".into(),
             Self::String => "str".into(),
+            Self::Decimal => "Decimal".into(),
             Self::DateTime => "datetime".into(),
             Self::SchemaRef { name, .. } => filter_schema_ref(name, "t.Dict[str, t.Any]"),
             Self::Uri => "str".into(),
@@ -1298,6 +1305,7 @@ impl FieldType {
             FieldType::UInt16 | FieldType::UInt64 | FieldType::Int64 => "Long".into(),
             FieldType::Int32 => "Integer".into(),
             FieldType::String => "String".into(),
+            FieldType::Decimal => "BigDecimal".into(),
             FieldType::DateTime => "OffsetDateTime".into(),
             FieldType::Uri => "URI".into(),
             FieldType::JsonObject => "Object".into(),
@@ -1334,6 +1342,7 @@ impl FieldType {
             | FieldType::Int64
             | FieldType::UInt64
             | FieldType::String
+            | FieldType::Decimal
             | FieldType::DateTime
             | FieldType::Uri
             | FieldType::JsonObject
@@ -1372,6 +1381,7 @@ impl FieldType {
             | FieldType::Int64
             | FieldType::UInt64
             | FieldType::String
+            | FieldType::Decimal
             | FieldType::DateTime
             | FieldType::Uri
             | FieldType::JsonObject
@@ -1395,6 +1405,7 @@ impl FieldType {
             | FieldType::UInt64
             | FieldType::Int32
             | FieldType::Int64 => "int".into(),
+            FieldType::Decimal => "float".into(),
             FieldType::Uri | FieldType::StringConst { .. } | FieldType::String => "string".into(),
             FieldType::StringEnum { .. } => unreachable_inline_enum(),
             FieldType::DateTime => r#"\DateTimeImmutable"#.into(),
@@ -1504,6 +1515,7 @@ impl minijinja::value::Object for FieldType {
                     F::Int16 | F::UInt16 | F::Int32 | F::Int64 | F::UInt64 => true,
                     F::Bool
                     | F::String
+                    | F::Decimal
                     | F::DateTime
                     | F::Uri
                     | F::JsonObject
