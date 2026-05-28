@@ -12,13 +12,18 @@ pub struct TaxBreakdownItem {
 
     pub tax_amount: i32,
 
-    pub tax_rate: String,
+    pub tax_rate: rust_decimal::Decimal,
 
     pub taxable_amount: i32,
 }
 
 impl TaxBreakdownItem {
-    pub fn new(name: String, tax_amount: i32, tax_rate: String, taxable_amount: i32) -> Self {
+    pub fn new(
+        name: String,
+        tax_amount: i32,
+        tax_rate: rust_decimal::Decimal,
+        taxable_amount: i32,
+    ) -> Self {
         Self {
             exemption_type: None,
             name,

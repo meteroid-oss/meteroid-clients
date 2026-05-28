@@ -11,6 +11,7 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class InvoiceLineItem {
     private String endDate;
 
     @JsonProperty private String name;
-    @JsonProperty private String quantity;
+    @JsonProperty private BigDecimal quantity;
 
     @JsonProperty("start_date")
     private String startDate;
@@ -37,10 +38,10 @@ public class InvoiceLineItem {
     private List<SubLineItem> subLineItems;
 
     @JsonProperty("tax_rate")
-    private String taxRate;
+    private BigDecimal taxRate;
 
     @JsonProperty("unit_price")
-    private String unitPrice;
+    private BigDecimal unitPrice;
 
     public InvoiceLineItem() {}
 
@@ -120,7 +121,7 @@ public class InvoiceLineItem {
         this.name = name;
     }
 
-    public InvoiceLineItem quantity(String quantity) {
+    public InvoiceLineItem quantity(BigDecimal quantity) {
         this.quantity = quantity;
         return this;
     }
@@ -131,11 +132,11 @@ public class InvoiceLineItem {
      * @return quantity
      */
     @javax.annotation.Nullable
-    public String getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
@@ -186,7 +187,7 @@ public class InvoiceLineItem {
         this.subLineItems = subLineItems;
     }
 
-    public InvoiceLineItem taxRate(String taxRate) {
+    public InvoiceLineItem taxRate(BigDecimal taxRate) {
         this.taxRate = taxRate;
         return this;
     }
@@ -197,15 +198,15 @@ public class InvoiceLineItem {
      * @return taxRate
      */
     @javax.annotation.Nonnull
-    public String getTaxRate() {
+    public BigDecimal getTaxRate() {
         return taxRate;
     }
 
-    public void setTaxRate(String taxRate) {
+    public void setTaxRate(BigDecimal taxRate) {
         this.taxRate = taxRate;
     }
 
-    public InvoiceLineItem unitPrice(String unitPrice) {
+    public InvoiceLineItem unitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
         return this;
     }
@@ -216,11 +217,11 @@ public class InvoiceLineItem {
      * @return unitPrice
      */
     @javax.annotation.Nullable
-    public String getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(String unitPrice) {
+    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
 

@@ -13,11 +13,11 @@ pub struct SlotFee {
 
     pub unit: String,
 
-    pub unit_rate: String,
+    pub unit_rate: rust_decimal::Decimal,
 }
 
 impl SlotFee {
-    pub fn new(initial_slots: i32, unit: String, unit_rate: String) -> Self {
+    pub fn new(initial_slots: i32, unit: String, unit_rate: rust_decimal::Decimal) -> Self {
         Self {
             initial_slots,
             max_slots: None,

@@ -5,15 +5,20 @@ use serde::{Deserialize, Serialize};
 pub struct TierRow {
     pub first_unit: i32,
 
-    pub flat_cap: String,
+    pub flat_cap: rust_decimal::Decimal,
 
-    pub flat_fee: String,
+    pub flat_fee: rust_decimal::Decimal,
 
-    pub rate: String,
+    pub rate: rust_decimal::Decimal,
 }
 
 impl TierRow {
-    pub fn new(first_unit: i32, flat_cap: String, flat_fee: String, rate: String) -> Self {
+    pub fn new(
+        first_unit: i32,
+        flat_cap: rust_decimal::Decimal,
+        flat_fee: rust_decimal::Decimal,
+        rate: rust_decimal::Decimal,
+    ) -> Self {
         Self {
             first_unit,
             flat_cap,

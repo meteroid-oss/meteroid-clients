@@ -15,16 +15,16 @@ pub struct InvoiceLineItem {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub quantity: Option<String>,
+    pub quantity: Option<rust_decimal::Decimal>,
 
     pub start_date: String,
 
     pub sub_line_items: Vec<SubLineItem>,
 
-    pub tax_rate: String,
+    pub tax_rate: rust_decimal::Decimal,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub unit_price: Option<String>,
+    pub unit_price: Option<rust_decimal::Decimal>,
 }
 
 impl InvoiceLineItem {
@@ -34,7 +34,7 @@ impl InvoiceLineItem {
         name: String,
         start_date: String,
         sub_line_items: Vec<SubLineItem>,
-        tax_rate: String,
+        tax_rate: rust_decimal::Decimal,
     ) -> Self {
         Self {
             amount_total,

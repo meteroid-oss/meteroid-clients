@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,7 +21,7 @@ public class PackagePricing {
     @JsonProperty("block_size")
     private Long blockSize;
 
-    @JsonProperty private String rate;
+    @JsonProperty private BigDecimal rate;
 
     public PackagePricing() {}
 
@@ -42,7 +44,7 @@ public class PackagePricing {
         this.blockSize = blockSize;
     }
 
-    public PackagePricing rate(String rate) {
+    public PackagePricing rate(BigDecimal rate) {
         this.rate = rate;
         return this;
     }
@@ -53,11 +55,11 @@ public class PackagePricing {
      * @return rate
      */
     @javax.annotation.Nonnull
-    public String getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 

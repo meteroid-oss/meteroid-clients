@@ -11,6 +11,7 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class MetricUsage {
     private String metricName;
 
     @JsonProperty("total_value")
-    private String totalValue;
+    private BigDecimal totalValue;
 
     public MetricUsage() {}
 
@@ -121,7 +122,7 @@ public class MetricUsage {
         this.metricName = metricName;
     }
 
-    public MetricUsage totalValue(String totalValue) {
+    public MetricUsage totalValue(BigDecimal totalValue) {
         this.totalValue = totalValue;
         return this;
     }
@@ -132,11 +133,11 @@ public class MetricUsage {
      * @return totalValue
      */
     @javax.annotation.Nonnull
-    public String getTotalValue() {
+    public BigDecimal getTotalValue() {
         return totalValue;
     }
 
-    public void setTotalValue(String totalValue) {
+    public void setTotalValue(BigDecimal totalValue) {
         this.totalValue = totalValue;
     }
 

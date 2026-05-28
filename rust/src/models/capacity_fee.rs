@@ -9,17 +9,17 @@ pub struct CapacityFee {
 
     pub metric_id: BillableMetricId,
 
-    pub overage_rate: String,
+    pub overage_rate: rust_decimal::Decimal,
 
-    pub rate: String,
+    pub rate: rust_decimal::Decimal,
 }
 
 impl CapacityFee {
     pub fn new(
         included: i32,
         metric_id: BillableMetricId,
-        overage_rate: String,
-        rate: String,
+        overage_rate: rust_decimal::Decimal,
+        rate: rust_decimal::Decimal,
     ) -> Self {
         Self {
             included,

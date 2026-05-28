@@ -11,13 +11,15 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class OneTimeFee {
     @JsonProperty private Integer quantity;
-    @JsonProperty private String rate;
+    @JsonProperty private BigDecimal rate;
 
     public OneTimeFee() {}
 
@@ -40,7 +42,7 @@ public class OneTimeFee {
         this.quantity = quantity;
     }
 
-    public OneTimeFee rate(String rate) {
+    public OneTimeFee rate(BigDecimal rate) {
         this.rate = rate;
         return this;
     }
@@ -51,11 +53,11 @@ public class OneTimeFee {
      * @return rate
      */
     @javax.annotation.Nonnull
-    public String getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 

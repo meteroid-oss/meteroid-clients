@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -20,7 +22,7 @@ public class MatrixRow {
     @JsonProperty private MatrixDimension dimension2;
 
     @JsonProperty("per_unit_price")
-    private String perUnitPrice;
+    private BigDecimal perUnitPrice;
 
     public MatrixRow() {}
 
@@ -62,7 +64,7 @@ public class MatrixRow {
         this.dimension2 = dimension2;
     }
 
-    public MatrixRow perUnitPrice(String perUnitPrice) {
+    public MatrixRow perUnitPrice(BigDecimal perUnitPrice) {
         this.perUnitPrice = perUnitPrice;
         return this;
     }
@@ -73,11 +75,11 @@ public class MatrixRow {
      * @return perUnitPrice
      */
     @javax.annotation.Nonnull
-    public String getPerUnitPrice() {
+    public BigDecimal getPerUnitPrice() {
         return perUnitPrice;
     }
 
-    public void setPerUnitPrice(String perUnitPrice) {
+    public void setPerUnitPrice(BigDecimal perUnitPrice) {
         this.perUnitPrice = perUnitPrice;
     }
 

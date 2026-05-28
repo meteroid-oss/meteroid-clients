@@ -13,7 +13,7 @@ pub struct MetricUsage {
 
     pub metric_name: String,
 
-    pub total_value: String,
+    pub total_value: rust_decimal::Decimal,
 }
 
 impl MetricUsage {
@@ -22,7 +22,7 @@ impl MetricUsage {
         metric_code: String,
         metric_id: BillableMetricId,
         metric_name: String,
-        total_value: String,
+        total_value: rust_decimal::Decimal,
     ) -> Self {
         Self {
             grouped_usage,

@@ -3,11 +3,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct RatePricing {
-    pub rate: String,
+    pub rate: rust_decimal::Decimal,
 }
 
 impl RatePricing {
-    pub fn new(rate: String) -> Self {
+    pub fn new(rate: rust_decimal::Decimal) -> Self {
         Self { rate }
     }
 }

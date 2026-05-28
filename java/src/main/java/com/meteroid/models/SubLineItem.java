@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,11 +20,11 @@ import lombok.ToString;
 public class SubLineItem {
     @JsonProperty private String id;
     @JsonProperty private String name;
-    @JsonProperty private String quantity;
+    @JsonProperty private BigDecimal quantity;
     @JsonProperty private Long total;
 
     @JsonProperty("unit_price")
-    private String unitPrice;
+    private BigDecimal unitPrice;
 
     public SubLineItem() {}
 
@@ -64,7 +66,7 @@ public class SubLineItem {
         this.name = name;
     }
 
-    public SubLineItem quantity(String quantity) {
+    public SubLineItem quantity(BigDecimal quantity) {
         this.quantity = quantity;
         return this;
     }
@@ -75,11 +77,11 @@ public class SubLineItem {
      * @return quantity
      */
     @javax.annotation.Nonnull
-    public String getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
@@ -102,7 +104,7 @@ public class SubLineItem {
         this.total = total;
     }
 
-    public SubLineItem unitPrice(String unitPrice) {
+    public SubLineItem unitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
         return this;
     }
@@ -113,11 +115,11 @@ public class SubLineItem {
      * @return unitPrice
      */
     @javax.annotation.Nonnull
-    public String getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(String unitPrice) {
+    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
 

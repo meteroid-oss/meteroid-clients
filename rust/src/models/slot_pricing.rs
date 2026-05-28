@@ -9,11 +9,11 @@ pub struct SlotPricing {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_slots: Option<i32>,
 
-    pub unit_rate: String,
+    pub unit_rate: rust_decimal::Decimal,
 }
 
 impl SlotPricing {
-    pub fn new(unit_rate: String) -> Self {
+    pub fn new(unit_rate: rust_decimal::Decimal) -> Self {
         Self {
             max_slots: None,
             min_slots: None,

@@ -5,11 +5,11 @@ use serde::{Deserialize, Serialize};
 pub struct PackagePricing {
     pub block_size: i32,
 
-    pub rate: String,
+    pub rate: rust_decimal::Decimal,
 }
 
 impl PackagePricing {
-    pub fn new(block_size: i32, rate: String) -> Self {
+    pub fn new(block_size: i32, rate: rust_decimal::Decimal) -> Self {
         Self { block_size, rate }
     }
 }

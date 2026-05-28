@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,9 +21,9 @@ public class CapacityPricing {
     @JsonProperty private Long included;
 
     @JsonProperty("overage_rate")
-    private String overageRate;
+    private BigDecimal overageRate;
 
-    @JsonProperty private String rate;
+    @JsonProperty private BigDecimal rate;
 
     public CapacityPricing() {}
 
@@ -44,7 +46,7 @@ public class CapacityPricing {
         this.included = included;
     }
 
-    public CapacityPricing overageRate(String overageRate) {
+    public CapacityPricing overageRate(BigDecimal overageRate) {
         this.overageRate = overageRate;
         return this;
     }
@@ -55,15 +57,15 @@ public class CapacityPricing {
      * @return overageRate
      */
     @javax.annotation.Nonnull
-    public String getOverageRate() {
+    public BigDecimal getOverageRate() {
         return overageRate;
     }
 
-    public void setOverageRate(String overageRate) {
+    public void setOverageRate(BigDecimal overageRate) {
         this.overageRate = overageRate;
     }
 
-    public CapacityPricing rate(String rate) {
+    public CapacityPricing rate(BigDecimal rate) {
         this.rate = rate;
         return this;
     }
@@ -74,11 +76,11 @@ public class CapacityPricing {
      * @return rate
      */
     @javax.annotation.Nonnull
-    public String getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 
