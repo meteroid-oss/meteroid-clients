@@ -1215,9 +1215,12 @@ impl FieldType {
     fn to_js_typename(&self) -> Cow<'_, str> {
         match self {
             Self::Bool => "boolean".into(),
-            Self::Int16 | Self::UInt16 | Self::Int32 | Self::Int64 | Self::UInt64 | Self::Decimal => {
-                "number".into()
-            }
+            Self::Int16
+            | Self::UInt16
+            | Self::Int32
+            | Self::Int64
+            | Self::UInt64
+            | Self::Decimal => "number".into(),
             Self::String | Self::Uri => "string".into(),
             Self::DateTime => "Date".into(),
             Self::JsonObject => "any".into(),
