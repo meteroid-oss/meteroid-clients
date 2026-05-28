@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -20,12 +22,12 @@ public class TierRow {
     private Long firstUnit;
 
     @JsonProperty("flat_cap")
-    private String flatCap;
+    private BigDecimal flatCap;
 
     @JsonProperty("flat_fee")
-    private String flatFee;
+    private BigDecimal flatFee;
 
-    @JsonProperty private String rate;
+    @JsonProperty private BigDecimal rate;
 
     public TierRow() {}
 
@@ -48,7 +50,7 @@ public class TierRow {
         this.firstUnit = firstUnit;
     }
 
-    public TierRow flatCap(String flatCap) {
+    public TierRow flatCap(BigDecimal flatCap) {
         this.flatCap = flatCap;
         return this;
     }
@@ -59,15 +61,15 @@ public class TierRow {
      * @return flatCap
      */
     @javax.annotation.Nonnull
-    public String getFlatCap() {
+    public BigDecimal getFlatCap() {
         return flatCap;
     }
 
-    public void setFlatCap(String flatCap) {
+    public void setFlatCap(BigDecimal flatCap) {
         this.flatCap = flatCap;
     }
 
-    public TierRow flatFee(String flatFee) {
+    public TierRow flatFee(BigDecimal flatFee) {
         this.flatFee = flatFee;
         return this;
     }
@@ -78,15 +80,15 @@ public class TierRow {
      * @return flatFee
      */
     @javax.annotation.Nonnull
-    public String getFlatFee() {
+    public BigDecimal getFlatFee() {
         return flatFee;
     }
 
-    public void setFlatFee(String flatFee) {
+    public void setFlatFee(BigDecimal flatFee) {
         this.flatFee = flatFee;
     }
 
-    public TierRow rate(String rate) {
+    public TierRow rate(BigDecimal rate) {
         this.rate = rate;
         return this;
     }
@@ -97,11 +99,11 @@ public class TierRow {
      * @return rate
      */
     @javax.annotation.Nonnull
-    public String getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 

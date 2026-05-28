@@ -49,7 +49,7 @@ pub struct CreateCheckoutSessionRequest {
     pub invoice_memo: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub invoice_threshold: Option<String>,
+    pub invoice_threshold: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Value>,

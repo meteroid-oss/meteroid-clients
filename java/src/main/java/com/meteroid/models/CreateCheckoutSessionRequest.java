@@ -11,6 +11,7 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class CreateCheckoutSessionRequest {
     private String invoiceMemo;
 
     @JsonProperty("invoice_threshold")
-    private String invoiceThreshold;
+    private BigDecimal invoiceThreshold;
 
     @JsonProperty private Object metadata;
 
@@ -323,7 +324,7 @@ public class CreateCheckoutSessionRequest {
         this.invoiceMemo = invoiceMemo;
     }
 
-    public CreateCheckoutSessionRequest invoiceThreshold(String invoiceThreshold) {
+    public CreateCheckoutSessionRequest invoiceThreshold(BigDecimal invoiceThreshold) {
         this.invoiceThreshold = invoiceThreshold;
         return this;
     }
@@ -334,11 +335,11 @@ public class CreateCheckoutSessionRequest {
      * @return invoiceThreshold
      */
     @javax.annotation.Nullable
-    public String getInvoiceThreshold() {
+    public BigDecimal getInvoiceThreshold() {
         return invoiceThreshold;
     }
 
-    public void setInvoiceThreshold(String invoiceThreshold) {
+    public void setInvoiceThreshold(BigDecimal invoiceThreshold) {
         this.invoiceThreshold = invoiceThreshold;
     }
 

@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,7 +21,7 @@ public class OneTimePricing {
     @JsonProperty private Integer quantity;
 
     @JsonProperty("unit_price")
-    private String unitPrice;
+    private BigDecimal unitPrice;
 
     public OneTimePricing() {}
 
@@ -42,7 +44,7 @@ public class OneTimePricing {
         this.quantity = quantity;
     }
 
-    public OneTimePricing unitPrice(String unitPrice) {
+    public OneTimePricing unitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
         return this;
     }
@@ -53,11 +55,11 @@ public class OneTimePricing {
      * @return unitPrice
      */
     @javax.annotation.Nonnull
-    public String getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(String unitPrice) {
+    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
 

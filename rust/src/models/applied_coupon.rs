@@ -6,7 +6,7 @@ use super::{applied_coupon_id::AppliedCouponId, coupon_id::CouponId};
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct AppliedCoupon {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub applied_amount: Option<String>,
+    pub applied_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub applied_count: Option<i32>,

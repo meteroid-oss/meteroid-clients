@@ -11,6 +11,7 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @ToString
@@ -19,7 +20,7 @@ import java.time.OffsetDateTime;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class AppliedCoupon {
     @JsonProperty("applied_amount")
-    private String appliedAmount;
+    private BigDecimal appliedAmount;
 
     @JsonProperty("applied_count")
     private Integer appliedCount;
@@ -40,7 +41,7 @@ public class AppliedCoupon {
 
     public AppliedCoupon() {}
 
-    public AppliedCoupon appliedAmount(String appliedAmount) {
+    public AppliedCoupon appliedAmount(BigDecimal appliedAmount) {
         this.appliedAmount = appliedAmount;
         return this;
     }
@@ -51,11 +52,11 @@ public class AppliedCoupon {
      * @return appliedAmount
      */
     @javax.annotation.Nullable
-    public String getAppliedAmount() {
+    public BigDecimal getAppliedAmount() {
         return appliedAmount;
     }
 
-    public void setAppliedAmount(String appliedAmount) {
+    public void setAppliedAmount(BigDecimal appliedAmount) {
         this.appliedAmount = appliedAmount;
     }
 

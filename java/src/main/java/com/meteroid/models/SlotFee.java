@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -28,7 +30,7 @@ public class SlotFee {
     @JsonProperty private String unit;
 
     @JsonProperty("unit_rate")
-    private String unitRate;
+    private BigDecimal unitRate;
 
     public SlotFee() {}
 
@@ -108,7 +110,7 @@ public class SlotFee {
         this.unit = unit;
     }
 
-    public SlotFee unitRate(String unitRate) {
+    public SlotFee unitRate(BigDecimal unitRate) {
         this.unitRate = unitRate;
         return this;
     }
@@ -119,11 +121,11 @@ public class SlotFee {
      * @return unitRate
      */
     @javax.annotation.Nonnull
-    public String getUnitRate() {
+    public BigDecimal getUnitRate() {
         return unitRate;
     }
 
-    public void setUnitRate(String unitRate) {
+    public void setUnitRate(BigDecimal unitRate) {
         this.unitRate = unitRate;
     }
 

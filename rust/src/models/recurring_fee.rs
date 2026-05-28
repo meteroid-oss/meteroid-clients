@@ -9,11 +9,11 @@ pub struct RecurringFee {
 
     pub quantity: i32,
 
-    pub rate: String,
+    pub rate: rust_decimal::Decimal,
 }
 
 impl RecurringFee {
-    pub fn new(billing_type: BillingTypeEnum, quantity: i32, rate: String) -> Self {
+    pub fn new(billing_type: BillingTypeEnum, quantity: i32, rate: rust_decimal::Decimal) -> Self {
         Self {
             billing_type,
             quantity,

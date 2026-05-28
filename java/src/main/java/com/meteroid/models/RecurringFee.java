@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -20,7 +22,7 @@ public class RecurringFee {
     private BillingTypeEnum billingType;
 
     @JsonProperty private Integer quantity;
-    @JsonProperty private String rate;
+    @JsonProperty private BigDecimal rate;
 
     public RecurringFee() {}
 
@@ -62,7 +64,7 @@ public class RecurringFee {
         this.quantity = quantity;
     }
 
-    public RecurringFee rate(String rate) {
+    public RecurringFee rate(BigDecimal rate) {
         this.rate = rate;
         return this;
     }
@@ -73,11 +75,11 @@ public class RecurringFee {
      * @return rate
      */
     @javax.annotation.Nonnull
-    public String getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 

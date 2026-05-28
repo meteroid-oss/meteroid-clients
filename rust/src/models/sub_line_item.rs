@@ -7,15 +7,21 @@ pub struct SubLineItem {
 
     pub name: String,
 
-    pub quantity: String,
+    pub quantity: rust_decimal::Decimal,
 
     pub total: i32,
 
-    pub unit_price: String,
+    pub unit_price: rust_decimal::Decimal,
 }
 
 impl SubLineItem {
-    pub fn new(id: String, name: String, quantity: String, total: i32, unit_price: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        quantity: rust_decimal::Decimal,
+        total: i32,
+        unit_price: rust_decimal::Decimal,
+    ) -> Self {
         Self {
             id,
             name,

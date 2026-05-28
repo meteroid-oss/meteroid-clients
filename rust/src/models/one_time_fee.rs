@@ -5,11 +5,11 @@ use serde::{Deserialize, Serialize};
 pub struct OneTimeFee {
     pub quantity: i32,
 
-    pub rate: String,
+    pub rate: rust_decimal::Decimal,
 }
 
 impl OneTimeFee {
-    pub fn new(quantity: i32, rate: String) -> Self {
+    pub fn new(quantity: i32, rate: rust_decimal::Decimal) -> Self {
         Self { quantity, rate }
     }
 }

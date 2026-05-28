@@ -10,11 +10,11 @@ pub struct MatrixRow {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dimension2: Option<MatrixDimension>,
 
-    pub per_unit_price: String,
+    pub per_unit_price: rust_decimal::Decimal,
 }
 
 impl MatrixRow {
-    pub fn new(dimension1: MatrixDimension, per_unit_price: String) -> Self {
+    pub fn new(dimension1: MatrixDimension, per_unit_price: rust_decimal::Decimal) -> Self {
         Self {
             dimension1,
             dimension2: None,

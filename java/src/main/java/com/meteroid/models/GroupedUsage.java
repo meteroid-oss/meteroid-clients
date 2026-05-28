@@ -11,6 +11,7 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class GroupedUsage {
     @JsonProperty private Map<String, String> dimensions;
-    @JsonProperty private String value;
+    @JsonProperty private BigDecimal value;
 
     public GroupedUsage() {}
 
@@ -52,7 +53,7 @@ public class GroupedUsage {
         this.dimensions = dimensions;
     }
 
-    public GroupedUsage value(String value) {
+    public GroupedUsage value(BigDecimal value) {
         this.value = value;
         return this;
     }
@@ -63,11 +64,11 @@ public class GroupedUsage {
      * @return value
      */
     @javax.annotation.Nonnull
-    public String getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(BigDecimal value) {
         this.value = value;
     }
 

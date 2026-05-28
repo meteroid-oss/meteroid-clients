@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,7 +27,7 @@ public class TaxBreakdownItem {
     private Long taxAmount;
 
     @JsonProperty("tax_rate")
-    private String taxRate;
+    private BigDecimal taxRate;
 
     @JsonProperty("taxable_amount")
     private Long taxableAmount;
@@ -89,7 +91,7 @@ public class TaxBreakdownItem {
         this.taxAmount = taxAmount;
     }
 
-    public TaxBreakdownItem taxRate(String taxRate) {
+    public TaxBreakdownItem taxRate(BigDecimal taxRate) {
         this.taxRate = taxRate;
         return this;
     }
@@ -100,11 +102,11 @@ public class TaxBreakdownItem {
      * @return taxRate
      */
     @javax.annotation.Nonnull
-    public String getTaxRate() {
+    public BigDecimal getTaxRate() {
         return taxRate;
     }
 
-    public void setTaxRate(String taxRate) {
+    public void setTaxRate(BigDecimal taxRate) {
         this.taxRate = taxRate;
     }
 

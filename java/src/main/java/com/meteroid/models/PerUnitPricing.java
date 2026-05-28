@@ -11,16 +11,18 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class PerUnitPricing {
-    @JsonProperty private String rate;
+    @JsonProperty private BigDecimal rate;
 
     public PerUnitPricing() {}
 
-    public PerUnitPricing rate(String rate) {
+    public PerUnitPricing rate(BigDecimal rate) {
         this.rate = rate;
         return this;
     }
@@ -31,11 +33,11 @@ public class PerUnitPricing {
      * @return rate
      */
     @javax.annotation.Nonnull
-    public String getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 
