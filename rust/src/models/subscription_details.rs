@@ -3,10 +3,10 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     applied_coupon_detailed::AppliedCouponDetailed, billing_period_enum::BillingPeriodEnum,
-    currency::Currency, customer_id::CustomerId, payment_methods_config::PaymentMethodsConfig,
-    plan_id::PlanId, plan_version_id::PlanVersionId, subscription_add_on::SubscriptionAddOn,
-    subscription_component::SubscriptionComponent, subscription_id::SubscriptionId,
-    subscription_status_enum::SubscriptionStatusEnum,
+    currency::Currency, customer_id::CustomerId, entitlement::Entitlement,
+    payment_methods_config::PaymentMethodsConfig, plan_id::PlanId, plan_version_id::PlanVersionId,
+    subscription_add_on::SubscriptionAddOn, subscription_component::SubscriptionComponent,
+    subscription_id::SubscriptionId, subscription_status_enum::SubscriptionStatusEnum,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -60,6 +60,9 @@ pub struct SubscriptionDetails {
     /// When the subscription ends (if set)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entitlements: Option<Vec<Entitlement>>,
 
     pub id: SubscriptionId,
 
@@ -142,6 +145,7 @@ impl SubscriptionDetails {
             customer_id,
             customer_name,
             end_date: None,
+            entitlements: None,
             id,
             invoice_memo: None,
             mrr_cents,

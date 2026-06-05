@@ -87,6 +87,19 @@ impl<'a> Products<'a> {
             .await
     }
 
+    pub async fn list_product_entitlements(
+        &self,
+        product_id: String,
+    ) -> Result<crate::models::ResolvedEntitlementListResponse> {
+        crate::request::Request::new(
+            http1::Method::GET,
+            "/api/v1/products/{product_id}/entitlements",
+        )
+        .with_path_param("product_id", product_id)
+        .execute(self.cfg)
+        .await
+    }
+
     pub async fn unarchive_product(&self, product_id: String) -> Result<()> {
         crate::request::Request::new(
             http1::Method::POST,

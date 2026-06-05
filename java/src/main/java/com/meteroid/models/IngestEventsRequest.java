@@ -22,6 +22,9 @@ public class IngestEventsRequest {
     @JsonProperty("allow_backfilling")
     private Boolean allowBackfilling;
 
+    @JsonProperty("allow_partial_failures")
+    private Boolean allowPartialFailures;
+
     @JsonProperty private List<Event> events;
 
     public IngestEventsRequest() {}
@@ -32,7 +35,7 @@ public class IngestEventsRequest {
     }
 
     /**
-     * allow ingesting events with timestamps more than a day in the past
+     * Allow events with timestamps more than 1 day in the past. Defaults to `false`.
      *
      * @return allowBackfilling
      */
@@ -43,6 +46,27 @@ public class IngestEventsRequest {
 
     public void setAllowBackfilling(Boolean allowBackfilling) {
         this.allowBackfilling = allowBackfilling;
+    }
+
+    public IngestEventsRequest allowPartialFailures(Boolean allowPartialFailures) {
+        this.allowPartialFailures = allowPartialFailures;
+        return this;
+    }
+
+    /**
+     * Accept the batch even if some events fail validation. Defaults to `false`. When `true`, valid
+     * events are ingested and failures are reported in the response body. When `false` (default),
+     * any invalid event rejects the entire batch.
+     *
+     * @return allowPartialFailures
+     */
+    @javax.annotation.Nullable
+    public Boolean getAllowPartialFailures() {
+        return allowPartialFailures;
+    }
+
+    public void setAllowPartialFailures(Boolean allowPartialFailures) {
+        this.allowPartialFailures = allowPartialFailures;
     }
 
     public IngestEventsRequest events(List<Event> events) {
@@ -60,7 +84,7 @@ public class IngestEventsRequest {
     }
 
     /**
-     * Get events
+     * 1–100 events per request.
      *
      * @return events
      */

@@ -5,6 +5,9 @@ use super::{customer_id::CustomerId, invoice_id::InvoiceId, invoice_status::Invo
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct InvoiceEventData {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub consolidated_into_invoice_id: Option<InvoiceId>,
+
     pub created_at: String,
 
     pub currency: String,
@@ -31,6 +34,7 @@ impl InvoiceEventData {
         total: i32,
     ) -> Self {
         Self {
+            consolidated_into_invoice_id: None,
             created_at,
             currency,
             customer_id,

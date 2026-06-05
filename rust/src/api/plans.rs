@@ -49,6 +49,19 @@ impl<'a> Plans<'a> {
         Self { cfg }
     }
 
+    pub async fn list_plan_version_entitlements(
+        &self,
+        plan_version_id: String,
+    ) -> Result<crate::models::ResolvedEntitlementListResponse> {
+        crate::request::Request::new(
+            http1::Method::GET,
+            "/api/v1/plan-versions/{plan_version_id}/entitlements",
+        )
+        .with_path_param("plan_version_id", plan_version_id)
+        .execute(self.cfg)
+        .await
+    }
+
     pub async fn list_plans(
         &self,
         options: Option<PlansListPlansOptions>,

@@ -2,9 +2,9 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    available_parameters::AvailableParameters, plan_id::PlanId, plan_status_enum::PlanStatusEnum,
-    plan_type_enum::PlanTypeEnum, plan_version_id::PlanVersionId, price_component::PriceComponent,
-    product_family::ProductFamily, trial_config::TrialConfig,
+    available_parameters::AvailableParameters, entitlement::Entitlement, plan_id::PlanId,
+    plan_status_enum::PlanStatusEnum, plan_type_enum::PlanTypeEnum, plan_version_id::PlanVersionId,
+    price_component::PriceComponent, product_family::ProductFamily, trial_config::TrialConfig,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -20,6 +20,9 @@ pub struct Plan {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entitlements: Option<Vec<Entitlement>>,
 
     pub id: PlanId,
 
@@ -70,6 +73,7 @@ impl Plan {
             created_at,
             currency,
             description: None,
+            entitlements: None,
             id,
             name,
             net_terms,

@@ -91,6 +91,16 @@ impl<'a> AddOns<'a> {
             .await
     }
 
+    pub async fn list_add_on_entitlements(
+        &self,
+        addon_id: String,
+    ) -> Result<crate::models::ResolvedEntitlementListResponse> {
+        crate::request::Request::new(http1::Method::GET, "/api/v1/addons/{addon_id}/entitlements")
+            .with_path_param("addon_id", addon_id)
+            .execute(self.cfg)
+            .await
+    }
+
     pub async fn unarchive_addon(&self, addon_id: String) -> Result<()> {
         crate::request::Request::new(http1::Method::POST, "/api/v1/addons/{addon_id}/unarchive")
             .with_path_param("addon_id", addon_id)

@@ -7,6 +7,7 @@ import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.CreateProductRequest;
 import com.meteroid.models.Product;
 import com.meteroid.models.ProductListResponse;
+import com.meteroid.models.ResolvedEntitlementListResponse;
 import com.meteroid.models.UpdateProductRequest;
 
 import okhttp3.HttpUrl;
@@ -86,6 +87,17 @@ public class Products {
                         .newUrlBuilder()
                         .encodedPath(String.format("/api/v1/products/%s/archive", productId));
         this.client.executeRequest("POST", url.build(), null, null, null);
+    }
+
+    /** */
+    public ResolvedEntitlementListResponse listProductEntitlements(final String productId)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(String.format("/api/v1/products/%s/entitlements", productId));
+        return this.client.executeRequest(
+                "GET", url.build(), null, null, ResolvedEntitlementListResponse.class);
     }
 
     /** */

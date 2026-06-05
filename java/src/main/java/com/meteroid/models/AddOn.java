@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @ToString
 @EqualsAndHashCode
@@ -25,6 +27,7 @@ public class AddOn {
     private OffsetDateTime createdAt;
 
     @JsonProperty private String description;
+    @JsonProperty private List<Entitlement> entitlements;
 
     @JsonProperty("fee_type")
     private ProductFeeTypeEnum feeType;
@@ -102,6 +105,34 @@ public class AddOn {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public AddOn entitlements(List<Entitlement> entitlements) {
+        this.entitlements = entitlements;
+        return this;
+    }
+
+    public AddOn addEntitlementsItem(Entitlement entitlementsItem) {
+        if (this.entitlements == null) {
+            this.entitlements = new ArrayList<>();
+        }
+        this.entitlements.add(entitlementsItem);
+
+        return this;
+    }
+
+    /**
+     * Get entitlements
+     *
+     * @return entitlements
+     */
+    @javax.annotation.Nullable
+    public List<Entitlement> getEntitlements() {
+        return entitlements;
+    }
+
+    public void setEntitlements(List<Entitlement> entitlements) {
+        this.entitlements = entitlements;
     }
 
     public AddOn feeType(ProductFeeTypeEnum feeType) {

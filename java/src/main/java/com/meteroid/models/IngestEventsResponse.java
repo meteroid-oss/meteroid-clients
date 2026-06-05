@@ -38,7 +38,7 @@ public class IngestEventsResponse {
     }
 
     /**
-     * Get failures
+     * Events that failed to ingest. Omitted when no failures.
      *
      * @return failures
      */

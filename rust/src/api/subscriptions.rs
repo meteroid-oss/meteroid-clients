@@ -111,4 +111,17 @@ impl<'a> Subscriptions<'a> {
         .execute(self.cfg)
         .await
     }
+
+    pub async fn list_subscription_entitlements(
+        &self,
+        subscription_id: String,
+    ) -> Result<crate::models::EffectiveEntitlementListResponse> {
+        crate::request::Request::new(
+            http1::Method::GET,
+            "/api/v1/subscriptions/{subscription_id}/entitlements",
+        )
+        .with_path_param("subscription_id", subscription_id)
+        .execute(self.cfg)
+        .await
+    }
 }

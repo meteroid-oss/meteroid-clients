@@ -161,6 +161,11 @@ impl Meteroid {
         super::Events::new(&self.cfg)
     }
 
+    /// Access the features API.
+    pub fn features(&self) -> super::Features<'_> {
+        super::Features::new(&self.cfg)
+    }
+
     /// Access the invoices API.
     pub fn invoices(&self) -> super::Invoices<'_> {
         super::Invoices::new(&self.cfg)

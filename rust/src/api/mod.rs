@@ -9,6 +9,7 @@ mod coupons;
 mod credit_notes;
 mod customers;
 mod events;
+mod features;
 mod invoices;
 mod metrics;
 mod o_auth;
@@ -29,6 +30,7 @@ pub use self::{
     credit_notes::CreditNotes,
     customers::{Customers, CustomersListCustomersOptions},
     events::Events,
+    features::{Features, FeaturesListFeaturesOptions},
     invoices::{Invoices, InvoicesListInvoicesOptions},
     metrics::{Metrics, MetricsListMetricsOptions},
     o_auth::OAuth,

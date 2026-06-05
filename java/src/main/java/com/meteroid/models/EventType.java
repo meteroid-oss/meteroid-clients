@@ -12,6 +12,7 @@ public enum EventType implements ToQueryParam {
     INVOICE_FINALIZED("invoice.finalized"),
     INVOICE_PAID("invoice.paid"),
     INVOICE_VOIDED("invoice.voided"),
+    INVOICE_CONSOLIDATED("invoice.consolidated"),
     QUOTE_ACCEPTED("quote.accepted"),
     QUOTE_CONVERTED("quote.converted"),
     CREDIT_NOTE_CREATED("credit_note.created"),

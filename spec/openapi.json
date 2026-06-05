@@ -391,6 +391,74 @@
         ]
       }
     },
+    "/api/v1/addons/{addon_id}/entitlements": {
+      "get": {
+        "tags": [
+          "Add-ons",
+          "Entitlements"
+        ],
+        "summary": "List add-on entitlements",
+        "operationId": "list_add_on_entitlements",
+        "parameters": [
+          {
+            "name": "addon_id",
+            "in": "path",
+            "description": "Add-on ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AddOnId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resolved entitlements for this add-on",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedEntitlementListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Add-on not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/addons/{addon_id}/unarchive": {
       "post": {
         "tags": [
@@ -2494,6 +2562,74 @@
         ]
       }
     },
+    "/api/v1/customers/{id_or_alias}/entitlements": {
+      "get": {
+        "tags": [
+          "Customers",
+          "Entitlements"
+        ],
+        "summary": "List customer entitlements",
+        "operationId": "get_effective_entitlements",
+        "parameters": [
+          {
+            "name": "id_or_alias",
+            "in": "path",
+            "description": "Customer ID or alias",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer entitlements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EffectiveEntitlementListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/customers/{id_or_alias}/portal-token": {
       "post": {
         "tags": [
@@ -2648,7 +2784,7 @@
           "Events"
         ],
         "summary": "Ingest events",
-        "description": "Ingest usage events for metering and billing purposes.",
+        "description": "Ingest usage events for metering and billing purposes.\n\nEvents are deduplicated by `(event_id, customer_id)` — re-sending the same pair will not be\ndouble-counted. If timestamps differ across duplicates, the event with the latest timestamp is used.\n\nBy default, any invalid event rejects the entire batch. Set `allow_partial_failures` to `true` to ingest valid events and receive per-event failure details in the response body.",
         "operationId": "ingest_events",
         "requestBody": {
           "content": {
@@ -2693,6 +2829,174 @@
           },
           "500": {
             "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/features": {
+      "get": {
+        "tags": [
+          "Features"
+        ],
+        "summary": "List features",
+        "operationId": "list_features",
+        "parameters": [
+          {
+            "name": "statuses",
+            "in": "query",
+            "description": "Filter by feature status. Repeat the param to select multiple, omit to return all.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/FeatureStatus"
+              }
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "description": "Filter by product. Omit to return features across all products.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ProductId"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by feature name.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of features",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/features/{feature_id}": {
+      "get": {
+        "tags": [
+          "Features"
+        ],
+        "summary": "Get feature details",
+        "operationId": "get_feature",
+        "parameters": [
+          {
+            "name": "feature_id",
+            "in": "path",
+            "description": "Feature ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FeatureId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feature details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Feature"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
             "content": {
               "application/json": {
                 "schema": {
@@ -3830,6 +4134,74 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/plan-versions/{plan_version_id}/entitlements": {
+      "get": {
+        "tags": [
+          "Plans",
+          "Entitlements"
+        ],
+        "summary": "List plan version entitlements",
+        "operationId": "list_plan_version_entitlements",
+        "parameters": [
+          {
+            "name": "plan_version_id",
+            "in": "path",
+            "description": "Plan version ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PlanVersionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resolved entitlements for this plan version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedEntitlementListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan version not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
       }
     },
     "/api/v1/plans": {
@@ -5148,6 +5520,74 @@
         ]
       }
     },
+    "/api/v1/products/{product_id}/entitlements": {
+      "get": {
+        "tags": [
+          "Products",
+          "Entitlements"
+        ],
+        "summary": "List product entitlements",
+        "operationId": "list_product_entitlements",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "description": "Product ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ProductId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List entitlements for this product",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedEntitlementListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/products/{product_id}/unarchive": {
       "post": {
         "tags": [
@@ -5679,6 +6119,74 @@
         ]
       }
     },
+    "/api/v1/subscriptions/{subscription_id}/entitlements": {
+      "get": {
+        "tags": [
+          "Subscriptions",
+          "Entitlements"
+        ],
+        "summary": "List subscription entitlements",
+        "operationId": "list_subscription_entitlements",
+        "parameters": [
+          {
+            "name": "subscription_id",
+            "in": "path",
+            "description": "Subscription ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SubscriptionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Effective entitlements for this subscription, with live usage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EffectiveEntitlementListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/usage/customer/{customer_id}": {
       "get": {
         "tags": [
@@ -6002,6 +6510,12 @@
               "string",
               "null"
             ]
+          },
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Entitlement"
+            }
           },
           "fee_type": {
             "oneOf": [
@@ -6592,6 +7106,10 @@
           }
         }
       },
+      "BillingCycleResetPeriod": {
+        "type": "object",
+        "description": "Resets each time your subscription renews — anchored to your billing cycle."
+      },
       "BillingMetricAggregateEnum": {
         "type": "string",
         "enum": [
@@ -6625,6 +7143,70 @@
         "enum": [
           "ADVANCE",
           "ARREARS"
+        ]
+      },
+      "BooleanEffectiveEntitlementValue": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BooleanEntitlementValue": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BooleanFeatureType": {
+        "type": "object"
+      },
+      "BooleanResolvedEntitlementValue": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CalendarResetPeriod": {
+        "type": "object",
+        "description": "Resets on calendar boundaries (e.g. the 1st of every month) — not tied to subscription start date.",
+        "required": [
+          "unit",
+          "interval"
+        ],
+        "properties": {
+          "interval": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "unit": {
+            "$ref": "#/components/schemas/CalendarUnit"
+          }
+        }
+      },
+      "CalendarUnit": {
+        "type": "string",
+        "enum": [
+          "HOUR",
+          "DAY",
+          "WEEK",
+          "MONTH",
+          "YEAR"
         ]
       },
       "CancelCheckoutSessionResponse": {
@@ -8695,6 +9277,107 @@
           }
         }
       },
+      "EffectiveEntitlement": {
+        "type": "object",
+        "description": "Merged entitlement value for a feature for a specific customer, enriched with live usage data.",
+        "required": [
+          "feature",
+          "value"
+        ],
+        "properties": {
+          "feature": {
+            "$ref": "#/components/schemas/FeatureRef"
+          },
+          "value": {
+            "$ref": "#/components/schemas/EffectiveEntitlementValue"
+          }
+        }
+      },
+      "EffectiveEntitlementListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EffectiveEntitlement"
+            }
+          }
+        }
+      },
+      "EffectiveEntitlementValue": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BooleanEffectiveEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/MeteredEffectiveEntitlementValue"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "BOOLEAN": "#/components/schemas/BooleanEffectiveEntitlementValue",
+            "METERED": "#/components/schemas/MeteredEffectiveEntitlementValue"
+          }
+        }
+      },
+      "Entitlement": {
+        "type": "object",
+        "description": "A raw entitlement row attached to one entity (feature, plan version, add-on, or subscription).",
+        "required": [
+          "id",
+          "feature_id",
+          "value",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "feature_id": {
+            "$ref": "#/components/schemas/FeatureId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/EntitlementId"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "value": {
+            "$ref": "#/components/schemas/EntitlementValue"
+          }
+        }
+      },
+      "EntitlementId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "ent_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "EntitlementValue": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BooleanEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/MeteredEntitlementValue"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "BOOLEAN": "#/components/schemas/BooleanEntitlementValue",
+            "METERED": "#/components/schemas/MeteredEntitlementValue"
+          }
+        }
+      },
       "ErrorCode": {
         "type": "string",
         "enum": [
@@ -8717,26 +9400,36 @@
         ],
         "properties": {
           "code": {
-            "type": "string"
+            "type": "string",
+            "description": "Billable metric code. Max 512 characters."
           },
           "customer_id": {
             "type": "string",
-            "description": "Either Meteroid's customer_id or an alias"
+            "description": "Meteroid customer ID or external customer alias."
           },
           "event_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique event identifier. Max 255 characters. A UUID or ULID is recommended."
           },
           "properties": {
             "type": "object",
+            "description": "Arbitrary string key-value pairs used by billable metrics for filtering and aggregation.",
             "additionalProperties": {
               "type": "string"
             },
             "propertyNames": {
               "type": "string"
+            },
+            "example": {
+              "region": "us-east-1",
+              "tier": "pro",
+              "bytes": "1048576"
             }
           },
           "timestamp": {
-            "type": "string"
+            "type": "string",
+            "description": "RFC 3339 timestamp. Defaults to ingestion time if omitted.\nMust be between 24 hours ago and 1 hour from now. Set `allow_backfilling` to remove the past limit.",
+            "example": "2026-01-15T10:30:00Z"
           }
         }
       },
@@ -8757,6 +9450,7 @@
           "invoice.finalized",
           "invoice.paid",
           "invoice.voided",
+          "invoice.consolidated",
           "quote.accepted",
           "quote.converted",
           "credit_note.created",
@@ -8884,6 +9578,138 @@
           }
         }
       },
+      "Feature": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "feature_type",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entitlement": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Entitlement",
+                "description": "Feature-level (default) entitlement, applied to all subscriptions as the lowest-priority."
+              }
+            ]
+          },
+          "feature_type": {
+            "$ref": "#/components/schemas/FeatureType"
+          },
+          "id": {
+            "$ref": "#/components/schemas/FeatureId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "product": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProductRef",
+                "description": "Product this feature belongs to."
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/FeatureStatus"
+          }
+        }
+      },
+      "FeatureId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "feat_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "FeatureListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "FeatureRef": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/FeatureId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "product": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProductRef"
+              }
+            ]
+          }
+        }
+      },
+      "FeatureStatus": {
+        "type": "string",
+        "description": "Lifecycle status of a feature.",
+        "enum": [
+          "ACTIVE",
+          "DISABLED",
+          "ARCHIVED"
+        ]
+      },
+      "FeatureType": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BooleanFeatureType"
+          },
+          {
+            "$ref": "#/components/schemas/MeteredFeatureType"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "BOOLEAN": "#/components/schemas/BooleanFeatureType",
+            "METERED": "#/components/schemas/MeteredFeatureType"
+          }
+        }
+      },
       "Fee": {
         "oneOf": [
           {
@@ -8932,6 +9758,24 @@
           }
         }
       },
+      "FixedWindowResetPeriod": {
+        "type": "object",
+        "description": "Resets at regular intervals — anchored to your subscription's exact activation time.",
+        "required": [
+          "unit",
+          "interval"
+        ],
+        "properties": {
+          "interval": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "unit": {
+            "$ref": "#/components/schemas/CalendarUnit"
+          }
+        }
+      },
       "GetCheckoutSessionResponse": {
         "type": "object",
         "required": [
@@ -8976,13 +9820,21 @@
               "boolean",
               "null"
             ],
-            "description": "allow ingesting events with timestamps more than a day in the past"
+            "description": "Allow events with timestamps more than 1 day in the past. Defaults to `false`."
+          },
+          "allow_partial_failures": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Accept the batch even if some events fail validation. Defaults to `false`.\nWhen `true`, valid events are ingested and failures are reported in the response body.\nWhen `false` (default), any invalid event rejects the entire batch."
           },
           "events": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Event"
-            }
+            },
+            "description": "1–100 events per request."
           }
         }
       },
@@ -8993,7 +9845,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IngestFailure"
-            }
+            },
+            "description": "Events that failed to ingest. Omitted when no failures."
           }
         }
       },
@@ -9246,6 +10099,17 @@
           "created_at"
         ],
         "properties": {
+          "consolidated_into_invoice_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/InvoiceId",
+                "description": "Set on `invoice.consolidated`: the parent invoice this one was merged into."
+              }
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -9492,6 +10356,130 @@
           "per_unit_price": {
             "type": "string",
             "format": "decimal"
+          }
+        }
+      },
+      "MeteredEffectiveEntitlementValue": {
+        "type": "object",
+        "required": [
+          "spec",
+          "usage"
+        ],
+        "properties": {
+          "spec": {
+            "$ref": "#/components/schemas/MeteredEntitlementSpec"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/MeteredEntitlementUsage"
+          }
+        }
+      },
+      "MeteredEntitlementSpec": {
+        "type": "object",
+        "required": [
+          "metric_id",
+          "reset_period",
+          "enabled"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "limit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "decimal"
+          },
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "reset_period": {
+            "$ref": "#/components/schemas/ResetPeriod"
+          }
+        }
+      },
+      "MeteredEntitlementUsage": {
+        "type": "object",
+        "properties": {
+          "consumed": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "decimal"
+          },
+          "remaining": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "decimal"
+          },
+          "reset_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "MeteredEntitlementValue": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Per-entitlement kill switch. `false` means disabled."
+          },
+          "limit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "decimal",
+            "description": "Cap on usage. Null means unlimited."
+          },
+          "reset_period": {
+            "$ref": "#/components/schemas/ResetPeriod"
+          }
+        }
+      },
+      "MeteredFeatureType": {
+        "type": "object",
+        "required": [
+          "metric_id"
+        ],
+        "properties": {
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          }
+        }
+      },
+      "MeteredResolvedEntitlementValue": {
+        "type": "object",
+        "required": [
+          "metric_id",
+          "reset_period",
+          "enabled"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "limit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "decimal"
+          },
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "reset_period": {
+            "$ref": "#/components/schemas/ResetPeriod"
           }
         }
       },
@@ -9830,6 +10818,10 @@
             "format": "decimal"
           }
         }
+      },
+      "NeverResetPeriod": {
+        "type": "object",
+        "description": "Never resets — counts all usage since the subscription was activated."
       },
       "NewProductRef": {
         "type": "object",
@@ -10373,6 +11365,12 @@
               "string",
               "null"
             ]
+          },
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Entitlement"
+            }
           },
           "id": {
             "$ref": "#/components/schemas/PlanId"
@@ -11240,6 +12238,87 @@
           }
         }
       },
+      "ResetPeriod": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BillingCycleResetPeriod",
+            "description": "Resets each time your subscription renews — anchored to your billing cycle."
+          },
+          {
+            "$ref": "#/components/schemas/CalendarResetPeriod",
+            "description": "Resets on calendar boundaries (e.g. the 1st of every month) — not tied to subscription start date."
+          },
+          {
+            "$ref": "#/components/schemas/FixedWindowResetPeriod",
+            "description": "Resets at regular intervals — anchored to your subscription's exact activation time."
+          },
+          {
+            "$ref": "#/components/schemas/SlidingWindowResetPeriod",
+            "description": "Always ends at now — e.g. 30 days means the last 30 days, old usage drops off automatically."
+          },
+          {
+            "$ref": "#/components/schemas/NeverResetPeriod",
+            "description": "Never resets — counts all usage since the subscription was activated."
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "BILLING_CYCLE": "#/components/schemas/BillingCycleResetPeriod",
+            "CALENDAR": "#/components/schemas/CalendarResetPeriod",
+            "FIXED_WINDOW": "#/components/schemas/FixedWindowResetPeriod",
+            "NEVER": "#/components/schemas/NeverResetPeriod",
+            "SLIDING_WINDOW": "#/components/schemas/SlidingWindowResetPeriod"
+          }
+        }
+      },
+      "ResolvedEntitlement": {
+        "type": "object",
+        "description": "Merged entitlement value for a feature across the priority hierarchy, without usage data.",
+        "required": [
+          "feature",
+          "value"
+        ],
+        "properties": {
+          "feature": {
+            "$ref": "#/components/schemas/FeatureRef"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ResolvedEntitlementValue"
+          }
+        }
+      },
+      "ResolvedEntitlementListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResolvedEntitlement"
+            }
+          }
+        }
+      },
+      "ResolvedEntitlementValue": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BooleanResolvedEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/MeteredResolvedEntitlementValue"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "BOOLEAN": "#/components/schemas/BooleanResolvedEntitlementValue",
+            "METERED": "#/components/schemas/MeteredResolvedEntitlementValue"
+          }
+        }
+      },
       "RestErrorResponse": {
         "type": "object",
         "required": [
@@ -11309,6 +12388,24 @@
           },
           "same_as_billing": {
             "type": "boolean"
+          }
+        }
+      },
+      "SlidingWindowResetPeriod": {
+        "type": "object",
+        "description": "Always ends at now — e.g. 30 days means the last 30 days, old usage drops off automatically.",
+        "required": [
+          "unit",
+          "interval"
+        ],
+        "properties": {
+          "interval": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "unit": {
+            "$ref": "#/components/schemas/CalendarUnit"
           }
         }
       },
@@ -12010,6 +13107,12 @@
             ],
             "format": "date",
             "description": "When the subscription ends (if set)"
+          },
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Entitlement"
+            }
           },
           "id": {
             "$ref": "#/components/schemas/SubscriptionId"
@@ -13090,12 +14193,45 @@
   },
   "tags": [
     {
+      "name": "Add-ons"
+    },
+    {
+      "name": "Batch Jobs"
+    },
+    {
+      "name": "Checkout Sessions"
+    },
+    {
       "name": "Connect",
       "description": "Manage connected accounts (Express & Standard)"
     },
     {
+      "name": "Coupons"
+    },
+    {
+      "name": "Credit Notes"
+    },
+    {
+      "name": "Customers"
+    },
+    {
+      "name": "Entitlements"
+    },
+    {
+      "name": "Events"
+    },
+    {
+      "name": "Features"
+    },
+    {
+      "name": "Invoices"
+    },
+    {
       "name": "Meteroid",
       "description": "Meteroid API"
+    },
+    {
+      "name": "Metrics"
     },
     {
       "name": "OAuth",
@@ -13104,6 +14240,21 @@
     {
       "name": "OAuth Apps",
       "description": "Manage OAuth applications for Connect integrations"
+    },
+    {
+      "name": "Plans"
+    },
+    {
+      "name": "Product Families"
+    },
+    {
+      "name": "Products"
+    },
+    {
+      "name": "Subscriptions"
+    },
+    {
+      "name": "Usage"
     }
   ],
   "webhooks": {
@@ -13497,6 +14648,43 @@
                 ],
                 "phone": "+1-555-0123",
                 "currency": "USD",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "invoice.consolidated": {
+      "post": {
+        "summary": "invoice.consolidated webhook",
+        "description": "An invoice was merged into a consolidated invoice and is superseded by its parent",
+        "operationId": "webhook_invoice_consolidated",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.consolidated",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "DRAFT",
+                "currency": "EUR",
+                "total": 10000,
+                "tax_amount": 2000,
+                "created_at": "1970-01-01T00:00:00.000Z",
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }

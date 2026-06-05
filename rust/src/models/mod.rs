@@ -24,10 +24,17 @@ pub mod batch_job_status;
 pub mod batch_job_type;
 pub mod billable_metric_id;
 pub mod billing_config;
+pub mod billing_cycle_reset_period;
 pub mod billing_metric_aggregate_enum;
 pub mod billing_period_enum;
 pub mod billing_type;
 pub mod billing_type_enum;
+pub mod boolean_effective_entitlement_value;
+pub mod boolean_entitlement_value;
+pub mod boolean_feature_type;
+pub mod boolean_resolved_entitlement_value;
+pub mod calendar_reset_period;
+pub mod calendar_unit;
 pub mod cancel_checkout_session_response;
 pub mod cancel_subscription_request;
 pub mod cancel_subscription_response;
@@ -87,6 +94,12 @@ pub mod customer_payment_method_id;
 pub mod customer_portal_token_response;
 pub mod customer_update_request;
 pub mod double_segmentation_matrix;
+pub mod effective_entitlement;
+pub mod effective_entitlement_list_response;
+pub mod effective_entitlement_value;
+pub mod entitlement;
+pub mod entitlement_id;
+pub mod entitlement_value;
 pub mod event;
 pub mod event_id;
 pub mod event_type;
@@ -98,8 +111,15 @@ pub mod extra_recurring_billing_type_enum;
 pub mod extra_recurring_fee_structure;
 pub mod extra_recurring_plan_fee;
 pub mod extra_recurring_pricing;
+pub mod feature;
+pub mod feature_id;
+pub mod feature_list_response;
+pub mod feature_ref;
+pub mod feature_status;
+pub mod feature_type;
 pub mod fee;
 pub mod fixed_discount;
+pub mod fixed_window_reset_period;
 pub mod get_checkout_session_response;
 pub mod grouped_usage;
 pub mod ingest_events_request;
@@ -122,6 +142,12 @@ pub mod matrix_dimension;
 pub mod matrix_plan_pricing;
 pub mod matrix_pricing;
 pub mod matrix_row;
+pub mod metered_effective_entitlement_value;
+pub mod metered_entitlement_spec;
+pub mod metered_entitlement_usage;
+pub mod metered_entitlement_value;
+pub mod metered_feature_type;
+pub mod metered_resolved_entitlement_value;
 pub mod metric;
 pub mod metric_dimension;
 pub mod metric_event;
@@ -130,6 +156,7 @@ pub mod metric_list_response;
 pub mod metric_segmentation_matrix;
 pub mod metric_summary;
 pub mod metric_usage;
+pub mod never_reset_period;
 pub mod new_product_ref;
 pub mod o_auth_app;
 pub mod o_auth_app_id;
@@ -198,9 +225,14 @@ pub mod rate_plan_fee;
 pub mod rate_pricing;
 pub mod recurring_fee;
 pub mod replace_plan_request;
+pub mod reset_period;
+pub mod resolved_entitlement;
+pub mod resolved_entitlement_list_response;
+pub mod resolved_entitlement_value;
 pub mod revocation_request;
 pub mod rotated_secret;
 pub mod shipping_address;
+pub mod sliding_window_reset_period;
 pub mod slot_downgrade_policy_enum;
 pub mod slot_fee;
 pub mod slot_fee_structure;
@@ -271,9 +303,14 @@ pub use self::{
     batch_job_list_response::BatchJobListResponse, batch_job_response::BatchJobResponse,
     batch_job_status::BatchJobStatus, batch_job_type::BatchJobType,
     billable_metric_id::BillableMetricId, billing_config::BillingConfig,
+    billing_cycle_reset_period::BillingCycleResetPeriod,
     billing_metric_aggregate_enum::BillingMetricAggregateEnum,
     billing_period_enum::BillingPeriodEnum, billing_type::BillingType,
     billing_type_enum::BillingTypeEnum,
+    boolean_effective_entitlement_value::BooleanEffectiveEntitlementValue,
+    boolean_entitlement_value::BooleanEntitlementValue, boolean_feature_type::BooleanFeatureType,
+    boolean_resolved_entitlement_value::BooleanResolvedEntitlementValue,
+    calendar_reset_period::CalendarResetPeriod, calendar_unit::CalendarUnit,
     cancel_checkout_session_response::CancelCheckoutSessionResponse,
     cancel_subscription_request::CancelSubscriptionRequest,
     cancel_subscription_response::CancelSubscriptionResponse, capacity_fee::CapacityFee,
@@ -307,14 +344,21 @@ pub use self::{
     customer_payment_method_id::CustomerPaymentMethodId,
     customer_portal_token_response::CustomerPortalTokenResponse,
     customer_update_request::CustomerUpdateRequest,
-    double_segmentation_matrix::DoubleSegmentationMatrix, event::Event, event_id::EventId,
-    event_type::EventType, existing_price_ref::ExistingPriceRef,
+    double_segmentation_matrix::DoubleSegmentationMatrix,
+    effective_entitlement::EffectiveEntitlement,
+    effective_entitlement_list_response::EffectiveEntitlementListResponse,
+    effective_entitlement_value::EffectiveEntitlementValue, entitlement::Entitlement,
+    entitlement_id::EntitlementId, entitlement_value::EntitlementValue, event::Event,
+    event_id::EventId, event_type::EventType, existing_price_ref::ExistingPriceRef,
     existing_product_ref::ExistingProductRef,
     external_payment_method_config::ExternalPaymentMethodConfig, extra_component::ExtraComponent,
     extra_recurring_billing_type_enum::ExtraRecurringBillingTypeEnum,
     extra_recurring_fee_structure::ExtraRecurringFeeStructure,
     extra_recurring_plan_fee::ExtraRecurringPlanFee,
-    extra_recurring_pricing::ExtraRecurringPricing, fee::Fee, fixed_discount::FixedDiscount,
+    extra_recurring_pricing::ExtraRecurringPricing, feature::Feature, feature_id::FeatureId,
+    feature_list_response::FeatureListResponse, feature_ref::FeatureRef,
+    feature_status::FeatureStatus, feature_type::FeatureType, fee::Fee,
+    fixed_discount::FixedDiscount, fixed_window_reset_period::FixedWindowResetPeriod,
     get_checkout_session_response::GetCheckoutSessionResponse, grouped_usage::GroupedUsage,
     ingest_events_request::IngestEventsRequest, ingest_events_response::IngestEventsResponse,
     ingest_failure::IngestFailure, introspection_request::IntrospectionRequest, invoice::Invoice,
@@ -325,17 +369,22 @@ pub use self::{
     linked_segmentation_matrix::LinkedSegmentationMatrix,
     list_checkout_sessions_response::ListCheckoutSessionsResponse,
     matrix_dimension::MatrixDimension, matrix_plan_pricing::MatrixPlanPricing,
-    matrix_pricing::MatrixPricing, matrix_row::MatrixRow, metric::Metric,
+    matrix_pricing::MatrixPricing, matrix_row::MatrixRow,
+    metered_effective_entitlement_value::MeteredEffectiveEntitlementValue,
+    metered_entitlement_spec::MeteredEntitlementSpec,
+    metered_entitlement_usage::MeteredEntitlementUsage,
+    metered_entitlement_value::MeteredEntitlementValue, metered_feature_type::MeteredFeatureType,
+    metered_resolved_entitlement_value::MeteredResolvedEntitlementValue, metric::Metric,
     metric_dimension::MetricDimension, metric_event::MetricEvent,
     metric_event_data::MetricEventData, metric_list_response::MetricListResponse,
     metric_segmentation_matrix::MetricSegmentationMatrix, metric_summary::MetricSummary,
-    metric_usage::MetricUsage, new_product_ref::NewProductRef, o_auth_app::OAuthApp,
-    o_auth_app_id::OAuthAppId, o_auth_app_with_secret::OAuthAppWithSecret,
-    o_auth_apps_response::OAuthAppsResponse, onboarding_link_response::OnboardingLinkResponse,
-    onboarding_mode::OnboardingMode, one_time_fee::OneTimeFee,
-    one_time_fee_structure::OneTimeFeeStructure, one_time_plan_fee::OneTimePlanFee,
-    one_time_pricing::OneTimePricing, online_method_config::OnlineMethodConfig,
-    online_methods_config::OnlineMethodsConfig,
+    metric_usage::MetricUsage, never_reset_period::NeverResetPeriod,
+    new_product_ref::NewProductRef, o_auth_app::OAuthApp, o_auth_app_id::OAuthAppId,
+    o_auth_app_with_secret::OAuthAppWithSecret, o_auth_apps_response::OAuthAppsResponse,
+    onboarding_link_response::OnboardingLinkResponse, onboarding_mode::OnboardingMode,
+    one_time_fee::OneTimeFee, one_time_fee_structure::OneTimeFeeStructure,
+    one_time_plan_fee::OneTimePlanFee, one_time_pricing::OneTimePricing,
+    online_method_config::OnlineMethodConfig, online_methods_config::OnlineMethodsConfig,
     online_payment_method_config::OnlinePaymentMethodConfig, organization_id::OrganizationId,
     package_plan_pricing::PackagePlanPricing, package_pricing::PackagePricing,
     pagination_response::PaginationResponse, patch_plan_request::PatchPlanRequest,
@@ -359,8 +408,12 @@ pub use self::{
     quote_event::QuoteEvent, quote_event_data::QuoteEventData, quote_id::QuoteId,
     rate_fee::RateFee, rate_fee_structure::RateFeeStructure, rate_plan_fee::RatePlanFee,
     rate_pricing::RatePricing, recurring_fee::RecurringFee,
-    replace_plan_request::ReplacePlanRequest, revocation_request::RevocationRequest,
+    replace_plan_request::ReplacePlanRequest, reset_period::ResetPeriod,
+    resolved_entitlement::ResolvedEntitlement,
+    resolved_entitlement_list_response::ResolvedEntitlementListResponse,
+    resolved_entitlement_value::ResolvedEntitlementValue, revocation_request::RevocationRequest,
     rotated_secret::RotatedSecret, shipping_address::ShippingAddress,
+    sliding_window_reset_period::SlidingWindowResetPeriod,
     slot_downgrade_policy_enum::SlotDowngradePolicyEnum, slot_fee::SlotFee,
     slot_fee_structure::SlotFeeStructure, slot_plan_fee::SlotPlanFee, slot_pricing::SlotPricing,
     slot_upgrade_policy_enum::SlotUpgradePolicyEnum, sub_line_item::SubLineItem,

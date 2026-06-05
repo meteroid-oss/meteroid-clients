@@ -10,6 +10,7 @@ import com.meteroid.models.CustomerListResponse;
 import com.meteroid.models.CustomerPatchRequest;
 import com.meteroid.models.CustomerPortalTokenResponse;
 import com.meteroid.models.CustomerUpdateRequest;
+import com.meteroid.models.EffectiveEntitlementListResponse;
 
 import okhttp3.HttpUrl;
 
@@ -102,6 +103,17 @@ public class Customers {
                         .encodedPath(String.format("/api/v1/customers/%s", idOrAlias));
         return this.client.executeRequest(
                 "PATCH", url.build(), null, customerPatchRequest, Customer.class);
+    }
+
+    /** */
+    public EffectiveEntitlementListResponse getEffectiveEntitlements(final String idOrAlias)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(String.format("/api/v1/customers/%s/entitlements", idOrAlias));
+        return this.client.executeRequest(
+                "GET", url.build(), null, null, EffectiveEntitlementListResponse.class);
     }
 
     /**

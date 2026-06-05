@@ -69,6 +69,7 @@ public class SubscriptionDetails {
     @JsonProperty("end_date")
     private String endDate;
 
+    @JsonProperty private List<Entitlement> entitlements;
     @JsonProperty private String id;
 
     @JsonProperty("invoice_memo")
@@ -458,6 +459,34 @@ public class SubscriptionDetails {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public SubscriptionDetails entitlements(List<Entitlement> entitlements) {
+        this.entitlements = entitlements;
+        return this;
+    }
+
+    public SubscriptionDetails addEntitlementsItem(Entitlement entitlementsItem) {
+        if (this.entitlements == null) {
+            this.entitlements = new ArrayList<>();
+        }
+        this.entitlements.add(entitlementsItem);
+
+        return this;
+    }
+
+    /**
+     * Get entitlements
+     *
+     * @return entitlements
+     */
+    @javax.annotation.Nullable
+    public List<Entitlement> getEntitlements() {
+        return entitlements;
+    }
+
+    public void setEntitlements(List<Entitlement> entitlements) {
+        this.entitlements = entitlements;
     }
 
     public SubscriptionDetails id(String id) {

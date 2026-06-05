@@ -6,6 +6,7 @@ import com.meteroid.Utils;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.CancelSubscriptionRequest;
 import com.meteroid.models.CancelSubscriptionResponse;
+import com.meteroid.models.EffectiveEntitlementListResponse;
 import com.meteroid.models.SubscriptionCreateRequest;
 import com.meteroid.models.SubscriptionDetails;
 import com.meteroid.models.SubscriptionListResponse;
@@ -108,5 +109,18 @@ public class Subscriptions {
                 null,
                 cancelSubscriptionRequest,
                 CancelSubscriptionResponse.class);
+    }
+
+    /** */
+    public EffectiveEntitlementListResponse listSubscriptionEntitlements(
+            final String subscriptionId) throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(
+                                String.format(
+                                        "/api/v1/subscriptions/%s/entitlements", subscriptionId));
+        return this.client.executeRequest(
+                "GET", url.build(), null, null, EffectiveEntitlementListResponse.class);
     }
 }

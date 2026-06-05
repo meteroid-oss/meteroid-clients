@@ -7,6 +7,7 @@ import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.AddOn;
 import com.meteroid.models.AddOnListResponse;
 import com.meteroid.models.CreateAddOnRequest;
+import com.meteroid.models.ResolvedEntitlementListResponse;
 import com.meteroid.models.UpdateAddOnRequest;
 
 import okhttp3.HttpUrl;
@@ -87,6 +88,17 @@ public class AddOns {
                         .newUrlBuilder()
                         .encodedPath(String.format("/api/v1/addons/%s/archive", addonId));
         this.client.executeRequest("POST", url.build(), null, null, null);
+    }
+
+    /** */
+    public ResolvedEntitlementListResponse listAddOnEntitlements(final String addonId)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(String.format("/api/v1/addons/%s/entitlements", addonId));
+        return this.client.executeRequest(
+                "GET", url.build(), null, null, ResolvedEntitlementListResponse.class);
     }
 
     /** */

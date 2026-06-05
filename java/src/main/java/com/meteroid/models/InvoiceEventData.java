@@ -18,6 +18,9 @@ import java.time.OffsetDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class InvoiceEventData {
+    @JsonProperty("consolidated_into_invoice_id")
+    private String consolidatedIntoInvoiceId;
+
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
@@ -37,6 +40,25 @@ public class InvoiceEventData {
     @JsonProperty private Long total;
 
     public InvoiceEventData() {}
+
+    public InvoiceEventData consolidatedIntoInvoiceId(String consolidatedIntoInvoiceId) {
+        this.consolidatedIntoInvoiceId = consolidatedIntoInvoiceId;
+        return this;
+    }
+
+    /**
+     * Get consolidatedIntoInvoiceId
+     *
+     * @return consolidatedIntoInvoiceId
+     */
+    @javax.annotation.Nullable
+    public String getConsolidatedIntoInvoiceId() {
+        return consolidatedIntoInvoiceId;
+    }
+
+    public void setConsolidatedIntoInvoiceId(String consolidatedIntoInvoiceId) {
+        this.consolidatedIntoInvoiceId = consolidatedIntoInvoiceId;
+    }
 
     public InvoiceEventData createdAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;

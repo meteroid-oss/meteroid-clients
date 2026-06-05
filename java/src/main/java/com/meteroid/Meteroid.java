@@ -48,6 +48,8 @@ public class Meteroid {
 
     private final Events events;
 
+    private final Features features;
+
     private final Invoices invoices;
 
     private final Metrics metrics;
@@ -110,6 +112,8 @@ public class Meteroid {
         this.customers = new Customers(httpClient);
 
         this.events = new Events(httpClient);
+
+        this.features = new Features(httpClient);
 
         this.invoices = new Invoices(httpClient);
 

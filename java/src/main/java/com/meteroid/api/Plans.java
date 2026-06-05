@@ -10,6 +10,7 @@ import com.meteroid.models.Plan;
 import com.meteroid.models.PlanListResponse;
 import com.meteroid.models.PlanVersionListResponse;
 import com.meteroid.models.ReplacePlanRequest;
+import com.meteroid.models.ResolvedEntitlementListResponse;
 
 import okhttp3.HttpUrl;
 
@@ -20,6 +21,19 @@ public class Plans {
 
     public Plans(MeteroidHttpClient client) {
         this.client = client;
+    }
+
+    /** */
+    public ResolvedEntitlementListResponse listPlanVersionEntitlements(final String planVersionId)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(
+                                String.format(
+                                        "/api/v1/plan-versions/%s/entitlements", planVersionId));
+        return this.client.executeRequest(
+                "GET", url.build(), null, null, ResolvedEntitlementListResponse.class);
     }
 
     /** */

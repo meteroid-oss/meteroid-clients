@@ -2,8 +2,8 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    add_on_id::AddOnId, price_id::PriceId, product_fee_type_enum::ProductFeeTypeEnum,
-    product_id::ProductId,
+    add_on_id::AddOnId, entitlement::Entitlement, price_id::PriceId,
+    product_fee_type_enum::ProductFeeTypeEnum, product_id::ProductId,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -15,6 +15,9 @@ pub struct AddOn {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entitlements: Option<Vec<Entitlement>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fee_type: Option<ProductFeeTypeEnum>,
@@ -46,6 +49,7 @@ impl AddOn {
             archived_at: None,
             created_at,
             description: None,
+            entitlements: None,
             fee_type: None,
             id,
             max_instances_per_subscription: None,

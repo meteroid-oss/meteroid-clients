@@ -102,6 +102,19 @@ impl<'a> Customers<'a> {
             .await
     }
 
+    pub async fn get_effective_entitlements(
+        &self,
+        id_or_alias: String,
+    ) -> Result<crate::models::EffectiveEntitlementListResponse> {
+        crate::request::Request::new(
+            http1::Method::GET,
+            "/api/v1/customers/{id_or_alias}/entitlements",
+        )
+        .with_path_param("id_or_alias", id_or_alias)
+        .execute(self.cfg)
+        .await
+    }
+
     /// Generates a JWT token that grants access to the customer portal.
     /// The token can be used to access invoices, payment methods, and other portal features.
     pub async fn create_portal_token(

@@ -31,6 +31,7 @@ public class Plan {
 
     @JsonProperty private String currency;
     @JsonProperty private String description;
+    @JsonProperty private List<Entitlement> entitlements;
     @JsonProperty private String id;
     @JsonProperty private String name;
 
@@ -154,6 +155,34 @@ public class Plan {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Plan entitlements(List<Entitlement> entitlements) {
+        this.entitlements = entitlements;
+        return this;
+    }
+
+    public Plan addEntitlementsItem(Entitlement entitlementsItem) {
+        if (this.entitlements == null) {
+            this.entitlements = new ArrayList<>();
+        }
+        this.entitlements.add(entitlementsItem);
+
+        return this;
+    }
+
+    /**
+     * Get entitlements
+     *
+     * @return entitlements
+     */
+    @javax.annotation.Nullable
+    public List<Entitlement> getEntitlements() {
+        return entitlements;
+    }
+
+    public void setEntitlements(List<Entitlement> entitlements) {
+        this.entitlements = entitlements;
     }
 
     public Plan id(String id) {

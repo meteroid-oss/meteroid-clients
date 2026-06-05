@@ -38,7 +38,7 @@ public class Event {
     }
 
     /**
-     * Get code
+     * Billable metric code. Max 512 characters.
      *
      * @return code
      */
@@ -57,7 +57,7 @@ public class Event {
     }
 
     /**
-     * Either Meteroid&#x27;s customer_id or an alias
+     * Meteroid customer ID or external customer alias.
      *
      * @return customerId
      */
@@ -76,7 +76,7 @@ public class Event {
     }
 
     /**
-     * Get eventId
+     * Unique event identifier. Max 255 characters. A UUID or ULID is recommended.
      *
      * @return eventId
      */
@@ -104,7 +104,7 @@ public class Event {
     }
 
     /**
-     * Get properties
+     * Arbitrary string key-value pairs used by billable metrics for filtering and aggregation.
      *
      * @return properties
      */
@@ -123,7 +123,8 @@ public class Event {
     }
 
     /**
-     * Get timestamp
+     * RFC 3339 timestamp. Defaults to ingestion time if omitted. Must be between 24 hours ago and 1
+     * hour from now. Set `allow_backfilling` to remove the past limit.
      *
      * @return timestamp
      */

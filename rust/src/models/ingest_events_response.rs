@@ -5,6 +5,7 @@ use super::ingest_failure::IngestFailure;
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct IngestEventsResponse {
+    /// Events that failed to ingest. Omitted when no failures.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub failures: Option<Vec<IngestFailure>>,
 }
