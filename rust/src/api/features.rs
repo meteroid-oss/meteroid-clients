@@ -51,9 +51,9 @@ impl<'a> Features<'a> {
             .await
     }
 
-    pub async fn get_feature(&self, feature_id: String) -> Result<crate::models::Feature> {
-        crate::request::Request::new(http1::Method::GET, "/api/v1/features/{feature_id}")
-            .with_path_param("feature_id", feature_id)
+    pub async fn get_feature(&self, id_or_code: String) -> Result<crate::models::Feature> {
+        crate::request::Request::new(http1::Method::GET, "/api/v1/features/{id_or_code}")
+            .with_path_param("id_or_code", id_or_code)
             .execute(self.cfg)
             .await
     }

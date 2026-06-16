@@ -16,11 +16,31 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class FeatureRef {
+    @JsonProperty private String code;
     @JsonProperty private String id;
     @JsonProperty private String name;
     @JsonProperty private ProductRef product;
 
     public FeatureRef() {}
+
+    public FeatureRef code(String code) {
+        this.code = code;
+        return this;
+    }
+
+    /**
+     * Customer-provided unique identifier, scoped per tenant.
+     *
+     * @return code
+     */
+    @javax.annotation.Nonnull
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public FeatureRef id(String id) {
         this.id = id;

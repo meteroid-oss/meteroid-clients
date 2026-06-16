@@ -18,6 +18,8 @@ import java.time.OffsetDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class Feature {
+    @JsonProperty private String code;
+
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
@@ -33,6 +35,25 @@ public class Feature {
     @JsonProperty private FeatureStatus status;
 
     public Feature() {}
+
+    public Feature code(String code) {
+        this.code = code;
+        return this;
+    }
+
+    /**
+     * Customer-provided unique identifier, scoped per tenant.
+     *
+     * @return code
+     */
+    @javax.annotation.Nonnull
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public Feature createdAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;

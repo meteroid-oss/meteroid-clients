@@ -8,6 +8,9 @@ use super::{
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Feature {
+    /// Customer-provided unique identifier, scoped per tenant.
+    pub code: String,
+
     pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,6 +33,7 @@ pub struct Feature {
 
 impl Feature {
     pub fn new(
+        code: String,
         created_at: String,
         feature_type: FeatureType,
         id: FeatureId,
@@ -37,6 +41,7 @@ impl Feature {
         status: FeatureStatus,
     ) -> Self {
         Self {
+            code,
             created_at,
             description: None,
             entitlement: None,
