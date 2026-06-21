@@ -5,7 +5,7 @@ use super::{feature_id::FeatureId, product_ref::ProductRef};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct FeatureRef {
-    /// Customer-provided unique identifier, scoped per tenant.
+    /// Unique key used to reference this feature in your code. Cannot be changed after creation.
     pub code: String,
 
     pub id: FeatureId,

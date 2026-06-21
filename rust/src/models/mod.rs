@@ -7,6 +7,7 @@ pub mod add_on_event_data;
 pub mod add_on_id;
 pub mod add_on_list_response;
 pub mod address;
+pub mod all_components_scope;
 pub mod applied_coupon;
 pub mod applied_coupon_detailed;
 pub mod applied_coupon_id;
@@ -50,6 +51,7 @@ pub mod checkout_type;
 pub mod component_override;
 pub mod component_parameterization;
 pub mod component_parameters;
+pub mod components_scope;
 pub mod connected_account;
 pub mod connected_account_id;
 pub mod connected_accounts_response;
@@ -156,6 +158,10 @@ pub mod metric_list_response;
 pub mod metric_segmentation_matrix;
 pub mod metric_summary;
 pub mod metric_usage;
+pub mod minimum_commitment;
+pub mod minimum_commitment_input;
+pub mod minimum_commitment_input_scope;
+pub mod minimum_commitment_scope;
 pub mod never_reset_period;
 pub mod new_product_ref;
 pub mod o_auth_app;
@@ -216,6 +222,7 @@ pub mod product_fee_type_enum;
 pub mod product_id;
 pub mod product_list_response;
 pub mod product_ref;
+pub mod products_scope;
 pub mod quote_event;
 pub mod quote_event_data;
 pub mod quote_id;
@@ -293,7 +300,8 @@ pub mod validation_error;
 
 pub use self::{
     add_on::AddOn, add_on_event::AddOnEvent, add_on_event_data::AddOnEventData, add_on_id::AddOnId,
-    add_on_list_response::AddOnListResponse, address::Address, applied_coupon::AppliedCoupon,
+    add_on_list_response::AddOnListResponse, address::Address,
+    all_components_scope::AllComponentsScope, applied_coupon::AppliedCoupon,
     applied_coupon_detailed::AppliedCouponDetailed, applied_coupon_id::AppliedCouponId,
     available_parameters::AvailableParameters, bank_account_id::BankAccountId,
     bank_transfer_payment_method_config::BankTransferPaymentMethodConfig,
@@ -319,8 +327,8 @@ pub use self::{
     checkout_session::CheckoutSession, checkout_session_id::CheckoutSessionId,
     checkout_session_status::CheckoutSessionStatus, checkout_type::CheckoutType,
     component_override::ComponentOverride, component_parameterization::ComponentParameterization,
-    component_parameters::ComponentParameters, connected_account::ConnectedAccount,
-    connected_account_id::ConnectedAccountId,
+    component_parameters::ComponentParameters, components_scope::ComponentsScope,
+    connected_account::ConnectedAccount, connected_account_id::ConnectedAccountId,
     connected_accounts_response::ConnectedAccountsResponse, connection_status::ConnectionStatus,
     connection_type::ConnectionType, country_code::CountryCode, coupon::Coupon,
     coupon_discount::CouponDiscount, coupon_event::CouponEvent, coupon_event_data::CouponEventData,
@@ -378,7 +386,10 @@ pub use self::{
     metric_dimension::MetricDimension, metric_event::MetricEvent,
     metric_event_data::MetricEventData, metric_list_response::MetricListResponse,
     metric_segmentation_matrix::MetricSegmentationMatrix, metric_summary::MetricSummary,
-    metric_usage::MetricUsage, never_reset_period::NeverResetPeriod,
+    metric_usage::MetricUsage, minimum_commitment::MinimumCommitment,
+    minimum_commitment_input::MinimumCommitmentInput,
+    minimum_commitment_input_scope::MinimumCommitmentInputScope,
+    minimum_commitment_scope::MinimumCommitmentScope, never_reset_period::NeverResetPeriod,
     new_product_ref::NewProductRef, o_auth_app::OAuthApp, o_auth_app_id::OAuthAppId,
     o_auth_app_with_secret::OAuthAppWithSecret, o_auth_apps_response::OAuthAppsResponse,
     onboarding_link_response::OnboardingLinkResponse, onboarding_mode::OnboardingMode,
@@ -405,9 +416,9 @@ pub use self::{
     product_family_id::ProductFamilyId, product_family_list_response::ProductFamilyListResponse,
     product_fee_structure::ProductFeeStructure, product_fee_type_enum::ProductFeeTypeEnum,
     product_id::ProductId, product_list_response::ProductListResponse, product_ref::ProductRef,
-    quote_event::QuoteEvent, quote_event_data::QuoteEventData, quote_id::QuoteId,
-    rate_fee::RateFee, rate_fee_structure::RateFeeStructure, rate_plan_fee::RatePlanFee,
-    rate_pricing::RatePricing, recurring_fee::RecurringFee,
+    products_scope::ProductsScope, quote_event::QuoteEvent, quote_event_data::QuoteEventData,
+    quote_id::QuoteId, rate_fee::RateFee, rate_fee_structure::RateFeeStructure,
+    rate_plan_fee::RatePlanFee, rate_pricing::RatePricing, recurring_fee::RecurringFee,
     replace_plan_request::ReplacePlanRequest, reset_period::ResetPeriod,
     resolved_entitlement::ResolvedEntitlement,
     resolved_entitlement_list_response::ResolvedEntitlementListResponse,

@@ -42,7 +42,7 @@ public class Feature {
     }
 
     /**
-     * Customer-provided unique identifier, scoped per tenant.
+     * Unique key used to reference this feature in your code. Cannot be changed after creation.
      *
      * @return code
      */

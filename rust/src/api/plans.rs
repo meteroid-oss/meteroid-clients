@@ -100,6 +100,32 @@ impl<'a> Plans<'a> {
             .await
     }
 
+    pub async fn set_plan_minimum(
+        &self,
+        plan_version_id: String,
+        minimum_commitment: crate::models::MinimumCommitment,
+    ) -> Result<crate::models::MinimumCommitment> {
+        crate::request::Request::new(
+            http1::Method::PUT,
+            "/api/v1/plans/versions/{plan_version_id}/minimum",
+        )
+        .with_path_param("plan_version_id", plan_version_id)
+        .with_body_param(minimum_commitment)
+        .execute(self.cfg)
+        .await
+    }
+
+    pub async fn delete_plan_minimum(&self, plan_version_id: String) -> Result<()> {
+        crate::request::Request::new(
+            http1::Method::DELETE,
+            "/api/v1/plans/versions/{plan_version_id}/minimum",
+        )
+        .with_path_param("plan_version_id", plan_version_id)
+        .returns_nothing()
+        .execute(self.cfg)
+        .await
+    }
+
     /// Retrieve a specific plan. Use `?version=draft` for the draft version,
     /// `?version=2` for a specific version number, or omit for the active version.
     pub async fn get_plan_details(

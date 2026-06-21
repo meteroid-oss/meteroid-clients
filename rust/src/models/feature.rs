@@ -8,7 +8,7 @@ use super::{
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Feature {
-    /// Customer-provided unique identifier, scoped per tenant.
+    /// Unique key used to reference this feature in your code. Cannot be changed after creation.
     pub code: String,
 
     pub created_at: String,

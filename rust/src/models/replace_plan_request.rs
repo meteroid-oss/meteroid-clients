@@ -2,9 +2,9 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    billing_config::BillingConfig, plan_add_on_input::PlanAddOnInput,
-    plan_status_enum::PlanStatusEnum, price_component_input::PriceComponentInput,
-    trial_config::TrialConfig,
+    billing_config::BillingConfig, minimum_commitment_input::MinimumCommitmentInput,
+    plan_add_on_input::PlanAddOnInput, plan_status_enum::PlanStatusEnum,
+    price_component_input::PriceComponentInput, trial_config::TrialConfig,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -21,6 +21,9 @@ pub struct ReplacePlanRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_commitment: Option<MinimumCommitmentInput>,
 
     pub name: String,
 
@@ -39,6 +42,7 @@ impl ReplacePlanRequest {
             components,
             currency,
             description: None,
+            minimum_commitment: None,
             name,
             status: None,
             trial: None,

@@ -26,6 +26,10 @@ public class ReplacePlanRequest {
     @JsonProperty private List<PriceComponentInput> components;
     @JsonProperty private String currency;
     @JsonProperty private String description;
+
+    @JsonProperty("minimum_commitment")
+    private MinimumCommitmentInput minimumCommitment;
+
     @JsonProperty private String name;
     @JsonProperty private PlanStatusEnum status;
     @JsonProperty private TrialConfig trial;
@@ -143,6 +147,25 @@ public class ReplacePlanRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ReplacePlanRequest minimumCommitment(MinimumCommitmentInput minimumCommitment) {
+        this.minimumCommitment = minimumCommitment;
+        return this;
+    }
+
+    /**
+     * Get minimumCommitment
+     *
+     * @return minimumCommitment
+     */
+    @javax.annotation.Nullable
+    public MinimumCommitmentInput getMinimumCommitment() {
+        return minimumCommitment;
+    }
+
+    public void setMinimumCommitment(MinimumCommitmentInput minimumCommitment) {
+        this.minimumCommitment = minimumCommitment;
     }
 
     public ReplacePlanRequest name(String name) {
