@@ -4,9 +4,10 @@ use serde::{Deserialize, Serialize};
 use super::{
     applied_coupon_detailed::AppliedCouponDetailed, billing_period_enum::BillingPeriodEnum,
     currency::Currency, customer_id::CustomerId, entitlement::Entitlement,
-    payment_methods_config::PaymentMethodsConfig, plan_id::PlanId, plan_version_id::PlanVersionId,
-    subscription_add_on::SubscriptionAddOn, subscription_component::SubscriptionComponent,
-    subscription_id::SubscriptionId, subscription_status_enum::SubscriptionStatusEnum,
+    minimum_commitment::MinimumCommitment, payment_methods_config::PaymentMethodsConfig,
+    plan_id::PlanId, plan_version_id::PlanVersionId, subscription_add_on::SubscriptionAddOn,
+    subscription_component::SubscriptionComponent, subscription_id::SubscriptionId,
+    subscription_status_enum::SubscriptionStatusEnum,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -69,6 +70,9 @@ pub struct SubscriptionDetails {
     /// Default memo for invoices
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invoice_memo: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_commitment: Option<MinimumCommitment>,
 
     /// Monthly recurring revenue in cents
     pub mrr_cents: i32,
@@ -148,6 +152,7 @@ impl SubscriptionDetails {
             entitlements: None,
             id,
             invoice_memo: None,
+            minimum_commitment: None,
             mrr_cents,
             net_terms,
             payment_methods_config: None,

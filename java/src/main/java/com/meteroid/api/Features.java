@@ -48,11 +48,11 @@ public class Features {
     }
 
     /** */
-    public Feature getFeature(final String featureId) throws IOException, ApiException {
+    public Feature getFeature(final String idOrCode) throws IOException, ApiException {
         HttpUrl.Builder url =
                 this.client
                         .newUrlBuilder()
-                        .encodedPath(String.format("/api/v1/features/%s", featureId));
+                        .encodedPath(String.format("/api/v1/features/%s", idOrCode));
         return this.client.executeRequest("GET", url.build(), null, null, Feature.class);
     }
 }

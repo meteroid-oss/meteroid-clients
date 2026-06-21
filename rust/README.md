@@ -185,7 +185,7 @@ let client = Meteroid::new("your-api-key".to_string(), Some(options));
 
 ```toml
 [dependencies]
-meteroid-rs = { version = "0.23.0", default-features = false, features = ["native-tls", "http1"] }
+meteroid-rs = { version = "0.24.0", default-features = false, features = ["native-tls", "http1"] }
 ```
 
 ## Error Handling

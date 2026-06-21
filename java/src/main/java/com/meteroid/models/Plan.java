@@ -33,6 +33,10 @@ public class Plan {
     @JsonProperty private String description;
     @JsonProperty private List<Entitlement> entitlements;
     @JsonProperty private String id;
+
+    @JsonProperty("minimum_commitment")
+    private MinimumCommitment minimumCommitment;
+
     @JsonProperty private String name;
 
     @JsonProperty("net_terms")
@@ -202,6 +206,25 @@ public class Plan {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Plan minimumCommitment(MinimumCommitment minimumCommitment) {
+        this.minimumCommitment = minimumCommitment;
+        return this;
+    }
+
+    /**
+     * Get minimumCommitment
+     *
+     * @return minimumCommitment
+     */
+    @javax.annotation.Nullable
+    public MinimumCommitment getMinimumCommitment() {
+        return minimumCommitment;
+    }
+
+    public void setMinimumCommitment(MinimumCommitment minimumCommitment) {
+        this.minimumCommitment = minimumCommitment;
     }
 
     public Plan name(String name) {

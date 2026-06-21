@@ -5,6 +5,9 @@ use super::{feature_id::FeatureId, product_ref::ProductRef};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct FeatureRef {
+    /// Unique key used to reference this feature in your code. Cannot be changed after creation.
+    pub code: String,
+
     pub id: FeatureId,
 
     pub name: String,
@@ -14,8 +17,9 @@ pub struct FeatureRef {
 }
 
 impl FeatureRef {
-    pub fn new(id: FeatureId, name: String) -> Self {
+    pub fn new(code: String, id: FeatureId, name: String) -> Self {
         Self {
+            code,
             id,
             name,
             product: None,

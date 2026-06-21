@@ -2946,7 +2946,7 @@
         ]
       }
     },
-    "/api/v1/features/{feature_id}": {
+    "/api/v1/features/{id_or_code}": {
       "get": {
         "tags": [
           "Features"
@@ -2955,12 +2955,12 @@
         "operationId": "get_feature",
         "parameters": [
           {
-            "name": "feature_id",
+            "name": "id_or_code",
             "in": "path",
-            "description": "Feature ID",
+            "description": "Feature ID or code",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/FeatureId"
+              "type": "string"
             }
           }
         ],
@@ -4387,6 +4387,151 @@
           },
           "409": {
             "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/plans/versions/{plan_version_id}/minimum": {
+      "put": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "Set or replace the plan-level minimum commitment for a draft plan version.",
+        "operationId": "set_plan_minimum",
+        "parameters": [
+          {
+            "name": "plan_version_id",
+            "in": "path",
+            "description": "Plan version ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PlanVersionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MinimumCommitment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Minimum commitment saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MinimumCommitment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan version not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "Remove the plan-level minimum commitment for a draft plan version.",
+        "operationId": "delete_plan_minimum",
+        "parameters": [
+          {
+            "name": "plan_version_id",
+            "in": "path",
+            "description": "Plan version ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PlanVersionId"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Minimum commitment removed"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan version not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -6703,6 +6848,10 @@
           }
         }
       },
+      "AllComponentsScope": {
+        "type": "object",
+        "description": "Every revenue line counts toward the floor."
+      },
       "AppliedCoupon": {
         "type": "object",
         "required": [
@@ -7551,6 +7700,21 @@
             ],
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "ComponentsScope": {
+        "type": "object",
+        "description": "Component names — matched against `ReplacePlanRequest::components[].name`.",
+        "required": [
+          "component_names"
+        ],
+        "properties": {
+          "component_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -9583,11 +9747,16 @@
         "required": [
           "id",
           "name",
+          "code",
           "feature_type",
           "status",
           "created_at"
         ],
         "properties": {
+          "code": {
+            "type": "string",
+            "description": "Unique key used to reference this feature in your code. Cannot be changed after creation."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -9663,9 +9832,14 @@
         "type": "object",
         "required": [
           "id",
-          "name"
+          "name",
+          "code"
         ],
         "properties": {
+          "code": {
+            "type": "string",
+            "description": "Unique key used to reference this feature in your code. Cannot be changed after creation."
+          },
           "id": {
             "$ref": "#/components/schemas/FeatureId"
           },
@@ -10819,6 +10993,72 @@
           }
         }
       },
+      "MinimumCommitment": {
+        "type": "object",
+        "required": [
+          "amount",
+          "scope"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Decimal string in the plan currency, e.g. \"100.00\"."
+          },
+          "scope": {
+            "$ref": "#/components/schemas/MinimumCommitmentScope"
+          }
+        }
+      },
+      "MinimumCommitmentInput": {
+        "type": "object",
+        "required": [
+          "amount",
+          "scope"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Decimal string in the plan currency."
+          },
+          "scope": {
+            "$ref": "#/components/schemas/MinimumCommitmentInputScope"
+          }
+        }
+      },
+      "MinimumCommitmentInputScope": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AllComponentsScope"
+          },
+          {
+            "$ref": "#/components/schemas/ComponentsScope"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "all_components": "#/components/schemas/AllComponentsScope",
+            "components": "#/components/schemas/ComponentsScope"
+          }
+        }
+      },
+      "MinimumCommitmentScope": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AllComponentsScope"
+          },
+          {
+            "$ref": "#/components/schemas/ProductsScope"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "all_components": "#/components/schemas/AllComponentsScope",
+            "products": "#/components/schemas/ProductsScope"
+          }
+        }
+      },
       "NeverResetPeriod": {
         "type": "object",
         "description": "Never resets — counts all usage since the subscription was activated."
@@ -11374,6 +11614,17 @@
           },
           "id": {
             "$ref": "#/components/schemas/PlanId"
+          },
+          "minimum_commitment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MinimumCommitment",
+                "description": "Plan-level minimum commitment (period true-up floor). When set, every billing-period\ninvoice for this plan is guaranteed to be at least `minimum_commitment.amount` after\ndiscounts, with a \"Minimum commitment\" line filling any shortfall."
+              }
+            ]
           },
           "name": {
             "type": "string"
@@ -12051,6 +12302,21 @@
           }
         }
       },
+      "ProductsScope": {
+        "type": "object",
+        "description": "Only lines for the listed products count. A product is the identity shared by plan\ncomponents, overrides and ad-hoc extras, so a subscription's billed set is matched uniformly.",
+        "required": [
+          "product_ids"
+        ],
+        "properties": {
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "QuoteEvent": {
         "allOf": [
           {
@@ -12211,6 +12477,17 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "minimum_commitment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MinimumCommitmentInput",
+                "description": "Optional plan-level period minimum commitment. Component scope must reference names\nthat exist in `components` (matched by name, not by ID, since component IDs are\nassigned by the server). Use `MinimumCommitmentInput` so the client can express\nscope by component name."
+              }
             ]
           },
           "name": {
@@ -13123,6 +13400,17 @@
               "null"
             ],
             "description": "Default memo for invoices"
+          },
+          "minimum_commitment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MinimumCommitment",
+                "description": "Materialized minimum-commitment floor on this subscription (plan snapshot or operator\noverride). Read-only here — set it at creation, or change it via a subscription amendment."
+              }
+            ]
           },
           "mrr_cents": {
             "type": "integer",

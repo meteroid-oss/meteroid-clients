@@ -75,6 +75,9 @@ public class SubscriptionDetails {
     @JsonProperty("invoice_memo")
     private String invoiceMemo;
 
+    @JsonProperty("minimum_commitment")
+    private MinimumCommitment minimumCommitment;
+
     @JsonProperty("mrr_cents")
     private Long mrrCents;
 
@@ -525,6 +528,25 @@ public class SubscriptionDetails {
 
     public void setInvoiceMemo(String invoiceMemo) {
         this.invoiceMemo = invoiceMemo;
+    }
+
+    public SubscriptionDetails minimumCommitment(MinimumCommitment minimumCommitment) {
+        this.minimumCommitment = minimumCommitment;
+        return this;
+    }
+
+    /**
+     * Get minimumCommitment
+     *
+     * @return minimumCommitment
+     */
+    @javax.annotation.Nullable
+    public MinimumCommitment getMinimumCommitment() {
+        return minimumCommitment;
+    }
+
+    public void setMinimumCommitment(MinimumCommitment minimumCommitment) {
+        this.minimumCommitment = minimumCommitment;
     }
 
     public SubscriptionDetails mrrCents(Long mrrCents) {

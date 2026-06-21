@@ -5,6 +5,7 @@ import com.meteroid.MeteroidHttpClient;
 import com.meteroid.Utils;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.CreatePlanRequest;
+import com.meteroid.models.MinimumCommitment;
 import com.meteroid.models.PatchPlanRequest;
 import com.meteroid.models.Plan;
 import com.meteroid.models.PlanListResponse;
@@ -79,6 +80,29 @@ public class Plans {
             throws IOException, ApiException {
         HttpUrl.Builder url = this.client.newUrlBuilder().encodedPath("/api/v1/plans");
         return this.client.executeRequest("POST", url.build(), null, createPlanRequest, Plan.class);
+    }
+
+    /** */
+    public MinimumCommitment setPlanMinimum(
+            final String planVersionId, final MinimumCommitment minimumCommitment)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(
+                                String.format("/api/v1/plans/versions/%s/minimum", planVersionId));
+        return this.client.executeRequest(
+                "PUT", url.build(), null, minimumCommitment, MinimumCommitment.class);
+    }
+
+    /** */
+    public void deletePlanMinimum(final String planVersionId) throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(
+                                String.format("/api/v1/plans/versions/%s/minimum", planVersionId));
+        this.client.executeRequest("DELETE", url.build(), null, null, null);
     }
 
     /**
