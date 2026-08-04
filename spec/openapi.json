@@ -539,7 +539,8 @@
                 "EVENT_CSV_IMPORT",
                 "CUSTOMER_CSV_IMPORT",
                 "SUBSCRIPTION_CSV_IMPORT",
-                "SUBSCRIPTION_PLAN_MIGRATION"
+                "SUBSCRIPTION_PLAN_MIGRATION",
+                "TAX_REPORT_EXPORT"
               ]
             }
           },
@@ -1954,6 +1955,733 @@
         ]
       }
     },
+    "/api/v1/credit-control/access": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Read-only entitlement/limit gate, served from this pod's in-process snapshot when it is live.",
+        "description": "This endpoint NEVER moves money or counters: it reports whether a caller is currently within\nits limits and balances. Consuming the quota still requires `POST /credit-control/admit`,\nwhich is always authoritative and never served from cache.\n\nEvery answer is labelled: `freshness.source` says where it came from, `freshness.age_ms` how\nold it is, and `freshness.fallback` marks a degraded answer produced while PostgreSQL was\nunreachable. A degraded answer follows the configured fail-closed / fail-open contract.",
+        "operationId": "check_access",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CustomerId"
+            }
+          },
+          {
+            "name": "policy_id",
+            "in": "query",
+            "description": "Limit policy id to evaluate. Mutually exclusive with `pool_key`.",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/LimitPolicyId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "name": "pool_key",
+            "in": "query",
+            "description": "Limit pool key to evaluate, when the caller keys limits by name.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "required_units",
+            "in": "query",
+            "description": "Units the caller intends to consume. Default 0 = \"is the gate open\".",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "required_value_units",
+            "in": "query",
+            "description": "Value units the caller intends to draw. Default 0 skips the balance check.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "max_age_ms",
+            "in": "query",
+            "description": "Reject an answer older than this and re-read. Clamped to the configured TTL.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "fallback",
+            "in": "query",
+            "description": "Per-request override of the degraded decision: `deny` or `allow`. Read-only path only.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access decision with freshness labelling",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessCheckResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/accounts": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Lists value accounts with posted/reserved/available balances and their active grants\n(classification, priority, expiry).",
+        "operationId": "list_accounts",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Value accounts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer has no credit-control configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/admit": {
+      "post": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Atomically evaluates and admits a direct charge or reservation command.",
+        "description": "Bounded direct commits guarantee idempotent replay only inside the published bounded window\n(one hour by default). Reservation commands and Strict-profile commands are durably idempotent.",
+        "operationId": "admit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdmitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Admission evaluated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdmitResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Hard-control path is safely unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/fast-readout": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Pre-flight remaining/limit readout, served from this pod's in-process snapshot when it is\nlive. Same content as `GET /credit-control/overview` + `/policies`, but without a database\nround-trip and with explicit freshness labelling. Read-only.",
+        "operationId": "fast_readout",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CustomerId"
+            }
+          },
+          {
+            "name": "max_age_ms",
+            "in": "query",
+            "description": "Reject an answer older than this and re-read. Clamped to the configured TTL.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cached credit-control readout with freshness labelling",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastReadoutResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/ledger": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Reads the paginated value ledger for an account with full balance and linkage fields.",
+        "operationId": "list_ledger_entries",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page (1-100, default 20)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ledger entries, newest first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/overview": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Reads the enforcement root, terms freshness, and all value-account balances.",
+        "description": "`root.compiled_terms_id` is the currently installed terms id that admissions must\npin; re-read it here to recover after a STALE_TERMS denial.",
+        "operationId": "get_overview",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit-control overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer has no credit-control configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/policies": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Lists limit policies with their live counters: consumed, remaining, limit, and the\nwindow start/end (reset time). Advisory policies are labeled explicitly.",
+        "operationId": "list_policies",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Limit policies with counters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer has no credit-control configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/reservations": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Lists reservations (holds) for a customer. Active holds only by default; pass\n`include_terminal=true` to include committed, released, and expired reservations.",
+        "operationId": "list_reservations",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include_terminal",
+            "in": "query",
+            "description": "Also return committed, released, and expired reservations.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer has no credit-control configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/reservations/settle": {
+      "post": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Commits, releases, or expires a reservation using its pinned terms and allocations.",
+        "operationId": "settle_reservation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettleReservationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Reservation settled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettleReservationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Hard-control path is safely unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-control/reservations/{reservation_id}": {
+      "get": {
+        "tags": [
+          "Credit control"
+        ],
+        "summary": "Reads a single reservation by id, including terminal states.",
+        "operationId": "get_reservation",
+        "parameters": [
+          {
+            "name": "reservation_id",
+            "in": "path",
+            "description": "Reservation id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationReadout"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reservation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/credit-notes/{credit_note_id}/download": {
       "get": {
         "tags": [
@@ -2649,6 +3377,22 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CustomerPortalTokenRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Portal token generated",
@@ -2656,6 +3400,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomerPortalTokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
                 }
               }
             }
@@ -5837,6 +6591,7 @@
                   "PAUSED",
                   "SUSPENDED",
                   "CANCELLED",
+                  "ABORTED",
                   "COMPLETED",
                   "SUPERSEDED",
                   "ERRORED"
@@ -6628,6 +7383,177 @@
   },
   "components": {
     "schemas": {
+      "AccessCheckResponse": {
+        "type": "object",
+        "required": [
+          "decision",
+          "allowed",
+          "reason",
+          "freshness"
+        ],
+        "properties": {
+          "allowed": {
+            "type": "boolean"
+          },
+          "available_value_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "decision": {
+            "type": "string",
+            "description": "`ALLOW` | `WARN` | `DENY`."
+          },
+          "fallback_cap_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Units the caller may consume against this answer when it is a fail-open fallback."
+          },
+          "freshness": {
+            "$ref": "#/components/schemas/FreshnessReadout"
+          },
+          "limit_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "remaining_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "AccountListResponse": {
+        "type": "object",
+        "required": [
+          "accounts",
+          "as_of"
+        ],
+        "properties": {
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountReadout"
+            }
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AccountPurpose": {
+        "type": "string",
+        "enum": [
+          "REALTIME_PREPAID",
+          "SERVICE_CREDIT",
+          "INVOICE_CREDIT"
+        ]
+      },
+      "AccountReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "root_id",
+          "account_code",
+          "purpose",
+          "application_stage",
+          "unit",
+          "state",
+          "posted_units",
+          "reserved_units",
+          "available_units",
+          "version",
+          "updated_at",
+          "grants"
+        ],
+        "properties": {
+          "account_code": {
+            "type": "string"
+          },
+          "application_stage": {
+            "$ref": "#/components/schemas/ApplicationStage"
+          },
+          "automatic_top_up": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AutoTopUpReadout"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "available_units": {
+            "type": "integer",
+            "format": "int64",
+            "description": "posted minus reserved: the balance new admissions can draw from."
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "grants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValueGrantReadout"
+            }
+          },
+          "id": {
+            "$ref": "#/components/schemas/ValueAccountId"
+          },
+          "posted_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/AccountPurpose"
+          },
+          "reserved_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "root_id": {
+            "$ref": "#/components/schemas/EnforcementRootId"
+          },
+          "state": {
+            "$ref": "#/components/schemas/AccountState"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/ChargeUnit"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AccountState": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "FROZEN",
+          "CLOSED",
+          "ARCHIVED"
+        ]
+      },
       "AddOn": {
         "type": "object",
         "required": [
@@ -6665,10 +7591,10 @@
           "fee_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductFeeTypeEnum"
               },
               {
-                "$ref": "#/components/schemas/ProductFeeTypeEnum"
+                "type": "null"
               }
             ]
           },
@@ -6750,10 +7676,10 @@
           "fee_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductFeeTypeEnum"
               },
               {
-                "$ref": "#/components/schemas/ProductFeeTypeEnum"
+                "type": "null"
               }
             ]
           },
@@ -6815,10 +7741,10 @@
           "country": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CountryCode"
               },
               {
-                "$ref": "#/components/schemas/CountryCode"
+                "type": "null"
               }
             ]
           },
@@ -6848,9 +7774,334 @@
           }
         }
       },
+      "AdmitAction": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "AUTHORIZE_AND_COMMIT"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "expires_at",
+              "integration_max_units",
+              "type"
+            ],
+            "properties": {
+              "expires_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "integration_max_units": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "RESERVE"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "reservation_id",
+              "type"
+            ],
+            "properties": {
+              "new_expires_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "reservation_id": {
+                "$ref": "#/components/schemas/EnforcementReservationId"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "EXTEND"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "AdmitRequest": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "root_id",
+          "compiled_terms_id",
+          "idempotency_key",
+          "action",
+          "application_stage",
+          "quantity",
+          "gross_units",
+          "billable_units"
+        ],
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/AdmitAction"
+          },
+          "allowance_covered_quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "application_stage": {
+            "$ref": "#/components/schemas/ApplicationStage"
+          },
+          "billable_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "billed_externally": {
+            "type": "boolean",
+            "description": "Explicit opt-out of invoice netting: attests this realtime currency charge is billed\noutside Meteroid. Required (true) whenever a REALTIME + CURRENCY + value_required\nadmission omits `billing_context`; recorded on the ledger so audit can prove intent."
+          },
+          "billing_context": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BillingContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compiled_terms_id": {
+            "$ref": "#/components/schemas/CompiledTermsId"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "evaluated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Defaults to the server receive time."
+          },
+          "gross_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Direct bounded commits replay for the advertised bounded window (one hour by default).\nReservation commands and Strict commands use the durable operation contract."
+          },
+          "price_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PriceId",
+                "description": "Optional catalog price rated and ownership-verified by Meteroid."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "rating_dimensions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "root_id": {
+            "$ref": "#/components/schemas/EnforcementRootId"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "unit": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ChargeUnit",
+                "description": "Exact unit for caller-rated requests. Omit when `price_id` is supplied."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "value_required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AdmitResponse": {
+        "type": "object",
+        "required": [
+          "operation_id",
+          "result",
+          "primary_reason",
+          "reasons",
+          "requested_quantity",
+          "gross_units",
+          "allowance_covered_quantity",
+          "allowance_covered_units",
+          "billable_units",
+          "value_covered_units",
+          "unfunded_units",
+          "would_have_denied",
+          "verified",
+          "allocations",
+          "replayed"
+        ],
+        "properties": {
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValueAllocation"
+            }
+          },
+          "allowance_covered_quantity": {
+            "type": "string"
+          },
+          "allowance_covered_units": {
+            "type": "string"
+          },
+          "billable_units": {
+            "type": "string"
+          },
+          "binding_constraint": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ConstraintOutcome",
+                "description": "The constraint that decided a DENY/WARN, when one bound."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consistency_profile": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ConsistencyProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstraintOutcome"
+            },
+            "description": "Per-constraint outcomes: remaining headroom on ALLOW, the exceeded limit and its\nreset time on DENY."
+          },
+          "evaluated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Instant the decision state was observed at: the decision is exact as of this time."
+          },
+          "gross_units": {
+            "type": "string"
+          },
+          "operation_id": {
+            "$ref": "#/components/schemas/EnforcementOperationId"
+          },
+          "primary_reason": {
+            "$ref": "#/components/schemas/DecisionReason"
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DecisionReason"
+            },
+            "description": "Every binding cause, most important first. Treat unrecognised values as opaque:\nnew reasons are added over time and are not a breaking change."
+          },
+          "replayed": {
+            "type": "boolean"
+          },
+          "requested_quantity": {
+            "type": "string"
+          },
+          "reservation_expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "reservation_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EnforcementReservationId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result": {
+            "$ref": "#/components/schemas/DecisionResult"
+          },
+          "terms_epoch": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "unfunded_units": {
+            "type": "string"
+          },
+          "value_covered_units": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "would_have_denied": {
+            "type": "boolean"
+          }
+        }
+      },
       "AllComponentsScope": {
         "type": "object",
         "description": "Every revenue line counts toward the floor."
+      },
+      "ApplicationStage": {
+        "type": "string",
+        "enum": [
+          "REALTIME",
+          "USAGE_SETTLEMENT",
+          "INVOICE"
+        ]
       },
       "AppliedCoupon": {
         "type": "object",
@@ -6919,6 +8170,89 @@
           "sub_cou_7n42DGM5Tflk9n8mt7Fhc7"
         ]
       },
+      "AutoTopUpReadout": {
+        "type": "object",
+        "required": [
+          "method",
+          "threshold_units",
+          "cooldown_seconds",
+          "max_consecutive_failures",
+          "consecutive_failures"
+        ],
+        "properties": {
+          "amount_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "consecutive_failures": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cooldown_seconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "daily_cap_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "last_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_succeeded_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "max_consecutive_failures": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "method": {
+            "type": "string"
+          },
+          "payment_method_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerPaymentMethodId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "suspended_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set when automatic top-ups are suspended after repeated failures; `last_error`\ncarries the final failure reason. Reconfigure to resume."
+          },
+          "target_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "threshold_units": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "AvailableParameters": {
         "type": "object",
         "properties": {
@@ -6972,10 +8306,10 @@
           "account_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BankAccountId"
               },
               {
-                "$ref": "#/components/schemas/BankAccountId"
+                "type": "null"
               }
             ]
           }
@@ -6999,7 +8333,8 @@
           "created_by",
           "created_at",
           "failure_count",
-          "has_error_csv"
+          "has_error_csv",
+          "has_output"
         ],
         "properties": {
           "completed_at": {
@@ -7034,6 +8369,9 @@
           "has_error_csv": {
             "type": "boolean"
           },
+          "has_output": {
+            "type": "boolean"
+          },
           "id": {
             "$ref": "#/components/schemas/BatchJobId"
           },
@@ -7051,6 +8389,12 @@
           },
           "job_type": {
             "$ref": "#/components/schemas/BatchJobType"
+          },
+          "output_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "processed_items": {
             "type": "integer",
@@ -7222,7 +8566,8 @@
           "EVENT_CSV_IMPORT",
           "CUSTOMER_CSV_IMPORT",
           "SUBSCRIPTION_CSV_IMPORT",
-          "SUBSCRIPTION_PLAN_MIGRATION"
+          "SUBSCRIPTION_PLAN_MIGRATION",
+          "TAX_REPORT_EXPORT"
         ]
       },
       "BillableMetricId": {
@@ -7252,6 +8597,32 @@
               "null"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "BillingContext": {
+        "type": "object",
+        "required": [
+          "subscription_id",
+          "event_at"
+        ],
+        "properties": {
+          "event_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "meter_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BillableMetricId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subscription_id": {
+            "$ref": "#/components/schemas/SubscriptionId"
           }
         }
       },
@@ -7293,6 +8664,18 @@
           "ADVANCE",
           "ARREARS"
         ]
+      },
+      "BooleanConfigValue": {
+        "type": "object",
+        "description": "A boolean config value.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "boolean"
+          }
+        }
       },
       "BooleanEffectiveEntitlementValue": {
         "type": "object",
@@ -7504,6 +8887,29 @@
           }
         }
       },
+      "ChargeUnit": {
+        "type": "object",
+        "required": [
+          "kind",
+          "code",
+          "scale"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "ISO currency or tenant-defined credit code."
+          },
+          "kind": {
+            "$ref": "#/components/schemas/UnitKind"
+          },
+          "scale": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Decimal scale of the integer amounts in this request.",
+            "minimum": 0
+          }
+        }
+      },
       "CheckoutSession": {
         "type": "object",
         "required": [
@@ -7579,10 +8985,10 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PaymentMethodsConfig"
               },
               {
-                "$ref": "#/components/schemas/PaymentMethodsConfig"
+                "type": "null"
               }
             ]
           },
@@ -7595,10 +9001,10 @@
           "subscription_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionId"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionId"
+                "type": "null"
               }
             ]
           },
@@ -7636,6 +9042,13 @@
           "SUBSCRIPTION_ACTIVATION",
           "PLAN_CHANGE",
           "ADDON_PURCHASE"
+        ]
+      },
+      "CompiledTermsId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "cterm_7n42DGM5Tflk9n8mt7Fhc7"
         ]
       },
       "ComponentOverride": {
@@ -7678,10 +9091,10 @@
           "billing_period": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingPeriodEnum"
               },
               {
-                "$ref": "#/components/schemas/BillingPeriodEnum"
+                "type": "null"
               }
             ]
           },
@@ -7718,6 +9131,97 @@
           }
         }
       },
+      "ConfigEffectiveEntitlementValue": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/ConfigValue"
+          }
+        }
+      },
+      "ConfigEntitlementValue": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/ConfigValue"
+          }
+        }
+      },
+      "ConfigFeatureType": {
+        "type": "object",
+        "description": "A static, typed configuration value. No metric — resolved synchronously.",
+        "required": [
+          "value_type"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Allowed values when `value_type = SELECT`. Empty otherwise."
+          },
+          "value_type": {
+            "$ref": "#/components/schemas/ConfigValueType",
+            "description": "The feature's value type, fixed at creation."
+          }
+        }
+      },
+      "ConfigResolvedEntitlementValue": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/ConfigValue"
+          }
+        }
+      },
+      "ConfigValue": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/NumberConfigValue"
+          },
+          {
+            "$ref": "#/components/schemas/BooleanConfigValue"
+          },
+          {
+            "$ref": "#/components/schemas/TextConfigValue"
+          },
+          {
+            "$ref": "#/components/schemas/JsonConfigValue"
+          }
+        ],
+        "description": "A static, typed configuration value carried by a Config entitlement. Resolved synchronously\nthrough the entitlement hierarchy — no metric, no usage counter.",
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "BOOLEAN": "#/components/schemas/BooleanConfigValue",
+            "JSON": "#/components/schemas/JsonConfigValue",
+            "NUMBER": "#/components/schemas/NumberConfigValue",
+            "TEXT": "#/components/schemas/TextConfigValue"
+          }
+        }
+      },
+      "ConfigValueType": {
+        "type": "string",
+        "description": "Authoritative value type of a Config feature. `MAP`/`JSON` both carry a JSON value.",
+        "enum": [
+          "NUMBER",
+          "BOOLEAN",
+          "TEXT",
+          "MAP",
+          "JSON",
+          "SELECT"
+        ]
+      },
       "ConnectedAccount": {
         "type": "object",
         "description": "A connected account (relationship between platform and connected org)",
@@ -7733,22 +9237,22 @@
           "connected_organization_id": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/OrganizationId",
                 "description": "For express accounts in pending status, this may be None until onboarding completes"
+              },
+              {
+                "type": "null"
               }
             ]
           },
           "connected_tenant_id": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/TenantId",
                 "description": "Tenant ID for express accounts (single-tenant). None for standard accounts (use tenant header)."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -7776,11 +9280,11 @@
           "pending_country": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/CountryCode",
                 "description": "Country code for the organization to be created (express flow only)"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -7801,10 +9305,10 @@
           "platform_customer_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CustomerId"
               },
               {
-                "$ref": "#/components/schemas/CustomerId"
+                "type": "null"
               }
             ]
           },
@@ -7861,6 +9365,101 @@
           "standard",
           "express"
         ]
+      },
+      "ConsistencyProfile": {
+        "type": "string",
+        "enum": [
+          "STRICT",
+          "BOUNDED_EXPOSURE",
+          "ADVISORY"
+        ]
+      },
+      "ConstraintAxis": {
+        "type": "string",
+        "enum": [
+          "CONFIG",
+          "ALLOWANCE",
+          "USAGE",
+          "BUDGET",
+          "VALUE"
+        ]
+      },
+      "ConstraintBehavior": {
+        "type": "string",
+        "enum": [
+          "DISABLED",
+          "OBSERVE",
+          "WARN",
+          "DENY"
+        ]
+      },
+      "ConstraintOutcome": {
+        "type": "object",
+        "description": "One evaluated policy or wallet constraint. `id` is the limit-policy id for counter\naxes and the value-account id for the VALUE axis; `window_end` is the counter's\nreset time and therefore the earliest retry after a windowed denial.",
+        "required": [
+          "id",
+          "axis",
+          "behavior",
+          "consumed_before",
+          "reserved_before",
+          "requested",
+          "exceeded_by",
+          "binding",
+          "window_instance_id",
+          "window_start",
+          "window_end"
+        ],
+        "properties": {
+          "axis": {
+            "$ref": "#/components/schemas/ConstraintAxis"
+          },
+          "behavior": {
+            "$ref": "#/components/schemas/ConstraintBehavior"
+          },
+          "binding": {
+            "type": "boolean",
+            "description": "True when this constraint decided the overall result."
+          },
+          "consumed_before": {
+            "type": "string"
+          },
+          "exceeded_by": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "limit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "remaining_after": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requested": {
+            "type": "string"
+          },
+          "reserved_before": {
+            "type": "string"
+          },
+          "window_end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "window_instance_id": {
+            "type": "string"
+          },
+          "window_start": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       },
       "CountryCode": {
         "type": "string",
@@ -8151,10 +9750,10 @@
           "components": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CreateSubscriptionComponents"
               },
               {
-                "$ref": "#/components/schemas/CreateSubscriptionComponents"
+                "type": "null"
               }
             ]
           },
@@ -8215,11 +9814,11 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/PaymentMethodsConfig",
                 "description": "Payment methods configuration. If not specified, inherits from the invoicing entity."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -8265,10 +9864,10 @@
           "connection_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ConnectionType"
               },
               {
-                "$ref": "#/components/schemas/ConnectionType"
+                "type": "null"
               }
             ]
           },
@@ -8276,10 +9875,10 @@
           "platform_customer_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CustomerId"
               },
               {
-                "$ref": "#/components/schemas/CustomerId"
+                "type": "null"
               }
             ]
           }
@@ -8363,6 +9962,16 @@
               "null"
             ]
           },
+          "filters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/MetricFilter"
+            },
+            "description": "Pre-aggregation property filters. Optional and backward-compatible; omit for none."
+          },
           "name": {
             "type": "string"
           },
@@ -8372,30 +9981,30 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           },
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
           "unit_conversion": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversion"
               },
               {
-                "$ref": "#/components/schemas/UnitConversion"
+                "type": "null"
               }
             ]
           },
@@ -8465,10 +10074,10 @@
           "billing": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingConfig"
               },
               {
-                "$ref": "#/components/schemas/BillingConfig"
+                "type": "null"
               }
             ]
           },
@@ -8509,10 +10118,10 @@
           "trial": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TrialConfig"
               },
               {
-                "$ref": "#/components/schemas/TrialConfig"
+                "type": "null"
               }
             ]
           }
@@ -8558,10 +10167,10 @@
           "customization": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionAddOnCustomization"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionAddOnCustomization"
+                "type": "null"
               }
             ]
           },
@@ -8612,6 +10221,143 @@
             }
           }
         }
+      },
+      "CreditControlEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreditControlEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "CreditControlEventData": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "root_id",
+          "policy_id",
+          "policy_kind",
+          "behavior",
+          "current_units",
+          "window_instance_id",
+          "window_start"
+        ],
+        "properties": {
+          "behavior": {
+            "$ref": "#/components/schemas/CreditControlLimitBehavior"
+          },
+          "current_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "limit_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "policy_id": {
+            "$ref": "#/components/schemas/LimitPolicyId"
+          },
+          "policy_kind": {
+            "$ref": "#/components/schemas/CreditControlPolicyKind"
+          },
+          "root_id": {
+            "$ref": "#/components/schemas/EnforcementRootId"
+          },
+          "threshold_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "unit_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "window_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "window_instance_id": {
+            "type": "string"
+          },
+          "window_start": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreditControlLimitBehavior": {
+        "type": "string",
+        "enum": [
+          "OBSERVE",
+          "WARN",
+          "DENY"
+        ]
+      },
+      "CreditControlPolicyKind": {
+        "type": "string",
+        "enum": [
+          "ALLOWANCE",
+          "USAGE",
+          "SPEND"
+        ]
+      },
+      "CreditFee": {
+        "type": "object",
+        "required": [
+          "rate",
+          "quantity",
+          "credit_amount"
+        ],
+        "properties": {
+          "credit_amount": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "rate": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "CreditFeeStructure": {
+        "type": "object"
       },
       "CreditNoteEvent": {
         "allOf": [
@@ -8706,6 +10452,28 @@
           "FINALIZED",
           "VOIDED"
         ]
+      },
+      "CreditPlanFee": {
+        "type": "object",
+        "description": "Prepaid credit fee: charged at `unit_price` × `quantity`, funds the wallet with\n`credit_amount` × `quantity` on payment.",
+        "required": [
+          "unit_price",
+          "quantity",
+          "credit_amount"
+        ],
+        "properties": {
+          "credit_amount": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "unit_price": {
+            "type": "string"
+          }
+        }
       },
       "Currency": {
         "type": "string",
@@ -8913,10 +10681,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -8965,10 +10733,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -8998,10 +10766,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9035,10 +10803,10 @@
           "invoicing_entity_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/InvoicingEntityId"
               },
               {
-                "$ref": "#/components/schemas/InvoicingEntityId"
+                "type": "null"
               }
             ]
           },
@@ -9060,10 +10828,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -9092,10 +10860,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9232,10 +11000,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9248,10 +11016,10 @@
           "currency": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Currency"
               },
               {
-                "$ref": "#/components/schemas/Currency"
+                "type": "null"
               }
             ]
           },
@@ -9276,10 +11044,10 @@
           "invoicing_entity_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/InvoicingEntityId"
               },
               {
-                "$ref": "#/components/schemas/InvoicingEntityId"
+                "type": "null"
               }
             ]
           },
@@ -9304,10 +11072,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -9325,6 +11093,20 @@
         "examples": [
           "pm_7n42DGM5Tflk9n8mt7Fhc7"
         ]
+      },
+      "CustomerPortalTokenRequest": {
+        "type": "object",
+        "properties": {
+          "expires_in_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Token lifetime in seconds. Defaults to 86400 (24 hours).\nMust be between 60 and 2592000 (30 days).",
+            "minimum": 0
+          }
+        }
       },
       "CustomerPortalTokenResponse": {
         "type": "object",
@@ -9362,10 +11144,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9411,10 +11193,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -9425,6 +11207,36 @@
             ]
           }
         }
+      },
+      "DecisionReason": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "CONFIG_DISABLED",
+          "ALLOWANCE_EXHAUSTED",
+          "USAGE_LIMIT_EXCEEDED",
+          "BUDGET_EXCEEDED",
+          "INSUFFICIENT_VALUE",
+          "ACCOUNT_FROZEN",
+          "ACCOUNT_CLOSED",
+          "TERMS_UNAVAILABLE",
+          "STALE_TERMS",
+          "POLICY_TOO_COMPLEX",
+          "INCOMPATIBLE_RATING",
+          "RESERVATION_EXPIRED",
+          "ACTUAL_EXCEEDS_RESERVATION",
+          "IDEMPOTENCY_CONFLICT",
+          "INVALID_REQUEST"
+        ]
+      },
+      "DecisionResult": {
+        "type": "string",
+        "enum": [
+          "ALLOW",
+          "WARN",
+          "DENY",
+          "UNVERIFIED"
+        ]
       },
       "DoubleSegmentationMatrix": {
         "type": "object",
@@ -9478,13 +11290,104 @@
           },
           {
             "$ref": "#/components/schemas/MeteredEffectiveEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigEffectiveEntitlementValue"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanEffectiveEntitlementValue",
+            "CONFIG": "#/components/schemas/ConfigEffectiveEntitlementValue",
             "METERED": "#/components/schemas/MeteredEffectiveEntitlementValue"
+          }
+        }
+      },
+      "EnforcementOperationId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "eop_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "EnforcementReservationId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "eres_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "EnforcementRootId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "eroot_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "EnforcementRootReadout": {
+        "type": "object",
+        "description": "Enforcement-root readout. `compiled_terms_id` is the currently installed terms id —\nthe exact value runtime admissions pin; re-read it here to recover from STALE_TERMS.",
+        "required": [
+          "id",
+          "consistency_profile",
+          "required_terms_epoch",
+          "installed_terms_epoch",
+          "terms_stale",
+          "version"
+        ],
+        "properties": {
+          "compiled_terms_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CompiledTermsId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consistency_profile": {
+            "$ref": "#/components/schemas/ConsistencyProfile"
+          },
+          "fence_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fenced_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/EnforcementRootId"
+          },
+          "installed_terms_epoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "required_terms_epoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "terms_last_verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "terms_stale": {
+            "type": "boolean",
+            "description": "True when configuration changed since the last publish: admissions pinned to the\ninstalled terms will be denied with STALE_TERMS until terms are republished."
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -9518,6 +11421,77 @@
           }
         }
       },
+      "EntitlementEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntitlementEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "EntitlementEventData": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "metric_id",
+          "consumed",
+          "limit"
+        ],
+        "properties": {
+          "consumed": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Usage consumed in the current window after this request."
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The included usage limit."
+          },
+          "metric_id": {
+            "$ref": "#/components/schemas/BillableMetricId"
+          },
+          "reset_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the window rolls over and the counter resets (RFC3339, UTC). Absent for a lifetime limit."
+          },
+          "threshold_pct": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "The crossed warning threshold, on `entitlement.threshold_reached`.",
+            "minimum": 0
+          }
+        }
+      },
       "EntitlementId": {
         "type": "string",
         "format": "MeteroidId",
@@ -9532,12 +11506,16 @@
           },
           {
             "$ref": "#/components/schemas/MeteredEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigEntitlementValue"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanEntitlementValue",
+            "CONFIG": "#/components/schemas/ConfigEntitlementValue",
             "METERED": "#/components/schemas/MeteredEntitlementValue"
           }
         }
@@ -9549,9 +11527,11 @@
           "NOT_FOUND",
           "CONFLICT",
           "FORBIDDEN",
+          "PAYMENT_REQUIRED",
           "UNAUTHORIZED",
           "TOO_MANY_REQUESTS",
-          "INTERNAL_SERVER_ERROR"
+          "INTERNAL_SERVER_ERROR",
+          "SERVICE_UNAVAILABLE"
         ]
       },
       "Event": {
@@ -9610,6 +11590,9 @@
           "metric.created",
           "customer.created",
           "subscription.created",
+          "subscription.updated",
+          "subscription.cancelled",
+          "subscription.ended",
           "invoice.created",
           "invoice.finalized",
           "invoice.paid",
@@ -9633,7 +11616,14 @@
           "coupon.archived",
           "addon.created",
           "addon.updated",
-          "addon.archived"
+          "addon.archived",
+          "entitlement.limit_reached",
+          "entitlement.threshold_reached",
+          "entitlement.reset",
+          "credit_control.threshold_reached",
+          "credit_control.limit_reached",
+          "credit_control.auto_topup_failed",
+          "credit_control.auto_topup_suspended"
         ]
       },
       "ExistingPriceRef": {
@@ -9742,6 +11732,164 @@
           }
         }
       },
+      "FastAccountReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "account_code",
+          "state",
+          "unit_code",
+          "unit_scale",
+          "posted_units",
+          "reserved_units",
+          "available_units"
+        ],
+        "properties": {
+          "account_code": {
+            "type": "string"
+          },
+          "available_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "$ref": "#/components/schemas/ValueAccountId"
+          },
+          "posted_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "reserved_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "state": {
+            "type": "string"
+          },
+          "unit_code": {
+            "type": "string"
+          },
+          "unit_scale": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "FastPolicyReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "pool_key",
+          "advisory",
+          "consumed_units",
+          "reserved_units"
+        ],
+        "properties": {
+          "advisory": {
+            "type": "boolean"
+          },
+          "consumed_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "$ref": "#/components/schemas/LimitPolicyId"
+          },
+          "limit_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "pool_key": {
+            "type": "string"
+          },
+          "remaining_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "reserved_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "window_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "window_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "FastReadoutResponse": {
+        "type": "object",
+        "required": [
+          "configured",
+          "terms_stale",
+          "fenced",
+          "accounts",
+          "policies",
+          "freshness"
+        ],
+        "properties": {
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FastAccountReadout"
+            }
+          },
+          "compiled_terms_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CompiledTermsId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "configured": {
+            "type": "boolean",
+            "description": "False when the customer has no credit-control configuration, or when the backend was\nunreachable and nothing was cached — read `freshness.fallback` to tell the two apart."
+          },
+          "fenced": {
+            "type": "boolean"
+          },
+          "freshness": {
+            "$ref": "#/components/schemas/FreshnessReadout"
+          },
+          "policies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FastPolicyReadout"
+            }
+          },
+          "root_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EnforcementRootId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "terms_stale": {
+            "type": "boolean"
+          }
+        }
+      },
       "Feature": {
         "type": "object",
         "required": [
@@ -9770,11 +11918,11 @@
           "entitlement": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/Entitlement",
                 "description": "Feature-level (default) entitlement, applied to all subscriptions as the lowest-priority."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -9790,11 +11938,11 @@
           "product": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/ProductRef",
                 "description": "Product this feature belongs to."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -9849,10 +11997,10 @@
           "product": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductRef"
               },
               {
-                "$ref": "#/components/schemas/ProductRef"
+                "type": "null"
               }
             ]
           }
@@ -9874,12 +12022,16 @@
           },
           {
             "$ref": "#/components/schemas/MeteredFeatureType"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigFeatureType"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanFeatureType",
+            "CONFIG": "#/components/schemas/ConfigFeatureType",
             "METERED": "#/components/schemas/MeteredFeatureType"
           }
         }
@@ -9903,12 +12055,16 @@
           },
           {
             "$ref": "#/components/schemas/OneTimePlanFee"
+          },
+          {
+            "$ref": "#/components/schemas/CreditPlanFee"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "CAPACITY": "#/components/schemas/CapacityPlanFee",
+            "CREDIT": "#/components/schemas/CreditPlanFee",
             "EXTRA_RECURRING": "#/components/schemas/ExtraRecurringPlanFee",
             "ONE_TIME": "#/components/schemas/OneTimePlanFee",
             "RATE": "#/components/schemas/RatePlanFee",
@@ -9947,6 +12103,55 @@
           },
           "unit": {
             "$ref": "#/components/schemas/CalendarUnit"
+          }
+        }
+      },
+      "FreshnessReadout": {
+        "type": "object",
+        "description": "Freshness label carried by every fast-path answer. `AUTHORITATIVE` is a live PostgreSQL read;\nanything else is served from this pod's in-process snapshot, and `fallback` marks an answer\nproduced while the authoritative backend was unreachable.",
+        "required": [
+          "source",
+          "age_ms",
+          "stale",
+          "fallback"
+        ],
+        "properties": {
+          "age_ms": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "as_of": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Instant the underlying snapshot was read. Absent for a pure fallback decision."
+          },
+          "fallback": {
+            "type": "boolean"
+          },
+          "installed_terms_epoch": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "resource_sequence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "source": {
+            "type": "string",
+            "description": "`AUTHORITATIVE` | `CACHE` | `STALE_CACHE` | `FALLBACK`."
+          },
+          "stale": {
+            "type": "boolean"
           }
         }
       },
@@ -10183,10 +12388,10 @@
           "subscription_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionId"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionId"
+                "type": "null"
               }
             ]
           },
@@ -10276,11 +12481,11 @@
           "consolidated_into_invoice_id": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/InvoiceId",
                 "description": "Set on `invoice.consolidated`: the parent invoice this one was merged into."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -10422,6 +12627,244 @@
           "ive_7n42DGM5Tflk9n8mt7Fhc7"
         ]
       },
+      "JsonConfigValue": {
+        "type": "object",
+        "description": "A structured (JSON) config value — the \"metadata\" case, several fields in one entitlement.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "object"
+          }
+        }
+      },
+      "LedgerEntryReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "account_id",
+          "account_sequence",
+          "kind",
+          "posted_delta_units",
+          "reserved_delta_units",
+          "posted_units_after",
+          "reserved_units_after",
+          "reason",
+          "effective_at",
+          "recorded_at"
+        ],
+        "properties": {
+          "account_id": {
+            "$ref": "#/components/schemas/ValueAccountId"
+          },
+          "account_sequence": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Gapless per-account ordering key."
+          },
+          "corrects_entry_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ValueLedgerEntryId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "credit_note_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "effective_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "grant_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ValueGrantId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "$ref": "#/components/schemas/ValueLedgerEntryId"
+          },
+          "invoice_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "operation_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ValueOperationId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "payment_transaction_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PaymentTransactionId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "posted_delta_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "posted_units_after": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reserved_delta_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "reserved_units_after": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "LedgerListResponse": {
+        "type": "object",
+        "required": [
+          "entries",
+          "pagination_meta"
+        ],
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LedgerEntryReadout"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "LimitBehavior": {
+        "type": "string",
+        "enum": [
+          "OBSERVE",
+          "WARN",
+          "DENY"
+        ]
+      },
+      "LimitGrantId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "lgr_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "LimitGrantReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "policy_id",
+          "quantity",
+          "source_kind",
+          "classification",
+          "composition",
+          "precedence",
+          "effective_from",
+          "version",
+          "scope"
+        ],
+        "properties": {
+          "classification": {
+            "type": "string"
+          },
+          "composition": {
+            "type": "string"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/LimitGrantId"
+          },
+          "policy_id": {
+            "$ref": "#/components/schemas/LimitPolicyId"
+          },
+          "precedence": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "source_kind": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "LimitPolicyId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "lpol_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
       "LinkedSegmentationMatrix": {
         "type": "object",
         "required": [
@@ -10520,10 +12963,10 @@
           "dimension2": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MatrixDimension"
               },
               {
-                "$ref": "#/components/schemas/MatrixDimension"
+                "type": "null"
               }
             ]
           },
@@ -10697,6 +13140,12 @@
               "null"
             ]
           },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricFilter"
+            }
+          },
           "id": {
             "$ref": "#/components/schemas/BillableMetricId"
           },
@@ -10709,30 +13158,30 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           },
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
           "unit_conversion": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversion"
               },
               {
-                "$ref": "#/components/schemas/UnitConversion"
+                "type": "null"
               }
             ]
           },
@@ -10834,20 +13283,20 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           },
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
@@ -10861,10 +13310,10 @@
           "unit_conversion_rounding": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversionRoundingEnum"
               },
               {
-                "$ref": "#/components/schemas/UnitConversionRoundingEnum"
+                "type": "null"
               }
             ]
           },
@@ -10875,6 +13324,39 @@
             ]
           }
         }
+      },
+      "MetricFilter": {
+        "type": "object",
+        "description": "A pre-aggregation filter: only events whose `property` matches feed the metric's\naggregation. Distinct from a segmentation dimension (which splits pricing). Multiple\nfilters are ANDed.",
+        "required": [
+          "property",
+          "op",
+          "values"
+        ],
+        "properties": {
+          "op": {
+            "$ref": "#/components/schemas/MetricFilterOperator"
+          },
+          "property": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "MetricFilterOperator": {
+        "type": "string",
+        "description": "Operator of a pre-aggregation [`MetricFilter`]. `EQUAL`/`NOT_EQUAL` are the single-value\nforms of `IN`/`NOT_IN`. Negation (`NOT_EQUAL`/`NOT_IN`) is presence-required: an event\nmissing the property is excluded.",
+        "enum": [
+          "EQUAL",
+          "NOT_EQUAL",
+          "IN",
+          "NOT_IN"
+        ]
       },
       "MetricListResponse": {
         "type": "object",
@@ -11079,6 +13561,19 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "NumberConfigValue": {
+        "type": "object",
+        "description": "A number config value (decimal, encoded as a string).",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -11316,20 +13811,20 @@
           "card": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/OnlineMethodConfig"
               },
               {
-                "$ref": "#/components/schemas/OnlineMethodConfig"
+                "type": "null"
               }
             ]
           },
           "direct_debit": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/OnlineMethodConfig"
               },
               {
-                "$ref": "#/components/schemas/OnlineMethodConfig"
+                "type": "null"
               }
             ]
           }
@@ -11341,11 +13836,11 @@
           "config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/OnlineMethodsConfig",
                 "description": "If None, inherits all online providers from invoicing entity."
+              },
+              {
+                "type": "null"
               }
             ]
           }
@@ -11357,6 +13852,42 @@
         "examples": [
           "org_7n42DGM5Tflk9n8mt7Fhc7"
         ]
+      },
+      "OverviewResponse": {
+        "type": "object",
+        "required": [
+          "root",
+          "accounts",
+          "policy_count",
+          "active_reservation_count",
+          "as_of"
+        ],
+        "properties": {
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountReadout"
+            }
+          },
+          "active_reservation_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instant this snapshot was read: balances and counters are exact as of this time."
+          },
+          "policy_count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "root": {
+            "$ref": "#/components/schemas/EnforcementRootReadout"
+          }
+        }
       },
       "PackagePlanPricing": {
         "type": "object",
@@ -11618,11 +14149,11 @@
           "minimum_commitment": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/MinimumCommitment",
                 "description": "Plan-level minimum commitment (period true-up floor). When set, every billing-period\ninvoice for this plan is guaranteed to be at least `minimum_commitment.amount` after\ndiscounts, with a \"Minimum commitment\" line filling any shortfall."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -11665,10 +14196,10 @@
           "trial": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TrialConfig"
               },
               {
-                "$ref": "#/components/schemas/TrialConfig"
+                "type": "null"
               }
             ]
           },
@@ -11700,10 +14231,10 @@
           "price_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PriceId"
               },
               {
-                "$ref": "#/components/schemas/PriceId"
+                "type": "null"
               }
             ]
           },
@@ -11912,6 +14443,255 @@
           }
         }
       },
+      "PolicyCounterReadout": {
+        "type": "object",
+        "description": "A live counter window for a policy. `window_end` is the reset time: consumption\nreturns to zero when a new window instance starts.",
+        "required": [
+          "window_instance_id",
+          "partition_key",
+          "window_start",
+          "consumed_units",
+          "reserved_units",
+          "updated_at"
+        ],
+        "properties": {
+          "consumed_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "limit_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "partition_key": {
+            "type": "string"
+          },
+          "remaining_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Headroom left in this window (limit minus consumed minus reserved, floored at 0)."
+          },
+          "reserved_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "window_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "window_instance_id": {
+            "type": "string"
+          },
+          "window_start": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PolicyKind": {
+        "type": "string",
+        "enum": [
+          "ALLOWANCE",
+          "USAGE",
+          "SPEND"
+        ]
+      },
+      "PolicyListResponse": {
+        "type": "object",
+        "required": [
+          "policies",
+          "grants",
+          "as_of"
+        ],
+        "properties": {
+          "as_of": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "grants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LimitGrantReadout"
+            }
+          },
+          "policies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PolicyReadout"
+            }
+          }
+        }
+      },
+      "PolicyReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "root_id",
+          "kind",
+          "pool_key",
+          "scope",
+          "partition_dimensions",
+          "window",
+          "behavior",
+          "thresholds",
+          "consistency_profile",
+          "advisory",
+          "status",
+          "version",
+          "effective_from",
+          "counters"
+        ],
+        "properties": {
+          "advisory": {
+            "type": "boolean"
+          },
+          "behavior": {
+            "$ref": "#/components/schemas/LimitBehavior"
+          },
+          "consistency_profile": {
+            "$ref": "#/components/schemas/ConsistencyProfile",
+            "description": "Effective enforcement label. ADVISORY policies (all rolling-window and non-DENY\npolicies) are observe-only: they never deny or hold capacity."
+          },
+          "counters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PolicyCounterReadout"
+            },
+            "description": "Live windows with consumption; empty until first use in the current window."
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/LimitPolicyId"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/PolicyKind"
+          },
+          "limit_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "meter_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BillableMetricId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "partition_dimensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pool_key": {
+            "type": "string"
+          },
+          "root_id": {
+            "$ref": "#/components/schemas/EnforcementRootId"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/PolicyStatus"
+          },
+          "thresholds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "unit": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ChargeUnit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "window": {
+            "type": "object"
+          }
+        }
+      },
+      "PolicyStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "ACTIVE",
+          "ARCHIVED"
+        ]
+      },
+      "PriceChargeUnit": {
+        "type": "object",
+        "required": [
+          "kind",
+          "code",
+          "scale"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/PriceChargeUnitKind"
+          },
+          "scale": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "PriceChargeUnitKind": {
+        "type": "string",
+        "enum": [
+          "CURRENCY",
+          "CUSTOM_CREDIT"
+        ]
+      },
       "PriceComponent": {
         "type": "object",
         "required": [
@@ -11922,10 +14702,10 @@
           "fee": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Fee"
               },
               {
-                "$ref": "#/components/schemas/Fee"
+                "type": "null"
               }
             ]
           },
@@ -11938,10 +14718,10 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           }
@@ -11970,10 +14750,10 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           }
@@ -12014,8 +14794,19 @@
           "cadence": {
             "$ref": "#/components/schemas/BillingPeriodEnum"
           },
+          "charge_unit": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PriceChargeUnit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "currency": {
-            "type": "string"
+            "type": "string",
+            "description": "Legacy storage name for the charge-unit code. For custom credits this must\nmatch `charge_unit.code`."
           },
           "pricing": {
             "$ref": "#/components/schemas/Pricing"
@@ -12235,12 +15026,16 @@
           },
           {
             "$ref": "#/components/schemas/OneTimeFeeStructure"
+          },
+          {
+            "$ref": "#/components/schemas/CreditFeeStructure"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "CAPACITY": "#/components/schemas/CapacityFeeStructure",
+            "CREDIT": "#/components/schemas/CreditFeeStructure",
             "EXTRA_RECURRING": "#/components/schemas/ExtraRecurringFeeStructure",
             "ONE_TIME": "#/components/schemas/OneTimeFeeStructure",
             "RATE": "#/components/schemas/RateFeeStructure",
@@ -12257,7 +15052,8 @@
           "CAPACITY",
           "USAGE",
           "EXTRA_RECURRING",
-          "ONE_TIME"
+          "ONE_TIME",
+          "CREDIT"
         ]
       },
       "ProductId": {
@@ -12360,10 +15156,10 @@
           "subscription_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionId"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionId"
+                "type": "null"
               }
             ]
           }
@@ -12457,10 +15253,10 @@
           "billing": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingConfig"
               },
               {
-                "$ref": "#/components/schemas/BillingConfig"
+                "type": "null"
               }
             ]
           },
@@ -12482,11 +15278,11 @@
           "minimum_commitment": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/MinimumCommitmentInput",
                 "description": "Optional plan-level period minimum commitment. Component scope must reference names\nthat exist in `components` (matched by name, not by ID, since component IDs are\nassigned by the server). Use `MinimumCommitmentInput` so the client can express\nscope by component name."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -12496,24 +15292,140 @@
           "status": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PlanStatusEnum"
               },
               {
-                "$ref": "#/components/schemas/PlanStatusEnum"
+                "type": "null"
               }
             ]
           },
           "trial": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TrialConfig"
               },
               {
-                "$ref": "#/components/schemas/TrialConfig"
+                "type": "null"
               }
             ]
           }
         }
+      },
+      "ReservationCounterCommit": {
+        "type": "object",
+        "required": [
+          "policy_id",
+          "units"
+        ],
+        "properties": {
+          "policy_id": {
+            "$ref": "#/components/schemas/LimitPolicyId"
+          },
+          "units": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ReservationListResponse": {
+        "type": "object",
+        "required": [
+          "reservations",
+          "as_of"
+        ],
+        "properties": {
+          "as_of": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reservations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReservationReadout"
+            }
+          }
+        }
+      },
+      "ReservationReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "state",
+          "unit",
+          "requested_quantity",
+          "committed_quantity",
+          "released_quantity",
+          "requested_units",
+          "reserved_units",
+          "committed_units",
+          "released_units",
+          "expires_at",
+          "version"
+        ],
+        "properties": {
+          "committed_quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "committed_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/EnforcementReservationId"
+          },
+          "released_quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "released_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "requested_quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "requested_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "reserved_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ReservationState"
+          },
+          "terminal_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/ChargeUnit"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ReservationState": {
+        "type": "string",
+        "enum": [
+          "RESERVED",
+          "PARTIALLY_COMMITTED",
+          "COMMITTED",
+          "RELEASED",
+          "EXPIRED"
+        ]
       },
       "ResetPeriod": {
         "oneOf": [
@@ -12586,12 +15498,16 @@
           },
           {
             "$ref": "#/components/schemas/MeteredResolvedEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigResolvedEntitlementValue"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanResolvedEntitlementValue",
+            "CONFIG": "#/components/schemas/ConfigResolvedEntitlementValue",
             "METERED": "#/components/schemas/MeteredResolvedEntitlementValue"
           }
         }
@@ -12647,6 +15563,157 @@
           }
         }
       },
+      "SettleReservationRequest": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "root_id",
+          "reservation_id",
+          "idempotency_key",
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/SettlementAction"
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "effective_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Defaults to the server receive time."
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "reservation_id": {
+            "$ref": "#/components/schemas/EnforcementReservationId"
+          },
+          "root_id": {
+            "$ref": "#/components/schemas/EnforcementRootId"
+          }
+        }
+      },
+      "SettleReservationResponse": {
+        "type": "object",
+        "required": [
+          "operation_id",
+          "reservation_id",
+          "state",
+          "committed_quantity",
+          "released_quantity",
+          "committed_units",
+          "released_units",
+          "replayed"
+        ],
+        "properties": {
+          "committed_quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "committed_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "operation_id": {
+            "$ref": "#/components/schemas/EnforcementOperationId"
+          },
+          "released_quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "released_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "replayed": {
+            "type": "boolean"
+          },
+          "reservation_id": {
+            "$ref": "#/components/schemas/EnforcementReservationId"
+          },
+          "settled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Instant this settlement was applied at; echoes `effective_at` when supplied."
+          },
+          "state": {
+            "$ref": "#/components/schemas/ReservationState"
+          }
+        }
+      },
+      "SettlementAction": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "quantity",
+              "value_units",
+              "type"
+            ],
+            "properties": {
+              "counters": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReservationCounterCommit"
+                }
+              },
+              "final_commit": {
+                "type": "boolean"
+              },
+              "quantity": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "COMMIT"
+                ]
+              },
+              "value_units": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "RELEASE"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "EXPIRE"
+                ]
+              }
+            }
+          }
+        ]
+      },
       "ShippingAddress": {
         "type": "object",
         "required": [
@@ -12656,10 +15723,10 @@
           "address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -12965,11 +16032,11 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/PaymentMethodsConfig",
                 "description": "Payment methods configuration (Online, BankTransfer, or External)"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -13091,10 +16158,10 @@
           "billing_period": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingPeriodEnum"
               },
               {
-                "$ref": "#/components/schemas/BillingPeriodEnum"
+                "type": "null"
               }
             ]
           },
@@ -13153,20 +16220,20 @@
           "price_component_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PriceComponentId"
               },
               {
-                "$ref": "#/components/schemas/PriceComponentId"
+                "type": "null"
               }
             ]
           },
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           }
@@ -13404,11 +16471,11 @@
           "minimum_commitment": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/MinimumCommitment",
                 "description": "Materialized minimum-commitment floor on this subscription (plan snapshot or operator\noverride). Read-only here — set it at creation, or change it via a subscription amendment."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -13427,10 +16494,10 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PaymentMethodsConfig"
               },
               {
-                "$ref": "#/components/schemas/PaymentMethodsConfig"
+                "type": "null"
               }
             ]
           },
@@ -13519,7 +16586,9 @@
           "net_terms",
           "mrr_cents",
           "period",
-          "status"
+          "status",
+          "auto_advance_invoices",
+          "charge_automatically"
         ],
         "properties": {
           "activated_at": {
@@ -13528,6 +16597,9 @@
               "null"
             ],
             "format": "date-time"
+          },
+          "auto_advance_invoices": {
+            "type": "boolean"
           },
           "billing_day_anchor": {
             "type": "integer",
@@ -13540,6 +16612,27 @@
               "null"
             ],
             "format": "date"
+          },
+          "cancellation_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Present on `subscription.cancelled` when a reason was supplied."
+          },
+          "change_type": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionUpdateType",
+                "description": "Present on `subscription.updated`: which mutation fired the event."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "charge_automatically": {
+            "type": "boolean"
           },
           "created_at": {
             "type": "string",
@@ -13595,6 +16688,12 @@
           "plan_name": {
             "type": "string"
           },
+          "purchase_order": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "start_date": {
             "type": "string",
             "format": "date"
@@ -13639,12 +16738,16 @@
           },
           {
             "$ref": "#/components/schemas/UsageFee"
+          },
+          {
+            "$ref": "#/components/schemas/CreditFee"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "CAPACITY": "#/components/schemas/CapacityFee",
+            "CREDIT": "#/components/schemas/CreditFee",
             "ONE_TIME": "#/components/schemas/OneTimeFee",
             "RATE": "#/components/schemas/RateFee",
             "RECURRING": "#/components/schemas/RecurringFee",
@@ -13700,6 +16803,7 @@
           "PAUSED",
           "SUSPENDED",
           "CANCELLED",
+          "ABORTED",
           "COMPLETED",
           "SUPERSEDED",
           "ERRORED"
@@ -13741,11 +16845,11 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/PaymentMethodsConfig",
                 "description": "Payment methods configuration (Online, BankTransfer, or External)"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -13769,6 +16873,20 @@
           }
         }
       },
+      "SubscriptionUpdateType": {
+        "type": "string",
+        "description": "Identifies which mutation triggered a `subscription.updated` webhook.",
+        "enum": [
+          "activated",
+          "trial_ended",
+          "billing_configuration_updated",
+          "plan_changed",
+          "amended",
+          "units_changed",
+          "paused",
+          "cancellation_scheduled"
+        ]
+      },
       "TaxBreakdownItem": {
         "type": "object",
         "required": [
@@ -13781,10 +16899,10 @@
           "exemption_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TaxExemptionType"
               },
               {
-                "$ref": "#/components/schemas/TaxExemptionType"
+                "type": "null"
               }
             ]
           },
@@ -13834,6 +16952,18 @@
           },
           "term": {
             "$ref": "#/components/schemas/BillingPeriodEnum"
+          }
+        }
+      },
+      "TextConfigValue": {
+        "type": "object",
+        "description": "A text config value.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string"
           }
         }
       },
@@ -14077,20 +17207,20 @@
           "payment_method_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CustomerPaymentMethodId"
               },
               {
-                "$ref": "#/components/schemas/CustomerPaymentMethodId"
+                "type": "null"
               }
             ]
           },
           "payment_method_info": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PaymentMethodInfo"
               },
               {
-                "$ref": "#/components/schemas/PaymentMethodInfo"
+                "type": "null"
               }
             ]
           },
@@ -14133,10 +17263,10 @@
           "trialing_plan_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PlanId"
               },
               {
-                "$ref": "#/components/schemas/PlanId"
+                "type": "null"
               }
             ]
           }
@@ -14169,6 +17299,13 @@
           "NONE"
         ]
       },
+      "UnitKind": {
+        "type": "string",
+        "enum": [
+          "CURRENCY",
+          "CUSTOM_CREDIT"
+        ]
+      },
       "UpdateAddOnRequest": {
         "type": "object",
         "properties": {
@@ -14194,10 +17331,10 @@
           "price_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PriceId"
               },
               {
-                "$ref": "#/components/schemas/PriceId"
+                "type": "null"
               }
             ]
           },
@@ -14221,10 +17358,10 @@
           "discount": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CouponDiscount"
               },
               {
-                "$ref": "#/components/schemas/CouponDiscount"
+                "type": "null"
               }
             ]
           },
@@ -14248,6 +17385,16 @@
               "null"
             ]
           },
+          "filters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/MetricFilter"
+            },
+            "description": "Absent = leave filters untouched; present (even empty) = replace them."
+          },
           "name": {
             "type": [
               "string",
@@ -14257,20 +17404,20 @@
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
           "unit_conversion": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversion"
               },
               {
-                "$ref": "#/components/schemas/UnitConversion"
+                "type": "null"
               }
             ]
           }
@@ -14288,10 +17435,10 @@
           "fee_structure": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductFeeStructure"
               },
               {
-                "$ref": "#/components/schemas/ProductFeeStructure"
+                "type": "null"
               }
             ]
           },
@@ -14427,6 +17574,153 @@
           }
         }
       },
+      "ValueAccountId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "vac_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "ValueAllocation": {
+        "type": "object",
+        "required": [
+          "account_id",
+          "grant_id",
+          "units",
+          "order_rank"
+        ],
+        "properties": {
+          "account_id": {
+            "$ref": "#/components/schemas/ValueAccountId"
+          },
+          "grant_id": {
+            "$ref": "#/components/schemas/ValueGrantId"
+          },
+          "order_rank": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "units": {
+            "type": "string"
+          }
+        }
+      },
+      "ValueGrantClassification": {
+        "type": "string",
+        "enum": [
+          "PAID",
+          "PROMOTIONAL"
+        ]
+      },
+      "ValueGrantId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "vgr_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "ValueGrantReadout": {
+        "type": "object",
+        "required": [
+          "id",
+          "operation_id",
+          "face_units",
+          "remaining_units",
+          "reserved_units",
+          "classification",
+          "source_kind",
+          "priority",
+          "effective_at",
+          "state",
+          "scope"
+        ],
+        "properties": {
+          "classification": {
+            "$ref": "#/components/schemas/ValueGrantClassification"
+          },
+          "effective_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "face_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "$ref": "#/components/schemas/ValueGrantId"
+          },
+          "operation_id": {
+            "$ref": "#/components/schemas/ValueOperationId"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "remaining_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "reserved_units": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "source_kind": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ValueGrantState"
+          }
+        }
+      },
+      "ValueGrantState": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "ACTIVE",
+          "DEPLETED",
+          "EXPIRED",
+          "VOIDED",
+          "FROZEN"
+        ]
+      },
+      "ValueLedgerEntryId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "vle_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "ValueOperationId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "vop_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
       "VolumePlanPricing": {
         "type": "object",
         "required": [
@@ -14498,6 +17792,9 @@
     },
     {
       "name": "Credit Notes"
+    },
+    {
+      "name": "Credit control"
     },
     {
       "name": "Customers"
@@ -14789,6 +18086,170 @@
         }
       }
     },
+    "credit_control.auto_topup_failed": {
+      "post": {
+        "summary": "credit_control.auto_topup_failed webhook",
+        "description": "An automatic top-up charge failed",
+        "operationId": "webhook_credit_control_auto_topup_failed",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditControlEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "credit_control.auto_topup_failed",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "root_id": "eroot_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_id": "lpol_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_kind": "SPEND",
+                "behavior": "WARN",
+                "unit_code": "USD",
+                "current_units": 8000,
+                "threshold_units": 8000,
+                "limit_units": 10000,
+                "window_instance_id": "2026-07",
+                "window_start": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "credit_control.auto_topup_suspended": {
+      "post": {
+        "summary": "credit_control.auto_topup_suspended webhook",
+        "description": "Automatic top-up was suspended after too many consecutive failures",
+        "operationId": "webhook_credit_control_auto_topup_suspended",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditControlEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "credit_control.auto_topup_suspended",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "root_id": "eroot_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_id": "lpol_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_kind": "SPEND",
+                "behavior": "WARN",
+                "unit_code": "USD",
+                "current_units": 8000,
+                "threshold_units": 8000,
+                "limit_units": 10000,
+                "window_instance_id": "2026-07",
+                "window_start": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "credit_control.limit_reached": {
+      "post": {
+        "summary": "credit_control.limit_reached webhook",
+        "description": "A credit-control hard or soft limit was reached",
+        "operationId": "webhook_credit_control_limit_reached",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditControlEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "credit_control.limit_reached",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "root_id": "eroot_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_id": "lpol_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_kind": "SPEND",
+                "behavior": "WARN",
+                "unit_code": "USD",
+                "current_units": 8000,
+                "threshold_units": 8000,
+                "limit_units": 10000,
+                "window_instance_id": "2026-07",
+                "window_start": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "credit_control.threshold_reached": {
+      "post": {
+        "summary": "credit_control.threshold_reached webhook",
+        "description": "A credit-control limit crossed an alert threshold",
+        "operationId": "webhook_credit_control_threshold_reached",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditControlEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "credit_control.threshold_reached",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "root_id": "eroot_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_id": "lpol_7n42DGM5Tflk9n8mt7Fhc7",
+                "policy_kind": "SPEND",
+                "behavior": "WARN",
+                "unit_code": "USD",
+                "current_units": 8000,
+                "threshold_units": 8000,
+                "limit_units": 10000,
+                "window_instance_id": "2026-07",
+                "window_start": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
     "credit_note.created": {
       "post": {
         "summary": "credit_note.created webhook",
@@ -14936,6 +18397,111 @@
                 ],
                 "phone": "+1-555-0123",
                 "currency": "USD",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "entitlement.limit_reached": {
+      "post": {
+        "summary": "entitlement.limit_reached webhook",
+        "description": "A metered entitlement reached its included usage limit",
+        "operationId": "webhook_entitlement_limit_reached",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitlementEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "entitlement.limit_reached",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "metric_id": "bm_7n42DGM5Tflk9n8mt7Fhc7",
+                "consumed": 100000,
+                "limit": 100000,
+                "reset_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "entitlement.reset": {
+      "post": {
+        "summary": "entitlement.reset webhook",
+        "description": "A metered entitlement's usage window rolled over and the counter reset",
+        "operationId": "webhook_entitlement_reset",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitlementEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "entitlement.reset",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "metric_id": "bm_7n42DGM5Tflk9n8mt7Fhc7",
+                "consumed": 100000,
+                "limit": 100000,
+                "reset_at": "1970-01-01T00:00:00.000Z",
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "entitlement.threshold_reached": {
+      "post": {
+        "summary": "entitlement.threshold_reached webhook",
+        "description": "A metered entitlement crossed its usage warning threshold",
+        "operationId": "webhook_entitlement_threshold_reached",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitlementEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "entitlement.threshold_reached",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "metric_id": "bm_7n42DGM5Tflk9n8mt7Fhc7",
+                "consumed": 100000,
+                "limit": 100000,
+                "reset_at": "1970-01-01T00:00:00.000Z",
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
@@ -15527,6 +19093,52 @@
         }
       }
     },
+    "subscription.cancelled": {
+      "post": {
+        "summary": "subscription.cancelled webhook",
+        "description": "A subscription was cancelled (its cancellation took effect)",
+        "operationId": "webhook_subscription_cancelled",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "subscription.cancelled",
+                "subscription_id": "sub_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_alias": "ACME",
+                "customer_name": "Acme Corporation",
+                "billing_day_anchor": 1,
+                "currency": "EUR",
+                "start_date": "1970-01-01",
+                "plan_name": "default",
+                "version": 0,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "net_terms": 0,
+                "mrr_cents": 0,
+                "period": "MONTHLY",
+                "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
     "subscription.created": {
       "post": {
         "summary": "subscription.created webhook",
@@ -15559,6 +19171,100 @@
                 "mrr_cents": 0,
                 "period": "MONTHLY",
                 "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "subscription.ended": {
+      "post": {
+        "summary": "subscription.ended webhook",
+        "description": "A subscription ended by reaching its fixed end date",
+        "operationId": "webhook_subscription_ended",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "subscription.ended",
+                "subscription_id": "sub_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_alias": "ACME",
+                "customer_name": "Acme Corporation",
+                "billing_day_anchor": 1,
+                "currency": "EUR",
+                "start_date": "1970-01-01",
+                "plan_name": "default",
+                "version": 0,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "net_terms": 0,
+                "mrr_cents": 0,
+                "period": "MONTHLY",
+                "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "subscription.updated": {
+      "post": {
+        "summary": "subscription.updated webhook",
+        "description": "A subscription was updated (plan change, amendment, seats, billing configuration, ...)",
+        "operationId": "webhook_subscription_updated",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "subscription.updated",
+                "subscription_id": "sub_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_alias": "ACME",
+                "customer_name": "Acme Corporation",
+                "billing_day_anchor": 1,
+                "currency": "EUR",
+                "start_date": "1970-01-01",
+                "plan_name": "default",
+                "version": 0,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "net_terms": 0,
+                "mrr_cents": 0,
+                "period": "MONTHLY",
+                "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
