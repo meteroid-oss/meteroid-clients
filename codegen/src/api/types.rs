@@ -349,6 +349,8 @@ fn promote_field_type(
         | FieldType::Int32
         | FieldType::Int64
         | FieldType::UInt64
+        | FieldType::Float
+        | FieldType::Double
         | FieldType::String
         | FieldType::Decimal
         | FieldType::DateTime
@@ -786,10 +788,9 @@ impl TypeData {
                         Ok((
                             enum_varnames[i]
                                 .as_str()
-                                .context(format!(
-                                    "enum varname {} is not a string",
-                                    &enum_varnames[i]
-                                ))?
+                                .with_context(|| {
+                                    format!("enum varname {} is not a string", enum_varnames[i])
+                                })?
                                 .to_string(),
                             num,
                         ))
@@ -928,6 +929,8 @@ pub(crate) enum FieldType {
     Int32,
     Int64,
     UInt64,
+    Float,
+    Double,
     String,
     Decimal,
     DateTime,
@@ -1026,6 +1029,12 @@ impl FieldType {
                 Some("uint" | "uint64") => Self::UInt64,
                 None => Self::Int64, // Default to i64 for integers without format
                 f => bail!("unsupported integer format: `{f:?}`"),
+            },
+            Some(InstanceType::Number) => match obj.format.as_deref() {
+                Some("float") => Self::Float,
+                // A number without a format is unbounded in JSON Schema, so pick the wider type.
+                Some("double") | None => Self::Double,
+                f => bail!("unsupported number format: `{f:?}`"),
             },
             Some(InstanceType::String) => {
                 // String consts are the only const / enum values we support, for now.
@@ -1151,6 +1160,8 @@ impl FieldType {
             Self::Int64 => "long".into(),
             Self::UInt16 => "ushort".into(),
             Self::UInt64 => "ulong".into(),
+            Self::Float => "float".into(),
+            Self::Double => "double".into(),
             Self::String => "string".into(),
             Self::Decimal => "decimal".into(),
             Self::DateTime => "DateTime".into(),
@@ -1176,6 +1187,8 @@ impl FieldType {
             Self::Int64 => "int64".into(),
             Self::UInt16 => "uint16".into(),
             Self::UInt64 => "uint64".into(),
+            Self::Float => "float32".into(),
+            Self::Double => "float64".into(),
             Self::Uri | Self::String | Self::Decimal => "string".into(),
             Self::DateTime => "time.Time".into(),
             Self::JsonObject => "map[string]any".into(),
@@ -1197,6 +1210,8 @@ impl FieldType {
             Self::UInt16 => "UShort".into(),
             Self::Int64 => "Long".into(),
             Self::UInt64 => "ULong".into(),
+            Self::Float => "Float".into(),
+            Self::Double => "Double".into(),
             Self::Uri | Self::String => "String".into(),
             Self::Decimal => "java.math.BigDecimal".into(),
             Self::DateTime => "Instant".into(),
@@ -1220,6 +1235,8 @@ impl FieldType {
             | Self::Int32
             | Self::Int64
             | Self::UInt64
+            | Self::Float
+            | Self::Double
             | Self::Decimal => "number".into(),
             Self::String | Self::Uri => "string".into(),
             Self::DateTime => "Date".into(),
@@ -1244,6 +1261,8 @@ impl FieldType {
             Self::Int32 |
             // FIXME: All integers in query params are currently i32
             Self::Int64 | Self::UInt64 => "i32".into(),
+            Self::Float => "f32".into(),
+            Self::Double => "f64".into(),
             // FIXME: Do we want a separate type for Uri?
             Self::Uri | Self::String => "String".into(),
             Self::Decimal => "rust_decimal::Decimal".into(),
@@ -1283,6 +1302,7 @@ impl FieldType {
         match self {
             Self::Bool => "bool".into(),
             Self::Int16 | Self::UInt16 | Self::Int32 | Self::Int64 | Self::UInt64 => "int".into(),
+            Self::Float | Self::Double => "float".into(),
             Self::String => "str".into(),
             Self::Decimal => "Decimal".into(),
             Self::DateTime => "datetime".into(),
@@ -1307,6 +1327,8 @@ impl FieldType {
             FieldType::Int16 => "Short".into(),
             FieldType::UInt16 | FieldType::UInt64 | FieldType::Int64 => "Long".into(),
             FieldType::Int32 => "Integer".into(),
+            FieldType::Float => "Float".into(),
+            FieldType::Double => "Double".into(),
             FieldType::String => "String".into(),
             FieldType::Decimal => "BigDecimal".into(),
             FieldType::DateTime => "OffsetDateTime".into(),
@@ -1344,6 +1366,8 @@ impl FieldType {
             | FieldType::Int32
             | FieldType::Int64
             | FieldType::UInt64
+            | FieldType::Float
+            | FieldType::Double
             | FieldType::String
             | FieldType::Decimal
             | FieldType::DateTime
@@ -1383,6 +1407,8 @@ impl FieldType {
             | FieldType::Int32
             | FieldType::Int64
             | FieldType::UInt64
+            | FieldType::Float
+            | FieldType::Double
             | FieldType::String
             | FieldType::Decimal
             | FieldType::DateTime
@@ -1408,7 +1434,7 @@ impl FieldType {
             | FieldType::UInt64
             | FieldType::Int32
             | FieldType::Int64 => "int".into(),
-            FieldType::Decimal => "float".into(),
+            FieldType::Float | FieldType::Double | FieldType::Decimal => "float".into(),
             FieldType::Uri | FieldType::StringConst { .. } | FieldType::String => "string".into(),
             FieldType::StringEnum { .. } => unreachable_inline_enum(),
             FieldType::DateTime => r#"\DateTimeImmutable"#.into(),
@@ -1517,6 +1543,8 @@ impl minijinja::value::Object for FieldType {
                 let is_int_or_uint = match &**self {
                     F::Int16 | F::UInt16 | F::Int32 | F::Int64 | F::UInt64 => true,
                     F::Bool
+                    | F::Float
+                    | F::Double
                     | F::String
                     | F::Decimal
                     | F::DateTime
