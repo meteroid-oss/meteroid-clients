@@ -33,6 +33,7 @@ async fn test_list_customers() {
                     "id": "cust_123",
                     "name": "Test Customer",
                     "currency": "USD",
+                    "custom_properties": {},
                     "custom_taxes": [],
                     "invoicing_emails": [],
                     "invoicing_entity_id": "inv_1"
@@ -99,6 +100,7 @@ async fn test_create_customer() {
         "id": "cust_new",
         "name": "New Customer",
         "currency": "USD",
+        "custom_properties": {},
         "custom_taxes": [],
         "invoicing_emails": ["billing@new.com"],
         "invoicing_entity_id": "inv_1"
@@ -158,6 +160,7 @@ async fn test_idempotency_key_is_sent_for_post_request() {
         "id": "cust_new",
         "name": "New Customer",
         "currency": "USD",
+        "custom_properties": {},
         "custom_taxes": [],
         "invoicing_emails": [],
         "invoicing_entity_id": "inv_1"
