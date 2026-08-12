@@ -788,10 +788,9 @@ impl TypeData {
                         Ok((
                             enum_varnames[i]
                                 .as_str()
-                                .context(format!(
-                                    "enum varname {} is not a string",
-                                    &enum_varnames[i]
-                                ))?
+                                .with_context(|| {
+                                    format!("enum varname {} is not a string", enum_varnames[i])
+                                })?
                                 .to_string(),
                             num,
                         ))
