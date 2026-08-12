@@ -151,6 +151,11 @@ impl Meteroid {
         super::CreditNotes::new(&self.cfg)
     }
 
+    /// Access the custom properties API.
+    pub fn custom_properties(&self) -> super::CustomProperties<'_> {
+        super::CustomProperties::new(&self.cfg)
+    }
+
     /// Access the customers API.
     pub fn customers(&self) -> super::Customers<'_> {
         super::Customers::new(&self.cfg)

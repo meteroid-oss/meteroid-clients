@@ -12,13 +12,22 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class Coupon {
+    @JsonProperty("archived_at")
+    private OffsetDateTime archivedAt;
+
     @JsonProperty private String code;
+
+    @JsonProperty("created_at")
+    private OffsetDateTime createdAt;
+
     @JsonProperty private String description;
     @JsonProperty private Boolean disabled;
     @JsonProperty private CouponDiscount discount;
@@ -28,8 +37,14 @@ public class Coupon {
 
     @JsonProperty private String id;
 
+    @JsonProperty("plan_ids")
+    private List<String> planIds;
+
     @JsonProperty("recurring_value")
     private Integer recurringValue;
+
+    @JsonProperty("redemption_count")
+    private Integer redemptionCount;
 
     @JsonProperty("redemption_limit")
     private Integer redemptionLimit;
@@ -37,6 +52,25 @@ public class Coupon {
     @JsonProperty private Boolean reusable;
 
     public Coupon() {}
+
+    public Coupon archivedAt(OffsetDateTime archivedAt) {
+        this.archivedAt = archivedAt;
+        return this;
+    }
+
+    /**
+     * Get archivedAt
+     *
+     * @return archivedAt
+     */
+    @javax.annotation.Nullable
+    public OffsetDateTime getArchivedAt() {
+        return archivedAt;
+    }
+
+    public void setArchivedAt(OffsetDateTime archivedAt) {
+        this.archivedAt = archivedAt;
+    }
 
     public Coupon code(String code) {
         this.code = code;
@@ -57,6 +91,25 @@ public class Coupon {
         this.code = code;
     }
 
+    public Coupon createdAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return createdAt
+     */
+    @javax.annotation.Nonnull
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Coupon description(String description) {
         this.description = description;
         return this;
@@ -67,7 +120,7 @@ public class Coupon {
      *
      * @return description
      */
-    @javax.annotation.Nonnull
+    @javax.annotation.Nullable
     public String getDescription() {
         return description;
     }
@@ -152,6 +205,34 @@ public class Coupon {
         this.id = id;
     }
 
+    public Coupon planIds(List<String> planIds) {
+        this.planIds = planIds;
+        return this;
+    }
+
+    public Coupon addPlanIdsItem(String planIdsItem) {
+        if (this.planIds == null) {
+            this.planIds = new ArrayList<>();
+        }
+        this.planIds.add(planIdsItem);
+
+        return this;
+    }
+
+    /**
+     * Get planIds
+     *
+     * @return planIds
+     */
+    @javax.annotation.Nonnull
+    public List<String> getPlanIds() {
+        return planIds;
+    }
+
+    public void setPlanIds(List<String> planIds) {
+        this.planIds = planIds;
+    }
+
     public Coupon recurringValue(Integer recurringValue) {
         this.recurringValue = recurringValue;
         return this;
@@ -169,6 +250,25 @@ public class Coupon {
 
     public void setRecurringValue(Integer recurringValue) {
         this.recurringValue = recurringValue;
+    }
+
+    public Coupon redemptionCount(Integer redemptionCount) {
+        this.redemptionCount = redemptionCount;
+        return this;
+    }
+
+    /**
+     * Get redemptionCount
+     *
+     * @return redemptionCount
+     */
+    @javax.annotation.Nonnull
+    public Integer getRedemptionCount() {
+        return redemptionCount;
+    }
+
+    public void setRedemptionCount(Integer redemptionCount) {
+        this.redemptionCount = redemptionCount;
     }
 
     public Coupon redemptionLimit(Integer redemptionLimit) {

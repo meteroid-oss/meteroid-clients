@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,7 +25,7 @@ public class ExtraRecurringPlanFee {
     @JsonProperty private Integer quantity;
 
     @JsonProperty("unit_price")
-    private String unitPrice;
+    private BigDecimal unitPrice;
 
     public ExtraRecurringPlanFee() {}
 
@@ -84,7 +86,7 @@ public class ExtraRecurringPlanFee {
         this.quantity = quantity;
     }
 
-    public ExtraRecurringPlanFee unitPrice(String unitPrice) {
+    public ExtraRecurringPlanFee unitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
         return this;
     }
@@ -95,11 +97,11 @@ public class ExtraRecurringPlanFee {
      * @return unitPrice
      */
     @javax.annotation.Nonnull
-    public String getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(String unitPrice) {
+    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
 

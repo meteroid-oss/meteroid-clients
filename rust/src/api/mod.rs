@@ -7,6 +7,7 @@ mod checkout_sessions;
 mod connect;
 mod coupons;
 mod credit_notes;
+mod custom_properties;
 mod customers;
 mod events;
 mod features;
@@ -27,7 +28,8 @@ pub use self::{
     client::{Meteroid, MeteroidOptions},
     connect::Connect,
     coupons::{Coupons, CouponsListCouponsOptions},
-    credit_notes::CreditNotes,
+    credit_notes::{CreditNotes, CreditNotesListCreditNotesOptions},
+    custom_properties::{CustomProperties, CustomPropertiesListDefinitionsOptions},
     customers::{Customers, CustomersListCustomersOptions},
     events::Events,
     features::{Features, FeaturesListFeaturesOptions},

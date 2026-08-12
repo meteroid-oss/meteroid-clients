@@ -17,6 +17,15 @@ pub enum EventType {
     #[serde(rename = "subscription.created")]
     SubscriptionCreated,
 
+    #[serde(rename = "subscription.updated")]
+    SubscriptionUpdated,
+
+    #[serde(rename = "subscription.cancelled")]
+    SubscriptionCancelled,
+
+    #[serde(rename = "subscription.ended")]
+    SubscriptionEnded,
+
     #[serde(rename = "invoice.created")]
     InvoiceCreated,
 
@@ -96,6 +105,9 @@ impl fmt::Display for EventType {
             Self::MetricCreated => "metric.created",
             Self::CustomerCreated => "customer.created",
             Self::SubscriptionCreated => "subscription.created",
+            Self::SubscriptionUpdated => "subscription.updated",
+            Self::SubscriptionCancelled => "subscription.cancelled",
+            Self::SubscriptionEnded => "subscription.ended",
             Self::InvoiceCreated => "invoice.created",
             Self::InvoiceFinalized => "invoice.finalized",
             Self::InvoicePaid => "invoice.paid",

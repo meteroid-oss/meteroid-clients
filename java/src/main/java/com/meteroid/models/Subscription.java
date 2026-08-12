@@ -44,6 +44,9 @@ public class Subscription {
     @JsonProperty("current_period_start")
     private String currentPeriodStart;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("customer_alias")
     private String customerAlias;
 
@@ -269,6 +272,25 @@ public class Subscription {
 
     public void setCurrentPeriodStart(String currentPeriodStart) {
         this.currentPeriodStart = currentPeriodStart;
+    }
+
+    public Subscription customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition `key`.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nonnull
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public Subscription customerAlias(String customerAlias) {

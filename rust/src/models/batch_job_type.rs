@@ -19,6 +19,9 @@ pub enum BatchJobType {
 
     #[serde(rename = "SUBSCRIPTION_PLAN_MIGRATION")]
     SubscriptionPlanMigration,
+
+    #[serde(rename = "TAX_REPORT_EXPORT")]
+    TaxReportExport,
 }
 
 impl fmt::Display for BatchJobType {
@@ -28,6 +31,7 @@ impl fmt::Display for BatchJobType {
             Self::CustomerCsvImport => "CUSTOMER_CSV_IMPORT",
             Self::SubscriptionCsvImport => "SUBSCRIPTION_CSV_IMPORT",
             Self::SubscriptionPlanMigration => "SUBSCRIPTION_PLAN_MIGRATION",
+            Self::TaxReportExport => "TAX_REPORT_EXPORT",
         };
         f.write_str(value)
     }

@@ -19,7 +19,7 @@ public class FeatureRef {
     @JsonProperty private String code;
     @JsonProperty private String id;
     @JsonProperty private String name;
-    @JsonProperty private ProductRef product;
+    @JsonProperty private EntitlementProductRef product;
 
     public FeatureRef() {}
 
@@ -80,7 +80,7 @@ public class FeatureRef {
         this.name = name;
     }
 
-    public FeatureRef product(ProductRef product) {
+    public FeatureRef product(EntitlementProductRef product) {
         this.product = product;
         return this;
     }
@@ -91,11 +91,11 @@ public class FeatureRef {
      * @return product
      */
     @javax.annotation.Nullable
-    public ProductRef getProduct() {
+    public EntitlementProductRef getProduct() {
         return product;
     }
 
-    public void setProduct(ProductRef product) {
+    public void setProduct(EntitlementProductRef product) {
         this.product = product;
     }
 

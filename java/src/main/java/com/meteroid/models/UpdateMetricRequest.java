@@ -11,12 +11,16 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class UpdateMetricRequest {
     @JsonProperty private String description;
+    @JsonProperty private List<MetricFilter> filters;
     @JsonProperty private String name;
 
     @JsonProperty("segmentation_matrix")
@@ -44,6 +48,34 @@ public class UpdateMetricRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public UpdateMetricRequest filters(List<MetricFilter> filters) {
+        this.filters = filters;
+        return this;
+    }
+
+    public UpdateMetricRequest addFiltersItem(MetricFilter filtersItem) {
+        if (this.filters == null) {
+            this.filters = new ArrayList<>();
+        }
+        this.filters.add(filtersItem);
+
+        return this;
+    }
+
+    /**
+     * Absent = leave filters untouched; present (even empty) = replace them.
+     *
+     * @return filters
+     */
+    @javax.annotation.Nullable
+    public List<MetricFilter> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(List<MetricFilter> filters) {
+        this.filters = filters;
     }
 
     public UpdateMetricRequest name(String name) {

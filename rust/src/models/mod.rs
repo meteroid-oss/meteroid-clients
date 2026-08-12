@@ -30,6 +30,7 @@ pub mod billing_metric_aggregate_enum;
 pub mod billing_period_enum;
 pub mod billing_type;
 pub mod billing_type_enum;
+pub mod boolean_config_value;
 pub mod boolean_effective_entitlement_value;
 pub mod boolean_entitlement_value;
 pub mod boolean_feature_type;
@@ -52,6 +53,12 @@ pub mod component_override;
 pub mod component_parameterization;
 pub mod component_parameters;
 pub mod components_scope;
+pub mod config_effective_entitlement_value;
+pub mod config_entitlement_value;
+pub mod config_feature_type;
+pub mod config_resolved_entitlement_value;
+pub mod config_value;
+pub mod config_value_type;
 pub mod connected_account;
 pub mod connected_account_id;
 pub mod connected_accounts_response;
@@ -78,11 +85,22 @@ pub mod create_plan_request;
 pub mod create_product_request;
 pub mod create_subscription_add_on;
 pub mod create_subscription_components;
+pub mod credit_note;
+pub mod credit_note_custom_properties_request;
 pub mod credit_note_event;
 pub mod credit_note_event_data;
 pub mod credit_note_id;
+pub mod credit_note_list_response;
 pub mod credit_note_status;
+pub mod credit_type;
 pub mod currency;
+pub mod custom_property_definition;
+pub mod custom_property_definition_create_request;
+pub mod custom_property_definition_id;
+pub mod custom_property_definition_list_response;
+pub mod custom_property_definition_update_request;
+pub mod custom_property_entity_type;
+pub mod custom_property_type;
 pub mod custom_tax_rate;
 pub mod customer;
 pub mod customer_create_request;
@@ -93,6 +111,7 @@ pub mod customer_id;
 pub mod customer_list_response;
 pub mod customer_patch_request;
 pub mod customer_payment_method_id;
+pub mod customer_portal_token_request;
 pub mod customer_portal_token_response;
 pub mod customer_update_request;
 pub mod double_segmentation_matrix;
@@ -101,6 +120,7 @@ pub mod effective_entitlement_list_response;
 pub mod effective_entitlement_value;
 pub mod entitlement;
 pub mod entitlement_id;
+pub mod entitlement_product_ref;
 pub mod entitlement_value;
 pub mod event;
 pub mod event_id;
@@ -129,6 +149,7 @@ pub mod ingest_events_response;
 pub mod ingest_failure;
 pub mod introspection_request;
 pub mod invoice;
+pub mod invoice_custom_properties_request;
 pub mod invoice_event;
 pub mod invoice_event_data;
 pub mod invoice_id;
@@ -138,6 +159,7 @@ pub mod invoice_payment_status;
 pub mod invoice_status;
 pub mod invoice_type;
 pub mod invoicing_entity_id;
+pub mod json_config_value;
 pub mod linked_segmentation_matrix;
 pub mod list_checkout_sessions_response;
 pub mod matrix_dimension;
@@ -154,6 +176,8 @@ pub mod metric;
 pub mod metric_dimension;
 pub mod metric_event;
 pub mod metric_event_data;
+pub mod metric_filter;
+pub mod metric_filter_operator;
 pub mod metric_list_response;
 pub mod metric_segmentation_matrix;
 pub mod metric_summary;
@@ -164,6 +188,7 @@ pub mod minimum_commitment_input_scope;
 pub mod minimum_commitment_scope;
 pub mod never_reset_period;
 pub mod new_product_ref;
+pub mod number_config_value;
 pub mod o_auth_app;
 pub mod o_auth_app_id;
 pub mod o_auth_app_with_secret;
@@ -223,6 +248,7 @@ pub mod product_id;
 pub mod product_list_response;
 pub mod product_ref;
 pub mod products_scope;
+pub mod property_config;
 pub mod quote_event;
 pub mod quote_event_data;
 pub mod quote_id;
@@ -238,6 +264,7 @@ pub mod resolved_entitlement_list_response;
 pub mod resolved_entitlement_value;
 pub mod revocation_request;
 pub mod rotated_secret;
+pub mod select_option;
 pub mod shipping_address;
 pub mod sliding_window_reset_period;
 pub mod slot_downgrade_policy_enum;
@@ -255,6 +282,7 @@ pub mod subscription_add_on_id;
 pub mod subscription_add_on_parameterization;
 pub mod subscription_add_on_price_override;
 pub mod subscription_component;
+pub mod subscription_coupon;
 pub mod subscription_create_request;
 pub mod subscription_details;
 pub mod subscription_event;
@@ -266,10 +294,12 @@ pub mod subscription_list_response;
 pub mod subscription_status_enum;
 pub mod subscription_update_request;
 pub mod subscription_update_response;
+pub mod subscription_update_type;
 pub mod tax_breakdown_item;
 pub mod tax_exemption_type;
 pub mod tenant_id;
 pub mod term_rate;
+pub mod text_config_value;
 pub mod tier_row;
 pub mod tiered_plan_pricing;
 pub mod tiered_pricing;
@@ -314,7 +344,7 @@ pub use self::{
     billing_cycle_reset_period::BillingCycleResetPeriod,
     billing_metric_aggregate_enum::BillingMetricAggregateEnum,
     billing_period_enum::BillingPeriodEnum, billing_type::BillingType,
-    billing_type_enum::BillingTypeEnum,
+    billing_type_enum::BillingTypeEnum, boolean_config_value::BooleanConfigValue,
     boolean_effective_entitlement_value::BooleanEffectiveEntitlementValue,
     boolean_entitlement_value::BooleanEntitlementValue, boolean_feature_type::BooleanFeatureType,
     boolean_resolved_entitlement_value::BooleanResolvedEntitlementValue,
@@ -328,7 +358,11 @@ pub use self::{
     checkout_session_status::CheckoutSessionStatus, checkout_type::CheckoutType,
     component_override::ComponentOverride, component_parameterization::ComponentParameterization,
     component_parameters::ComponentParameters, components_scope::ComponentsScope,
-    connected_account::ConnectedAccount, connected_account_id::ConnectedAccountId,
+    config_effective_entitlement_value::ConfigEffectiveEntitlementValue,
+    config_entitlement_value::ConfigEntitlementValue, config_feature_type::ConfigFeatureType,
+    config_resolved_entitlement_value::ConfigResolvedEntitlementValue, config_value::ConfigValue,
+    config_value_type::ConfigValueType, connected_account::ConnectedAccount,
+    connected_account_id::ConnectedAccountId,
     connected_accounts_response::ConnectedAccountsResponse, connection_status::ConnectionStatus,
     connection_type::ConnectionType, country_code::CountryCode, coupon::Coupon,
     coupon_discount::CouponDiscount, coupon_event::CouponEvent, coupon_event_data::CouponEventData,
@@ -342,23 +376,32 @@ pub use self::{
     create_onboarding_link_request::CreateOnboardingLinkRequest,
     create_plan_request::CreatePlanRequest, create_product_request::CreateProductRequest,
     create_subscription_add_on::CreateSubscriptionAddOn,
-    create_subscription_components::CreateSubscriptionComponents,
+    create_subscription_components::CreateSubscriptionComponents, credit_note::CreditNote,
+    credit_note_custom_properties_request::CreditNoteCustomPropertiesRequest,
     credit_note_event::CreditNoteEvent, credit_note_event_data::CreditNoteEventData,
-    credit_note_id::CreditNoteId, credit_note_status::CreditNoteStatus, currency::Currency,
-    custom_tax_rate::CustomTaxRate, customer::Customer,
+    credit_note_id::CreditNoteId, credit_note_list_response::CreditNoteListResponse,
+    credit_note_status::CreditNoteStatus, credit_type::CreditType, currency::Currency,
+    custom_property_definition::CustomPropertyDefinition,
+    custom_property_definition_create_request::CustomPropertyDefinitionCreateRequest,
+    custom_property_definition_id::CustomPropertyDefinitionId,
+    custom_property_definition_list_response::CustomPropertyDefinitionListResponse,
+    custom_property_definition_update_request::CustomPropertyDefinitionUpdateRequest,
+    custom_property_entity_type::CustomPropertyEntityType,
+    custom_property_type::CustomPropertyType, custom_tax_rate::CustomTaxRate, customer::Customer,
     customer_create_request::CustomerCreateRequest, customer_details::CustomerDetails,
     customer_event::CustomerEvent, customer_event_data::CustomerEventData, customer_id::CustomerId,
     customer_list_response::CustomerListResponse, customer_patch_request::CustomerPatchRequest,
     customer_payment_method_id::CustomerPaymentMethodId,
+    customer_portal_token_request::CustomerPortalTokenRequest,
     customer_portal_token_response::CustomerPortalTokenResponse,
     customer_update_request::CustomerUpdateRequest,
     double_segmentation_matrix::DoubleSegmentationMatrix,
     effective_entitlement::EffectiveEntitlement,
     effective_entitlement_list_response::EffectiveEntitlementListResponse,
     effective_entitlement_value::EffectiveEntitlementValue, entitlement::Entitlement,
-    entitlement_id::EntitlementId, entitlement_value::EntitlementValue, event::Event,
-    event_id::EventId, event_type::EventType, existing_price_ref::ExistingPriceRef,
-    existing_product_ref::ExistingProductRef,
+    entitlement_id::EntitlementId, entitlement_product_ref::EntitlementProductRef,
+    entitlement_value::EntitlementValue, event::Event, event_id::EventId, event_type::EventType,
+    existing_price_ref::ExistingPriceRef, existing_product_ref::ExistingProductRef,
     external_payment_method_config::ExternalPaymentMethodConfig, extra_component::ExtraComponent,
     extra_recurring_billing_type_enum::ExtraRecurringBillingTypeEnum,
     extra_recurring_fee_structure::ExtraRecurringFeeStructure,
@@ -370,11 +413,12 @@ pub use self::{
     get_checkout_session_response::GetCheckoutSessionResponse, grouped_usage::GroupedUsage,
     ingest_events_request::IngestEventsRequest, ingest_events_response::IngestEventsResponse,
     ingest_failure::IngestFailure, introspection_request::IntrospectionRequest, invoice::Invoice,
-    invoice_event::InvoiceEvent, invoice_event_data::InvoiceEventData, invoice_id::InvoiceId,
+    invoice_custom_properties_request::InvoiceCustomPropertiesRequest, invoice_event::InvoiceEvent,
+    invoice_event_data::InvoiceEventData, invoice_id::InvoiceId,
     invoice_line_item::InvoiceLineItem, invoice_list_response::InvoiceListResponse,
     invoice_payment_status::InvoicePaymentStatus, invoice_status::InvoiceStatus,
     invoice_type::InvoiceType, invoicing_entity_id::InvoicingEntityId,
-    linked_segmentation_matrix::LinkedSegmentationMatrix,
+    json_config_value::JsonConfigValue, linked_segmentation_matrix::LinkedSegmentationMatrix,
     list_checkout_sessions_response::ListCheckoutSessionsResponse,
     matrix_dimension::MatrixDimension, matrix_plan_pricing::MatrixPlanPricing,
     matrix_pricing::MatrixPricing, matrix_row::MatrixRow,
@@ -384,18 +428,20 @@ pub use self::{
     metered_entitlement_value::MeteredEntitlementValue, metered_feature_type::MeteredFeatureType,
     metered_resolved_entitlement_value::MeteredResolvedEntitlementValue, metric::Metric,
     metric_dimension::MetricDimension, metric_event::MetricEvent,
-    metric_event_data::MetricEventData, metric_list_response::MetricListResponse,
+    metric_event_data::MetricEventData, metric_filter::MetricFilter,
+    metric_filter_operator::MetricFilterOperator, metric_list_response::MetricListResponse,
     metric_segmentation_matrix::MetricSegmentationMatrix, metric_summary::MetricSummary,
     metric_usage::MetricUsage, minimum_commitment::MinimumCommitment,
     minimum_commitment_input::MinimumCommitmentInput,
     minimum_commitment_input_scope::MinimumCommitmentInputScope,
     minimum_commitment_scope::MinimumCommitmentScope, never_reset_period::NeverResetPeriod,
-    new_product_ref::NewProductRef, o_auth_app::OAuthApp, o_auth_app_id::OAuthAppId,
-    o_auth_app_with_secret::OAuthAppWithSecret, o_auth_apps_response::OAuthAppsResponse,
-    onboarding_link_response::OnboardingLinkResponse, onboarding_mode::OnboardingMode,
-    one_time_fee::OneTimeFee, one_time_fee_structure::OneTimeFeeStructure,
-    one_time_plan_fee::OneTimePlanFee, one_time_pricing::OneTimePricing,
-    online_method_config::OnlineMethodConfig, online_methods_config::OnlineMethodsConfig,
+    new_product_ref::NewProductRef, number_config_value::NumberConfigValue, o_auth_app::OAuthApp,
+    o_auth_app_id::OAuthAppId, o_auth_app_with_secret::OAuthAppWithSecret,
+    o_auth_apps_response::OAuthAppsResponse, onboarding_link_response::OnboardingLinkResponse,
+    onboarding_mode::OnboardingMode, one_time_fee::OneTimeFee,
+    one_time_fee_structure::OneTimeFeeStructure, one_time_plan_fee::OneTimePlanFee,
+    one_time_pricing::OneTimePricing, online_method_config::OnlineMethodConfig,
+    online_methods_config::OnlineMethodsConfig,
     online_payment_method_config::OnlinePaymentMethodConfig, organization_id::OrganizationId,
     package_plan_pricing::PackagePlanPricing, package_pricing::PackagePricing,
     pagination_response::PaginationResponse, patch_plan_request::PatchPlanRequest,
@@ -416,14 +462,14 @@ pub use self::{
     product_family_id::ProductFamilyId, product_family_list_response::ProductFamilyListResponse,
     product_fee_structure::ProductFeeStructure, product_fee_type_enum::ProductFeeTypeEnum,
     product_id::ProductId, product_list_response::ProductListResponse, product_ref::ProductRef,
-    products_scope::ProductsScope, quote_event::QuoteEvent, quote_event_data::QuoteEventData,
-    quote_id::QuoteId, rate_fee::RateFee, rate_fee_structure::RateFeeStructure,
-    rate_plan_fee::RatePlanFee, rate_pricing::RatePricing, recurring_fee::RecurringFee,
-    replace_plan_request::ReplacePlanRequest, reset_period::ResetPeriod,
-    resolved_entitlement::ResolvedEntitlement,
+    products_scope::ProductsScope, property_config::PropertyConfig, quote_event::QuoteEvent,
+    quote_event_data::QuoteEventData, quote_id::QuoteId, rate_fee::RateFee,
+    rate_fee_structure::RateFeeStructure, rate_plan_fee::RatePlanFee, rate_pricing::RatePricing,
+    recurring_fee::RecurringFee, replace_plan_request::ReplacePlanRequest,
+    reset_period::ResetPeriod, resolved_entitlement::ResolvedEntitlement,
     resolved_entitlement_list_response::ResolvedEntitlementListResponse,
     resolved_entitlement_value::ResolvedEntitlementValue, revocation_request::RevocationRequest,
-    rotated_secret::RotatedSecret, shipping_address::ShippingAddress,
+    rotated_secret::RotatedSecret, select_option::SelectOption, shipping_address::ShippingAddress,
     sliding_window_reset_period::SlidingWindowResetPeriod,
     slot_downgrade_policy_enum::SlotDowngradePolicyEnum, slot_fee::SlotFee,
     slot_fee_structure::SlotFeeStructure, slot_plan_fee::SlotPlanFee, slot_pricing::SlotPricing,
@@ -435,7 +481,7 @@ pub use self::{
     subscription_add_on_id::SubscriptionAddOnId,
     subscription_add_on_parameterization::SubscriptionAddOnParameterization,
     subscription_add_on_price_override::SubscriptionAddOnPriceOverride,
-    subscription_component::SubscriptionComponent,
+    subscription_component::SubscriptionComponent, subscription_coupon::SubscriptionCoupon,
     subscription_create_request::SubscriptionCreateRequest,
     subscription_details::SubscriptionDetails, subscription_event::SubscriptionEvent,
     subscription_event_data::SubscriptionEventData, subscription_fee::SubscriptionFee,
@@ -443,12 +489,14 @@ pub use self::{
     subscription_id::SubscriptionId, subscription_list_response::SubscriptionListResponse,
     subscription_status_enum::SubscriptionStatusEnum,
     subscription_update_request::SubscriptionUpdateRequest,
-    subscription_update_response::SubscriptionUpdateResponse, tax_breakdown_item::TaxBreakdownItem,
+    subscription_update_response::SubscriptionUpdateResponse,
+    subscription_update_type::SubscriptionUpdateType, tax_breakdown_item::TaxBreakdownItem,
     tax_exemption_type::TaxExemptionType, tenant_id::TenantId, term_rate::TermRate,
-    tier_row::TierRow, tiered_plan_pricing::TieredPlanPricing, tiered_pricing::TieredPricing,
-    token_introspection_response::TokenIntrospectionResponse, token_request::TokenRequest,
-    token_response::TokenResponse, transaction::Transaction, trial_config::TrialConfig,
-    unit_conversion::UnitConversion, unit_conversion_rounding_enum::UnitConversionRoundingEnum,
+    text_config_value::TextConfigValue, tier_row::TierRow, tiered_plan_pricing::TieredPlanPricing,
+    tiered_pricing::TieredPricing, token_introspection_response::TokenIntrospectionResponse,
+    token_request::TokenRequest, token_response::TokenResponse, transaction::Transaction,
+    trial_config::TrialConfig, unit_conversion::UnitConversion,
+    unit_conversion_rounding_enum::UnitConversionRoundingEnum,
     update_add_on_request::UpdateAddOnRequest, update_coupon_request::UpdateCouponRequest,
     update_metric_request::UpdateMetricRequest, update_product_request::UpdateProductRequest,
     usage_fee::UsageFee, usage_fee_structure::UsageFeeStructure, usage_model_enum::UsageModelEnum,

@@ -539,7 +539,8 @@
                 "EVENT_CSV_IMPORT",
                 "CUSTOMER_CSV_IMPORT",
                 "SUBSCRIPTION_CSV_IMPORT",
-                "SUBSCRIPTION_PLAN_MIGRATION"
+                "SUBSCRIPTION_PLAN_MIGRATION",
+                "TAX_REPORT_EXPORT"
               ]
             }
           },
@@ -1954,6 +1955,316 @@
         ]
       }
     },
+    "/api/v1/credit-notes": {
+      "get": {
+        "tags": [
+          "Credit Notes"
+        ],
+        "summary": "List credit notes",
+        "description": "List a tenant's credit notes, optionally filtered by customer, invoice or status.",
+        "operationId": "list_credit_notes",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "description": "Filter by customer ID",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CustomerId"
+            }
+          },
+          {
+            "name": "invoice_id",
+            "in": "query",
+            "description": "Filter by invoice ID",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/InvoiceId"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "CreditNoteStatus",
+              "enum": [
+                "DRAFT",
+                "FINALIZED",
+                "VOIDED"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Free-text search over credit note number.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Sort order. Format: `column.direction`. Allowed columns: `created_at`, `credit_note_number`, `total`, `status`. Direction: `asc` or `desc`. Default: `created_at.desc`.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of credit notes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNoteListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-notes/{credit_note_id}": {
+      "get": {
+        "tags": [
+          "Credit Notes"
+        ],
+        "summary": "Get credit note",
+        "description": "Retrieve a single credit note by ID.",
+        "operationId": "get_credit_note_by_id",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "description": "Credit Note ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CreditNoteId"
+            },
+            "example": "cn_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit note details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNote"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Credit note not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/credit-notes/{credit_note_id}/custom-properties": {
+      "patch": {
+        "tags": [
+          "Credit Notes"
+        ],
+        "summary": "Update credit note custom properties",
+        "description": "Merge custom property values onto a credit note (send a key with `null` to remove it).\nValues are validated against the tenant's `CREDIT_NOTE` property definitions. Allowed at any\nstatus — custom properties are external workflow metadata and stay editable after the credit\nnote is finalized.",
+        "operationId": "patch_credit_note_custom_properties",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "description": "Credit Note ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CreditNoteId"
+            },
+            "example": "cn_123"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditNoteCustomPropertiesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated credit note",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditNote"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Credit note not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/credit-notes/{credit_note_id}/download": {
       "get": {
         "tags": [
@@ -1997,6 +2308,387 @@
           },
           "404": {
             "description": "Credit note not found or PDF not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/custom-property-definitions": {
+      "get": {
+        "tags": [
+          "Custom Properties"
+        ],
+        "summary": "List custom property definitions",
+        "operationId": "list_definitions",
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "query",
+            "description": "Filter to a single entity type.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CustomPropertyEntityType"
+            }
+          },
+          {
+            "name": "include_archived",
+            "in": "query",
+            "description": "Include archived (soft-deleted) definitions. Defaults to false.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-indexed)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of custom property definitions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomPropertyDefinitionListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Custom Properties"
+        ],
+        "summary": "Create a custom property definition",
+        "operationId": "create_definition",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomPropertyDefinitionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomPropertyDefinition"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A definition with this key already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/custom-property-definitions/{id}": {
+      "get": {
+        "tags": [
+          "Custom Properties"
+        ],
+        "summary": "Get a custom property definition",
+        "operationId": "get_definition",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "custom property definition ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Custom property definition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomPropertyDefinition"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Custom Properties"
+        ],
+        "summary": "Update a custom property definition",
+        "operationId": "update_definition",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "custom property definition ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomPropertyDefinitionUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomPropertyDefinition"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Custom Properties"
+        ],
+        "summary": "Archive a custom property definition",
+        "description": "Soft-deletes the definition. Existing property values on entities are preserved; the definition\nsimply stops being enforced on new writes.",
+        "operationId": "archive_definition",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "custom property definition ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archived",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomPropertyDefinition"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -2649,6 +3341,16 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerPortalTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Portal token generated",
@@ -2656,6 +3358,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomerPortalTokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
                 }
               }
             }
@@ -3166,6 +3878,105 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices/{invoice_id}/custom-properties": {
+      "patch": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Update invoice custom properties",
+        "description": "Merge custom property values onto an invoice (send a key with `null` to remove it).\nValues are validated against the tenant's `INVOICE` property definitions. Allowed at any\nstatus — custom properties are external workflow metadata and stay editable after the invoice\nis finalized.",
+        "operationId": "patch_invoice_custom_properties",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "description": "Invoice ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/InvoiceId"
+            },
+            "example": "inv_123"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceCustomPropertiesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated invoice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
                 }
               }
             }
@@ -5837,6 +6648,7 @@
                   "PAUSED",
                   "SUSPENDED",
                   "CANCELLED",
+                  "ABORTED",
                   "COMPLETED",
                   "SUPERSEDED",
                   "ERRORED"
@@ -6665,10 +7477,10 @@
           "fee_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductFeeTypeEnum"
               },
               {
-                "$ref": "#/components/schemas/ProductFeeTypeEnum"
+                "type": "null"
               }
             ]
           },
@@ -6750,10 +7562,10 @@
           "fee_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductFeeTypeEnum"
               },
               {
-                "$ref": "#/components/schemas/ProductFeeTypeEnum"
+                "type": "null"
               }
             ]
           },
@@ -6815,10 +7627,10 @@
           "country": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CountryCode"
               },
               {
-                "$ref": "#/components/schemas/CountryCode"
+                "type": "null"
               }
             ]
           },
@@ -6908,7 +7720,7 @@
             "$ref": "#/components/schemas/AppliedCoupon"
           },
           "coupon": {
-            "$ref": "#/components/schemas/Coupon"
+            "$ref": "#/components/schemas/SubscriptionCoupon"
           }
         }
       },
@@ -6972,10 +7784,10 @@
           "account_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BankAccountId"
               },
               {
-                "$ref": "#/components/schemas/BankAccountId"
+                "type": "null"
               }
             ]
           }
@@ -6999,7 +7811,8 @@
           "created_by",
           "created_at",
           "failure_count",
-          "has_error_csv"
+          "has_error_csv",
+          "has_output"
         ],
         "properties": {
           "completed_at": {
@@ -7034,6 +7847,9 @@
           "has_error_csv": {
             "type": "boolean"
           },
+          "has_output": {
+            "type": "boolean"
+          },
           "id": {
             "$ref": "#/components/schemas/BatchJobId"
           },
@@ -7051,6 +7867,12 @@
           },
           "job_type": {
             "$ref": "#/components/schemas/BatchJobType"
+          },
+          "output_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "processed_items": {
             "type": "integer",
@@ -7222,7 +8044,8 @@
           "EVENT_CSV_IMPORT",
           "CUSTOMER_CSV_IMPORT",
           "SUBSCRIPTION_CSV_IMPORT",
-          "SUBSCRIPTION_PLAN_MIGRATION"
+          "SUBSCRIPTION_PLAN_MIGRATION",
+          "TAX_REPORT_EXPORT"
         ]
       },
       "BillableMetricId": {
@@ -7293,6 +8116,18 @@
           "ADVANCE",
           "ARREARS"
         ]
+      },
+      "BooleanConfigValue": {
+        "type": "object",
+        "description": "A boolean config value.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "boolean"
+          }
+        }
       },
       "BooleanEffectiveEntitlementValue": {
         "type": "object",
@@ -7497,10 +8332,12 @@
             "minimum": 0
           },
           "per_unit_overage": {
-            "type": "string"
+            "type": "string",
+            "format": "decimal"
           },
           "price": {
-            "type": "string"
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -7579,10 +8416,10 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PaymentMethodsConfig"
               },
               {
-                "$ref": "#/components/schemas/PaymentMethodsConfig"
+                "type": "null"
               }
             ]
           },
@@ -7595,10 +8432,10 @@
           "subscription_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionId"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionId"
+                "type": "null"
               }
             ]
           },
@@ -7678,10 +8515,10 @@
           "billing_period": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingPeriodEnum"
               },
               {
-                "$ref": "#/components/schemas/BillingPeriodEnum"
+                "type": "null"
               }
             ]
           },
@@ -7718,6 +8555,97 @@
           }
         }
       },
+      "ConfigEffectiveEntitlementValue": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/ConfigValue"
+          }
+        }
+      },
+      "ConfigEntitlementValue": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/ConfigValue"
+          }
+        }
+      },
+      "ConfigFeatureType": {
+        "type": "object",
+        "description": "A static, typed configuration value. No metric — resolved synchronously.",
+        "required": [
+          "value_type"
+        ],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Allowed values when `value_type = SELECT`. Empty otherwise."
+          },
+          "value_type": {
+            "$ref": "#/components/schemas/ConfigValueType",
+            "description": "The feature's value type, fixed at creation."
+          }
+        }
+      },
+      "ConfigResolvedEntitlementValue": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/ConfigValue"
+          }
+        }
+      },
+      "ConfigValue": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/NumberConfigValue"
+          },
+          {
+            "$ref": "#/components/schemas/BooleanConfigValue"
+          },
+          {
+            "$ref": "#/components/schemas/TextConfigValue"
+          },
+          {
+            "$ref": "#/components/schemas/JsonConfigValue"
+          }
+        ],
+        "description": "A static, typed configuration value carried by a Config entitlement. Resolved synchronously\nthrough the entitlement hierarchy — no metric, no usage counter.",
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "BOOLEAN": "#/components/schemas/BooleanConfigValue",
+            "JSON": "#/components/schemas/JsonConfigValue",
+            "NUMBER": "#/components/schemas/NumberConfigValue",
+            "TEXT": "#/components/schemas/TextConfigValue"
+          }
+        }
+      },
+      "ConfigValueType": {
+        "type": "string",
+        "description": "Authoritative value type of a Config feature. `MAP`/`JSON` both carry a JSON value.",
+        "enum": [
+          "NUMBER",
+          "BOOLEAN",
+          "TEXT",
+          "MAP",
+          "JSON",
+          "SELECT"
+        ]
+      },
       "ConnectedAccount": {
         "type": "object",
         "description": "A connected account (relationship between platform and connected org)",
@@ -7733,22 +8661,22 @@
           "connected_organization_id": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/OrganizationId",
                 "description": "For express accounts in pending status, this may be None until onboarding completes"
+              },
+              {
+                "type": "null"
               }
             ]
           },
           "connected_tenant_id": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/TenantId",
                 "description": "Tenant ID for express accounts (single-tenant). None for standard accounts (use tenant header)."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -7776,11 +8704,11 @@
           "pending_country": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/CountryCode",
                 "description": "Country code for the organization to be created (express flow only)"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -7801,10 +8729,10 @@
           "platform_customer_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CustomerId"
               },
               {
-                "$ref": "#/components/schemas/CustomerId"
+                "type": "null"
               }
             ]
           },
@@ -7876,17 +8804,33 @@
         "required": [
           "id",
           "code",
-          "description",
           "discount",
           "reusable",
-          "disabled"
+          "disabled",
+          "created_at",
+          "redemption_count",
+          "plan_ids"
         ],
         "properties": {
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
           "code": {
             "type": "string"
           },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
           "description": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "disabled": {
             "type": "boolean"
@@ -7904,11 +8848,21 @@
           "id": {
             "$ref": "#/components/schemas/CouponId"
           },
+          "plan_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanId"
+            }
+          },
           "recurring_value": {
             "type": [
               "integer",
               "null"
             ],
+            "format": "int32"
+          },
+          "redemption_count": {
+            "type": "integer",
             "format": "int32"
           },
           "redemption_limit": {
@@ -8151,10 +9105,10 @@
           "components": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CreateSubscriptionComponents"
               },
               {
-                "$ref": "#/components/schemas/CreateSubscriptionComponents"
+                "type": "null"
               }
             ]
           },
@@ -8215,11 +9169,11 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/PaymentMethodsConfig",
                 "description": "Payment methods configuration. If not specified, inherits from the invoicing entity."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -8265,10 +9219,10 @@
           "connection_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ConnectionType"
               },
               {
-                "$ref": "#/components/schemas/ConnectionType"
+                "type": "null"
               }
             ]
           },
@@ -8276,10 +9230,10 @@
           "platform_customer_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CustomerId"
               },
               {
-                "$ref": "#/components/schemas/CustomerId"
+                "type": "null"
               }
             ]
           }
@@ -8363,6 +9317,16 @@
               "null"
             ]
           },
+          "filters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/MetricFilter"
+            },
+            "description": "Pre-aggregation property filters. Optional and backward-compatible; omit for none."
+          },
           "name": {
             "type": "string"
           },
@@ -8372,30 +9336,30 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           },
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
           "unit_conversion": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversion"
               },
               {
-                "$ref": "#/components/schemas/UnitConversion"
+                "type": "null"
               }
             ]
           },
@@ -8465,10 +9429,10 @@
           "billing": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingConfig"
               },
               {
-                "$ref": "#/components/schemas/BillingConfig"
+                "type": "null"
               }
             ]
           },
@@ -8509,10 +9473,10 @@
           "trial": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TrialConfig"
               },
               {
-                "$ref": "#/components/schemas/TrialConfig"
+                "type": "null"
               }
             ]
           }
@@ -8558,10 +9522,10 @@
           "customization": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionAddOnCustomization"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionAddOnCustomization"
+                "type": "null"
               }
             ]
           },
@@ -8613,6 +9577,156 @@
           }
         }
       },
+      "CreditNote": {
+        "type": "object",
+        "required": [
+          "id",
+          "credit_note_number",
+          "status",
+          "credit_type",
+          "customer_id",
+          "invoice_id",
+          "invoice_number",
+          "currency",
+          "subtotal",
+          "tax_amount",
+          "total",
+          "refunded_amount_cents",
+          "credited_amount_cents",
+          "line_items",
+          "tax_breakdown",
+          "created_at",
+          "custom_properties"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "credit_note_number": {
+            "type": "string"
+          },
+          "credit_type": {
+            "$ref": "#/components/schemas/CreditType"
+          },
+          "credited_amount_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition `key`."
+          },
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "finalized_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/CreditNoteId"
+          },
+          "invoice_id": {
+            "$ref": "#/components/schemas/InvoiceId"
+          },
+          "invoice_number": {
+            "type": "string"
+          },
+          "line_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLineItem"
+            }
+          },
+          "memo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plan_version_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanVersionId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "refunded_amount_cents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CreditNoteStatus"
+          },
+          "subscription_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subtotal": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tax_amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tax_breakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxBreakdownItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "voided_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "CreditNoteCustomPropertiesRequest": {
+        "type": "object",
+        "description": "Merge update of a credit note's custom property values (send a key with `null` to remove it).\nAllowed at any status — custom properties stay editable after the credit note is finalized.",
+        "required": [
+          "custom_properties"
+        ],
+        "properties": {
+          "custom_properties": {}
+        }
+      },
       "CreditNoteEvent": {
         "allOf": [
           {
@@ -8648,10 +9762,14 @@
           "invoice_id",
           "status",
           "currency",
+          "subtotal",
           "total",
           "tax_amount",
           "refunded_amount_cents",
           "credited_amount_cents",
+          "line_items",
+          "tax_breakdown",
+          "custom_properties",
           "created_at"
         ],
         "properties": {
@@ -8662,6 +9780,13 @@
           "credit_note_id": {
             "$ref": "#/components/schemas/CreditNoteId"
           },
+          "credit_note_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Absent while the credit note is a draft — the number is assigned at finalization."
+          },
           "credited_amount_cents": {
             "type": "integer",
             "format": "int64"
@@ -8669,11 +9794,40 @@
           "currency": {
             "type": "string"
           },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition key."
+          },
           "customer_id": {
             "$ref": "#/components/schemas/CustomerId"
           },
           "invoice_id": {
             "$ref": "#/components/schemas/InvoiceId"
+          },
+          "invoice_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Number of the invoice being credited."
+          },
+          "line_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLineItem"
+            },
+            "description": "Credited line items (negated amounts)."
+          },
+          "memo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "refunded_amount_cents": {
             "type": "integer",
@@ -8682,9 +9836,20 @@
           "status": {
             "$ref": "#/components/schemas/CreditNoteStatus"
           },
+          "subtotal": {
+            "type": "integer",
+            "format": "int64"
+          },
           "tax_amount": {
             "type": "integer",
             "format": "int64"
+          },
+          "tax_breakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxBreakdownItem"
+            },
+            "description": "Per-rate tax (VAT) breakdown for the credited amount."
           },
           "total": {
             "type": "integer",
@@ -8699,12 +9864,40 @@
           "crn_7n42DGM5Tflk9n8mt7Fhc7"
         ]
       },
+      "CreditNoteListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditNote"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
       "CreditNoteStatus": {
         "type": "string",
+        "title": "CreditNoteStatus",
         "enum": [
           "DRAFT",
           "FINALIZED",
           "VOIDED"
+        ]
+      },
+      "CreditType": {
+        "type": "string",
+        "title": "CreditType",
+        "enum": [
+          "CREDIT_TO_BALANCE",
+          "REFUND",
+          "DEBT_CANCELLATION"
         ]
       },
       "Currency": {
@@ -8874,6 +10067,189 @@
           "EUR"
         ]
       },
+      "CustomPropertyDefinition": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity_type",
+          "key",
+          "name",
+          "property_type",
+          "config",
+          "required",
+          "display_order",
+          "archived"
+        ],
+        "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "config": {
+            "$ref": "#/components/schemas/PropertyConfig"
+          },
+          "default_value": {},
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "display_order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "entity_type": {
+            "$ref": "#/components/schemas/CustomPropertyEntityType"
+          },
+          "id": {
+            "$ref": "#/components/schemas/CustomPropertyDefinitionId"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "property_type": {
+            "$ref": "#/components/schemas/CustomPropertyType"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CustomPropertyDefinitionCreateRequest": {
+        "type": "object",
+        "required": [
+          "entity_type",
+          "key",
+          "name",
+          "property_type"
+        ],
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/PropertyConfig"
+          },
+          "default_value": {},
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "display_order": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "entity_type": {
+            "$ref": "#/components/schemas/CustomPropertyEntityType"
+          },
+          "key": {
+            "type": "string",
+            "description": "Immutable machine name; letters, digits and underscores only. Unique per entity type."
+          },
+          "name": {
+            "type": "string"
+          },
+          "property_type": {
+            "$ref": "#/components/schemas/CustomPropertyType"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CustomPropertyDefinitionId": {
+        "type": "string",
+        "format": "MeteroidId",
+        "examples": [
+          "cpd_7n42DGM5Tflk9n8mt7Fhc7"
+        ]
+      },
+      "CustomPropertyDefinitionListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination_meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomPropertyDefinition"
+            }
+          },
+          "pagination_meta": {
+            "$ref": "#/components/schemas/PaginationResponse"
+          }
+        }
+      },
+      "CustomPropertyDefinitionUpdateRequest": {
+        "type": "object",
+        "description": "Update of a definition. `key`, `entity_type` and `property_type` are immutable and cannot be\nchanged here. Any field left absent is unchanged.",
+        "properties": {
+          "config": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "default_value": {},
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "display_order": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "required": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "CustomPropertyEntityType": {
+        "type": "string",
+        "enum": [
+          "CUSTOMER",
+          "SUBSCRIPTION",
+          "INVOICE",
+          "CREDIT_NOTE"
+        ]
+      },
+      "CustomPropertyType": {
+        "type": "string",
+        "enum": [
+          "TEXT",
+          "NUMBER",
+          "BOOLEAN",
+          "DATE",
+          "DATETIME",
+          "SINGLE_SELECT",
+          "MULTI_SELECT",
+          "JSON",
+          "URL",
+          "EMAIL"
+        ]
+      },
       "CustomTaxRate": {
         "type": "object",
         "required": [
@@ -8901,7 +10277,8 @@
           "invoicing_emails",
           "currency",
           "invoicing_entity_id",
-          "custom_taxes"
+          "custom_taxes",
+          "custom_properties"
         ],
         "properties": {
           "alias": {
@@ -8913,10 +10290,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -8934,6 +10311,9 @@
           },
           "currency": {
             "$ref": "#/components/schemas/Currency"
+          },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition `key`."
           },
           "custom_taxes": {
             "type": "array",
@@ -8965,10 +10345,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -8998,10 +10378,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9020,6 +10400,9 @@
           "currency": {
             "$ref": "#/components/schemas/Currency"
           },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition `key`. Validated against the\ntenant's `CUSTOMER` property definitions. Omit to leave unset."
+          },
           "custom_taxes": {
             "type": "array",
             "items": {
@@ -9035,10 +10418,10 @@
           "invoicing_entity_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/InvoicingEntityId"
               },
               {
-                "$ref": "#/components/schemas/InvoicingEntityId"
+                "type": "null"
               }
             ]
           },
@@ -9060,10 +10443,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -9092,10 +10475,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9157,7 +10540,8 @@
           "customer_id",
           "name",
           "invoicing_emails",
-          "currency"
+          "currency",
+          "custom_properties"
         ],
         "properties": {
           "alias": {
@@ -9174,6 +10558,9 @@
           },
           "currency": {
             "type": "string"
+          },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition key."
           },
           "customer_id": {
             "$ref": "#/components/schemas/CustomerId"
@@ -9232,10 +10619,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9248,12 +10635,15 @@
           "currency": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Currency"
               },
               {
-                "$ref": "#/components/schemas/Currency"
+                "type": "null"
               }
             ]
+          },
+          "custom_properties": {
+            "description": "Partial update of custom property values (merge; send a key with `null` to remove it).\nOmit to leave unchanged."
           },
           "custom_taxes": {
             "type": [
@@ -9276,10 +10666,10 @@
           "invoicing_entity_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/InvoicingEntityId"
               },
               {
-                "$ref": "#/components/schemas/InvoicingEntityId"
+                "type": "null"
               }
             ]
           },
@@ -9304,10 +10694,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -9325,6 +10715,20 @@
         "examples": [
           "pm_7n42DGM5Tflk9n8mt7Fhc7"
         ]
+      },
+      "CustomerPortalTokenRequest": {
+        "type": "object",
+        "properties": {
+          "expires_in_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Token lifetime in seconds. Defaults to 86400 (24 hours).\nMust be between 60 and 2592000 (30 days).",
+            "minimum": 0
+          }
+        }
       },
       "CustomerPortalTokenResponse": {
         "type": "object",
@@ -9362,10 +10766,10 @@
           "billing_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -9377,6 +10781,9 @@
           },
           "currency": {
             "$ref": "#/components/schemas/Currency"
+          },
+          "custom_properties": {
+            "description": "User-defined custom property values (full replace). Omit to leave unchanged."
           },
           "custom_taxes": {
             "type": "array",
@@ -9411,10 +10818,10 @@
           "shipping_address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ShippingAddress"
               },
               {
-                "$ref": "#/components/schemas/ShippingAddress"
+                "type": "null"
               }
             ]
           },
@@ -9478,12 +10885,16 @@
           },
           {
             "$ref": "#/components/schemas/MeteredEffectiveEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigEffectiveEntitlementValue"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanEffectiveEntitlementValue",
+            "CONFIG": "#/components/schemas/ConfigEffectiveEntitlementValue",
             "METERED": "#/components/schemas/MeteredEffectiveEntitlementValue"
           }
         }
@@ -9525,6 +10936,22 @@
           "ent_7n42DGM5Tflk9n8mt7Fhc7"
         ]
       },
+      "EntitlementProductRef": {
+        "type": "object",
+        "description": "Minimal reference to the product a feature belongs to.",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ProductId"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "EntitlementValue": {
         "oneOf": [
           {
@@ -9532,12 +10959,16 @@
           },
           {
             "$ref": "#/components/schemas/MeteredEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigEntitlementValue"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanEntitlementValue",
+            "CONFIG": "#/components/schemas/ConfigEntitlementValue",
             "METERED": "#/components/schemas/MeteredEntitlementValue"
           }
         }
@@ -9610,6 +11041,9 @@
           "metric.created",
           "customer.created",
           "subscription.created",
+          "subscription.updated",
+          "subscription.cancelled",
+          "subscription.ended",
           "invoice.created",
           "invoice.finalized",
           "invoice.paid",
@@ -9720,7 +11154,8 @@
             "minimum": 0
           },
           "unit_price": {
-            "type": "string"
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -9770,11 +11205,11 @@
           "entitlement": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/Entitlement",
                 "description": "Feature-level (default) entitlement, applied to all subscriptions as the lowest-priority."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -9790,11 +11225,11 @@
           "product": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/EntitlementProductRef",
+                "description": "Product this feature belongs to."
               },
               {
-                "$ref": "#/components/schemas/ProductRef",
-                "description": "Product this feature belongs to."
+                "type": "null"
               }
             ]
           },
@@ -9849,10 +11284,10 @@
           "product": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/EntitlementProductRef"
               },
               {
-                "$ref": "#/components/schemas/ProductRef"
+                "type": "null"
               }
             ]
           }
@@ -9874,12 +11309,16 @@
           },
           {
             "$ref": "#/components/schemas/MeteredFeatureType"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigFeatureType"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanFeatureType",
+            "CONFIG": "#/components/schemas/ConfigFeatureType",
             "METERED": "#/components/schemas/MeteredFeatureType"
           }
         }
@@ -10075,7 +11514,8 @@
           "coupons",
           "invoice_type",
           "net_terms",
-          "created_at"
+          "created_at",
+          "custom_properties"
         ],
         "properties": {
           "amount_due": {
@@ -10085,6 +11525,17 @@
           "applied_credits": {
             "type": "integer",
             "format": "int64"
+          },
+          "child_invoice_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceId",
+                "description": "Set on a cancelled invoice that has been reissued: the corrective invoice replacing it."
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "coupons": {
             "type": "array",
@@ -10098,6 +11549,9 @@
           },
           "currency": {
             "$ref": "#/components/schemas/Currency"
+          },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition `key`."
           },
           "customer_details": {
             "$ref": "#/components/schemas/CustomerDetails"
@@ -10162,6 +11616,17 @@
             ],
             "format": "date-time"
           },
+          "parent_invoice_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceId",
+                "description": "Set on a corrective invoice: the cancelled invoice this one replaces\n(\"cancels and replaces\"). The original is credited in full by a credit note."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "payment_status": {
             "$ref": "#/components/schemas/InvoicePaymentStatus"
           },
@@ -10183,10 +11648,10 @@
           "subscription_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionId"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionId"
+                "type": "null"
               }
             ]
           },
@@ -10234,6 +11699,16 @@
           }
         }
       },
+      "InvoiceCustomPropertiesRequest": {
+        "type": "object",
+        "description": "Merge update of an invoice's custom property values (send a key with `null` to remove it).\nAllowed at any status — custom properties stay editable after the invoice is finalized.",
+        "required": [
+          "custom_properties"
+        ],
+        "properties": {
+          "custom_properties": {}
+        }
+      },
       "InvoiceEvent": {
         "allOf": [
           {
@@ -10270,17 +11745,18 @@
           "currency",
           "total",
           "tax_amount",
-          "created_at"
+          "created_at",
+          "custom_properties"
         ],
         "properties": {
           "consolidated_into_invoice_id": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/InvoiceId",
                 "description": "Set on `invoice.consolidated`: the parent invoice this one was merged into."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -10291,11 +11767,32 @@
           "currency": {
             "type": "string"
           },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition key."
+          },
           "customer_id": {
             "$ref": "#/components/schemas/CustomerId"
           },
           "invoice_id": {
             "$ref": "#/components/schemas/InvoiceId"
+          },
+          "invoice_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Absent while the invoice is a draft — the number is assigned at finalization."
+          },
+          "parent_invoice_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceId",
+                "description": "Set on a corrective invoice: the cancelled invoice this one replaces\n(\"cancels and replaces\"). The original is credited in full by a credit note."
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
             "$ref": "#/components/schemas/InvoiceStatus"
@@ -10422,6 +11919,16 @@
           "ive_7n42DGM5Tflk9n8mt7Fhc7"
         ]
       },
+      "JsonConfigValue": {
+        "type": "object",
+        "description": "A structured (JSON) config value — the \"metadata\" case, several fields in one entitlement.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {}
+        }
+      },
       "LinkedSegmentationMatrix": {
         "type": "object",
         "required": [
@@ -10520,10 +12027,10 @@
           "dimension2": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MatrixDimension"
               },
               {
-                "$ref": "#/components/schemas/MatrixDimension"
+                "type": "null"
               }
             ]
           },
@@ -10697,6 +12204,12 @@
               "null"
             ]
           },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MetricFilter"
+            }
+          },
           "id": {
             "$ref": "#/components/schemas/BillableMetricId"
           },
@@ -10709,30 +12222,30 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           },
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
           "unit_conversion": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversion"
               },
               {
-                "$ref": "#/components/schemas/UnitConversion"
+                "type": "null"
               }
             ]
           },
@@ -10834,20 +12347,20 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           },
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
@@ -10861,10 +12374,10 @@
           "unit_conversion_rounding": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversionRoundingEnum"
               },
               {
-                "$ref": "#/components/schemas/UnitConversionRoundingEnum"
+                "type": "null"
               }
             ]
           },
@@ -10875,6 +12388,39 @@
             ]
           }
         }
+      },
+      "MetricFilter": {
+        "type": "object",
+        "description": "A pre-aggregation filter: only events whose `property` matches feed the metric's\naggregation. Distinct from a segmentation dimension (which splits pricing). Multiple\nfilters are ANDed.",
+        "required": [
+          "property",
+          "op",
+          "values"
+        ],
+        "properties": {
+          "op": {
+            "$ref": "#/components/schemas/MetricFilterOperator"
+          },
+          "property": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "MetricFilterOperator": {
+        "type": "string",
+        "description": "Operator of a pre-aggregation [`MetricFilter`]. `EQUAL`/`NOT_EQUAL` are the single-value\nforms of `IN`/`NOT_IN`. Negation (`NOT_EQUAL`/`NOT_IN`) is presence-required: an event\nmissing the property is excluded.",
+        "enum": [
+          "EQUAL",
+          "NOT_EQUAL",
+          "IN",
+          "NOT_IN"
+        ]
       },
       "MetricListResponse": {
         "type": "object",
@@ -11082,6 +12628,19 @@
           }
         }
       },
+      "NumberConfigValue": {
+        "type": "object",
+        "description": "A number config value (decimal, encoded as a string).",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
       "OAuthApp": {
         "type": "object",
         "description": "An OAuth application registered by a platform",
@@ -11277,7 +12836,8 @@
             "minimum": 0
           },
           "unit_price": {
-            "type": "string"
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -11316,20 +12876,20 @@
           "card": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/OnlineMethodConfig"
               },
               {
-                "$ref": "#/components/schemas/OnlineMethodConfig"
+                "type": "null"
               }
             ]
           },
           "direct_debit": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/OnlineMethodConfig"
               },
               {
-                "$ref": "#/components/schemas/OnlineMethodConfig"
+                "type": "null"
               }
             ]
           }
@@ -11341,11 +12901,11 @@
           "config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/OnlineMethodsConfig",
                 "description": "If None, inherits all online providers from invoicing entity."
+              },
+              {
+                "type": "null"
               }
             ]
           }
@@ -11371,7 +12931,8 @@
             "minimum": 0
           },
           "rate": {
-            "type": "string"
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -11539,7 +13100,8 @@
         ],
         "properties": {
           "rate": {
-            "type": "string"
+            "type": "string",
+            "format": "decimal"
           }
         }
       },
@@ -11618,11 +13180,11 @@
           "minimum_commitment": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/MinimumCommitment",
                 "description": "Plan-level minimum commitment (period true-up floor). When set, every billing-period\ninvoice for this plan is guaranteed to be at least `minimum_commitment.amount` after\ndiscounts, with a \"Minimum commitment\" line filling any shortfall."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -11665,10 +13227,10 @@
           "trial": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TrialConfig"
               },
               {
-                "$ref": "#/components/schemas/TrialConfig"
+                "type": "null"
               }
             ]
           },
@@ -11700,10 +13262,10 @@
           "price_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PriceId"
               },
               {
-                "$ref": "#/components/schemas/PriceId"
+                "type": "null"
               }
             ]
           },
@@ -11922,10 +13484,10 @@
           "fee": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Fee"
               },
               {
-                "$ref": "#/components/schemas/Fee"
+                "type": "null"
               }
             ]
           },
@@ -11938,10 +13500,10 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           }
@@ -11970,10 +13532,10 @@
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
           }
@@ -12317,6 +13879,46 @@
           }
         }
       },
+      "PropertyConfig": {
+        "type": "object",
+        "description": "Type-specific configuration. Only the fields relevant to `property_type` are interpreted.",
+        "properties": {
+          "max": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "max_length": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Maximum length for `TEXT`.",
+            "minimum": 0
+          },
+          "min": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Inclusive numeric bounds for `NUMBER`."
+          },
+          "options": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SelectOption"
+            },
+            "description": "Allowed choices for `SINGLE_SELECT` / `MULTI_SELECT`."
+          }
+        }
+      },
       "QuoteEvent": {
         "allOf": [
           {
@@ -12360,10 +13962,10 @@
           "subscription_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/SubscriptionId"
               },
               {
-                "$ref": "#/components/schemas/SubscriptionId"
+                "type": "null"
               }
             ]
           }
@@ -12457,10 +14059,10 @@
           "billing": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingConfig"
               },
               {
-                "$ref": "#/components/schemas/BillingConfig"
+                "type": "null"
               }
             ]
           },
@@ -12482,11 +14084,11 @@
           "minimum_commitment": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/MinimumCommitmentInput",
                 "description": "Optional plan-level period minimum commitment. Component scope must reference names\nthat exist in `components` (matched by name, not by ID, since component IDs are\nassigned by the server). Use `MinimumCommitmentInput` so the client can express\nscope by component name."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -12496,20 +14098,20 @@
           "status": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PlanStatusEnum"
               },
               {
-                "$ref": "#/components/schemas/PlanStatusEnum"
+                "type": "null"
               }
             ]
           },
           "trial": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TrialConfig"
               },
               {
-                "$ref": "#/components/schemas/TrialConfig"
+                "type": "null"
               }
             ]
           }
@@ -12586,12 +14188,16 @@
           },
           {
             "$ref": "#/components/schemas/MeteredResolvedEntitlementValue"
+          },
+          {
+            "$ref": "#/components/schemas/ConfigResolvedEntitlementValue"
           }
         ],
         "discriminator": {
           "propertyName": "type",
           "mapping": {
             "BOOLEAN": "#/components/schemas/BooleanResolvedEntitlementValue",
+            "CONFIG": "#/components/schemas/ConfigResolvedEntitlementValue",
             "METERED": "#/components/schemas/MeteredResolvedEntitlementValue"
           }
         }
@@ -12647,6 +14253,23 @@
           }
         }
       },
+      "SelectOption": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
       "ShippingAddress": {
         "type": "object",
         "required": [
@@ -12656,10 +14279,10 @@
           "address": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/Address"
               },
               {
-                "$ref": "#/components/schemas/Address"
+                "type": "null"
               }
             ]
           },
@@ -12868,7 +14491,8 @@
           "period",
           "created_at",
           "auto_advance_invoices",
-          "charge_automatically"
+          "charge_automatically",
+          "custom_properties"
         ],
         "properties": {
           "activated_at": {
@@ -12920,6 +14544,9 @@
             "format": "date",
             "description": "Current billing period start date"
           },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition `key`."
+          },
           "customer_alias": {
             "type": [
               "string",
@@ -12965,11 +14592,11 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/PaymentMethodsConfig",
                 "description": "Payment methods configuration (Online, BankTransfer, or External)"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -13091,10 +14718,10 @@
           "billing_period": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/BillingPeriodEnum"
               },
               {
-                "$ref": "#/components/schemas/BillingPeriodEnum"
+                "type": "null"
               }
             ]
           },
@@ -13153,22 +14780,75 @@
           "price_component_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PriceComponentId"
               },
               {
-                "$ref": "#/components/schemas/PriceComponentId"
+                "type": "null"
               }
             ]
           },
           "product_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductId"
               },
               {
-                "$ref": "#/components/schemas/ProductId"
+                "type": "null"
               }
             ]
+          }
+        }
+      },
+      "SubscriptionCoupon": {
+        "type": "object",
+        "description": "Coupon as embedded in subscription details — a subset of the `Coupon` resource\nreturned by the coupons API.",
+        "required": [
+          "id",
+          "code",
+          "description",
+          "discount",
+          "reusable",
+          "disabled"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "discount": {
+            "$ref": "#/components/schemas/CouponDiscount"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/CouponId"
+          },
+          "recurring_value": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "redemption_limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "reusable": {
+            "type": "boolean"
           }
         }
       },
@@ -13210,6 +14890,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition `key`. Validated against the\ntenant's subscription definitions."
           },
           "customer_id_or_alias": {
             "type": "string",
@@ -13291,7 +14974,8 @@
           "charge_automatically",
           "components",
           "add_ons",
-          "applied_coupons"
+          "applied_coupons",
+          "custom_properties"
         ],
         "properties": {
           "activated_at": {
@@ -13365,6 +15049,9 @@
             "format": "date",
             "description": "Current billing period start date"
           },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition `key`."
+          },
           "customer_alias": {
             "type": [
               "string",
@@ -13404,11 +15091,11 @@
           "minimum_commitment": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/MinimumCommitment",
                 "description": "Materialized minimum-commitment floor on this subscription (plan snapshot or operator\noverride). Read-only here — set it at creation, or change it via a subscription amendment."
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -13427,10 +15114,10 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PaymentMethodsConfig"
               },
               {
-                "$ref": "#/components/schemas/PaymentMethodsConfig"
+                "type": "null"
               }
             ]
           },
@@ -13519,7 +15206,10 @@
           "net_terms",
           "mrr_cents",
           "period",
-          "status"
+          "status",
+          "auto_advance_invoices",
+          "charge_automatically",
+          "custom_properties"
         ],
         "properties": {
           "activated_at": {
@@ -13528,6 +15218,9 @@
               "null"
             ],
             "format": "date-time"
+          },
+          "auto_advance_invoices": {
+            "type": "boolean"
           },
           "billing_day_anchor": {
             "type": "integer",
@@ -13541,12 +15234,36 @@
             ],
             "format": "date"
           },
+          "cancellation_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Present on `subscription.cancelled` when a reason was supplied."
+          },
+          "change_type": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionUpdateType",
+                "description": "Present on `subscription.updated`: which mutation fired the event."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "charge_automatically": {
+            "type": "boolean"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
           },
           "currency": {
             "type": "string"
+          },
+          "custom_properties": {
+            "description": "User-defined custom property values, keyed by definition key."
           },
           "customer_alias": {
             "type": [
@@ -13594,6 +15311,12 @@
           },
           "plan_name": {
             "type": "string"
+          },
+          "purchase_order": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "start_date": {
             "type": "string",
@@ -13700,6 +15423,7 @@
           "PAUSED",
           "SUSPENDED",
           "CANCELLED",
+          "ABORTED",
           "COMPLETED",
           "SUPERSEDED",
           "ERRORED"
@@ -13722,6 +15446,9 @@
             ],
             "description": "Automatically try to charge the customer's configured payment method on finalize."
           },
+          "custom_properties": {
+            "description": "Partial update of custom property values (merge; send a key with `null` to remove it).\nValidated against the tenant's `SUBSCRIPTION` property definitions. Omit to leave unchanged."
+          },
           "invoice_memo": {
             "type": [
               "string",
@@ -13741,11 +15468,11 @@
           "payment_methods_config": {
             "oneOf": [
               {
-                "type": "null"
-              },
-              {
                 "$ref": "#/components/schemas/PaymentMethodsConfig",
                 "description": "Payment methods configuration (Online, BankTransfer, or External)"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -13769,6 +15496,20 @@
           }
         }
       },
+      "SubscriptionUpdateType": {
+        "type": "string",
+        "description": "Identifies which mutation triggered a `subscription.updated` webhook.",
+        "enum": [
+          "activated",
+          "trial_ended",
+          "billing_configuration_updated",
+          "plan_changed",
+          "amended",
+          "units_changed",
+          "paused",
+          "cancellation_scheduled"
+        ]
+      },
       "TaxBreakdownItem": {
         "type": "object",
         "required": [
@@ -13781,10 +15522,10 @@
           "exemption_type": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/TaxExemptionType"
               },
               {
-                "$ref": "#/components/schemas/TaxExemptionType"
+                "type": "null"
               }
             ]
           },
@@ -13830,10 +15571,23 @@
         ],
         "properties": {
           "price": {
-            "type": "string"
+            "type": "string",
+            "format": "decimal"
           },
           "term": {
             "$ref": "#/components/schemas/BillingPeriodEnum"
+          }
+        }
+      },
+      "TextConfigValue": {
+        "type": "object",
+        "description": "A text config value.",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string"
           }
         }
       },
@@ -13841,9 +15595,7 @@
         "type": "object",
         "required": [
           "first_unit",
-          "rate",
-          "flat_fee",
-          "flat_cap"
+          "rate"
         ],
         "properties": {
           "first_unit": {
@@ -13852,11 +15604,17 @@
             "minimum": 0
           },
           "flat_cap": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "decimal"
           },
           "flat_fee": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "decimal"
           },
           "rate": {
@@ -14077,20 +15835,20 @@
           "payment_method_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CustomerPaymentMethodId"
               },
               {
-                "$ref": "#/components/schemas/CustomerPaymentMethodId"
+                "type": "null"
               }
             ]
           },
           "payment_method_info": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PaymentMethodInfo"
               },
               {
-                "$ref": "#/components/schemas/PaymentMethodInfo"
+                "type": "null"
               }
             ]
           },
@@ -14133,10 +15891,10 @@
           "trialing_plan_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PlanId"
               },
               {
-                "$ref": "#/components/schemas/PlanId"
+                "type": "null"
               }
             ]
           }
@@ -14194,10 +15952,10 @@
           "price_id": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PriceId"
               },
               {
-                "$ref": "#/components/schemas/PriceId"
+                "type": "null"
               }
             ]
           },
@@ -14221,10 +15979,10 @@
           "discount": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/CouponDiscount"
               },
               {
-                "$ref": "#/components/schemas/CouponDiscount"
+                "type": "null"
               }
             ]
           },
@@ -14248,6 +16006,16 @@
               "null"
             ]
           },
+          "filters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/MetricFilter"
+            },
+            "description": "Absent = leave filters untouched; present (even empty) = replace them."
+          },
           "name": {
             "type": [
               "string",
@@ -14257,20 +16025,20 @@
           "segmentation_matrix": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/MetricSegmentationMatrix"
               },
               {
-                "$ref": "#/components/schemas/MetricSegmentationMatrix"
+                "type": "null"
               }
             ]
           },
           "unit_conversion": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/UnitConversion"
               },
               {
-                "$ref": "#/components/schemas/UnitConversion"
+                "type": "null"
               }
             ]
           }
@@ -14288,10 +16056,10 @@
           "fee_structure": {
             "oneOf": [
               {
-                "type": "null"
+                "$ref": "#/components/schemas/ProductFeeStructure"
               },
               {
-                "$ref": "#/components/schemas/ProductFeeStructure"
+                "type": "null"
               }
             ]
           },
@@ -14498,6 +16266,9 @@
     },
     {
       "name": "Credit Notes"
+    },
+    {
+      "name": "Custom Properties"
     },
     {
       "name": "Customers"
@@ -14808,14 +16579,21 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "credit_note.created",
                 "credit_note_id": "crn_7n42DGM5Tflk9n8mt7Fhc7",
+                "credit_note_number": "CN-000001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "status": "DRAFT",
                 "currency": "EUR",
+                "subtotal": 4000,
                 "total": 5000,
                 "tax_amount": 1000,
                 "refunded_amount_cents": 0,
                 "credited_amount_cents": 5000,
+                "line_items": [],
+                "tax_breakdown": [],
+                "reason": "Partial refund",
+                "custom_properties": {},
                 "created_at": "1970-01-01T00:00:00.000Z",
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
@@ -14848,14 +16626,21 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "credit_note.finalized",
                 "credit_note_id": "crn_7n42DGM5Tflk9n8mt7Fhc7",
+                "credit_note_number": "CN-000001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "status": "DRAFT",
                 "currency": "EUR",
+                "subtotal": 4000,
                 "total": 5000,
                 "tax_amount": 1000,
                 "refunded_amount_cents": 0,
                 "credited_amount_cents": 5000,
+                "line_items": [],
+                "tax_breakdown": [],
+                "reason": "Partial refund",
+                "custom_properties": {},
                 "created_at": "1970-01-01T00:00:00.000Z",
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
@@ -14888,14 +16673,21 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "credit_note.voided",
                 "credit_note_id": "crn_7n42DGM5Tflk9n8mt7Fhc7",
+                "credit_note_number": "CN-000001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "status": "DRAFT",
                 "currency": "EUR",
+                "subtotal": 4000,
                 "total": 5000,
                 "tax_amount": 1000,
                 "refunded_amount_cents": 0,
                 "credited_amount_cents": 5000,
+                "line_items": [],
+                "tax_breakdown": [],
+                "reason": "Partial refund",
+                "custom_properties": {},
                 "created_at": "1970-01-01T00:00:00.000Z",
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
@@ -14936,6 +16728,9 @@
                 ],
                 "phone": "+1-555-0123",
                 "currency": "USD",
+                "custom_properties": {
+                  "account_tier": "enterprise"
+                },
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
@@ -14967,12 +16762,14 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "invoice.consolidated",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "status": "DRAFT",
                 "currency": "EUR",
                 "total": 10000,
                 "tax_amount": 2000,
                 "created_at": "1970-01-01T00:00:00.000Z",
+                "custom_properties": {},
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
@@ -15004,12 +16801,14 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "invoice.created",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "status": "DRAFT",
                 "currency": "EUR",
                 "total": 10000,
                 "tax_amount": 2000,
                 "created_at": "1970-01-01T00:00:00.000Z",
+                "custom_properties": {},
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
@@ -15041,12 +16840,14 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "invoice.finalized",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "status": "DRAFT",
                 "currency": "EUR",
                 "total": 10000,
                 "tax_amount": 2000,
                 "created_at": "1970-01-01T00:00:00.000Z",
+                "custom_properties": {},
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
@@ -15078,12 +16879,14 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "invoice.paid",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "status": "DRAFT",
                 "currency": "EUR",
                 "total": 10000,
                 "tax_amount": 2000,
                 "created_at": "1970-01-01T00:00:00.000Z",
+                "custom_properties": {},
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
@@ -15115,12 +16918,14 @@
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "invoice.voided",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
                 "status": "DRAFT",
                 "currency": "EUR",
                 "total": 10000,
                 "tax_amount": 2000,
                 "created_at": "1970-01-01T00:00:00.000Z",
+                "custom_properties": {},
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }
@@ -15527,6 +17332,55 @@
         }
       }
     },
+    "subscription.cancelled": {
+      "post": {
+        "summary": "subscription.cancelled webhook",
+        "description": "A subscription was cancelled (its cancellation took effect)",
+        "operationId": "webhook_subscription_cancelled",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "subscription.cancelled",
+                "subscription_id": "sub_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_alias": "ACME",
+                "customer_name": "Acme Corporation",
+                "billing_day_anchor": 1,
+                "currency": "EUR",
+                "start_date": "1970-01-01",
+                "plan_name": "default",
+                "version": 0,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "net_terms": 0,
+                "mrr_cents": 0,
+                "period": "MONTHLY",
+                "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
+                "custom_properties": {
+                  "pdp_external_status": "approved"
+                },
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
     "subscription.created": {
       "post": {
         "summary": "subscription.created webhook",
@@ -15559,6 +17413,109 @@
                 "mrr_cents": 0,
                 "period": "MONTHLY",
                 "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
+                "custom_properties": {
+                  "pdp_external_status": "approved"
+                },
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "subscription.ended": {
+      "post": {
+        "summary": "subscription.ended webhook",
+        "description": "A subscription ended by reaching its fixed end date",
+        "operationId": "webhook_subscription_ended",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "subscription.ended",
+                "subscription_id": "sub_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_alias": "ACME",
+                "customer_name": "Acme Corporation",
+                "billing_day_anchor": 1,
+                "currency": "EUR",
+                "start_date": "1970-01-01",
+                "plan_name": "default",
+                "version": 0,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "net_terms": 0,
+                "mrr_cents": 0,
+                "period": "MONTHLY",
+                "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
+                "custom_properties": {
+                  "pdp_external_status": "approved"
+                },
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "subscription.updated": {
+      "post": {
+        "summary": "subscription.updated webhook",
+        "description": "A subscription was updated (plan change, amendment, seats, billing configuration, ...)",
+        "operationId": "webhook_subscription_updated",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "subscription.updated",
+                "subscription_id": "sub_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_alias": "ACME",
+                "customer_name": "Acme Corporation",
+                "billing_day_anchor": 1,
+                "currency": "EUR",
+                "start_date": "1970-01-01",
+                "plan_name": "default",
+                "version": 0,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "net_terms": 0,
+                "mrr_cents": 0,
+                "period": "MONTHLY",
+                "status": "PENDING_ACTIVATION",
+                "auto_advance_invoices": true,
+                "charge_automatically": true,
+                "custom_properties": {
+                  "pdp_external_status": "approved"
+                },
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }

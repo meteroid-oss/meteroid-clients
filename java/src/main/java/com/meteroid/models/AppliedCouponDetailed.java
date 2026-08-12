@@ -19,7 +19,7 @@ public class AppliedCouponDetailed {
     @JsonProperty("applied_coupon")
     private AppliedCoupon appliedCoupon;
 
-    @JsonProperty private Coupon coupon;
+    @JsonProperty private SubscriptionCoupon coupon;
 
     public AppliedCouponDetailed() {}
 
@@ -42,7 +42,7 @@ public class AppliedCouponDetailed {
         this.appliedCoupon = appliedCoupon;
     }
 
-    public AppliedCouponDetailed coupon(Coupon coupon) {
+    public AppliedCouponDetailed coupon(SubscriptionCoupon coupon) {
         this.coupon = coupon;
         return this;
     }
@@ -53,11 +53,11 @@ public class AppliedCouponDetailed {
      * @return coupon
      */
     @javax.annotation.Nonnull
-    public Coupon getCoupon() {
+    public SubscriptionCoupon getCoupon() {
         return coupon;
     }
 
-    public void setCoupon(Coupon coupon) {
+    public void setCoupon(SubscriptionCoupon coupon) {
         this.coupon = coupon;
     }
 

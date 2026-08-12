@@ -19,6 +19,10 @@ pub struct CustomerUpdateRequest {
 
     pub currency: Currency,
 
+    /// User-defined custom property values (full replace). Omit to leave unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_properties: Option<serde_json::Value>,
+
     pub custom_taxes: Vec<CustomTaxRate>,
 
     pub invoicing_emails: Vec<String>,
@@ -53,6 +57,7 @@ impl CustomerUpdateRequest {
             billing_address: None,
             billing_email: None,
             currency,
+            custom_properties: None,
             custom_taxes,
             invoicing_emails,
             invoicing_entity_id,

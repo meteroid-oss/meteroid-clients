@@ -5,6 +5,7 @@ import com.meteroid.MeteroidHttpClient;
 import com.meteroid.Utils;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.Invoice;
+import com.meteroid.models.InvoiceCustomPropertiesRequest;
 import com.meteroid.models.InvoiceListResponse;
 
 import okhttp3.HttpUrl;
@@ -58,6 +59,25 @@ public class Invoices {
                         .newUrlBuilder()
                         .encodedPath(String.format("/api/v1/invoices/%s", invoiceId));
         return this.client.executeRequest("GET", url.build(), null, null, Invoice.class);
+    }
+
+    /**
+     * Merge custom property values onto an invoice (send a key with `null` to remove it). Values
+     * are validated against the tenant's `INVOICE` property definitions. Allowed at any status —
+     * custom properties are external workflow metadata and stay editable after the invoice is
+     * finalized.
+     */
+    public Invoice patchInvoiceCustomProperties(
+            final String invoiceId,
+            final InvoiceCustomPropertiesRequest invoiceCustomPropertiesRequest)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(
+                                String.format("/api/v1/invoices/%s/custom-properties", invoiceId));
+        return this.client.executeRequest(
+                "PATCH", url.build(), null, invoiceCustomPropertiesRequest, Invoice.class);
     }
 
     /** Download the PDF document for an invoice. */

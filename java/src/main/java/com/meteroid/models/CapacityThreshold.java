@@ -11,6 +11,8 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -20,9 +22,9 @@ public class CapacityThreshold {
     private Long includedAmount;
 
     @JsonProperty("per_unit_overage")
-    private String perUnitOverage;
+    private BigDecimal perUnitOverage;
 
-    @JsonProperty private String price;
+    @JsonProperty private BigDecimal price;
 
     public CapacityThreshold() {}
 
@@ -45,7 +47,7 @@ public class CapacityThreshold {
         this.includedAmount = includedAmount;
     }
 
-    public CapacityThreshold perUnitOverage(String perUnitOverage) {
+    public CapacityThreshold perUnitOverage(BigDecimal perUnitOverage) {
         this.perUnitOverage = perUnitOverage;
         return this;
     }
@@ -56,15 +58,15 @@ public class CapacityThreshold {
      * @return perUnitOverage
      */
     @javax.annotation.Nonnull
-    public String getPerUnitOverage() {
+    public BigDecimal getPerUnitOverage() {
         return perUnitOverage;
     }
 
-    public void setPerUnitOverage(String perUnitOverage) {
+    public void setPerUnitOverage(BigDecimal perUnitOverage) {
         this.perUnitOverage = perUnitOverage;
     }
 
-    public CapacityThreshold price(String price) {
+    public CapacityThreshold price(BigDecimal price) {
         this.price = price;
         return this;
     }
@@ -75,11 +77,11 @@ public class CapacityThreshold {
      * @return price
      */
     @javax.annotation.Nonnull
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

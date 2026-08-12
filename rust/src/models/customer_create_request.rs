@@ -22,6 +22,11 @@ pub struct CustomerCreateRequest {
 
     pub currency: Currency,
 
+    /// User-defined custom property values, keyed by definition `key`. Validated against the
+    /// tenant's `CUSTOMER` property definitions. Omit to leave unset.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_properties: Option<serde_json::Value>,
+
     pub custom_taxes: Vec<CustomTaxRate>,
 
     pub invoicing_emails: Vec<String>,
@@ -57,6 +62,7 @@ impl CustomerCreateRequest {
             billing_email: None,
             connected_account_id: None,
             currency,
+            custom_properties: None,
             custom_taxes,
             invoicing_emails,
             invoicing_entity_id: None,

@@ -32,6 +32,9 @@ public class Customer {
 
     @JsonProperty private Currency currency;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("custom_taxes")
     private List<CustomTaxRate> customTaxes;
 
@@ -147,6 +150,25 @@ public class Customer {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public Customer customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition `key`.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nonnull
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public Customer customTaxes(List<CustomTaxRate> customTaxes) {

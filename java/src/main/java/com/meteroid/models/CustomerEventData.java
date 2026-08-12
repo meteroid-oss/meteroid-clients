@@ -26,6 +26,9 @@ public class CustomerEventData {
 
     @JsonProperty private String currency;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("customer_id")
     private String customerId;
 
@@ -92,6 +95,25 @@ public class CustomerEventData {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public CustomerEventData customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition key.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nonnull
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public CustomerEventData customerId(String customerId) {

@@ -13,6 +13,11 @@ pub struct SubscriptionUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub charge_automatically: Option<bool>,
 
+    /// Partial update of custom property values (merge; send a key with `null` to remove it).
+    /// Validated against the tenant's `SUBSCRIPTION` property definitions. Omit to leave unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_properties: Option<serde_json::Value>,
+
     /// Default memo for invoices
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invoice_memo: Option<String>,
@@ -34,6 +39,7 @@ impl SubscriptionUpdateRequest {
         Self {
             auto_advance_invoices: None,
             charge_automatically: None,
+            custom_properties: None,
             invoice_memo: None,
             net_terms: None,
             payment_methods_config: None,

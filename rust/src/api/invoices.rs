@@ -63,6 +63,25 @@ impl<'a> Invoices<'a> {
             .await
     }
 
+    /// Merge custom property values onto an invoice (send a key with `null` to remove it).
+    /// Values are validated against the tenant's `INVOICE` property definitions. Allowed at any
+    /// status — custom properties are external workflow metadata and stay editable after the invoice
+    /// is finalized.
+    pub async fn patch_invoice_custom_properties(
+        &self,
+        invoice_id: String,
+        invoice_custom_properties_request: crate::models::InvoiceCustomPropertiesRequest,
+    ) -> Result<crate::models::Invoice> {
+        crate::request::Request::new(
+            http1::Method::PATCH,
+            "/api/v1/invoices/{invoice_id}/custom-properties",
+        )
+        .with_path_param("invoice_id", invoice_id)
+        .with_body_param(invoice_custom_properties_request)
+        .execute(self.cfg)
+        .await
+    }
+
     /// Download the PDF document for an invoice.
     pub async fn download_invoice_pdf(&self, invoice_id: String) -> Result<bytes::Bytes> {
         crate::request::Request::new(http1::Method::GET, "/api/v1/invoices/{invoice_id}/download")

@@ -120,12 +120,14 @@ impl<'a> Customers<'a> {
     pub async fn create_portal_token(
         &self,
         id_or_alias: String,
+        customer_portal_token_request: crate::models::CustomerPortalTokenRequest,
     ) -> Result<crate::models::CustomerPortalTokenResponse> {
         crate::request::Request::new(
             http1::Method::POST,
             "/api/v1/customers/{id_or_alias}/portal-token",
         )
         .with_path_param("id_or_alias", id_or_alias)
+        .with_body_param(customer_portal_token_request)
         .execute(self.cfg)
         .await
     }

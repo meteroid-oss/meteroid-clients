@@ -13,6 +13,9 @@ pub struct CustomerEventData {
 
     pub currency: String,
 
+    /// User-defined custom property values, keyed by definition key.
+    pub custom_properties: serde_json::Value,
+
     pub customer_id: CustomerId,
 
     pub invoicing_emails: Vec<String>,
@@ -26,6 +29,7 @@ pub struct CustomerEventData {
 impl CustomerEventData {
     pub fn new(
         currency: String,
+        custom_properties: serde_json::Value,
         customer_id: CustomerId,
         invoicing_emails: Vec<String>,
         name: String,
@@ -34,6 +38,7 @@ impl CustomerEventData {
             alias: None,
             billing_email: None,
             currency,
+            custom_properties,
             customer_id,
             invoicing_emails,
             name,

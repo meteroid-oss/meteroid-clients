@@ -21,16 +21,31 @@ public class SubscriptionEventData {
     @JsonProperty("activated_at")
     private OffsetDateTime activatedAt;
 
+    @JsonProperty("auto_advance_invoices")
+    private Boolean autoAdvanceInvoices;
+
     @JsonProperty("billing_day_anchor")
     private Integer billingDayAnchor;
 
     @JsonProperty("billing_start_date")
     private String billingStartDate;
 
+    @JsonProperty("cancellation_reason")
+    private String cancellationReason;
+
+    @JsonProperty("change_type")
+    private SubscriptionUpdateType changeType;
+
+    @JsonProperty("charge_automatically")
+    private Boolean chargeAutomatically;
+
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
     @JsonProperty private String currency;
+
+    @JsonProperty("custom_properties")
+    private Object customProperties;
 
     @JsonProperty("customer_alias")
     private String customerAlias;
@@ -60,6 +75,9 @@ public class SubscriptionEventData {
 
     @JsonProperty("plan_name")
     private String planName;
+
+    @JsonProperty("purchase_order")
+    private String purchaseOrder;
 
     @JsonProperty("start_date")
     private String startDate;
@@ -93,6 +111,25 @@ public class SubscriptionEventData {
 
     public void setActivatedAt(OffsetDateTime activatedAt) {
         this.activatedAt = activatedAt;
+    }
+
+    public SubscriptionEventData autoAdvanceInvoices(Boolean autoAdvanceInvoices) {
+        this.autoAdvanceInvoices = autoAdvanceInvoices;
+        return this;
+    }
+
+    /**
+     * Get autoAdvanceInvoices
+     *
+     * @return autoAdvanceInvoices
+     */
+    @javax.annotation.Nonnull
+    public Boolean getAutoAdvanceInvoices() {
+        return autoAdvanceInvoices;
+    }
+
+    public void setAutoAdvanceInvoices(Boolean autoAdvanceInvoices) {
+        this.autoAdvanceInvoices = autoAdvanceInvoices;
     }
 
     public SubscriptionEventData billingDayAnchor(Integer billingDayAnchor) {
@@ -133,6 +170,63 @@ public class SubscriptionEventData {
         this.billingStartDate = billingStartDate;
     }
 
+    public SubscriptionEventData cancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+        return this;
+    }
+
+    /**
+     * Present on `subscription.cancelled` when a reason was supplied.
+     *
+     * @return cancellationReason
+     */
+    @javax.annotation.Nullable
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public SubscriptionEventData changeType(SubscriptionUpdateType changeType) {
+        this.changeType = changeType;
+        return this;
+    }
+
+    /**
+     * Get changeType
+     *
+     * @return changeType
+     */
+    @javax.annotation.Nullable
+    public SubscriptionUpdateType getChangeType() {
+        return changeType;
+    }
+
+    public void setChangeType(SubscriptionUpdateType changeType) {
+        this.changeType = changeType;
+    }
+
+    public SubscriptionEventData chargeAutomatically(Boolean chargeAutomatically) {
+        this.chargeAutomatically = chargeAutomatically;
+        return this;
+    }
+
+    /**
+     * Get chargeAutomatically
+     *
+     * @return chargeAutomatically
+     */
+    @javax.annotation.Nonnull
+    public Boolean getChargeAutomatically() {
+        return chargeAutomatically;
+    }
+
+    public void setChargeAutomatically(Boolean chargeAutomatically) {
+        this.chargeAutomatically = chargeAutomatically;
+    }
+
     public SubscriptionEventData createdAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
@@ -169,6 +263,25 @@ public class SubscriptionEventData {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public SubscriptionEventData customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition key.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nonnull
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public SubscriptionEventData customerAlias(String customerAlias) {
@@ -359,6 +472,25 @@ public class SubscriptionEventData {
 
     public void setPlanName(String planName) {
         this.planName = planName;
+    }
+
+    public SubscriptionEventData purchaseOrder(String purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
+        return this;
+    }
+
+    /**
+     * Get purchaseOrder
+     *
+     * @return purchaseOrder
+     */
+    @javax.annotation.Nullable
+    public String getPurchaseOrder() {
+        return purchaseOrder;
+    }
+
+    public void setPurchaseOrder(String purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
     }
 
     public SubscriptionEventData startDate(String startDate) {

@@ -27,6 +27,11 @@ pub struct SubscriptionCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coupon_codes: Option<Vec<String>>,
 
+    /// User-defined custom property values, keyed by definition `key`. Validated against the
+    /// tenant's subscription definitions.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_properties: Option<serde_json::Value>,
+
     pub customer_id_or_alias: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -78,6 +83,7 @@ impl SubscriptionCreateRequest {
             billing_day_anchor: None,
             charge_automatically: None,
             coupon_codes: None,
+            custom_properties: None,
             customer_id_or_alias,
             end_date: None,
             invoice_memo: None,
