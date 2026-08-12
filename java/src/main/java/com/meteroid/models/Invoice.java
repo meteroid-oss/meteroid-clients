@@ -26,12 +26,18 @@ public class Invoice {
     @JsonProperty("applied_credits")
     private Long appliedCredits;
 
+    @JsonProperty("child_invoice_id")
+    private String childInvoiceId;
+
     @JsonProperty private List<CouponLineItem> coupons;
 
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
     @JsonProperty private Currency currency;
+
+    @JsonProperty("custom_properties")
+    private Object customProperties;
 
     @JsonProperty("customer_details")
     private CustomerDetails customerDetails;
@@ -69,6 +75,9 @@ public class Invoice {
 
     @JsonProperty("paid_at")
     private OffsetDateTime paidAt;
+
+    @JsonProperty("parent_invoice_id")
+    private String parentInvoiceId;
 
     @JsonProperty("payment_status")
     private InvoicePaymentStatus paymentStatus;
@@ -142,6 +151,25 @@ public class Invoice {
         this.appliedCredits = appliedCredits;
     }
 
+    public Invoice childInvoiceId(String childInvoiceId) {
+        this.childInvoiceId = childInvoiceId;
+        return this;
+    }
+
+    /**
+     * Get childInvoiceId
+     *
+     * @return childInvoiceId
+     */
+    @javax.annotation.Nullable
+    public String getChildInvoiceId() {
+        return childInvoiceId;
+    }
+
+    public void setChildInvoiceId(String childInvoiceId) {
+        this.childInvoiceId = childInvoiceId;
+    }
+
     public Invoice coupons(List<CouponLineItem> coupons) {
         this.coupons = coupons;
         return this;
@@ -206,6 +234,25 @@ public class Invoice {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public Invoice customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition `key`.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nonnull
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public Invoice customerDetails(CustomerDetails customerDetails) {
@@ -462,6 +509,25 @@ public class Invoice {
 
     public void setPaidAt(OffsetDateTime paidAt) {
         this.paidAt = paidAt;
+    }
+
+    public Invoice parentInvoiceId(String parentInvoiceId) {
+        this.parentInvoiceId = parentInvoiceId;
+        return this;
+    }
+
+    /**
+     * Get parentInvoiceId
+     *
+     * @return parentInvoiceId
+     */
+    @javax.annotation.Nullable
+    public String getParentInvoiceId() {
+        return parentInvoiceId;
+    }
+
+    public void setParentInvoiceId(String parentInvoiceId) {
+        this.parentInvoiceId = parentInvoiceId;
     }
 
     public Invoice paymentStatus(InvoicePaymentStatus paymentStatus) {

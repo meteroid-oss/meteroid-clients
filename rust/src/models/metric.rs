@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     billable_metric_id::BillableMetricId,
-    billing_metric_aggregate_enum::BillingMetricAggregateEnum,
+    billing_metric_aggregate_enum::BillingMetricAggregateEnum, metric_filter::MetricFilter,
     metric_segmentation_matrix::MetricSegmentationMatrix, product_family_id::ProductFamilyId,
     product_id::ProductId, unit_conversion::UnitConversion,
 };
@@ -24,6 +24,9 @@ pub struct Metric {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub filters: Option<Vec<MetricFilter>>,
 
     pub id: BillableMetricId,
 
@@ -60,6 +63,7 @@ impl Metric {
             code,
             created_at,
             description: None,
+            filters: None,
             id,
             name,
             product_family_id,

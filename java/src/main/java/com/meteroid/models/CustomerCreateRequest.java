@@ -32,6 +32,9 @@ public class CustomerCreateRequest {
 
     @JsonProperty private Currency currency;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("custom_taxes")
     private List<CustomTaxRate> customTaxes;
 
@@ -148,6 +151,26 @@ public class CustomerCreateRequest {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public CustomerCreateRequest customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition `key`. Validated against the
+     * tenant&#x27;s `CUSTOMER` property definitions. Omit to leave unset.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nullable
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public CustomerCreateRequest customTaxes(List<CustomTaxRate> customTaxes) {

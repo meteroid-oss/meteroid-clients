@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    billing_metric_aggregate_enum::BillingMetricAggregateEnum,
+    billing_metric_aggregate_enum::BillingMetricAggregateEnum, metric_filter::MetricFilter,
     metric_segmentation_matrix::MetricSegmentationMatrix, product_family_id::ProductFamilyId,
     product_id::ProductId, unit_conversion::UnitConversion,
 };
@@ -18,6 +18,10 @@ pub struct CreateMetricRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+
+    /// Pre-aggregation property filters. Optional and backward-compatible; omit for none.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub filters: Option<Vec<MetricFilter>>,
 
     pub name: String,
 
@@ -48,6 +52,7 @@ impl CreateMetricRequest {
             aggregation_type,
             code,
             description: None,
+            filters: None,
             name,
             product_family_id,
             product_id: None,

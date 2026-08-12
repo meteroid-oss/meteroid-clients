@@ -15,11 +15,17 @@ pub struct Invoice {
 
     pub applied_credits: i32,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub child_invoice_id: Option<InvoiceId>,
+
     pub coupons: Vec<CouponLineItem>,
 
     pub created_at: String,
 
     pub currency: Currency,
+
+    /// User-defined custom property values, keyed by definition `key`.
+    pub custom_properties: serde_json::Value,
 
     pub customer_details: CustomerDetails,
 
@@ -51,6 +57,9 @@ pub struct Invoice {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub paid_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_invoice_id: Option<InvoiceId>,
 
     pub payment_status: InvoicePaymentStatus,
 
@@ -91,6 +100,7 @@ impl Invoice {
         coupons: Vec<CouponLineItem>,
         created_at: String,
         currency: Currency,
+        custom_properties: serde_json::Value,
         customer_details: CustomerDetails,
         customer_id: CustomerId,
         id: InvoiceId,
@@ -111,9 +121,11 @@ impl Invoice {
         Self {
             amount_due,
             applied_credits,
+            child_invoice_id: None,
             coupons,
             created_at,
             currency,
+            custom_properties,
             customer_details,
             customer_id,
             due_date: None,
@@ -127,6 +139,7 @@ impl Invoice {
             memo: None,
             net_terms,
             paid_at: None,
+            parent_invoice_id: None,
             payment_status,
             purchase_order: None,
             reference: None,

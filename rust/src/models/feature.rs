@@ -2,8 +2,8 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    entitlement::Entitlement, feature_id::FeatureId, feature_status::FeatureStatus,
-    feature_type::FeatureType, product_ref::ProductRef,
+    entitlement::Entitlement, entitlement_product_ref::EntitlementProductRef,
+    feature_id::FeatureId, feature_status::FeatureStatus, feature_type::FeatureType,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -26,7 +26,7 @@ pub struct Feature {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub product: Option<ProductRef>,
+    pub product: Option<EntitlementProductRef>,
 
     pub status: FeatureStatus,
 }

@@ -23,6 +23,8 @@ pub struct BatchJobDetailResponse {
 
     pub has_error_csv: bool,
 
+    pub has_output: bool,
+
     pub id: BatchJobId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,6 +34,9 @@ pub struct BatchJobDetailResponse {
     pub input_file_url: Option<String>,
 
     pub job_type: BatchJobType,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub output_url: Option<String>,
 
     pub processed_items: i32,
 
@@ -48,6 +53,7 @@ impl BatchJobDetailResponse {
         failed_items: i32,
         failure_count: i32,
         has_error_csv: bool,
+        has_output: bool,
         id: BatchJobId,
         job_type: BatchJobType,
         processed_items: i32,
@@ -61,10 +67,12 @@ impl BatchJobDetailResponse {
             failed_items,
             failure_count,
             has_error_csv,
+            has_output,
             id,
             input_file_name: None,
             input_file_url: None,
             job_type,
+            output_url: None,
             processed_items,
             status,
             total_items: None,

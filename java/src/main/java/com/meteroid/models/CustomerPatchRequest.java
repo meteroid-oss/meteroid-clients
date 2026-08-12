@@ -29,6 +29,9 @@ public class CustomerPatchRequest {
 
     @JsonProperty private Currency currency;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("custom_taxes")
     private List<CustomTaxRate> customTaxes;
 
@@ -126,6 +129,26 @@ public class CustomerPatchRequest {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public CustomerPatchRequest customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * Partial update of custom property values (merge; send a key with `null` to remove it). Omit
+     * to leave unchanged.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nullable
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public CustomerPatchRequest customTaxes(List<CustomTaxRate> customTaxes) {

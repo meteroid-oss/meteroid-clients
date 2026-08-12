@@ -60,7 +60,7 @@ public class TierRow {
      *
      * @return flatCap
      */
-    @javax.annotation.Nonnull
+    @javax.annotation.Nullable
     public BigDecimal getFlatCap() {
         return flatCap;
     }
@@ -79,7 +79,7 @@ public class TierRow {
      *
      * @return flatFee
      */
-    @javax.annotation.Nonnull
+    @javax.annotation.Nullable
     public BigDecimal getFlatFee() {
         return flatFee;
     }

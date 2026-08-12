@@ -37,6 +37,9 @@ public class SubscriptionCreateRequest {
     @JsonProperty("coupon_codes")
     private List<String> couponCodes;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("customer_id_or_alias")
     private String customerIdOrAlias;
 
@@ -205,6 +208,26 @@ public class SubscriptionCreateRequest {
 
     public void setCouponCodes(List<String> couponCodes) {
         this.couponCodes = couponCodes;
+    }
+
+    public SubscriptionCreateRequest customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition `key`. Validated against the
+     * tenant&#x27;s subscription definitions.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nullable
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public SubscriptionCreateRequest customerIdOrAlias(String customerIdOrAlias) {

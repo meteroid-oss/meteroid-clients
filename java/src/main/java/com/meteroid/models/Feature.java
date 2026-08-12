@@ -31,7 +31,7 @@ public class Feature {
 
     @JsonProperty private String id;
     @JsonProperty private String name;
-    @JsonProperty private ProductRef product;
+    @JsonProperty private EntitlementProductRef product;
     @JsonProperty private FeatureStatus status;
 
     public Feature() {}
@@ -169,7 +169,7 @@ public class Feature {
         this.name = name;
     }
 
-    public Feature product(ProductRef product) {
+    public Feature product(EntitlementProductRef product) {
         this.product = product;
         return this;
     }
@@ -180,11 +180,11 @@ public class Feature {
      * @return product
      */
     @javax.annotation.Nullable
-    public ProductRef getProduct() {
+    public EntitlementProductRef getProduct() {
         return product;
     }
 
-    public void setProduct(ProductRef product) {
+    public void setProduct(EntitlementProductRef product) {
         this.product = product;
     }
 

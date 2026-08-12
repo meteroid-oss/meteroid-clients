@@ -12,7 +12,7 @@ pub struct ExtraRecurringPlanFee {
 
     pub quantity: i32,
 
-    pub unit_price: String,
+    pub unit_price: rust_decimal::Decimal,
 }
 
 impl ExtraRecurringPlanFee {
@@ -20,7 +20,7 @@ impl ExtraRecurringPlanFee {
         billing_type: BillingType,
         cadence: BillingPeriodEnum,
         quantity: i32,
-        unit_price: String,
+        unit_price: rust_decimal::Decimal,
     ) -> Self {
         Self {
             billing_type,

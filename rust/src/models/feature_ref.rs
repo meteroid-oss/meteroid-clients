@@ -1,7 +1,7 @@
 // this file is @generated
 use serde::{Deserialize, Serialize};
 
-use super::{feature_id::FeatureId, product_ref::ProductRef};
+use super::{entitlement_product_ref::EntitlementProductRef, feature_id::FeatureId};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct FeatureRef {
@@ -13,7 +13,7 @@ pub struct FeatureRef {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub product: Option<ProductRef>,
+    pub product: Option<EntitlementProductRef>,
 }
 
 impl FeatureRef {

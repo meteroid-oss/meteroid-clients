@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @ToString
 @EqualsAndHashCode
@@ -24,10 +26,16 @@ public class CreditNoteEventData {
     @JsonProperty("credit_note_id")
     private String creditNoteId;
 
+    @JsonProperty("credit_note_number")
+    private String creditNoteNumber;
+
     @JsonProperty("credited_amount_cents")
     private Long creditedAmountCents;
 
     @JsonProperty private String currency;
+
+    @JsonProperty("custom_properties")
+    private Object customProperties;
 
     @JsonProperty("customer_id")
     private String customerId;
@@ -35,13 +43,26 @@ public class CreditNoteEventData {
     @JsonProperty("invoice_id")
     private String invoiceId;
 
+    @JsonProperty("invoice_number")
+    private String invoiceNumber;
+
+    @JsonProperty("line_items")
+    private List<InvoiceLineItem> lineItems;
+
+    @JsonProperty private String memo;
+    @JsonProperty private String reason;
+
     @JsonProperty("refunded_amount_cents")
     private Long refundedAmountCents;
 
     @JsonProperty private CreditNoteStatus status;
+    @JsonProperty private Long subtotal;
 
     @JsonProperty("tax_amount")
     private Long taxAmount;
+
+    @JsonProperty("tax_breakdown")
+    private List<TaxBreakdownItem> taxBreakdown;
 
     @JsonProperty private Long total;
 
@@ -85,6 +106,25 @@ public class CreditNoteEventData {
         this.creditNoteId = creditNoteId;
     }
 
+    public CreditNoteEventData creditNoteNumber(String creditNoteNumber) {
+        this.creditNoteNumber = creditNoteNumber;
+        return this;
+    }
+
+    /**
+     * Absent while the credit note is a draft — the number is assigned at finalization.
+     *
+     * @return creditNoteNumber
+     */
+    @javax.annotation.Nullable
+    public String getCreditNoteNumber() {
+        return creditNoteNumber;
+    }
+
+    public void setCreditNoteNumber(String creditNoteNumber) {
+        this.creditNoteNumber = creditNoteNumber;
+    }
+
     public CreditNoteEventData creditedAmountCents(Long creditedAmountCents) {
         this.creditedAmountCents = creditedAmountCents;
         return this;
@@ -121,6 +161,25 @@ public class CreditNoteEventData {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public CreditNoteEventData customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition key.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nonnull
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public CreditNoteEventData customerId(String customerId) {
@@ -161,6 +220,91 @@ public class CreditNoteEventData {
         this.invoiceId = invoiceId;
     }
 
+    public CreditNoteEventData invoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+        return this;
+    }
+
+    /**
+     * Number of the invoice being credited.
+     *
+     * @return invoiceNumber
+     */
+    @javax.annotation.Nullable
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public CreditNoteEventData lineItems(List<InvoiceLineItem> lineItems) {
+        this.lineItems = lineItems;
+        return this;
+    }
+
+    public CreditNoteEventData addLineItemsItem(InvoiceLineItem lineItemsItem) {
+        if (this.lineItems == null) {
+            this.lineItems = new ArrayList<>();
+        }
+        this.lineItems.add(lineItemsItem);
+
+        return this;
+    }
+
+    /**
+     * Credited line items (negated amounts).
+     *
+     * @return lineItems
+     */
+    @javax.annotation.Nonnull
+    public List<InvoiceLineItem> getLineItems() {
+        return lineItems;
+    }
+
+    public void setLineItems(List<InvoiceLineItem> lineItems) {
+        this.lineItems = lineItems;
+    }
+
+    public CreditNoteEventData memo(String memo) {
+        this.memo = memo;
+        return this;
+    }
+
+    /**
+     * Get memo
+     *
+     * @return memo
+     */
+    @javax.annotation.Nullable
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public CreditNoteEventData reason(String reason) {
+        this.reason = reason;
+        return this;
+    }
+
+    /**
+     * Get reason
+     *
+     * @return reason
+     */
+    @javax.annotation.Nullable
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     public CreditNoteEventData refundedAmountCents(Long refundedAmountCents) {
         this.refundedAmountCents = refundedAmountCents;
         return this;
@@ -199,6 +343,25 @@ public class CreditNoteEventData {
         this.status = status;
     }
 
+    public CreditNoteEventData subtotal(Long subtotal) {
+        this.subtotal = subtotal;
+        return this;
+    }
+
+    /**
+     * Get subtotal
+     *
+     * @return subtotal
+     */
+    @javax.annotation.Nonnull
+    public Long getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(Long subtotal) {
+        this.subtotal = subtotal;
+    }
+
     public CreditNoteEventData taxAmount(Long taxAmount) {
         this.taxAmount = taxAmount;
         return this;
@@ -216,6 +379,34 @@ public class CreditNoteEventData {
 
     public void setTaxAmount(Long taxAmount) {
         this.taxAmount = taxAmount;
+    }
+
+    public CreditNoteEventData taxBreakdown(List<TaxBreakdownItem> taxBreakdown) {
+        this.taxBreakdown = taxBreakdown;
+        return this;
+    }
+
+    public CreditNoteEventData addTaxBreakdownItem(TaxBreakdownItem taxBreakdownItem) {
+        if (this.taxBreakdown == null) {
+            this.taxBreakdown = new ArrayList<>();
+        }
+        this.taxBreakdown.add(taxBreakdownItem);
+
+        return this;
+    }
+
+    /**
+     * Per-rate tax (VAT) breakdown for the credited amount.
+     *
+     * @return taxBreakdown
+     */
+    @javax.annotation.Nonnull
+    public List<TaxBreakdownItem> getTaxBreakdown() {
+        return taxBreakdown;
+    }
+
+    public void setTaxBreakdown(List<TaxBreakdownItem> taxBreakdown) {
+        this.taxBreakdown = taxBreakdown;
     }
 
     public CreditNoteEventData total(Long total) {

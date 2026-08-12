@@ -32,6 +32,9 @@ pub enum SubscriptionStatusEnum {
     #[serde(rename = "CANCELLED")]
     Cancelled,
 
+    #[serde(rename = "ABORTED")]
+    Aborted,
+
     #[serde(rename = "COMPLETED")]
     Completed,
 
@@ -53,6 +56,7 @@ impl fmt::Display for SubscriptionStatusEnum {
             Self::Paused => "PAUSED",
             Self::Suspended => "SUSPENDED",
             Self::Cancelled => "CANCELLED",
+            Self::Aborted => "ABORTED",
             Self::Completed => "COMPLETED",
             Self::Superseded => "SUPERSEDED",
             Self::Errored => "ERRORED",

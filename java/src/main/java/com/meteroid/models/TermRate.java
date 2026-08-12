@@ -11,17 +11,19 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class TermRate {
-    @JsonProperty private String price;
+    @JsonProperty private BigDecimal price;
     @JsonProperty private BillingPeriodEnum term;
 
     public TermRate() {}
 
-    public TermRate price(String price) {
+    public TermRate price(BigDecimal price) {
         this.price = price;
         return this;
     }
@@ -32,11 +34,11 @@ public class TermRate {
      * @return price
      */
     @javax.annotation.Nonnull
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

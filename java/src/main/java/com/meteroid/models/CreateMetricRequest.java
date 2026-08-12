@@ -11,6 +11,9 @@ import com.meteroid.Utils;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ToString
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,6 +27,7 @@ public class CreateMetricRequest {
 
     @JsonProperty private String code;
     @JsonProperty private String description;
+    @JsonProperty private List<MetricFilter> filters;
     @JsonProperty private String name;
 
     @JsonProperty("product_family_id")
@@ -117,6 +121,34 @@ public class CreateMetricRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public CreateMetricRequest filters(List<MetricFilter> filters) {
+        this.filters = filters;
+        return this;
+    }
+
+    public CreateMetricRequest addFiltersItem(MetricFilter filtersItem) {
+        if (this.filters == null) {
+            this.filters = new ArrayList<>();
+        }
+        this.filters.add(filtersItem);
+
+        return this;
+    }
+
+    /**
+     * Pre-aggregation property filters. Optional and backward-compatible; omit for none.
+     *
+     * @return filters
+     */
+    @javax.annotation.Nullable
+    public List<MetricFilter> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(List<MetricFilter> filters) {
+        this.filters = filters;
     }
 
     public CreateMetricRequest name(String name) {

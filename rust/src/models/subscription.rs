@@ -41,6 +41,9 @@ pub struct Subscription {
     /// Current billing period start date
     pub current_period_start: String,
 
+    /// User-defined custom property values, keyed by definition `key`.
+    pub custom_properties: serde_json::Value,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub customer_alias: Option<String>,
 
@@ -102,6 +105,7 @@ impl Subscription {
         created_at: String,
         currency: Currency,
         current_period_start: String,
+        custom_properties: serde_json::Value,
         customer_id: CustomerId,
         customer_name: String,
         id: SubscriptionId,
@@ -125,6 +129,7 @@ impl Subscription {
             currency,
             current_period_end: None,
             current_period_start,
+            custom_properties,
             customer_alias: None,
             customer_id,
             customer_name,

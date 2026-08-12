@@ -17,7 +17,8 @@ import lombok.*;
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = EntitlementValue.Boolean.class, name = "BOOLEAN"),
-    @JsonSubTypes.Type(value = EntitlementValue.Metered.class, name = "METERED")
+    @JsonSubTypes.Type(value = EntitlementValue.Metered.class, name = "METERED"),
+    @JsonSubTypes.Type(value = EntitlementValue.Config.class, name = "CONFIG")
 })
 @ToString
 @EqualsAndHashCode
@@ -111,6 +112,41 @@ public abstract class EntitlementValue {
 
         /** Set the wrapped data for this variant. */
         public Metered data(MeteredEntitlementValue data) {
+            this.data = data;
+            return this;
+        }
+    }
+
+    /**
+     * Variant: CONFIG
+     *
+     * <p>This variant wraps ConfigEntitlementValue.
+     */
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = true)
+    @JsonTypeName("CONFIG")
+    public static class Config extends EntitlementValue {
+        @JsonUnwrapped private ConfigEntitlementValue data;
+
+        public Config() {}
+
+        public Config(ConfigEntitlementValue data) {
+            this.data = data;
+        }
+
+        @java.lang.Override
+        public String getType() {
+            return "CONFIG";
+        }
+
+        /** Get the wrapped data for this variant. */
+        @javax.annotation.Nonnull
+        public ConfigEntitlementValue getData() {
+            return data;
+        }
+
+        /** Set the wrapped data for this variant. */
+        public Config data(ConfigEntitlementValue data) {
             this.data = data;
             return this;
         }

@@ -44,6 +44,8 @@ public class Meteroid {
 
     private final CreditNotes creditNotes;
 
+    private final CustomProperties customProperties;
+
     private final Customers customers;
 
     private final Events events;
@@ -108,6 +110,8 @@ public class Meteroid {
         this.coupons = new Coupons(httpClient);
 
         this.creditNotes = new CreditNotes(httpClient);
+
+        this.customProperties = new CustomProperties(httpClient);
 
         this.customers = new Customers(httpClient);
 

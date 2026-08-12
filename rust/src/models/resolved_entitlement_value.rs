@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     boolean_resolved_entitlement_value::BooleanResolvedEntitlementValue,
+    config_resolved_entitlement_value::ConfigResolvedEntitlementValue,
     metered_resolved_entitlement_value::MeteredResolvedEntitlementValue,
 };
 
@@ -13,6 +14,8 @@ pub enum ResolvedEntitlementValue {
     Boolean(BooleanResolvedEntitlementValue),
     #[serde(rename = "METERED")]
     Metered(MeteredResolvedEntitlementValue),
+    #[serde(rename = "CONFIG")]
+    Config(ConfigResolvedEntitlementValue),
 }
 
 impl Default for ResolvedEntitlementValue {

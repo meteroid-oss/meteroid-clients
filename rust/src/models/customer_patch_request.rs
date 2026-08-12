@@ -20,6 +20,11 @@ pub struct CustomerPatchRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub currency: Option<Currency>,
 
+    /// Partial update of custom property values (merge; send a key with `null` to remove it).
+    /// Omit to leave unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_properties: Option<serde_json::Value>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_taxes: Option<Vec<CustomTaxRate>>,
 
@@ -52,6 +57,7 @@ impl CustomerPatchRequest {
             billing_address: None,
             billing_email: None,
             currency: None,
+            custom_properties: None,
             custom_taxes: None,
             invoicing_emails: None,
             invoicing_entity_id: None,

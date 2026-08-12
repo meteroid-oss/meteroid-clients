@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @ToString
 @EqualsAndHashCode
@@ -33,6 +35,7 @@ public class Metric {
     private OffsetDateTime createdAt;
 
     @JsonProperty private String description;
+    @JsonProperty private List<MetricFilter> filters;
     @JsonProperty private String id;
     @JsonProperty private String name;
 
@@ -165,6 +168,34 @@ public class Metric {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Metric filters(List<MetricFilter> filters) {
+        this.filters = filters;
+        return this;
+    }
+
+    public Metric addFiltersItem(MetricFilter filtersItem) {
+        if (this.filters == null) {
+            this.filters = new ArrayList<>();
+        }
+        this.filters.add(filtersItem);
+
+        return this;
+    }
+
+    /**
+     * Get filters
+     *
+     * @return filters
+     */
+    @javax.annotation.Nullable
+    public List<MetricFilter> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(List<MetricFilter> filters) {
+        this.filters = filters;
     }
 
     public Metric id(String id) {

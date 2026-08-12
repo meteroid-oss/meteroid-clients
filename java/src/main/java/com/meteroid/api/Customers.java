@@ -8,6 +8,7 @@ import com.meteroid.models.Customer;
 import com.meteroid.models.CustomerCreateRequest;
 import com.meteroid.models.CustomerListResponse;
 import com.meteroid.models.CustomerPatchRequest;
+import com.meteroid.models.CustomerPortalTokenRequest;
 import com.meteroid.models.CustomerPortalTokenResponse;
 import com.meteroid.models.CustomerUpdateRequest;
 import com.meteroid.models.EffectiveEntitlementListResponse;
@@ -120,14 +121,19 @@ public class Customers {
      * Generates a JWT token that grants access to the customer portal. The token can be used to
      * access invoices, payment methods, and other portal features.
      */
-    public CustomerPortalTokenResponse createPortalToken(final String idOrAlias)
+    public CustomerPortalTokenResponse createPortalToken(
+            final String idOrAlias, final CustomerPortalTokenRequest customerPortalTokenRequest)
             throws IOException, ApiException {
         HttpUrl.Builder url =
                 this.client
                         .newUrlBuilder()
                         .encodedPath(String.format("/api/v1/customers/%s/portal-token", idOrAlias));
         return this.client.executeRequest(
-                "POST", url.build(), null, null, CustomerPortalTokenResponse.class);
+                "POST",
+                url.build(),
+                null,
+                customerPortalTokenRequest,
+                CustomerPortalTokenResponse.class);
     }
 
     /** */

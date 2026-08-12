@@ -13,6 +13,7 @@ public enum SubscriptionStatusEnum implements ToQueryParam {
     PAUSED("PAUSED"),
     SUSPENDED("SUSPENDED"),
     CANCELLED("CANCELLED"),
+    ABORTED("ABORTED"),
     COMPLETED("COMPLETED"),
     SUPERSEDED("SUPERSEDED"),
     ERRORED("ERRORED");

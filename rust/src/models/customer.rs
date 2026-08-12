@@ -22,6 +22,9 @@ pub struct Customer {
 
     pub currency: Currency,
 
+    /// User-defined custom property values, keyed by definition `key`.
+    pub custom_properties: serde_json::Value,
+
     pub custom_taxes: Vec<CustomTaxRate>,
 
     pub id: CustomerId,
@@ -45,6 +48,7 @@ pub struct Customer {
 impl Customer {
     pub fn new(
         currency: Currency,
+        custom_properties: serde_json::Value,
         custom_taxes: Vec<CustomTaxRate>,
         id: CustomerId,
         invoicing_emails: Vec<String>,
@@ -57,6 +61,7 @@ impl Customer {
             billing_email: None,
             connected_account_id: None,
             currency,
+            custom_properties,
             custom_taxes,
             id,
             invoicing_emails,

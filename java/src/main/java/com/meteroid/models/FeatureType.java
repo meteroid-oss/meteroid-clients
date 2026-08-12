@@ -17,7 +17,8 @@ import lombok.*;
         visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = FeatureType.Boolean.class, name = "BOOLEAN"),
-    @JsonSubTypes.Type(value = FeatureType.Metered.class, name = "METERED")
+    @JsonSubTypes.Type(value = FeatureType.Metered.class, name = "METERED"),
+    @JsonSubTypes.Type(value = FeatureType.Config.class, name = "CONFIG")
 })
 @ToString
 @EqualsAndHashCode
@@ -111,6 +112,41 @@ public abstract class FeatureType {
 
         /** Set the wrapped data for this variant. */
         public Metered data(MeteredFeatureType data) {
+            this.data = data;
+            return this;
+        }
+    }
+
+    /**
+     * Variant: CONFIG
+     *
+     * <p>This variant wraps ConfigFeatureType.
+     */
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = true)
+    @JsonTypeName("CONFIG")
+    public static class Config extends FeatureType {
+        @JsonUnwrapped private ConfigFeatureType data;
+
+        public Config() {}
+
+        public Config(ConfigFeatureType data) {
+            this.data = data;
+        }
+
+        @java.lang.Override
+        public String getType() {
+            return "CONFIG";
+        }
+
+        /** Get the wrapped data for this variant. */
+        @javax.annotation.Nonnull
+        public ConfigFeatureType getData() {
+            return data;
+        }
+
+        /** Set the wrapped data for this variant. */
+        public Config data(ConfigFeatureType data) {
             this.data = data;
             return this;
         }

@@ -29,6 +29,9 @@ public class CustomerUpdateRequest {
 
     @JsonProperty private Currency currency;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("custom_taxes")
     private List<CustomTaxRate> customTaxes;
 
@@ -126,6 +129,25 @@ public class CustomerUpdateRequest {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public CustomerUpdateRequest customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values (full replace). Omit to leave unchanged.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nullable
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public CustomerUpdateRequest customTaxes(List<CustomTaxRate> customTaxes) {

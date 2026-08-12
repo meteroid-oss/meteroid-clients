@@ -26,11 +26,20 @@ public class InvoiceEventData {
 
     @JsonProperty private String currency;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("customer_id")
     private String customerId;
 
     @JsonProperty("invoice_id")
     private String invoiceId;
+
+    @JsonProperty("invoice_number")
+    private String invoiceNumber;
+
+    @JsonProperty("parent_invoice_id")
+    private String parentInvoiceId;
 
     @JsonProperty private InvoiceStatus status;
 
@@ -98,6 +107,25 @@ public class InvoiceEventData {
         this.currency = currency;
     }
 
+    public InvoiceEventData customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * User-defined custom property values, keyed by definition key.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nonnull
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
+    }
+
     public InvoiceEventData customerId(String customerId) {
         this.customerId = customerId;
         return this;
@@ -134,6 +162,44 @@ public class InvoiceEventData {
 
     public void setInvoiceId(String invoiceId) {
         this.invoiceId = invoiceId;
+    }
+
+    public InvoiceEventData invoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+        return this;
+    }
+
+    /**
+     * Absent while the invoice is a draft — the number is assigned at finalization.
+     *
+     * @return invoiceNumber
+     */
+    @javax.annotation.Nullable
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public InvoiceEventData parentInvoiceId(String parentInvoiceId) {
+        this.parentInvoiceId = parentInvoiceId;
+        return this;
+    }
+
+    /**
+     * Get parentInvoiceId
+     *
+     * @return parentInvoiceId
+     */
+    @javax.annotation.Nullable
+    public String getParentInvoiceId() {
+        return parentInvoiceId;
+    }
+
+    public void setParentInvoiceId(String parentInvoiceId) {
+        this.parentInvoiceId = parentInvoiceId;
     }
 
     public InvoiceEventData status(InvoiceStatus status) {

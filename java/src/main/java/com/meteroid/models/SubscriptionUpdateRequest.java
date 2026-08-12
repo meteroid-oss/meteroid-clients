@@ -22,6 +22,9 @@ public class SubscriptionUpdateRequest {
     @JsonProperty("charge_automatically")
     private Boolean chargeAutomatically;
 
+    @JsonProperty("custom_properties")
+    private Object customProperties;
+
     @JsonProperty("invoice_memo")
     private String invoiceMemo;
 
@@ -72,6 +75,27 @@ public class SubscriptionUpdateRequest {
 
     public void setChargeAutomatically(Boolean chargeAutomatically) {
         this.chargeAutomatically = chargeAutomatically;
+    }
+
+    public SubscriptionUpdateRequest customProperties(Object customProperties) {
+        this.customProperties = customProperties;
+        return this;
+    }
+
+    /**
+     * Partial update of custom property values (merge; send a key with `null` to remove it).
+     * Validated against the tenant&#x27;s `SUBSCRIPTION` property definitions. Omit to leave
+     * unchanged.
+     *
+     * @return customProperties
+     */
+    @javax.annotation.Nullable
+    public Object getCustomProperties() {
+        return customProperties;
+    }
+
+    public void setCustomProperties(Object customProperties) {
+        this.customProperties = customProperties;
     }
 
     public SubscriptionUpdateRequest invoiceMemo(String invoiceMemo) {

@@ -39,6 +39,9 @@ public class BatchJobDetailResponse {
     @JsonProperty("has_error_csv")
     private Boolean hasErrorCsv;
 
+    @JsonProperty("has_output")
+    private Boolean hasOutput;
+
     @JsonProperty private String id;
 
     @JsonProperty("input_file_name")
@@ -49,6 +52,9 @@ public class BatchJobDetailResponse {
 
     @JsonProperty("job_type")
     private BatchJobType jobType;
+
+    @JsonProperty("output_url")
+    private String outputUrl;
 
     @JsonProperty("processed_items")
     private Integer processedItems;
@@ -193,6 +199,25 @@ public class BatchJobDetailResponse {
         this.hasErrorCsv = hasErrorCsv;
     }
 
+    public BatchJobDetailResponse hasOutput(Boolean hasOutput) {
+        this.hasOutput = hasOutput;
+        return this;
+    }
+
+    /**
+     * Get hasOutput
+     *
+     * @return hasOutput
+     */
+    @javax.annotation.Nonnull
+    public Boolean getHasOutput() {
+        return hasOutput;
+    }
+
+    public void setHasOutput(Boolean hasOutput) {
+        this.hasOutput = hasOutput;
+    }
+
     public BatchJobDetailResponse id(String id) {
         this.id = id;
         return this;
@@ -267,6 +292,25 @@ public class BatchJobDetailResponse {
 
     public void setJobType(BatchJobType jobType) {
         this.jobType = jobType;
+    }
+
+    public BatchJobDetailResponse outputUrl(String outputUrl) {
+        this.outputUrl = outputUrl;
+        return this;
+    }
+
+    /**
+     * Get outputUrl
+     *
+     * @return outputUrl
+     */
+    @javax.annotation.Nullable
+    public String getOutputUrl() {
+        return outputUrl;
+    }
+
+    public void setOutputUrl(String outputUrl) {
+        this.outputUrl = outputUrl;
     }
 
     public BatchJobDetailResponse processedItems(Integer processedItems) {

@@ -74,6 +74,7 @@ fn test_customer_list_response_with_data() {
                 "id": "cust_123",
                 "name": "Test Customer",
                 "currency": "USD",
+                "custom_properties": {},
                 "custom_taxes": [],
                 "invoicing_emails": [],
                 "invoicing_entity_id": "inv_entity_1"
@@ -90,6 +91,7 @@ fn test_customer_list_response_with_data() {
                 id: "cust_123".to_string(),
                 name: "Test Customer".to_string(),
                 currency: Currency::Usd,
+                custom_properties: json!({}),
                 custom_taxes: vec![],
                 invoicing_emails: vec![],
                 invoicing_entity_id: "inv_entity_1".to_string(),
@@ -190,6 +192,7 @@ fn test_optional_fields_deserialize_as_none() {
         "id": "cust_123",
         "name": "Test",
         "currency": "USD",
+        "custom_properties": {},
         "custom_taxes": [],
         "invoicing_emails": [],
         "invoicing_entity_id": "inv_1"
@@ -207,6 +210,7 @@ fn test_optional_fields_deserialize_as_some() {
         "id": "cust_123",
         "name": "Test",
         "currency": "USD",
+        "custom_properties": {},
         "custom_taxes": [],
         "invoicing_emails": [],
         "invoicing_entity_id": "inv_1",
