@@ -8,7 +8,8 @@ public enum InvoiceStatus implements ToQueryParam {
     DRAFT("DRAFT"),
     FINALIZED("FINALIZED"),
     UNCOLLECTIBLE("UNCOLLECTIBLE"),
-    VOID("VOID");
+    VOID("VOID"),
+    CLOSED("CLOSED");
     private final String value;
 
     InvoiceStatus(String value) {

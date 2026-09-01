@@ -7,7 +7,8 @@ import com.meteroid.Utils.ToQueryParam;
 public enum TaxExemptionType implements ToQueryParam {
     REVERSE_CHARGE("REVERSE_CHARGE"),
     TAX_EXEMPT("TAX_EXEMPT"),
-    NOT_REGISTERED("NOT_REGISTERED");
+    NOT_REGISTERED("NOT_REGISTERED"),
+    EXPORT("EXPORT");
     private final String value;
 
     TaxExemptionType(String value) {

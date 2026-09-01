@@ -22,6 +22,9 @@ pub enum PaymentStatusEnum {
 
     #[serde(rename = "FAILED")]
     Failed,
+
+    #[serde(rename = "REFUNDED")]
+    Refunded,
 }
 
 impl fmt::Display for PaymentStatusEnum {
@@ -32,6 +35,7 @@ impl fmt::Display for PaymentStatusEnum {
             Self::Settled => "SETTLED",
             Self::Cancelled => "CANCELLED",
             Self::Failed => "FAILED",
+            Self::Refunded => "REFUNDED",
         };
         f.write_str(value)
     }

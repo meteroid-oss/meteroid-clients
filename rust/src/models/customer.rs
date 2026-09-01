@@ -33,6 +33,10 @@ pub struct Customer {
 
     pub invoicing_entity_id: InvoicingEntityId,
 
+    /// Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub invoicing_language: Option<String>,
+
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -66,6 +70,7 @@ impl Customer {
             id,
             invoicing_emails,
             invoicing_entity_id,
+            invoicing_language: None,
             name,
             phone: None,
             shipping_address: None,

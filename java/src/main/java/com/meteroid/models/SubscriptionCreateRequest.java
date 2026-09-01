@@ -28,6 +28,9 @@ public class SubscriptionCreateRequest {
     @JsonProperty("auto_advance_invoices")
     private Boolean autoAdvanceInvoices;
 
+    @JsonProperty("backdate_invoices")
+    private Boolean backdateInvoices;
+
     @JsonProperty("billing_day_anchor")
     private Integer billingDayAnchor;
 
@@ -142,6 +145,26 @@ public class SubscriptionCreateRequest {
 
     public void setAutoAdvanceInvoices(Boolean autoAdvanceInvoices) {
         this.autoAdvanceInvoices = autoAdvanceInvoices;
+    }
+
+    public SubscriptionCreateRequest backdateInvoices(Boolean backdateInvoices) {
+        this.backdateInvoices = backdateInvoices;
+        return this;
+    }
+
+    /**
+     * Historical import mode: when true, invoices finalized for this subscription keep their
+     * billing-period date as the invoice date instead of being stamped with the emission date.
+     *
+     * @return backdateInvoices
+     */
+    @javax.annotation.Nullable
+    public Boolean getBackdateInvoices() {
+        return backdateInvoices;
+    }
+
+    public void setBackdateInvoices(Boolean backdateInvoices) {
+        this.backdateInvoices = backdateInvoices;
     }
 
     public SubscriptionCreateRequest billingDayAnchor(Integer billingDayAnchor) {

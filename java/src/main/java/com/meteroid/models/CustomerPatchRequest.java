@@ -35,11 +35,17 @@ public class CustomerPatchRequest {
     @JsonProperty("custom_taxes")
     private List<CustomTaxRate> customTaxes;
 
+    @JsonProperty("exemption_reason")
+    private String exemptionReason;
+
     @JsonProperty("invoicing_emails")
     private List<String> invoicingEmails;
 
     @JsonProperty("invoicing_entity_id")
     private String invoicingEntityId;
+
+    @JsonProperty("invoicing_language")
+    private String invoicingLanguage;
 
     @JsonProperty("is_tax_exempt")
     private Boolean isTaxExempt;
@@ -179,6 +185,25 @@ public class CustomerPatchRequest {
         this.customTaxes = customTaxes;
     }
 
+    public CustomerPatchRequest exemptionReason(String exemptionReason) {
+        this.exemptionReason = exemptionReason;
+        return this;
+    }
+
+    /**
+     * Free-text legal exemption mention surfaced on exempt invoices.
+     *
+     * @return exemptionReason
+     */
+    @javax.annotation.Nullable
+    public String getExemptionReason() {
+        return exemptionReason;
+    }
+
+    public void setExemptionReason(String exemptionReason) {
+        this.exemptionReason = exemptionReason;
+    }
+
     public CustomerPatchRequest invoicingEmails(List<String> invoicingEmails) {
         this.invoicingEmails = invoicingEmails;
         return this;
@@ -224,6 +249,27 @@ public class CustomerPatchRequest {
 
     public void setInvoicingEntityId(String invoicingEntityId) {
         this.invoicingEntityId = invoicingEntityId;
+    }
+
+    public CustomerPatchRequest invoicingLanguage(String invoicingLanguage) {
+        this.invoicingLanguage = invoicingLanguage;
+        return this;
+    }
+
+    /**
+     * Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
+     * Omit to leave unchanged, send `&quot;&quot;` to reset to the invoicing entity default.
+     * Unsupported languages fall back to `en-US` when rendering.
+     *
+     * @return invoicingLanguage
+     */
+    @javax.annotation.Nullable
+    public String getInvoicingLanguage() {
+        return invoicingLanguage;
+    }
+
+    public void setInvoicingLanguage(String invoicingLanguage) {
+        this.invoicingLanguage = invoicingLanguage;
     }
 
     public CustomerPatchRequest isTaxExempt(Boolean isTaxExempt) {

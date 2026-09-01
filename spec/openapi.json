@@ -3764,7 +3764,8 @@
                   "DRAFT",
                   "FINALIZED",
                   "UNCOLLECTIBLE",
-                  "VOID"
+                  "VOID",
+                  "CLOSED"
                 ]
               }
             }
@@ -10333,6 +10334,13 @@
           "invoicing_entity_id": {
             "$ref": "#/components/schemas/InvoicingEntityId"
           },
+          "invoicing_language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default."
+          },
           "name": {
             "type": "string"
           },
@@ -10409,6 +10417,13 @@
               "$ref": "#/components/schemas/CustomTaxRate"
             }
           },
+          "exemption_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free-text legal exemption mention surfaced on exempt invoices."
+          },
           "invoicing_emails": {
             "type": "array",
             "items": {
@@ -10424,6 +10439,13 @@
                 "type": "null"
               }
             ]
+          },
+          "invoicing_language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.\nUnsupported languages fall back to `en-US` when rendering."
           },
           "is_tax_exempt": {
             "type": [
@@ -10654,6 +10676,13 @@
               "$ref": "#/components/schemas/CustomTaxRate"
             }
           },
+          "exemption_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free-text legal exemption mention surfaced on exempt invoices."
+          },
           "invoicing_emails": {
             "type": [
               "array",
@@ -10672,6 +10701,13 @@
                 "type": "null"
               }
             ]
+          },
+          "invoicing_language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.\nOmit to leave unchanged, send `\"\"` to reset to the invoicing entity default.\nUnsupported languages fall back to `en-US` when rendering."
           },
           "is_tax_exempt": {
             "type": [
@@ -10791,6 +10827,13 @@
               "$ref": "#/components/schemas/CustomTaxRate"
             }
           },
+          "exemption_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free-text legal exemption mention surfaced on exempt invoices."
+          },
           "invoicing_emails": {
             "type": "array",
             "items": {
@@ -10799,6 +10842,13 @@
           },
           "invoicing_entity_id": {
             "$ref": "#/components/schemas/InvoicingEntityId"
+          },
+          "invoicing_language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.\nOmit or send `\"\"` to reset to the invoicing entity default (full-replace update).\nUnsupported languages fall back to `en-US` when rendering."
           },
           "is_tax_exempt": {
             "type": [
@@ -11048,7 +11098,9 @@
           "invoice.finalized",
           "invoice.paid",
           "invoice.voided",
+          "invoice.closed",
           "invoice.consolidated",
+          "invoice.deleted",
           "quote.accepted",
           "quote.converted",
           "credit_note.created",
@@ -11526,6 +11578,14 @@
             "type": "integer",
             "format": "int64"
           },
+          "billing_period_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The period/moment this invoice is about — the subscription period start, or the invoice's\nown date for manual/one-off. Stable and always present, distinct from `invoice_date` (the\nemission date). Shown as \"Invoice date\"."
+          },
           "child_invoice_id": {
             "oneOf": [
               {
@@ -11890,7 +11950,8 @@
           "UNPAID",
           "PARTIALLY_PAID",
           "PAID",
-          "ERRORED"
+          "ERRORED",
+          "PROCESSING"
         ]
       },
       "InvoiceStatus": {
@@ -11900,7 +11961,8 @@
           "DRAFT",
           "FINALIZED",
           "UNCOLLECTIBLE",
-          "VOID"
+          "VOID",
+          "CLOSED"
         ]
       },
       "InvoiceType": {
@@ -13076,7 +13138,8 @@
           "PENDING",
           "SETTLED",
           "CANCELLED",
-          "FAILED"
+          "FAILED",
+          "REFUNDED"
         ]
       },
       "PaymentTransactionId": {
@@ -14873,6 +14936,10 @@
           "auto_advance_invoices": {
             "type": "boolean"
           },
+          "backdate_invoices": {
+            "type": "boolean",
+            "description": "Historical import mode: when true, invoices finalized for this subscription keep their\nbilling-period date as the invoice date instead of being stamped with the emission date."
+          },
           "billing_day_anchor": {
             "type": [
               "integer",
@@ -15519,6 +15586,13 @@
           "name"
         ],
         "properties": {
+          "exemption_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free-text legal exemption mention (EU exempt/reverse-charge invoices)."
+          },
           "exemption_type": {
             "oneOf": [
               {
@@ -15534,17 +15608,22 @@
           },
           "tax_amount": {
             "type": "integer",
-            "format": "int64",
-            "minimum": 0
+            "format": "int64"
           },
           "tax_rate": {
             "type": "string",
             "format": "decimal"
           },
+          "tax_reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Accounting/reporting code of the tax rate for this line, for exports."
+          },
           "taxable_amount": {
             "type": "integer",
-            "format": "int64",
-            "minimum": 0
+            "format": "int64"
           }
         }
       },
@@ -15553,7 +15632,8 @@
         "enum": [
           "REVERSE_CHARGE",
           "TAX_EXEMPT",
-          "NOT_REGISTERED"
+          "NOT_REGISTERED",
+          "EXPORT"
         ]
       },
       "TenantId": {
@@ -16743,6 +16823,45 @@
         }
       }
     },
+    "invoice.closed": {
+      "post": {
+        "summary": "invoice.closed webhook",
+        "description": "An empty recurring invoice was closed with nothing to bill",
+        "operationId": "webhook_invoice_closed",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.closed",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "DRAFT",
+                "currency": "EUR",
+                "total": 10000,
+                "tax_amount": 2000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "custom_properties": {},
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
     "invoice.consolidated": {
       "post": {
         "summary": "invoice.consolidated webhook",
@@ -16800,6 +16919,45 @@
               "example": {
                 "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
                 "type": "invoice.created",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "invoice_number": "INV-0001",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "status": "DRAFT",
+                "currency": "EUR",
+                "total": 10000,
+                "tax_amount": 2000,
+                "created_at": "1970-01-01T00:00:00.000Z",
+                "custom_properties": {},
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "invoice.deleted": {
+      "post": {
+        "summary": "invoice.deleted webhook",
+        "description": "A draft invoice was deleted",
+        "operationId": "webhook_invoice_deleted",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.deleted",
                 "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
                 "invoice_number": "INV-0001",
                 "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",

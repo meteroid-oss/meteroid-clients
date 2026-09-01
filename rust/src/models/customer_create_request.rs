@@ -29,10 +29,19 @@ pub struct CustomerCreateRequest {
 
     pub custom_taxes: Vec<CustomTaxRate>,
 
+    /// Free-text legal exemption mention surfaced on exempt invoices.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exemption_reason: Option<String>,
+
     pub invoicing_emails: Vec<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invoicing_entity_id: Option<InvoicingEntityId>,
+
+    /// Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
+    /// Unsupported languages fall back to `en-US` when rendering.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub invoicing_language: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_tax_exempt: Option<bool>,
@@ -64,8 +73,10 @@ impl CustomerCreateRequest {
             currency,
             custom_properties: None,
             custom_taxes,
+            exemption_reason: None,
             invoicing_emails,
             invoicing_entity_id: None,
+            invoicing_language: None,
             is_tax_exempt: None,
             name,
             phone: None,

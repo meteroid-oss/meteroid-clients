@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.26.0
+
+* Invoice lifecycle: new `CLOSED` invoice status (empty recurring invoice closed with nothing to bill) and the matching `invoice.closed` webhook event, plus a new `invoice.deleted` event for draft deletions
+* New `billing_period_start` on `Invoice` — the period the invoice is about, stable and distinct from `invoice_date` (the emission date)
+* New `backdate_invoices` on `SubscriptionCreateRequest` for historical imports: finalized invoices keep their billing-period date instead of the emission date
+* Payments: `PROCESSING` added to `InvoicePaymentStatus`, `REFUNDED` added to `PaymentStatusEnum`
+* Invoicing language: new `invoicing_language` on `Customer`, `CustomerCreateRequest`, `CustomerUpdateRequest` and `CustomerPatchRequest`
+* Tax: new `exemption_reason` on the customer create/update/patch requests, new `exemption_reason` and `tax_reference` on `TaxBreakdownItem`, and `EXPORT` added to `TaxExemptionType`
+
 ## Version 0.25.0
 
 * Credit notes: new `CreditNotes` endpoints `list_credit_notes`, `get_credit_note_by_id` and `patch_credit_note_custom_properties`, and new models (`CreditNote`, `CreditNoteListResponse`, `CreditNoteCustomPropertiesRequest`, `CreditType`)

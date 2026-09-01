@@ -18,6 +18,11 @@ pub struct SubscriptionCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auto_advance_invoices: Option<bool>,
 
+    /// Historical import mode: when true, invoices finalized for this subscription keep their
+    /// billing-period date as the invoice date instead of being stamped with the emission date.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub backdate_invoices: Option<bool>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_day_anchor: Option<i32>,
 
@@ -80,6 +85,7 @@ impl SubscriptionCreateRequest {
             activation_condition,
             add_ons: None,
             auto_advance_invoices: None,
+            backdate_invoices: None,
             billing_day_anchor: None,
             charge_automatically: None,
             coupon_codes: None,

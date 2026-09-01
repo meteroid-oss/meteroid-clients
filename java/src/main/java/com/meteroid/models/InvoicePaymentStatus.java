@@ -8,7 +8,8 @@ public enum InvoicePaymentStatus implements ToQueryParam {
     UNPAID("UNPAID"),
     PARTIALLY_PAID("PARTIALLY_PAID"),
     PAID("PAID"),
-    ERRORED("ERRORED");
+    ERRORED("ERRORED"),
+    PROCESSING("PROCESSING");
     private final String value;
 
     InvoicePaymentStatus(String value) {

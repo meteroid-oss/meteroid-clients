@@ -9,7 +9,8 @@ public enum PaymentStatusEnum implements ToQueryParam {
     PENDING("PENDING"),
     SETTLED("SETTLED"),
     CANCELLED("CANCELLED"),
-    FAILED("FAILED");
+    FAILED("FAILED"),
+    REFUNDED("REFUNDED");
     private final String value;
 
     PaymentStatusEnum(String value) {

@@ -19,6 +19,9 @@ pub enum InvoicePaymentStatus {
 
     #[serde(rename = "ERRORED")]
     Errored,
+
+    #[serde(rename = "PROCESSING")]
+    Processing,
 }
 
 impl fmt::Display for InvoicePaymentStatus {
@@ -28,6 +31,7 @@ impl fmt::Display for InvoicePaymentStatus {
             Self::PartiallyPaid => "PARTIALLY_PAID",
             Self::Paid => "PAID",
             Self::Errored => "ERRORED",
+            Self::Processing => "PROCESSING",
         };
         f.write_str(value)
     }
