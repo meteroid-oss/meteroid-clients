@@ -26,6 +26,9 @@ public class Invoice {
     @JsonProperty("applied_credits")
     private Long appliedCredits;
 
+    @JsonProperty("billing_period_start")
+    private String billingPeriodStart;
+
     @JsonProperty("child_invoice_id")
     private String childInvoiceId;
 
@@ -149,6 +152,27 @@ public class Invoice {
 
     public void setAppliedCredits(Long appliedCredits) {
         this.appliedCredits = appliedCredits;
+    }
+
+    public Invoice billingPeriodStart(String billingPeriodStart) {
+        this.billingPeriodStart = billingPeriodStart;
+        return this;
+    }
+
+    /**
+     * The period&#x2f;moment this invoice is about — the subscription period start, or the
+     * invoice&#x27;s own date for manual&#x2f;one-off. Stable and always present, distinct from
+     * `invoice_date` (the emission date). Shown as &quot;Invoice date&quot;.
+     *
+     * @return billingPeriodStart
+     */
+    @javax.annotation.Nullable
+    public String getBillingPeriodStart() {
+        return billingPeriodStart;
+    }
+
+    public void setBillingPeriodStart(String billingPeriodStart) {
+        this.billingPeriodStart = billingPeriodStart;
     }
 
     public Invoice childInvoiceId(String childInvoiceId) {

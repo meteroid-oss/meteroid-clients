@@ -18,6 +18,9 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class TaxBreakdownItem {
+    @JsonProperty("exemption_reason")
+    private String exemptionReason;
+
     @JsonProperty("exemption_type")
     private TaxExemptionType exemptionType;
 
@@ -29,10 +32,32 @@ public class TaxBreakdownItem {
     @JsonProperty("tax_rate")
     private BigDecimal taxRate;
 
+    @JsonProperty("tax_reference")
+    private String taxReference;
+
     @JsonProperty("taxable_amount")
     private Long taxableAmount;
 
     public TaxBreakdownItem() {}
+
+    public TaxBreakdownItem exemptionReason(String exemptionReason) {
+        this.exemptionReason = exemptionReason;
+        return this;
+    }
+
+    /**
+     * Free-text legal exemption mention (EU exempt&#x2f;reverse-charge invoices).
+     *
+     * @return exemptionReason
+     */
+    @javax.annotation.Nullable
+    public String getExemptionReason() {
+        return exemptionReason;
+    }
+
+    public void setExemptionReason(String exemptionReason) {
+        this.exemptionReason = exemptionReason;
+    }
 
     public TaxBreakdownItem exemptionType(TaxExemptionType exemptionType) {
         this.exemptionType = exemptionType;
@@ -108,6 +133,25 @@ public class TaxBreakdownItem {
 
     public void setTaxRate(BigDecimal taxRate) {
         this.taxRate = taxRate;
+    }
+
+    public TaxBreakdownItem taxReference(String taxReference) {
+        this.taxReference = taxReference;
+        return this;
+    }
+
+    /**
+     * Accounting&#x2f;reporting code of the tax rate for this line, for exports.
+     *
+     * @return taxReference
+     */
+    @javax.annotation.Nullable
+    public String getTaxReference() {
+        return taxReference;
+    }
+
+    public void setTaxReference(String taxReference) {
+        this.taxReference = taxReference;
     }
 
     public TaxBreakdownItem taxableAmount(Long taxableAmount) {

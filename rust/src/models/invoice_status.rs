@@ -19,6 +19,9 @@ pub enum InvoiceStatus {
 
     #[serde(rename = "VOID")]
     Void,
+
+    #[serde(rename = "CLOSED")]
+    Closed,
 }
 
 impl fmt::Display for InvoiceStatus {
@@ -28,6 +31,7 @@ impl fmt::Display for InvoiceStatus {
             Self::Finalized => "FINALIZED",
             Self::Uncollectible => "UNCOLLECTIBLE",
             Self::Void => "VOID",
+            Self::Closed => "CLOSED",
         };
         f.write_str(value)
     }

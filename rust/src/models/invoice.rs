@@ -15,6 +15,12 @@ pub struct Invoice {
 
     pub applied_credits: i32,
 
+    /// The period/moment this invoice is about — the subscription period start, or the invoice's
+    /// own date for manual/one-off. Stable and always present, distinct from `invoice_date` (the
+    /// emission date). Shown as "Invoice date".
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub billing_period_start: Option<String>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub child_invoice_id: Option<InvoiceId>,
 
@@ -121,6 +127,7 @@ impl Invoice {
         Self {
             amount_due,
             applied_credits,
+            billing_period_start: None,
             child_invoice_id: None,
             coupons,
             created_at,

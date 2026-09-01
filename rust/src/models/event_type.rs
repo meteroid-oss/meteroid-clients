@@ -38,8 +38,14 @@ pub enum EventType {
     #[serde(rename = "invoice.voided")]
     InvoiceVoided,
 
+    #[serde(rename = "invoice.closed")]
+    InvoiceClosed,
+
     #[serde(rename = "invoice.consolidated")]
     InvoiceConsolidated,
+
+    #[serde(rename = "invoice.deleted")]
+    InvoiceDeleted,
 
     #[serde(rename = "quote.accepted")]
     QuoteAccepted,
@@ -112,7 +118,9 @@ impl fmt::Display for EventType {
             Self::InvoiceFinalized => "invoice.finalized",
             Self::InvoicePaid => "invoice.paid",
             Self::InvoiceVoided => "invoice.voided",
+            Self::InvoiceClosed => "invoice.closed",
             Self::InvoiceConsolidated => "invoice.consolidated",
+            Self::InvoiceDeleted => "invoice.deleted",
             Self::QuoteAccepted => "quote.accepted",
             Self::QuoteConverted => "quote.converted",
             Self::CreditNoteCreated => "credit_note.created",

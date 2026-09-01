@@ -16,6 +16,9 @@ pub enum TaxExemptionType {
 
     #[serde(rename = "NOT_REGISTERED")]
     NotRegistered,
+
+    #[serde(rename = "EXPORT")]
+    Export,
 }
 
 impl fmt::Display for TaxExemptionType {
@@ -24,6 +27,7 @@ impl fmt::Display for TaxExemptionType {
             Self::ReverseCharge => "REVERSE_CHARGE",
             Self::TaxExempt => "TAX_EXEMPT",
             Self::NotRegistered => "NOT_REGISTERED",
+            Self::Export => "EXPORT",
         };
         f.write_str(value)
     }

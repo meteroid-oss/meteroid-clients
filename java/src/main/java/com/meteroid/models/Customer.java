@@ -46,6 +46,9 @@ public class Customer {
     @JsonProperty("invoicing_entity_id")
     private String invoicingEntityId;
 
+    @JsonProperty("invoicing_language")
+    private String invoicingLanguage;
+
     @JsonProperty private String name;
     @JsonProperty private String phone;
 
@@ -263,6 +266,25 @@ public class Customer {
 
     public void setInvoicingEntityId(String invoicingEntityId) {
         this.invoicingEntityId = invoicingEntityId;
+    }
+
+    public Customer invoicingLanguage(String invoicingLanguage) {
+        this.invoicingLanguage = invoicingLanguage;
+        return this;
+    }
+
+    /**
+     * Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
+     *
+     * @return invoicingLanguage
+     */
+    @javax.annotation.Nullable
+    public String getInvoicingLanguage() {
+        return invoicingLanguage;
+    }
+
+    public void setInvoicingLanguage(String invoicingLanguage) {
+        this.invoicingLanguage = invoicingLanguage;
     }
 
     public Customer name(String name) {
