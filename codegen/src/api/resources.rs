@@ -252,7 +252,7 @@ impl Operation {
         for param in op.parameters {
             match param {
                 ReferenceOr::Reference { .. } => {
-                    tracing::warn!("$ref parameters are not currently supported");
+                    tracing::error!("$ref parameters are not currently supported");
                     return None;
                 }
                 ReferenceOr::Item(openapi::Parameter::Path {
@@ -261,7 +261,7 @@ impl Operation {
                 }) => {
                     assert!(parameter_data.required, "no optional path params");
                     if let Err(e) = enforce_string_parameter(&parameter_data) {
-                        tracing::warn!("unsupported path parameter: {e}");
+                        tracing::error!("unsupported path parameter: {e}");
                         return None;
                     }
 
@@ -276,7 +276,7 @@ impl Operation {
                     }
 
                     if let Err(e) = enforce_string_parameter(&parameter_data) {
-                        tracing::warn!("unsupported header parameter: {e}");
+                        tracing::error!("unsupported header parameter: {e}");
                         return None;
                     }
 
@@ -301,7 +301,7 @@ impl Operation {
                     let r#type = match FieldType::from_openapi(parameter_data.format) {
                         Ok(t) => t,
                         Err(e) => {
-                            tracing::warn!("unsupported query parameter type: {e}");
+                            tracing::error!("unsupported query parameter type: {e}");
                             return None;
                         }
                     };
@@ -320,7 +320,7 @@ impl Operation {
                     });
                 }
                 ReferenceOr::Item(parameter) => {
-                    tracing::warn!(
+                    tracing::error!(
                         ?parameter,
                         "this kind of parameter is not currently supported"
                     );
@@ -587,9 +587,9 @@ fn response_body_info(resp: ReferenceOr<openapi::Response>) -> (Option<String>, 
 
             // Handle JSON responses
             let Some(json_body) = resp_body.content.swap_remove("application/json") else {
-                tracing::info!(
+                tracing::error!(
                     content_types = ?resp_body.content.keys().collect::<Vec<_>>(),
-                    "skipping unknown response body type"
+                    "unsupported response body content type"
                 );
                 return (None, ResponseKind::None);
             };

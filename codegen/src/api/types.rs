@@ -43,13 +43,13 @@ pub(crate) fn from_referenced_components(
     let mut types = BTreeMap::new();
     let mut add_type = |schema_name: &str, extra_components: &mut BTreeSet<_>| {
         let Some(s) = schemas.swap_remove(schema_name) else {
-            tracing::warn!(schema_name, "schema not found");
+            tracing::error!(schema_name, "schema not found");
             return;
         };
 
         let obj = match s.json_schema {
             Schema::Bool(_) => {
-                tracing::warn!(schema_name, "found $ref'erenced bool schema, wat?!");
+                tracing::error!(schema_name, "found $ref'erenced bool schema, wat?!");
                 return;
             }
             Schema::Object(o) => o,
@@ -66,7 +66,7 @@ pub(crate) fn from_referenced_components(
                 types.insert(schema_name.to_owned(), ty);
             }
             Err(e) => {
-                tracing::warn!(schema_name, "unsupported schema: {e:#}");
+                tracing::error!(schema_name, "unsupported schema: {e:#}");
             }
         }
     };
