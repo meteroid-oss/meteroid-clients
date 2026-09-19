@@ -6,7 +6,13 @@ import "encoding/json"
 // A static, typed configuration value carried by a Config entitlement. Resolved synchronously
 // through the entitlement hierarchy — no metric, no usage counter.
 // ConfigValue is a tagged union discriminated by the kind field.
-// Exactly one variant pointer is set, matching Kind.
+//
+// When [ConfigValue.IsKnown] reports true, exactly one variant pointer is
+// set, matching Kind. A variant added to the API after this SDK
+// version was released still decodes without error, but with every variant
+// pointer nil: always give a `switch` on Kind a `default:` branch (or
+// check IsKnown first) instead of dereferencing a pointer unconditionally. The
+// unknown variant's JSON is available from [ConfigValue.Raw].
 type ConfigValue struct {
 	// Kind selects the active variant. Compare it against the
 	// ConfigValue* constants.
@@ -54,6 +60,28 @@ func NewConfigValueText(value TextConfigValue) ConfigValue {
 // NewConfigValueJson builds a ConfigValue holding the JSON variant.
 func NewConfigValueJson(value JsonConfigValue) ConfigValue {
 	return ConfigValue{Kind: ConfigValueJson, Json: &value}
+}
+
+// IsKnown reports whether Kind is one of the variants this SDK version
+// knows about, i.e. one of the ConfigValue* constants. It is false for a
+// variant added to the API later, whose payload is then only available from
+// [ConfigValue.Raw].
+func (u ConfigValue) IsKnown() bool {
+	switch u.Kind {
+	case ConfigValueNumber, ConfigValueBoolean, ConfigValueText, ConfigValueJson:
+		return true
+	}
+	return false
+}
+
+// Raw returns the JSON of a variant this SDK version does not know about, as
+// decoded (see [ConfigValue.IsKnown]). It is nil for a known variant, and
+// for a value that was not decoded from JSON. The returned slice is a copy.
+func (u ConfigValue) Raw() json.RawMessage {
+	if u.IsKnown() || len(u.raw) == 0 {
+		return nil
+	}
+	return append(json.RawMessage(nil), u.raw...)
 }
 
 // MarshalJSON implements json.Marshaler.

@@ -4,7 +4,13 @@ package meteroid
 import "encoding/json"
 
 // FeatureType is a tagged union discriminated by the type field.
-// Exactly one variant pointer is set, matching Type.
+//
+// When [FeatureType.IsKnown] reports true, exactly one variant pointer is
+// set, matching Type. A variant added to the API after this SDK
+// version was released still decodes without error, but with every variant
+// pointer nil: always give a `switch` on Type a `default:` branch (or
+// check IsKnown first) instead of dereferencing a pointer unconditionally. The
+// unknown variant's JSON is available from [FeatureType.Raw].
 type FeatureType struct {
 	// Type selects the active variant. Compare it against the
 	// FeatureType* constants.
@@ -44,6 +50,28 @@ func NewFeatureTypeMetered(value MeteredFeatureType) FeatureType {
 // NewFeatureTypeConfig builds a FeatureType holding the CONFIG variant.
 func NewFeatureTypeConfig(value ConfigFeatureType) FeatureType {
 	return FeatureType{Type: FeatureTypeConfig, Config: &value}
+}
+
+// IsKnown reports whether Type is one of the variants this SDK version
+// knows about, i.e. one of the FeatureType* constants. It is false for a
+// variant added to the API later, whose payload is then only available from
+// [FeatureType.Raw].
+func (u FeatureType) IsKnown() bool {
+	switch u.Type {
+	case FeatureTypeBoolean, FeatureTypeMetered, FeatureTypeConfig:
+		return true
+	}
+	return false
+}
+
+// Raw returns the JSON of a variant this SDK version does not know about, as
+// decoded (see [FeatureType.IsKnown]). It is nil for a known variant, and
+// for a value that was not decoded from JSON. The returned slice is a copy.
+func (u FeatureType) Raw() json.RawMessage {
+	if u.IsKnown() || len(u.raw) == 0 {
+		return nil
+	}
+	return append(json.RawMessage(nil), u.raw...)
 }
 
 // MarshalJSON implements json.Marshaler.

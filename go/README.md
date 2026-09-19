@@ -217,14 +217,26 @@ case meteroid.SubscriptionFeeRate:
 	fmt.Println("rate:", fee.Rate.Rate)
 case meteroid.SubscriptionFeeUsage:
 	fmt.Println("usage metric:", fee.Usage.MetricId)
+default:
+	// A variant added to the API after this SDK version: every variant pointer
+	// is nil. fee.IsKnown() is false and fee.Raw() holds its JSON.
+	log.Printf("unhandled fee type %q: %s", fee.Type, fee.Raw())
 }
 ```
 
-A variant this SDK version does not know about decodes without error, and
-re-encodes with every field and value intact, so new API variants never break an
-older build. The re-encoded bytes are not necessarily identical to the ones
-received: `encoding/json` compacts whitespace and escapes `<`, `>` and `&` as
-`\u003c`, `\u003e` and `\u0026`.
+A variant this SDK version does not know about decodes without error, so new API
+variants never break an older build, but it decodes with **every variant pointer
+nil**. Always give such a `switch` a `default:` branch (or check `IsKnown()`
+first) rather than dereferencing a pointer unconditionally. Every union has:
+
+- `IsKnown() bool`: false when the discriminator is not one of the union's
+  constants;
+- `Raw() json.RawMessage`: the JSON of an unknown variant, `nil` for a known one.
+
+An unknown variant also re-encodes with every field and value intact. The
+re-encoded bytes are not necessarily identical to the ones received:
+`encoding/json` compacts whitespace and escapes `<`, `>` and `&` as `\u003c`,
+`\u003e` and `\u0026`.
 
 ## Enums
 

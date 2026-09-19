@@ -4,7 +4,13 @@ package meteroid
 import "encoding/json"
 
 // PriceEntry is a tagged union discriminated by the type field.
-// Exactly one variant pointer is set, matching Type.
+//
+// When [PriceEntry.IsKnown] reports true, exactly one variant pointer is
+// set, matching Type. A variant added to the API after this SDK
+// version was released still decodes without error, but with every variant
+// pointer nil: always give a `switch` on Type a `default:` branch (or
+// check IsKnown first) instead of dereferencing a pointer unconditionally. The
+// unknown variant's JSON is available from [PriceEntry.Raw].
 type PriceEntry struct {
 	// Type selects the active variant. Compare it against the
 	// PriceEntry* constants.
@@ -36,6 +42,28 @@ func NewPriceEntryExisting(value ExistingPriceRef) PriceEntry {
 // NewPriceEntryNew builds a PriceEntry holding the NEW variant.
 func NewPriceEntryNew(value PriceInput) PriceEntry {
 	return PriceEntry{Type: PriceEntryNew, New: &value}
+}
+
+// IsKnown reports whether Type is one of the variants this SDK version
+// knows about, i.e. one of the PriceEntry* constants. It is false for a
+// variant added to the API later, whose payload is then only available from
+// [PriceEntry.Raw].
+func (u PriceEntry) IsKnown() bool {
+	switch u.Type {
+	case PriceEntryExisting, PriceEntryNew:
+		return true
+	}
+	return false
+}
+
+// Raw returns the JSON of a variant this SDK version does not know about, as
+// decoded (see [PriceEntry.IsKnown]). It is nil for a known variant, and
+// for a value that was not decoded from JSON. The returned slice is a copy.
+func (u PriceEntry) Raw() json.RawMessage {
+	if u.IsKnown() || len(u.raw) == 0 {
+		return nil
+	}
+	return append(json.RawMessage(nil), u.raw...)
 }
 
 // MarshalJSON implements json.Marshaler.

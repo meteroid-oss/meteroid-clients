@@ -216,6 +216,81 @@ func TestTaggedUnionUnknownVariantIsPreserved(t *testing.T) {
 	}
 }
 
+// An unknown variant must be detectable: IsKnown is false, every variant
+// pointer is nil and Raw exposes its JSON. A known variant reports IsKnown and
+// has no Raw.
+func TestTaggedUnionUnknownVariantIsDetectable(t *testing.T) {
+	const payload = `{"type":"SOMETHING_NEW","every":"week"}`
+
+	var period ResetPeriod
+	if err := json.Unmarshal([]byte(payload), &period); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if period.IsKnown() {
+		t.Error("IsKnown() = true for an unknown discriminator")
+	}
+	if period.BillingCycle != nil || period.Calendar != nil || period.FixedWindow != nil ||
+		period.SlidingWindow != nil || period.Never != nil {
+		t.Errorf("a variant pointer was set for an unknown discriminator: %+v", period)
+	}
+	if got := string(period.Raw()); got != payload {
+		t.Errorf("Raw() = %s, want %s", got, payload)
+	}
+
+	// Raw hands out a copy: mutating it must not corrupt the re-encoding.
+	raw := period.Raw()
+	raw[0] = 'X'
+	encoded, err := json.Marshal(period)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if string(encoded) != payload {
+		t.Errorf("re-encoded as %s, want %s", encoded, payload)
+	}
+
+	// The documented pattern: a switch with a default branch never touches a
+	// nil pointer.
+	var handled string
+	switch period.Type {
+	case ResetPeriodNever:
+		handled = "never"
+	case ResetPeriodBillingCycle:
+		handled = "billing cycle"
+	default:
+		handled = "unknown: " + string(period.Raw())
+	}
+	if handled != "unknown: "+payload {
+		t.Errorf("default branch not taken: %q", handled)
+	}
+
+	var known ResetPeriod
+	if err := json.Unmarshal([]byte(`{"type":"NEVER"}`), &known); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if !known.IsKnown() || known.Never == nil {
+		t.Errorf("known variant: IsKnown() = %v, Never = %v", known.IsKnown(), known.Never)
+	}
+	if known.Raw() != nil {
+		t.Errorf("Raw() = %s for a known variant, want nil", known.Raw())
+	}
+
+	// Every union gets the same accessors, including when nested.
+	var value EffectiveEntitlementValue
+	if err := json.Unmarshal([]byte(`{"type":"TIERED","tiers":[1,2]}`), &value); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if value.IsKnown() || value.Raw() == nil {
+		t.Errorf("EffectiveEntitlementValue: IsKnown() = %v, Raw() = %s", value.IsKnown(), value.Raw())
+	}
+	built := NewConfigValueJson(JsonConfigValue{Value: json.RawMessage(`1`)})
+	if !built.IsKnown() || built.Raw() != nil {
+		t.Errorf("constructed ConfigValue: IsKnown() = %v, Raw() = %s", built.IsKnown(), built.Raw())
+	}
+	if (Fee{}).IsKnown() {
+		t.Error("zero-value Fee reports IsKnown() = true")
+	}
+}
+
 // Encoding a union with no variant set is a programming error and must be
 // reported rather than silently producing a half-written object.
 func TestTaggedUnionEmptyIsAnError(t *testing.T) {

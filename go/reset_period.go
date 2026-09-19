@@ -4,7 +4,13 @@ package meteroid
 import "encoding/json"
 
 // ResetPeriod is a tagged union discriminated by the type field.
-// Exactly one variant pointer is set, matching Type.
+//
+// When [ResetPeriod.IsKnown] reports true, exactly one variant pointer is
+// set, matching Type. A variant added to the API after this SDK
+// version was released still decodes without error, but with every variant
+// pointer nil: always give a `switch` on Type a `default:` branch (or
+// check IsKnown first) instead of dereferencing a pointer unconditionally. The
+// unknown variant's JSON is available from [ResetPeriod.Raw].
 type ResetPeriod struct {
 	// Type selects the active variant. Compare it against the
 	// ResetPeriod* constants.
@@ -60,6 +66,28 @@ func NewResetPeriodSlidingWindow(value SlidingWindowResetPeriod) ResetPeriod {
 // NewResetPeriodNever builds a ResetPeriod holding the NEVER variant.
 func NewResetPeriodNever(value NeverResetPeriod) ResetPeriod {
 	return ResetPeriod{Type: ResetPeriodNever, Never: &value}
+}
+
+// IsKnown reports whether Type is one of the variants this SDK version
+// knows about, i.e. one of the ResetPeriod* constants. It is false for a
+// variant added to the API later, whose payload is then only available from
+// [ResetPeriod.Raw].
+func (u ResetPeriod) IsKnown() bool {
+	switch u.Type {
+	case ResetPeriodBillingCycle, ResetPeriodCalendar, ResetPeriodFixedWindow, ResetPeriodSlidingWindow, ResetPeriodNever:
+		return true
+	}
+	return false
+}
+
+// Raw returns the JSON of a variant this SDK version does not know about, as
+// decoded (see [ResetPeriod.IsKnown]). It is nil for a known variant, and
+// for a value that was not decoded from JSON. The returned slice is a copy.
+func (u ResetPeriod) Raw() json.RawMessage {
+	if u.IsKnown() || len(u.raw) == 0 {
+		return nil
+	}
+	return append(json.RawMessage(nil), u.raw...)
 }
 
 // MarshalJSON implements json.Marshaler.

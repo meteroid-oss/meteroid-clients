@@ -24,7 +24,13 @@ import "encoding/json"
 {{ doc_comment }}
 {% if type.deprecated %}{{ go_deprecated("type") }}
 {% endif %}// {{ type_name }} is a tagged union discriminated by the {{ type.discriminator_field }} field.
-// Exactly one variant pointer is set, matching {{ disc_field }}.
+//
+// When [{{ type_name }}.IsKnown] reports true, exactly one variant pointer is
+// set, matching {{ disc_field }}. A variant added to the API after this SDK
+// version was released still decodes without error, but with every variant
+// pointer nil: always give a `switch` on {{ disc_field }} a `default:` branch (or
+// check IsKnown first) instead of dereferencing a pointer unconditionally. The
+// unknown variant's JSON is available from [{{ type_name }}.Raw].
 type {{ type_name }} struct {
 // {{ disc_field }} selects the active variant. Compare it against the
 // {{ type_name }}* constants.
@@ -51,6 +57,28 @@ func New{{ type_name }}{{ variant.name | to_upper_camel_case }}(value {{ variant
 }
 
 {% endif %}{% endfor %}
+// IsKnown reports whether {{ disc_field }} is one of the variants this SDK version
+// knows about, i.e. one of the {{ type_name }}* constants. It is false for a
+// variant added to the API later, whose payload is then only available from
+// [{{ type_name }}.Raw].
+func (u {{ type_name }}) IsKnown() bool {
+	switch u.{{ disc_field }} {
+	case {% for variant in type.variants if variant.schema_ref is defined %}{% if not loop.first %}, {% endif %}{{ type_name }}{{ variant.name | to_upper_camel_case }}{% endfor %}:
+		return true
+	}
+	return false
+}
+
+// Raw returns the JSON of a variant this SDK version does not know about, as
+// decoded (see [{{ type_name }}.IsKnown]). It is nil for a known variant, and
+// for a value that was not decoded from JSON. The returned slice is a copy.
+func (u {{ type_name }}) Raw() json.RawMessage {
+	if u.IsKnown() || len(u.raw) == 0 {
+		return nil
+	}
+	return append(json.RawMessage(nil), u.raw...)
+}
+
 // MarshalJSON implements json.Marshaler.
 func (u {{ type_name }}) MarshalJSON() ([]byte, error) {
 	switch u.{{ disc_field }} {

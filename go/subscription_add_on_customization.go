@@ -4,7 +4,13 @@ package meteroid
 import "encoding/json"
 
 // SubscriptionAddOnCustomization is a tagged union discriminated by the type field.
-// Exactly one variant pointer is set, matching Type.
+//
+// When [SubscriptionAddOnCustomization.IsKnown] reports true, exactly one variant pointer is
+// set, matching Type. A variant added to the API after this SDK
+// version was released still decodes without error, but with every variant
+// pointer nil: always give a `switch` on Type a `default:` branch (or
+// check IsKnown first) instead of dereferencing a pointer unconditionally. The
+// unknown variant's JSON is available from [SubscriptionAddOnCustomization.Raw].
 type SubscriptionAddOnCustomization struct {
 	// Type selects the active variant. Compare it against the
 	// SubscriptionAddOnCustomization* constants.
@@ -36,6 +42,28 @@ func NewSubscriptionAddOnCustomizationPriceOverride(value SubscriptionAddOnPrice
 // NewSubscriptionAddOnCustomizationParameterization builds a SubscriptionAddOnCustomization holding the PARAMETERIZATION variant.
 func NewSubscriptionAddOnCustomizationParameterization(value SubscriptionAddOnParameterization) SubscriptionAddOnCustomization {
 	return SubscriptionAddOnCustomization{Type: SubscriptionAddOnCustomizationParameterization, Parameterization: &value}
+}
+
+// IsKnown reports whether Type is one of the variants this SDK version
+// knows about, i.e. one of the SubscriptionAddOnCustomization* constants. It is false for a
+// variant added to the API later, whose payload is then only available from
+// [SubscriptionAddOnCustomization.Raw].
+func (u SubscriptionAddOnCustomization) IsKnown() bool {
+	switch u.Type {
+	case SubscriptionAddOnCustomizationPriceOverride, SubscriptionAddOnCustomizationParameterization:
+		return true
+	}
+	return false
+}
+
+// Raw returns the JSON of a variant this SDK version does not know about, as
+// decoded (see [SubscriptionAddOnCustomization.IsKnown]). It is nil for a known variant, and
+// for a value that was not decoded from JSON. The returned slice is a copy.
+func (u SubscriptionAddOnCustomization) Raw() json.RawMessage {
+	if u.IsKnown() || len(u.raw) == 0 {
+		return nil
+	}
+	return append(json.RawMessage(nil), u.raw...)
 }
 
 // MarshalJSON implements json.Marshaler.

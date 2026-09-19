@@ -4,7 +4,13 @@ package meteroid
 import "encoding/json"
 
 // ResolvedEntitlementValue is a tagged union discriminated by the type field.
-// Exactly one variant pointer is set, matching Type.
+//
+// When [ResolvedEntitlementValue.IsKnown] reports true, exactly one variant pointer is
+// set, matching Type. A variant added to the API after this SDK
+// version was released still decodes without error, but with every variant
+// pointer nil: always give a `switch` on Type a `default:` branch (or
+// check IsKnown first) instead of dereferencing a pointer unconditionally. The
+// unknown variant's JSON is available from [ResolvedEntitlementValue.Raw].
 type ResolvedEntitlementValue struct {
 	// Type selects the active variant. Compare it against the
 	// ResolvedEntitlementValue* constants.
@@ -44,6 +50,28 @@ func NewResolvedEntitlementValueMetered(value MeteredResolvedEntitlementValue) R
 // NewResolvedEntitlementValueConfig builds a ResolvedEntitlementValue holding the CONFIG variant.
 func NewResolvedEntitlementValueConfig(value ConfigResolvedEntitlementValue) ResolvedEntitlementValue {
 	return ResolvedEntitlementValue{Type: ResolvedEntitlementValueConfig, Config: &value}
+}
+
+// IsKnown reports whether Type is one of the variants this SDK version
+// knows about, i.e. one of the ResolvedEntitlementValue* constants. It is false for a
+// variant added to the API later, whose payload is then only available from
+// [ResolvedEntitlementValue.Raw].
+func (u ResolvedEntitlementValue) IsKnown() bool {
+	switch u.Type {
+	case ResolvedEntitlementValueBoolean, ResolvedEntitlementValueMetered, ResolvedEntitlementValueConfig:
+		return true
+	}
+	return false
+}
+
+// Raw returns the JSON of a variant this SDK version does not know about, as
+// decoded (see [ResolvedEntitlementValue.IsKnown]). It is nil for a known variant, and
+// for a value that was not decoded from JSON. The returned slice is a copy.
+func (u ResolvedEntitlementValue) Raw() json.RawMessage {
+	if u.IsKnown() || len(u.raw) == 0 {
+		return nil
+	}
+	return append(json.RawMessage(nil), u.raw...)
 }
 
 // MarshalJSON implements json.Marshaler.
