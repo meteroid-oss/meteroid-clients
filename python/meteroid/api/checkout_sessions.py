@@ -10,7 +10,7 @@ from ..models import (
     GetCheckoutSessionResponse,
     ListCheckoutSessionsResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class CheckoutSessionsAsync(ApiBaseAsync):
@@ -32,7 +32,7 @@ class CheckoutSessionsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return ListCheckoutSessionsResponse.from_dict(response.json())
+        return decode_response(response, ListCheckoutSessionsResponse)
 
     async def create_checkout_session(
         self,
@@ -43,7 +43,7 @@ class CheckoutSessionsAsync(ApiBaseAsync):
             path="/api/v1/checkout-sessions",
             json_body=create_checkout_session_request.to_dict(),
         )
-        return CreateCheckoutSessionResponse.from_dict(response.json())
+        return decode_response(response, CreateCheckoutSessionResponse)
 
     async def get_checkout_session(
         self,
@@ -56,7 +56,7 @@ class CheckoutSessionsAsync(ApiBaseAsync):
                 "id": id,
             },
         )
-        return GetCheckoutSessionResponse.from_dict(response.json())
+        return decode_response(response, GetCheckoutSessionResponse)
 
     async def cancel_checkout_session(
         self,
@@ -69,7 +69,7 @@ class CheckoutSessionsAsync(ApiBaseAsync):
                 "id": id,
             },
         )
-        return CancelCheckoutSessionResponse.from_dict(response.json())
+        return decode_response(response, CancelCheckoutSessionResponse)
 
 
 class CheckoutSessions(ApiBaseSync):
@@ -91,7 +91,7 @@ class CheckoutSessions(ApiBaseSync):
                 },
             ),
         )
-        return ListCheckoutSessionsResponse.from_dict(response.json())
+        return decode_response(response, ListCheckoutSessionsResponse)
 
     def create_checkout_session(
         self,
@@ -102,7 +102,7 @@ class CheckoutSessions(ApiBaseSync):
             path="/api/v1/checkout-sessions",
             json_body=create_checkout_session_request.to_dict(),
         )
-        return CreateCheckoutSessionResponse.from_dict(response.json())
+        return decode_response(response, CreateCheckoutSessionResponse)
 
     def get_checkout_session(
         self,
@@ -115,7 +115,7 @@ class CheckoutSessions(ApiBaseSync):
                 "id": id,
             },
         )
-        return GetCheckoutSessionResponse.from_dict(response.json())
+        return decode_response(response, GetCheckoutSessionResponse)
 
     def cancel_checkout_session(
         self,
@@ -128,4 +128,4 @@ class CheckoutSessions(ApiBaseSync):
                 "id": id,
             },
         )
-        return CancelCheckoutSessionResponse.from_dict(response.json())
+        return decode_response(response, CancelCheckoutSessionResponse)

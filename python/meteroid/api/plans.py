@@ -14,7 +14,7 @@ from ..models import (
     ReplacePlanRequest,
     ResolvedEntitlementListResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class PlansAsync(ApiBaseAsync):
@@ -31,7 +31,7 @@ class PlansAsync(ApiBaseAsync):
                 "plan_version_id": plan_version_id,
             },
         )
-        return ResolvedEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, ResolvedEntitlementListResponse)
 
     async def list_plans(
         self,
@@ -65,7 +65,7 @@ class PlansAsync(ApiBaseAsync):
                 },
             ),
         )
-        return PlanListResponse.from_dict(response.json())
+        return decode_response(response, PlanListResponse)
 
     async def create_plan(
         self,
@@ -78,7 +78,7 @@ class PlansAsync(ApiBaseAsync):
             path="/api/v1/plans",
             json_body=create_plan_request.to_dict(),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     async def set_plan_minimum(
         self,
@@ -93,7 +93,7 @@ class PlansAsync(ApiBaseAsync):
             },
             json_body=minimum_commitment.to_dict(),
         )
-        return MinimumCommitment.from_dict(response.json())
+        return decode_response(response, MinimumCommitment)
 
     async def delete_plan_minimum(
         self,
@@ -129,7 +129,7 @@ class PlansAsync(ApiBaseAsync):
                 },
             ),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     async def replace_plan(
         self,
@@ -147,7 +147,7 @@ class PlansAsync(ApiBaseAsync):
             },
             json_body=replace_plan_request.to_dict(),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     async def patch_plan(
         self,
@@ -164,7 +164,7 @@ class PlansAsync(ApiBaseAsync):
             },
             json_body=patch_plan_request.to_dict(),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     async def archive_plan(
         self,
@@ -190,7 +190,7 @@ class PlansAsync(ApiBaseAsync):
                 "plan_id": plan_id,
             },
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     async def unarchive_plan(
         self,
@@ -226,7 +226,7 @@ class PlansAsync(ApiBaseAsync):
                 },
             ),
         )
-        return PlanVersionListResponse.from_dict(response.json())
+        return decode_response(response, PlanVersionListResponse)
 
 
 class Plans(ApiBaseSync):
@@ -243,7 +243,7 @@ class Plans(ApiBaseSync):
                 "plan_version_id": plan_version_id,
             },
         )
-        return ResolvedEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, ResolvedEntitlementListResponse)
 
     def list_plans(
         self,
@@ -277,7 +277,7 @@ class Plans(ApiBaseSync):
                 },
             ),
         )
-        return PlanListResponse.from_dict(response.json())
+        return decode_response(response, PlanListResponse)
 
     def create_plan(
         self,
@@ -290,7 +290,7 @@ class Plans(ApiBaseSync):
             path="/api/v1/plans",
             json_body=create_plan_request.to_dict(),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     def set_plan_minimum(
         self,
@@ -305,7 +305,7 @@ class Plans(ApiBaseSync):
             },
             json_body=minimum_commitment.to_dict(),
         )
-        return MinimumCommitment.from_dict(response.json())
+        return decode_response(response, MinimumCommitment)
 
     def delete_plan_minimum(
         self,
@@ -341,7 +341,7 @@ class Plans(ApiBaseSync):
                 },
             ),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     def replace_plan(
         self,
@@ -359,7 +359,7 @@ class Plans(ApiBaseSync):
             },
             json_body=replace_plan_request.to_dict(),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     def patch_plan(
         self,
@@ -376,7 +376,7 @@ class Plans(ApiBaseSync):
             },
             json_body=patch_plan_request.to_dict(),
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     def archive_plan(
         self,
@@ -402,7 +402,7 @@ class Plans(ApiBaseSync):
                 "plan_id": plan_id,
             },
         )
-        return Plan.from_dict(response.json())
+        return decode_response(response, Plan)
 
     def unarchive_plan(
         self,
@@ -438,4 +438,4 @@ class Plans(ApiBaseSync):
                 },
             ),
         )
-        return PlanVersionListResponse.from_dict(response.json())
+        return decode_response(response, PlanVersionListResponse)

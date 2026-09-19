@@ -11,7 +11,7 @@ from ..models import (
     CustomerUpdateRequest,
     EffectiveEntitlementListResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class CustomersAsync(ApiBaseAsync):
@@ -44,7 +44,7 @@ class CustomersAsync(ApiBaseAsync):
                 },
             ),
         )
-        return CustomerListResponse.from_dict(response.json())
+        return decode_response(response, CustomerListResponse)
 
     async def create_customer(
         self,
@@ -55,7 +55,7 @@ class CustomersAsync(ApiBaseAsync):
             path="/api/v1/customers",
             json_body=customer_create_request.to_dict(),
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     async def get_customer(
         self,
@@ -69,7 +69,7 @@ class CustomersAsync(ApiBaseAsync):
                 "id_or_alias": id_or_alias,
             },
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     async def update_customer(
         self,
@@ -84,7 +84,7 @@ class CustomersAsync(ApiBaseAsync):
             },
             json_body=customer_update_request.to_dict(),
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     async def archive_customer(
         self,
@@ -113,7 +113,7 @@ class CustomersAsync(ApiBaseAsync):
             },
             json_body=customer_patch_request.to_dict(),
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     async def get_effective_entitlements(
         self,
@@ -126,7 +126,7 @@ class CustomersAsync(ApiBaseAsync):
                 "id_or_alias": id_or_alias,
             },
         )
-        return EffectiveEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, EffectiveEntitlementListResponse)
 
     async def create_portal_token(
         self,
@@ -143,7 +143,7 @@ class CustomersAsync(ApiBaseAsync):
             },
             json_body=customer_portal_token_request.to_dict(),
         )
-        return CustomerPortalTokenResponse.from_dict(response.json())
+        return decode_response(response, CustomerPortalTokenResponse)
 
     async def unarchive_customer(
         self,
@@ -188,7 +188,7 @@ class Customers(ApiBaseSync):
                 },
             ),
         )
-        return CustomerListResponse.from_dict(response.json())
+        return decode_response(response, CustomerListResponse)
 
     def create_customer(
         self,
@@ -199,7 +199,7 @@ class Customers(ApiBaseSync):
             path="/api/v1/customers",
             json_body=customer_create_request.to_dict(),
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     def get_customer(
         self,
@@ -213,7 +213,7 @@ class Customers(ApiBaseSync):
                 "id_or_alias": id_or_alias,
             },
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     def update_customer(
         self,
@@ -228,7 +228,7 @@ class Customers(ApiBaseSync):
             },
             json_body=customer_update_request.to_dict(),
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     def archive_customer(
         self,
@@ -257,7 +257,7 @@ class Customers(ApiBaseSync):
             },
             json_body=customer_patch_request.to_dict(),
         )
-        return Customer.from_dict(response.json())
+        return decode_response(response, Customer)
 
     def get_effective_entitlements(
         self,
@@ -270,7 +270,7 @@ class Customers(ApiBaseSync):
                 "id_or_alias": id_or_alias,
             },
         )
-        return EffectiveEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, EffectiveEntitlementListResponse)
 
     def create_portal_token(
         self,
@@ -287,7 +287,7 @@ class Customers(ApiBaseSync):
             },
             json_body=customer_portal_token_request.to_dict(),
         )
-        return CustomerPortalTokenResponse.from_dict(response.json())
+        return decode_response(response, CustomerPortalTokenResponse)
 
     def unarchive_customer(
         self,

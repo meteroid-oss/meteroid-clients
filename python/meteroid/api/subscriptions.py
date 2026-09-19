@@ -14,7 +14,7 @@ from ..models import (
     SubscriptionUpdateRequest,
     SubscriptionUpdateResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class SubscriptionsAsync(ApiBaseAsync):
@@ -50,7 +50,7 @@ class SubscriptionsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return SubscriptionListResponse.from_dict(response.json())
+        return decode_response(response, SubscriptionListResponse)
 
     async def create_subscription(
         self,
@@ -62,7 +62,7 @@ class SubscriptionsAsync(ApiBaseAsync):
             path="/api/v1/subscriptions",
             json_body=subscription_create_request.to_dict(),
         )
-        return SubscriptionDetails.from_dict(response.json())
+        return decode_response(response, SubscriptionDetails)
 
     async def subscription_details(
         self,
@@ -76,7 +76,7 @@ class SubscriptionsAsync(ApiBaseAsync):
                 "subscription_id": subscription_id,
             },
         )
-        return SubscriptionDetails.from_dict(response.json())
+        return decode_response(response, SubscriptionDetails)
 
     async def update_subscription(
         self,
@@ -92,7 +92,7 @@ class SubscriptionsAsync(ApiBaseAsync):
             },
             json_body=subscription_update_request.to_dict(),
         )
-        return SubscriptionUpdateResponse.from_dict(response.json())
+        return decode_response(response, SubscriptionUpdateResponse)
 
     async def cancel_subscription(
         self,
@@ -108,7 +108,7 @@ class SubscriptionsAsync(ApiBaseAsync):
             },
             json_body=cancel_subscription_request.to_dict(),
         )
-        return CancelSubscriptionResponse.from_dict(response.json())
+        return decode_response(response, CancelSubscriptionResponse)
 
     async def list_subscription_entitlements(
         self,
@@ -121,7 +121,7 @@ class SubscriptionsAsync(ApiBaseAsync):
                 "subscription_id": subscription_id,
             },
         )
-        return EffectiveEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, EffectiveEntitlementListResponse)
 
     async def subscription_summary(
         self,
@@ -136,7 +136,7 @@ class SubscriptionsAsync(ApiBaseAsync):
                 "subscription_id": subscription_id,
             },
         )
-        return Subscription.from_dict(response.json())
+        return decode_response(response, Subscription)
 
 
 class Subscriptions(ApiBaseSync):
@@ -172,7 +172,7 @@ class Subscriptions(ApiBaseSync):
                 },
             ),
         )
-        return SubscriptionListResponse.from_dict(response.json())
+        return decode_response(response, SubscriptionListResponse)
 
     def create_subscription(
         self,
@@ -184,7 +184,7 @@ class Subscriptions(ApiBaseSync):
             path="/api/v1/subscriptions",
             json_body=subscription_create_request.to_dict(),
         )
-        return SubscriptionDetails.from_dict(response.json())
+        return decode_response(response, SubscriptionDetails)
 
     def subscription_details(
         self,
@@ -198,7 +198,7 @@ class Subscriptions(ApiBaseSync):
                 "subscription_id": subscription_id,
             },
         )
-        return SubscriptionDetails.from_dict(response.json())
+        return decode_response(response, SubscriptionDetails)
 
     def update_subscription(
         self,
@@ -214,7 +214,7 @@ class Subscriptions(ApiBaseSync):
             },
             json_body=subscription_update_request.to_dict(),
         )
-        return SubscriptionUpdateResponse.from_dict(response.json())
+        return decode_response(response, SubscriptionUpdateResponse)
 
     def cancel_subscription(
         self,
@@ -230,7 +230,7 @@ class Subscriptions(ApiBaseSync):
             },
             json_body=cancel_subscription_request.to_dict(),
         )
-        return CancelSubscriptionResponse.from_dict(response.json())
+        return decode_response(response, CancelSubscriptionResponse)
 
     def list_subscription_entitlements(
         self,
@@ -243,7 +243,7 @@ class Subscriptions(ApiBaseSync):
                 "subscription_id": subscription_id,
             },
         )
-        return EffectiveEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, EffectiveEntitlementListResponse)
 
     def subscription_summary(
         self,
@@ -258,4 +258,4 @@ class Subscriptions(ApiBaseSync):
                 "subscription_id": subscription_id,
             },
         )
-        return Subscription.from_dict(response.json())
+        return decode_response(response, Subscription)

@@ -9,7 +9,7 @@ from ..models import (
     BatchJobStatus,
     BatchJobType,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class BatchJobsAsync(ApiBaseAsync):
@@ -39,7 +39,7 @@ class BatchJobsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return BatchJobListResponse.from_dict(response.json())
+        return decode_response(response, BatchJobListResponse)
 
     async def get_batch_job(
         self,
@@ -53,7 +53,7 @@ class BatchJobsAsync(ApiBaseAsync):
                 "batch_job_id": batch_job_id,
             },
         )
-        return BatchJobDetailResponse.from_dict(response.json())
+        return decode_response(response, BatchJobDetailResponse)
 
     async def list_batch_job_failures(
         self,
@@ -78,7 +78,7 @@ class BatchJobsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return BatchJobFailuresResponse.from_dict(response.json())
+        return decode_response(response, BatchJobFailuresResponse)
 
 
 class BatchJobs(ApiBaseSync):
@@ -108,7 +108,7 @@ class BatchJobs(ApiBaseSync):
                 },
             ),
         )
-        return BatchJobListResponse.from_dict(response.json())
+        return decode_response(response, BatchJobListResponse)
 
     def get_batch_job(
         self,
@@ -122,7 +122,7 @@ class BatchJobs(ApiBaseSync):
                 "batch_job_id": batch_job_id,
             },
         )
-        return BatchJobDetailResponse.from_dict(response.json())
+        return decode_response(response, BatchJobDetailResponse)
 
     def list_batch_job_failures(
         self,
@@ -147,4 +147,4 @@ class BatchJobs(ApiBaseSync):
                 },
             ),
         )
-        return BatchJobFailuresResponse.from_dict(response.json())
+        return decode_response(response, BatchJobFailuresResponse)

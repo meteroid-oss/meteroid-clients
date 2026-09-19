@@ -8,7 +8,7 @@ from ..models import (
     CustomPropertyDefinitionUpdateRequest,
     CustomPropertyEntityType,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class CustomPropertiesAsync(ApiBaseAsync):
@@ -38,7 +38,7 @@ class CustomPropertiesAsync(ApiBaseAsync):
                 },
             ),
         )
-        return CustomPropertyDefinitionListResponse.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinitionListResponse)
 
     async def create_definition(
         self,
@@ -49,7 +49,7 @@ class CustomPropertiesAsync(ApiBaseAsync):
             path="/api/v1/custom-property-definitions",
             json_body=custom_property_definition_create_request.to_dict(),
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)
 
     async def get_definition(
         self,
@@ -62,7 +62,7 @@ class CustomPropertiesAsync(ApiBaseAsync):
                 "id": id,
             },
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)
 
     async def update_definition(
         self,
@@ -77,7 +77,7 @@ class CustomPropertiesAsync(ApiBaseAsync):
             },
             json_body=custom_property_definition_update_request.to_dict(),
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)
 
     async def archive_definition(
         self,
@@ -92,7 +92,7 @@ class CustomPropertiesAsync(ApiBaseAsync):
                 "id": id,
             },
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)
 
 
 class CustomProperties(ApiBaseSync):
@@ -122,7 +122,7 @@ class CustomProperties(ApiBaseSync):
                 },
             ),
         )
-        return CustomPropertyDefinitionListResponse.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinitionListResponse)
 
     def create_definition(
         self,
@@ -133,7 +133,7 @@ class CustomProperties(ApiBaseSync):
             path="/api/v1/custom-property-definitions",
             json_body=custom_property_definition_create_request.to_dict(),
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)
 
     def get_definition(
         self,
@@ -146,7 +146,7 @@ class CustomProperties(ApiBaseSync):
                 "id": id,
             },
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)
 
     def update_definition(
         self,
@@ -161,7 +161,7 @@ class CustomProperties(ApiBaseSync):
             },
             json_body=custom_property_definition_update_request.to_dict(),
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)
 
     def archive_definition(
         self,
@@ -176,4 +176,4 @@ class CustomProperties(ApiBaseSync):
                 "id": id,
             },
         )
-        return CustomPropertyDefinition.from_dict(response.json())
+        return decode_response(response, CustomPropertyDefinition)

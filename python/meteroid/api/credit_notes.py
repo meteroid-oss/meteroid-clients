@@ -9,7 +9,7 @@ from ..models import (
     CustomerId,
     InvoiceId,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class CreditNotesAsync(ApiBaseAsync):
@@ -49,7 +49,7 @@ class CreditNotesAsync(ApiBaseAsync):
                 },
             ),
         )
-        return CreditNoteListResponse.from_dict(response.json())
+        return decode_response(response, CreditNoteListResponse)
 
     async def get_credit_note_by_id(
         self,
@@ -63,7 +63,7 @@ class CreditNotesAsync(ApiBaseAsync):
                 "credit_note_id": credit_note_id,
             },
         )
-        return CreditNote.from_dict(response.json())
+        return decode_response(response, CreditNote)
 
     async def patch_credit_note_custom_properties(
         self,
@@ -82,7 +82,7 @@ class CreditNotesAsync(ApiBaseAsync):
             },
             json_body=credit_note_custom_properties_request.to_dict(),
         )
-        return CreditNote.from_dict(response.json())
+        return decode_response(response, CreditNote)
 
     async def download_credit_note_pdf(
         self,
@@ -150,7 +150,7 @@ class CreditNotes(ApiBaseSync):
                 },
             ),
         )
-        return CreditNoteListResponse.from_dict(response.json())
+        return decode_response(response, CreditNoteListResponse)
 
     def get_credit_note_by_id(
         self,
@@ -164,7 +164,7 @@ class CreditNotes(ApiBaseSync):
                 "credit_note_id": credit_note_id,
             },
         )
-        return CreditNote.from_dict(response.json())
+        return decode_response(response, CreditNote)
 
     def patch_credit_note_custom_properties(
         self,
@@ -183,7 +183,7 @@ class CreditNotes(ApiBaseSync):
             },
             json_body=credit_note_custom_properties_request.to_dict(),
         )
-        return CreditNote.from_dict(response.json())
+        return decode_response(response, CreditNote)
 
     def download_credit_note_pdf(
         self,

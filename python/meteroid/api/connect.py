@@ -7,7 +7,7 @@ from ..models import (
     CreateOnboardingLinkRequest,
     OnboardingLinkResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync
+from .common import ApiBaseAsync, ApiBaseSync, decode_response
 
 
 class ConnectAsync(ApiBaseAsync):
@@ -21,7 +21,7 @@ class ConnectAsync(ApiBaseAsync):
             method="get",
             path="/api/v1/connected-accounts",
         )
-        return ConnectedAccountsResponse.from_dict(response.json())
+        return decode_response(response, ConnectedAccountsResponse)
 
     async def create_connected_account(
         self,
@@ -34,7 +34,7 @@ class ConnectAsync(ApiBaseAsync):
             path="/api/v1/connected-accounts",
             json_body=create_connected_account_request.to_dict(),
         )
-        return ConnectedAccount.from_dict(response.json())
+        return decode_response(response, ConnectedAccount)
 
     async def get_connected_account(
         self,
@@ -48,7 +48,7 @@ class ConnectAsync(ApiBaseAsync):
                 "id": id,
             },
         )
-        return ConnectedAccount.from_dict(response.json())
+        return decode_response(response, ConnectedAccount)
 
     async def disconnect_account(
         self,
@@ -78,7 +78,7 @@ class ConnectAsync(ApiBaseAsync):
             },
             json_body=create_onboarding_link_request.to_dict(),
         )
-        return OnboardingLinkResponse.from_dict(response.json())
+        return decode_response(response, OnboardingLinkResponse)
 
 
 class Connect(ApiBaseSync):
@@ -92,7 +92,7 @@ class Connect(ApiBaseSync):
             method="get",
             path="/api/v1/connected-accounts",
         )
-        return ConnectedAccountsResponse.from_dict(response.json())
+        return decode_response(response, ConnectedAccountsResponse)
 
     def create_connected_account(
         self,
@@ -105,7 +105,7 @@ class Connect(ApiBaseSync):
             path="/api/v1/connected-accounts",
             json_body=create_connected_account_request.to_dict(),
         )
-        return ConnectedAccount.from_dict(response.json())
+        return decode_response(response, ConnectedAccount)
 
     def get_connected_account(
         self,
@@ -119,7 +119,7 @@ class Connect(ApiBaseSync):
                 "id": id,
             },
         )
-        return ConnectedAccount.from_dict(response.json())
+        return decode_response(response, ConnectedAccount)
 
     def disconnect_account(
         self,
@@ -149,4 +149,4 @@ class Connect(ApiBaseSync):
             },
             json_body=create_onboarding_link_request.to_dict(),
         )
-        return OnboardingLinkResponse.from_dict(response.json())
+        return decode_response(response, OnboardingLinkResponse)

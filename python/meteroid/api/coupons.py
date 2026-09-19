@@ -8,7 +8,7 @@ from ..models import (
     CreateCouponRequest,
     UpdateCouponRequest,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class CouponsAsync(ApiBaseAsync):
@@ -39,7 +39,7 @@ class CouponsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return CouponListResponse.from_dict(response.json())
+        return decode_response(response, CouponListResponse)
 
     async def create_coupon(
         self,
@@ -50,7 +50,7 @@ class CouponsAsync(ApiBaseAsync):
             path="/api/v1/coupons",
             json_body=create_coupon_request.to_dict(),
         )
-        return Coupon.from_dict(response.json())
+        return decode_response(response, Coupon)
 
     async def get_coupon(
         self,
@@ -63,7 +63,7 @@ class CouponsAsync(ApiBaseAsync):
                 "coupon_id": coupon_id,
             },
         )
-        return Coupon.from_dict(response.json())
+        return decode_response(response, Coupon)
 
     async def update_coupon(
         self,
@@ -78,7 +78,7 @@ class CouponsAsync(ApiBaseAsync):
             },
             json_body=update_coupon_request.to_dict(),
         )
-        return Coupon.from_dict(response.json())
+        return decode_response(response, Coupon)
 
     async def archive_coupon(
         self,
@@ -157,7 +157,7 @@ class Coupons(ApiBaseSync):
                 },
             ),
         )
-        return CouponListResponse.from_dict(response.json())
+        return decode_response(response, CouponListResponse)
 
     def create_coupon(
         self,
@@ -168,7 +168,7 @@ class Coupons(ApiBaseSync):
             path="/api/v1/coupons",
             json_body=create_coupon_request.to_dict(),
         )
-        return Coupon.from_dict(response.json())
+        return decode_response(response, Coupon)
 
     def get_coupon(
         self,
@@ -181,7 +181,7 @@ class Coupons(ApiBaseSync):
                 "coupon_id": coupon_id,
             },
         )
-        return Coupon.from_dict(response.json())
+        return decode_response(response, Coupon)
 
     def update_coupon(
         self,
@@ -196,7 +196,7 @@ class Coupons(ApiBaseSync):
             },
             json_body=update_coupon_request.to_dict(),
         )
-        return Coupon.from_dict(response.json())
+        return decode_response(response, Coupon)
 
     def archive_coupon(
         self,

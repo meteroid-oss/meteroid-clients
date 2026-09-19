@@ -23,6 +23,8 @@ import math
 import time
 import typing as t
 
+from .errors import MeteroidError
+
 __all__ = ["Webhook", "WebhookVerificationError"]
 
 WEBHOOK_TOLERANCE_IN_SECONDS = 5 * 60
@@ -37,7 +39,7 @@ _SVIX_SIGNATURE = "svix-signature"
 _SVIX_TIMESTAMP = "svix-timestamp"
 
 
-class WebhookVerificationError(Exception):
+class WebhookVerificationError(MeteroidError):
     """Raised when a webhook payload fails signature verification."""
 
 

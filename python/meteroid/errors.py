@@ -1,8 +1,15 @@
 """Exceptions raised by the Meteroid SDK.
 
+Every exception this SDK raises derives from :class:`MeteroidError`:
+
 * :class:`ApiException` -- the API answered with a non-2xx status code.
 * :class:`NetworkException` -- the request never got an answer.
-* :class:`ModelParseError` -- a 2xx body could not be mapped onto its model.
+* :class:`ResponseDecodeError` -- a 2xx body was not valid JSON or did not
+  match its model.
+* :class:`ModelParseError` -- a payload handed to ``Model.from_dict`` /
+  ``Model.from_json`` could not be mapped onto the model.
+* :class:`meteroid.webhooks.WebhookVerificationError` -- a webhook payload
+  failed signature verification.
 """
 
 from __future__ import annotations
@@ -13,7 +20,7 @@ from .models.error_code import ErrorCode
 from .models.o_auth_error_code import OAuthErrorCode
 from .models.o_auth_error_response import OAuthErrorResponse
 from .models.rest_error_response import RestErrorResponse
-from .serialization import ModelParseError
+from .serialization import MeteroidError, ModelParseError
 
 __all__ = [
     "MeteroidError",
@@ -21,14 +28,11 @@ __all__ = [
     "ErrorPayload",
     "NetworkException",
     "ModelParseError",
+    "ResponseDecodeError",
 ]
 
 #: The typed error bodies documented by the OpenAPI spec.
 ErrorPayload = t.Union[RestErrorResponse, OAuthErrorResponse]
-
-
-class MeteroidError(Exception):
-    """Base class for every error raised by this SDK."""
 
 
 class NetworkException(MeteroidError):
@@ -133,3 +137,25 @@ class ApiException(MeteroidError):
         if self.payload is not None:
             return f"Http error (status={self.status_code}) {self.code}: {self.message}"
         return f"Http error (status={self.status_code}) body={self.body_as_str}"
+
+
+class ResponseDecodeError(MeteroidError, ValueError):
+    """A 2xx response body could not be decoded into the expected model.
+
+    Raised when the body is not valid JSON or does not match the model this
+    SDK version expects (e.g. a value it does not know yet). The original
+    exception is chained as ``__cause__``; ``status_code`` and ``raw_body``
+    keep the full response for inspection.
+    """
+
+    status_code: int
+    raw_body: bytes
+
+    def __init__(self, status_code: int, raw_body: bytes, reason: str) -> None:
+        self.status_code = status_code
+        self.raw_body = raw_body
+        super().__init__(f"Could not decode response (status={status_code}): {reason}")
+
+    @property
+    def body_as_str(self) -> str:
+        return self.raw_body.decode("utf-8", errors="replace")

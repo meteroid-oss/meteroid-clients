@@ -22,6 +22,7 @@ from .errors import (
     MeteroidError,
     ModelParseError,
     NetworkException,
+    ResponseDecodeError,
 )
 from .webhooks import Webhook, WebhookVerificationError
 
@@ -33,6 +34,7 @@ __all__ = [
     "MeteroidOptions",
     "ModelParseError",
     "NetworkException",
+    "ResponseDecodeError",
     "Webhook",
     "WebhookVerificationError",
     "__version__",

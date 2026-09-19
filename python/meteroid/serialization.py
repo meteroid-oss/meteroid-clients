@@ -25,6 +25,7 @@ from decimal import Decimal
 __all__ = [
     "BaseModel",
     "TaggedUnionModel",
+    "MeteroidError",
     "ModelParseError",
     "format_decimal",
     "parse_datetime",
@@ -35,8 +36,20 @@ __all__ = [
 _T = t.TypeVar("_T", bound="BaseModel")
 
 
-class ModelParseError(ValueError):
-    """Raised when an API payload cannot be mapped onto a model."""
+# `MeteroidError` is defined here rather than in `errors.py` because the
+# generated models import this module and `errors.py` imports the models. It is
+# re-exported from `meteroid.errors` and `meteroid`, which is where to import it.
+class MeteroidError(Exception):
+    """Base class for every error raised by this SDK."""
+
+
+class ModelParseError(MeteroidError, ValueError):
+    """Raised when a payload cannot be mapped onto a model.
+
+    It is also a :class:`ValueError`. A client call never lets it escape on its
+    own: a response body that fails to parse raises
+    :class:`meteroid.errors.ResponseDecodeError`, chained to this error.
+    """
 
 
 # --------------------------------------------------------------------------

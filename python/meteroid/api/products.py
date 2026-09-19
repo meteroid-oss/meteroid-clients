@@ -9,7 +9,7 @@ from ..models import (
     ResolvedEntitlementListResponse,
     UpdateProductRequest,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class ProductsAsync(ApiBaseAsync):
@@ -40,7 +40,7 @@ class ProductsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return ProductListResponse.from_dict(response.json())
+        return decode_response(response, ProductListResponse)
 
     async def create_product(
         self,
@@ -51,7 +51,7 @@ class ProductsAsync(ApiBaseAsync):
             path="/api/v1/products",
             json_body=create_product_request.to_dict(),
         )
-        return Product.from_dict(response.json())
+        return decode_response(response, Product)
 
     async def get_product(
         self,
@@ -64,7 +64,7 @@ class ProductsAsync(ApiBaseAsync):
                 "product_id": product_id,
             },
         )
-        return Product.from_dict(response.json())
+        return decode_response(response, Product)
 
     async def update_product(
         self,
@@ -80,7 +80,7 @@ class ProductsAsync(ApiBaseAsync):
             },
             json_body=update_product_request.to_dict(),
         )
-        return Product.from_dict(response.json())
+        return decode_response(response, Product)
 
     async def archive_product(
         self,
@@ -105,7 +105,7 @@ class ProductsAsync(ApiBaseAsync):
                 "product_id": product_id,
             },
         )
-        return ResolvedEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, ResolvedEntitlementListResponse)
 
     async def unarchive_product(
         self,
@@ -148,7 +148,7 @@ class Products(ApiBaseSync):
                 },
             ),
         )
-        return ProductListResponse.from_dict(response.json())
+        return decode_response(response, ProductListResponse)
 
     def create_product(
         self,
@@ -159,7 +159,7 @@ class Products(ApiBaseSync):
             path="/api/v1/products",
             json_body=create_product_request.to_dict(),
         )
-        return Product.from_dict(response.json())
+        return decode_response(response, Product)
 
     def get_product(
         self,
@@ -172,7 +172,7 @@ class Products(ApiBaseSync):
                 "product_id": product_id,
             },
         )
-        return Product.from_dict(response.json())
+        return decode_response(response, Product)
 
     def update_product(
         self,
@@ -188,7 +188,7 @@ class Products(ApiBaseSync):
             },
             json_body=update_product_request.to_dict(),
         )
-        return Product.from_dict(response.json())
+        return decode_response(response, Product)
 
     def archive_product(
         self,
@@ -213,7 +213,7 @@ class Products(ApiBaseSync):
                 "product_id": product_id,
             },
         )
-        return ResolvedEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, ResolvedEntitlementListResponse)
 
     def unarchive_product(
         self,

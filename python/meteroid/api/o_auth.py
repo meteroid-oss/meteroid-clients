@@ -7,7 +7,7 @@ from ..models import (
     TokenRequest,
     TokenResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync
+from .common import ApiBaseAsync, ApiBaseSync, decode_response
 
 
 class OAuthAsync(ApiBaseAsync):
@@ -24,7 +24,7 @@ class OAuthAsync(ApiBaseAsync):
             path="/api/v1/oauth/introspect",
             form_body=introspection_request.to_dict(),
         )
-        return TokenIntrospectionResponse.from_dict(response.json())
+        return decode_response(response, TokenIntrospectionResponse)
 
     async def revoke_endpoint(
         self,
@@ -52,7 +52,7 @@ class OAuthAsync(ApiBaseAsync):
             path="/api/v1/oauth/token",
             form_body=token_request.to_dict(),
         )
-        return TokenResponse.from_dict(response.json())
+        return decode_response(response, TokenResponse)
 
 
 class OAuth(ApiBaseSync):
@@ -69,7 +69,7 @@ class OAuth(ApiBaseSync):
             path="/api/v1/oauth/introspect",
             form_body=introspection_request.to_dict(),
         )
-        return TokenIntrospectionResponse.from_dict(response.json())
+        return decode_response(response, TokenIntrospectionResponse)
 
     def revoke_endpoint(
         self,
@@ -97,4 +97,4 @@ class OAuth(ApiBaseSync):
             path="/api/v1/oauth/token",
             form_body=token_request.to_dict(),
         )
-        return TokenResponse.from_dict(response.json())
+        return decode_response(response, TokenResponse)

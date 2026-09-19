@@ -14,7 +14,7 @@ from ..models import (
     {{ c | to_upper_camel_case }},
 {% endfor -%}
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 {% for is_async in [true, false] %}
 {%- set class_suffix %}{% if is_async %}Async{% endif %}{% endset %}
 {%- set base_class %}{% if is_async %}ApiBaseAsync{% else %}ApiBaseSync{% endif %}{% endset %}
@@ -127,7 +127,7 @@ class {{ resource_class_name }}{{ class_suffix }}({{ base_class }}):
 {%- elif op.response_is_text %}
         return response.text
 {%- elif op.response_body_schema_name is defined %}
-        return {{ op.response_body_schema_name | to_upper_camel_case }}.from_dict(response.json())
+        return decode_response(response, {{ op.response_body_schema_name | to_upper_camel_case }})
 {%- endif %}
 {%- endfor %}
 {% endfor %}

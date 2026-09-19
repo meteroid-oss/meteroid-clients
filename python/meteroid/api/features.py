@@ -7,7 +7,7 @@ from ..models import (
     FeatureStatus,
     ProductId,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class FeaturesAsync(ApiBaseAsync):
@@ -40,7 +40,7 @@ class FeaturesAsync(ApiBaseAsync):
                 },
             ),
         )
-        return FeatureListResponse.from_dict(response.json())
+        return decode_response(response, FeatureListResponse)
 
     async def get_feature(
         self,
@@ -53,7 +53,7 @@ class FeaturesAsync(ApiBaseAsync):
                 "id_or_code": id_or_code,
             },
         )
-        return Feature.from_dict(response.json())
+        return decode_response(response, Feature)
 
 
 class Features(ApiBaseSync):
@@ -86,7 +86,7 @@ class Features(ApiBaseSync):
                 },
             ),
         )
-        return FeatureListResponse.from_dict(response.json())
+        return decode_response(response, FeatureListResponse)
 
     def get_feature(
         self,
@@ -99,4 +99,4 @@ class Features(ApiBaseSync):
                 "id_or_code": id_or_code,
             },
         )
-        return Feature.from_dict(response.json())
+        return decode_response(response, Feature)

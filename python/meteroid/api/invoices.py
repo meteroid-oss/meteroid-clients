@@ -9,7 +9,7 @@ from ..models import (
     InvoiceStatus,
     SubscriptionId,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class InvoicesAsync(ApiBaseAsync):
@@ -48,7 +48,7 @@ class InvoicesAsync(ApiBaseAsync):
                 },
             ),
         )
-        return InvoiceListResponse.from_dict(response.json())
+        return decode_response(response, InvoiceListResponse)
 
     async def get_invoice_by_id(
         self,
@@ -62,7 +62,7 @@ class InvoicesAsync(ApiBaseAsync):
                 "invoice_id": invoice_id,
             },
         )
-        return Invoice.from_dict(response.json())
+        return decode_response(response, Invoice)
 
     async def patch_invoice_custom_properties(
         self,
@@ -81,7 +81,7 @@ class InvoicesAsync(ApiBaseAsync):
             },
             json_body=invoice_custom_properties_request.to_dict(),
         )
-        return Invoice.from_dict(response.json())
+        return decode_response(response, Invoice)
 
     async def download_invoice_pdf(
         self,
@@ -112,7 +112,7 @@ class InvoicesAsync(ApiBaseAsync):
                 "invoice_id": invoice_id,
             },
         )
-        return Invoice.from_dict(response.json())
+        return decode_response(response, Invoice)
 
     async def download_invoice_xml(
         self,
@@ -166,7 +166,7 @@ class Invoices(ApiBaseSync):
                 },
             ),
         )
-        return InvoiceListResponse.from_dict(response.json())
+        return decode_response(response, InvoiceListResponse)
 
     def get_invoice_by_id(
         self,
@@ -180,7 +180,7 @@ class Invoices(ApiBaseSync):
                 "invoice_id": invoice_id,
             },
         )
-        return Invoice.from_dict(response.json())
+        return decode_response(response, Invoice)
 
     def patch_invoice_custom_properties(
         self,
@@ -199,7 +199,7 @@ class Invoices(ApiBaseSync):
             },
             json_body=invoice_custom_properties_request.to_dict(),
         )
-        return Invoice.from_dict(response.json())
+        return decode_response(response, Invoice)
 
     def download_invoice_pdf(
         self,
@@ -230,7 +230,7 @@ class Invoices(ApiBaseSync):
                 "invoice_id": invoice_id,
             },
         )
-        return Invoice.from_dict(response.json())
+        return decode_response(response, Invoice)
 
     def download_invoice_xml(
         self,

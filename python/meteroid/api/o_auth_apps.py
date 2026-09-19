@@ -7,7 +7,7 @@ from ..models import (
     OAuthAppWithSecret,
     RotatedSecret,
 )
-from .common import ApiBaseAsync, ApiBaseSync
+from .common import ApiBaseAsync, ApiBaseSync, decode_response
 
 
 class OAuthAppsAsync(ApiBaseAsync):
@@ -21,7 +21,7 @@ class OAuthAppsAsync(ApiBaseAsync):
             method="get",
             path="/api/v1/oauth-apps",
         )
-        return OAuthAppsResponse.from_dict(response.json())
+        return decode_response(response, OAuthAppsResponse)
 
     async def create_oauth_app(
         self,
@@ -34,7 +34,7 @@ class OAuthAppsAsync(ApiBaseAsync):
             path="/api/v1/oauth-apps",
             json_body=create_o_auth_app_request.to_dict(),
         )
-        return OAuthAppWithSecret.from_dict(response.json())
+        return decode_response(response, OAuthAppWithSecret)
 
     async def get_oauth_app(
         self,
@@ -48,7 +48,7 @@ class OAuthAppsAsync(ApiBaseAsync):
                 "id": id,
             },
         )
-        return OAuthApp.from_dict(response.json())
+        return decode_response(response, OAuthApp)
 
     async def delete_oauth_app(
         self,
@@ -76,7 +76,7 @@ class OAuthAppsAsync(ApiBaseAsync):
                 "id": id,
             },
         )
-        return RotatedSecret.from_dict(response.json())
+        return decode_response(response, RotatedSecret)
 
 
 class OAuthApps(ApiBaseSync):
@@ -90,7 +90,7 @@ class OAuthApps(ApiBaseSync):
             method="get",
             path="/api/v1/oauth-apps",
         )
-        return OAuthAppsResponse.from_dict(response.json())
+        return decode_response(response, OAuthAppsResponse)
 
     def create_oauth_app(
         self,
@@ -103,7 +103,7 @@ class OAuthApps(ApiBaseSync):
             path="/api/v1/oauth-apps",
             json_body=create_o_auth_app_request.to_dict(),
         )
-        return OAuthAppWithSecret.from_dict(response.json())
+        return decode_response(response, OAuthAppWithSecret)
 
     def get_oauth_app(
         self,
@@ -117,7 +117,7 @@ class OAuthApps(ApiBaseSync):
                 "id": id,
             },
         )
-        return OAuthApp.from_dict(response.json())
+        return decode_response(response, OAuthApp)
 
     def delete_oauth_app(
         self,
@@ -145,4 +145,4 @@ class OAuthApps(ApiBaseSync):
                 "id": id,
             },
         )
-        return RotatedSecret.from_dict(response.json())
+        return decode_response(response, RotatedSecret)

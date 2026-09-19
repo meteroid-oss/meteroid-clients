@@ -6,7 +6,7 @@ from ..models import (
     ProductFamilyCreateRequest,
     ProductFamilyListResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class ProductFamiliesAsync(ApiBaseAsync):
@@ -35,7 +35,7 @@ class ProductFamiliesAsync(ApiBaseAsync):
                 },
             ),
         )
-        return ProductFamilyListResponse.from_dict(response.json())
+        return decode_response(response, ProductFamilyListResponse)
 
     async def create_product_family(
         self,
@@ -46,7 +46,7 @@ class ProductFamiliesAsync(ApiBaseAsync):
             path="/api/v1/product_families",
             json_body=product_family_create_request.to_dict(),
         )
-        return ProductFamily.from_dict(response.json())
+        return decode_response(response, ProductFamily)
 
     async def get_product_family_by_id_or_alias(
         self,
@@ -60,7 +60,7 @@ class ProductFamiliesAsync(ApiBaseAsync):
                 "id_or_alias": id_or_alias,
             },
         )
-        return ProductFamily.from_dict(response.json())
+        return decode_response(response, ProductFamily)
 
 
 class ProductFamilies(ApiBaseSync):
@@ -89,7 +89,7 @@ class ProductFamilies(ApiBaseSync):
                 },
             ),
         )
-        return ProductFamilyListResponse.from_dict(response.json())
+        return decode_response(response, ProductFamilyListResponse)
 
     def create_product_family(
         self,
@@ -100,7 +100,7 @@ class ProductFamilies(ApiBaseSync):
             path="/api/v1/product_families",
             json_body=product_family_create_request.to_dict(),
         )
-        return ProductFamily.from_dict(response.json())
+        return decode_response(response, ProductFamily)
 
     def get_product_family_by_id_or_alias(
         self,
@@ -114,4 +114,4 @@ class ProductFamilies(ApiBaseSync):
                 "id_or_alias": id_or_alias,
             },
         )
-        return ProductFamily.from_dict(response.json())
+        return decode_response(response, ProductFamily)

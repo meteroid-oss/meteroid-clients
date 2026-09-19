@@ -5,7 +5,7 @@ from ..models import (
     BillableMetricId,
     UsageResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class UsageAsync(ApiBaseAsync):
@@ -34,7 +34,7 @@ class UsageAsync(ApiBaseAsync):
                 },
             ),
         )
-        return UsageResponse.from_dict(response.json())
+        return decode_response(response, UsageResponse)
 
     async def get_subscription_usage(
         self,
@@ -60,7 +60,7 @@ class UsageAsync(ApiBaseAsync):
                 },
             ),
         )
-        return UsageResponse.from_dict(response.json())
+        return decode_response(response, UsageResponse)
 
     async def get_usage_summary(
         self,
@@ -81,7 +81,7 @@ class UsageAsync(ApiBaseAsync):
                 },
             ),
         )
-        return UsageResponse.from_dict(response.json())
+        return decode_response(response, UsageResponse)
 
 
 class Usage(ApiBaseSync):
@@ -110,7 +110,7 @@ class Usage(ApiBaseSync):
                 },
             ),
         )
-        return UsageResponse.from_dict(response.json())
+        return decode_response(response, UsageResponse)
 
     def get_subscription_usage(
         self,
@@ -136,7 +136,7 @@ class Usage(ApiBaseSync):
                 },
             ),
         )
-        return UsageResponse.from_dict(response.json())
+        return decode_response(response, UsageResponse)
 
     def get_usage_summary(
         self,
@@ -157,4 +157,4 @@ class Usage(ApiBaseSync):
                 },
             ),
         )
-        return UsageResponse.from_dict(response.json())
+        return decode_response(response, UsageResponse)

@@ -33,8 +33,8 @@ from decimal import Decimal
 import httpx
 
 from .._version import __version__
-from ..errors import ApiException, NetworkException
-from ..serialization import format_datetime, format_decimal
+from ..errors import ApiException, NetworkException, ResponseDecodeError
+from ..serialization import BaseModel, format_datetime, format_decimal
 
 __all__ = [
     "ApiBase",
@@ -44,6 +44,7 @@ __all__ = [
     "DEFAULT_NUM_RETRIES",
     "DEFAULT_SERVER_URL",
     "DEFAULT_TIMEOUT",
+    "decode_response",
     "default_retry_schedule",
     "serialize_query_params",
 ]
@@ -54,6 +55,7 @@ DEFAULT_NUM_RETRIES = 2
 _MAX_BACKOFF = 5.0
 
 QueryValue = t.Union[str, t.List[str]]
+_M = t.TypeVar("_M", bound=BaseModel)
 
 
 def _serialize_scalar(value: t.Any) -> str:
@@ -126,6 +128,23 @@ def _raise_for_status(response: httpx.Response) -> httpx.Response:
     # Any other status -- 4xx, 5xx, or a 3xx left unfollowed -- is an error;
     # see `ApiException` for how the body is decoded.
     raise ApiException.from_response(response.status_code, response.content)
+
+
+def decode_response(response: httpx.Response, model: t.Type[_M]) -> _M:
+    """Decode a 2xx JSON body into ``model``.
+
+    Any failure -- invalid JSON or UTF-8, or a body that does not match the
+    model -- raises :class:`ResponseDecodeError`, so a client call only ever
+    raises :class:`MeteroidError` subclasses.
+    """
+    try:
+        return model.from_dict(response.json())
+    # `json.JSONDecodeError`, `UnicodeDecodeError` and `ModelParseError` are
+    # `ValueError`s; `TypeError` covers a JSON shape the model code trips on.
+    except (ValueError, TypeError) as exc:
+        raise ResponseDecodeError(
+            response.status_code, response.content, str(exc)
+        ) from exc
 
 
 class ApiBase:

@@ -8,7 +8,7 @@ from ..models import (
     ResolvedEntitlementListResponse,
     UpdateAddOnRequest,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class AddOnsAsync(ApiBaseAsync):
@@ -42,7 +42,7 @@ class AddOnsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return AddOnListResponse.from_dict(response.json())
+        return decode_response(response, AddOnListResponse)
 
     async def create_addon(
         self,
@@ -53,7 +53,7 @@ class AddOnsAsync(ApiBaseAsync):
             path="/api/v1/addons",
             json_body=create_add_on_request.to_dict(),
         )
-        return AddOn.from_dict(response.json())
+        return decode_response(response, AddOn)
 
     async def get_addon(
         self,
@@ -66,7 +66,7 @@ class AddOnsAsync(ApiBaseAsync):
                 "addon_id": addon_id,
             },
         )
-        return AddOn.from_dict(response.json())
+        return decode_response(response, AddOn)
 
     async def update_addon(
         self,
@@ -81,7 +81,7 @@ class AddOnsAsync(ApiBaseAsync):
             },
             json_body=update_add_on_request.to_dict(),
         )
-        return AddOn.from_dict(response.json())
+        return decode_response(response, AddOn)
 
     async def archive_addon(
         self,
@@ -106,7 +106,7 @@ class AddOnsAsync(ApiBaseAsync):
                 "addon_id": addon_id,
             },
         )
-        return ResolvedEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, ResolvedEntitlementListResponse)
 
     async def unarchive_addon(
         self,
@@ -152,7 +152,7 @@ class AddOns(ApiBaseSync):
                 },
             ),
         )
-        return AddOnListResponse.from_dict(response.json())
+        return decode_response(response, AddOnListResponse)
 
     def create_addon(
         self,
@@ -163,7 +163,7 @@ class AddOns(ApiBaseSync):
             path="/api/v1/addons",
             json_body=create_add_on_request.to_dict(),
         )
-        return AddOn.from_dict(response.json())
+        return decode_response(response, AddOn)
 
     def get_addon(
         self,
@@ -176,7 +176,7 @@ class AddOns(ApiBaseSync):
                 "addon_id": addon_id,
             },
         )
-        return AddOn.from_dict(response.json())
+        return decode_response(response, AddOn)
 
     def update_addon(
         self,
@@ -191,7 +191,7 @@ class AddOns(ApiBaseSync):
             },
             json_body=update_add_on_request.to_dict(),
         )
-        return AddOn.from_dict(response.json())
+        return decode_response(response, AddOn)
 
     def archive_addon(
         self,
@@ -216,7 +216,7 @@ class AddOns(ApiBaseSync):
                 "addon_id": addon_id,
             },
         )
-        return ResolvedEntitlementListResponse.from_dict(response.json())
+        return decode_response(response, ResolvedEntitlementListResponse)
 
     def unarchive_addon(
         self,

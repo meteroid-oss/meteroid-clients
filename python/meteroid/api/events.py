@@ -4,7 +4,7 @@ from ..models import (
     IngestEventsRequest,
     IngestEventsResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync
+from .common import ApiBaseAsync, ApiBaseSync, decode_response
 
 
 class EventsAsync(ApiBaseAsync):
@@ -25,7 +25,7 @@ class EventsAsync(ApiBaseAsync):
             path="/api/v1/events/ingest",
             json_body=ingest_events_request.to_dict(),
         )
-        return IngestEventsResponse.from_dict(response.json())
+        return decode_response(response, IngestEventsResponse)
 
 
 class Events(ApiBaseSync):
@@ -46,4 +46,4 @@ class Events(ApiBaseSync):
             path="/api/v1/events/ingest",
             json_body=ingest_events_request.to_dict(),
         )
-        return IngestEventsResponse.from_dict(response.json())
+        return decode_response(response, IngestEventsResponse)

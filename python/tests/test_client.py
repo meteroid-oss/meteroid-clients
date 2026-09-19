@@ -1,6 +1,7 @@
 """HTTP-level client tests, mirroring rust/tests/it/wiremock_tests.rs."""
 
 import json
+import typing as t
 
 import httpx
 import pytest
@@ -10,8 +11,12 @@ from meteroid import (
     ApiException,
     Meteroid,
     MeteroidAsync,
+    MeteroidError,
     MeteroidOptions,
+    ModelParseError,
     NetworkException,
+    ResponseDecodeError,
+    WebhookVerificationError,
 )
 from meteroid.models import (
     BatchJobStatus,
@@ -491,3 +496,72 @@ def test_timeouts_are_retried_and_surface_as_network_exception() -> None:
             client.customers.list_customers()
 
     assert route.call_count == 3
+
+
+# --------------------------------------------------------------------------
+# Undecodable 2xx bodies
+# --------------------------------------------------------------------------
+
+UNDECODABLE_BODIES = [
+    pytest.param(b"<html>not json</html>", json.JSONDecodeError, id="malformed-json"),
+    pytest.param(b"\xff\xfe\xfa", ValueError, id="invalid-utf8"),
+    pytest.param(b'{"id": "cust_123"}', ModelParseError, id="model-mismatch"),
+    pytest.param(b'["not", "an", "object"]', ModelParseError, id="wrong-shape"),
+]
+
+
+def assert_decode_error(
+    exc: ResponseDecodeError, body: bytes, cause: t.Type[BaseException]
+) -> None:
+    assert isinstance(exc, MeteroidError)
+    assert exc.status_code == 200
+    assert exc.raw_body == body
+    assert isinstance(exc.__cause__, cause)
+
+
+@pytest.mark.parametrize(("body", "cause"), UNDECODABLE_BODIES)
+@respx.mock
+def test_undecodable_success_body_raises_response_decode_error(
+    body: bytes, cause: t.Type[BaseException]
+) -> None:
+    respx.get(f"{BASE_URL}/api/v1/customers/cust_123").mock(
+        return_value=httpx.Response(200, content=body)
+    )
+
+    with make_client() as client:
+        with pytest.raises(MeteroidError) as excinfo:
+            client.customers.get_customer("cust_123")
+
+    assert isinstance(excinfo.value, ResponseDecodeError)
+    assert_decode_error(excinfo.value, body, cause)
+
+
+@pytest.mark.parametrize(("body", "cause"), UNDECODABLE_BODIES)
+@respx.mock
+async def test_async_undecodable_success_body_raises_response_decode_error(
+    body: bytes, cause: t.Type[BaseException]
+) -> None:
+    respx.get(f"{BASE_URL}/api/v1/customers/cust_123").mock(
+        return_value=httpx.Response(200, content=body)
+    )
+
+    async with make_async_client() as client:
+        with pytest.raises(MeteroidError) as excinfo:
+            await client.customers.get_customer("cust_123")
+
+    assert isinstance(excinfo.value, ResponseDecodeError)
+    assert_decode_error(excinfo.value, body, cause)
+
+
+def test_every_sdk_exception_is_a_meteroid_error() -> None:
+    for exc_type in (
+        ApiException,
+        NetworkException,
+        ResponseDecodeError,
+        ModelParseError,
+        WebhookVerificationError,
+    ):
+        assert issubclass(exc_type, MeteroidError), exc_type
+    # Kept `ValueError`s so existing `except ValueError` handlers still work.
+    assert issubclass(ModelParseError, ValueError)
+    assert issubclass(ResponseDecodeError, ValueError)

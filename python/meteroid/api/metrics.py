@@ -8,7 +8,7 @@ from ..models import (
     ProductFamilyId,
     UpdateMetricRequest,
 )
-from .common import ApiBaseAsync, ApiBaseSync, serialize_query_params
+from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
 
 
 class MetricsAsync(ApiBaseAsync):
@@ -40,7 +40,7 @@ class MetricsAsync(ApiBaseAsync):
                 },
             ),
         )
-        return MetricListResponse.from_dict(response.json())
+        return decode_response(response, MetricListResponse)
 
     async def create_metric(
         self,
@@ -51,7 +51,7 @@ class MetricsAsync(ApiBaseAsync):
             path="/api/v1/metrics",
             json_body=create_metric_request.to_dict(),
         )
-        return Metric.from_dict(response.json())
+        return decode_response(response, Metric)
 
     async def get_metric(
         self,
@@ -64,7 +64,7 @@ class MetricsAsync(ApiBaseAsync):
                 "metric_id": metric_id,
             },
         )
-        return Metric.from_dict(response.json())
+        return decode_response(response, Metric)
 
     async def update_metric(
         self,
@@ -80,7 +80,7 @@ class MetricsAsync(ApiBaseAsync):
             },
             json_body=update_metric_request.to_dict(),
         )
-        return Metric.from_dict(response.json())
+        return decode_response(response, Metric)
 
     async def archive_metric(
         self,
@@ -136,7 +136,7 @@ class Metrics(ApiBaseSync):
                 },
             ),
         )
-        return MetricListResponse.from_dict(response.json())
+        return decode_response(response, MetricListResponse)
 
     def create_metric(
         self,
@@ -147,7 +147,7 @@ class Metrics(ApiBaseSync):
             path="/api/v1/metrics",
             json_body=create_metric_request.to_dict(),
         )
-        return Metric.from_dict(response.json())
+        return decode_response(response, Metric)
 
     def get_metric(
         self,
@@ -160,7 +160,7 @@ class Metrics(ApiBaseSync):
                 "metric_id": metric_id,
             },
         )
-        return Metric.from_dict(response.json())
+        return decode_response(response, Metric)
 
     def update_metric(
         self,
@@ -176,7 +176,7 @@ class Metrics(ApiBaseSync):
             },
             json_body=update_metric_request.to_dict(),
         )
-        return Metric.from_dict(response.json())
+        return decode_response(response, Metric)
 
     def archive_metric(
         self,
