@@ -1,0 +1,91 @@
+// this file is @generated
+package meteroid
+
+import "encoding/json"
+
+// PriceEntry is a tagged union discriminated by the type field.
+// Exactly one variant pointer is set, matching Type.
+type PriceEntry struct {
+	// Type selects the active variant. Compare it against the
+	// PriceEntry* constants.
+	Type string `json:"type"`
+
+	// Existing is set when Type is PriceEntryExisting.
+	Existing *ExistingPriceRef `json:"-"`
+	// New is set when Type is PriceEntryNew.
+	New *PriceInput `json:"-"`
+
+	// raw keeps the payload of a variant this SDK version does not know about, so
+	// that decoding and re-encoding an unknown variant preserves every field and
+	// value. It is not byte-for-byte identical: `encoding/json` compacts the
+	// whitespace and escapes `<`, `>` and `&` as `\u003c`, `\u003e` and `\u0026`.
+	raw json.RawMessage
+}
+
+// Discriminator values for PriceEntry.
+const (
+	PriceEntryExisting = "EXISTING"
+	PriceEntryNew      = "NEW"
+)
+
+// NewPriceEntryExisting builds a PriceEntry holding the EXISTING variant.
+func NewPriceEntryExisting(value ExistingPriceRef) PriceEntry {
+	return PriceEntry{Type: PriceEntryExisting, Existing: &value}
+}
+
+// NewPriceEntryNew builds a PriceEntry holding the NEW variant.
+func NewPriceEntryNew(value PriceInput) PriceEntry {
+	return PriceEntry{Type: PriceEntryNew, New: &value}
+}
+
+// MarshalJSON implements json.Marshaler.
+func (u PriceEntry) MarshalJSON() ([]byte, error) {
+	switch u.Type {
+	case PriceEntryExisting:
+		if u.Existing == nil {
+			return nil, &UnionError{Union: "PriceEntry", Discriminator: u.Type, Reason: "variant payload is nil"}
+		}
+		return marshalUnionVariant("type", u.Type, u.Existing)
+	case PriceEntryNew:
+		if u.New == nil {
+			return nil, &UnionError{Union: "PriceEntry", Discriminator: u.Type, Reason: "variant payload is nil"}
+		}
+		return marshalUnionVariant("type", u.Type, u.New)
+	}
+
+	if len(u.raw) > 0 {
+		return u.raw, nil
+	}
+	if u.Type == "" {
+		return nil, &UnionError{Union: "PriceEntry", Discriminator: "", Reason: "no variant set"}
+	}
+	return nil, &UnionError{Union: "PriceEntry", Discriminator: u.Type, Reason: "unknown discriminator"}
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+//
+// Payloads carrying an unrecognized discriminator are kept rather than rejected,
+// so a newer API version does not break older SDK builds. Re-encoding such a
+// value reproduces the same JSON document, though not necessarily the same
+// bytes: `encoding/json` compacts whitespace and escapes `<`, `>` and `&`.
+func (u *PriceEntry) UnmarshalJSON(data []byte) error {
+	var tag struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal(data, &tag); err != nil {
+		return err
+	}
+
+	*u = PriceEntry{Type: tag.Type}
+	switch tag.Type {
+	case PriceEntryExisting:
+		u.Existing = new(ExistingPriceRef)
+		return json.Unmarshal(data, u.Existing)
+	case PriceEntryNew:
+		u.New = new(PriceInput)
+		return json.Unmarshal(data, u.New)
+	default:
+		u.raw = append(json.RawMessage(nil), data...)
+		return nil
+	}
+}
