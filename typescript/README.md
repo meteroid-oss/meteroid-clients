@@ -243,13 +243,38 @@ import type {
 
 - **Field names** are `lowerCamelCase` in TypeScript and are mapped to the wire's `snake_case`
   by the generated serializers.
-- **`date-time`** fields are `Date`. **`date`** fields (`start_date`, `invoice_date`, …) are
-  ISO `YYYY-MM-DD` strings.
-- **Decimal** fields (`rate`, `flat_fee`, `unit_price`, …) are `string`, because the API sends
-  them as exact decimal strings and `number` cannot represent them losslessly.
+- **`date-time`** fields are `Date` (see [Dates and times](#dates-and-times)). **`date`** fields
+  (`start_date`, `invoice_date`, …) are ISO `YYYY-MM-DD` strings.
+- **Decimal** fields (`rate`, `flat_fee`, `unit_price`, …) are `string` (see
+  [Decimals](#decimals)).
 - **Enums** are TypeScript `enum`s whose values are the wire strings
   (`InvoiceStatus.Closed === "CLOSED"`). Because they are nominal, pass the enum member
   (`Currency.Eur`) rather than a bare string literal.
+
+### Decimals
+
+Decimal fields are strings on purpose: the API sends them as exact decimal strings, and converting
+them to `number` would silently lose precision (`0.1 + 0.2 !== 0.3`). Pass them through as they are,
+and use a decimal library such as [`decimal.js`](https://www.npmjs.com/package/decimal.js) or
+[`big.js`](https://www.npmjs.com/package/big.js) when you need arithmetic:
+
+```typescript
+import Decimal from "decimal.js";
+
+const amount = new Decimal(subLineItem.unitPrice).times(subLineItem.quantity); // exact
+```
+
+The SDK itself does not depend on any decimal library.
+
+### Dates and times
+
+`date-time` fields are JavaScript `Date`s, so they have **millisecond** precision: when the API sends
+microseconds, the extra digits are truncated.
+
+Every date-time the API sends is in UTC. Some fields come without a UTC offset (e.g.
+`2026-09-19T10:00:00.123456`); the SDK reads those as UTC rather than local time, which is what
+`new Date(...)` would do with them. `toISOString()` always renders a `Date` in UTC
+(`2026-09-19T10:00:00.123Z`), while `toString()` and `toLocaleString()` use the local time zone.
 
 ### Discriminated unions
 
@@ -287,6 +312,7 @@ npm install
 npm run typecheck   # tsc --noEmit
 npm run check       # biome format + lint + assists
 npm run build       # emit dist/
+npm test            # unit tests, then the built package from an ES module
 ```
 
 Regenerating the client (from the repository root):
