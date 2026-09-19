@@ -492,3 +492,64 @@ def test_non_finite_decimals_are_never_serialized(bad: str) -> None:
         to_json_value([Decimal(bad)])
     with pytest.raises(ValueError, match="non-finite decimal"):
         serialize_query_params({"amount": Decimal(bad)})
+
+
+@pytest.mark.parametrize(
+    ("fraction", "micros"),
+    [
+        ("", 0),
+        (".1", 100000),
+        (".123", 123000),
+        (".123456", 123456),
+        (".1234567", 123456),
+        (".123456789", 123456),
+        (".000000999", 0),
+    ],
+)
+@pytest.mark.parametrize(
+    ("suffix", "offset"),
+    [
+        ("", datetime.timedelta(0)),
+        ("Z", datetime.timedelta(0)),
+        ("z", datetime.timedelta(0)),
+        ("+00:00", datetime.timedelta(0)),
+        ("+02:00", datetime.timedelta(hours=2)),
+        ("-05:30", -datetime.timedelta(hours=5, minutes=30)),
+    ],
+)
+def test_parse_datetime_fractional_seconds(
+    fraction: str, micros: int, suffix: str, offset: datetime.timedelta
+) -> None:
+    from meteroid.serialization import parse_datetime
+
+    parsed = parse_datetime(f"2026-09-19T10:00:00{fraction}{suffix}")
+    assert parsed.tzinfo is not None
+    assert parsed.utcoffset() == offset
+    assert parsed.replace(tzinfo=None) == datetime.datetime(2026, 9, 19, 10, 0, 0, micros)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    ["2026-09-19T10:00:00.", "2026-09-19T10:00:00.12a", "not a date", "2026-13-01"],
+)
+def test_parse_datetime_rejects_garbage(raw: str) -> None:
+    from meteroid.serialization import parse_datetime
+
+    with pytest.raises(ModelParseError):
+        parse_datetime(raw)
+
+
+def test_model_with_nanosecond_datetime() -> None:
+    from meteroid.models import AppliedCoupon
+
+    applied = AppliedCoupon.from_dict(
+        {
+            "id": "ac_1",
+            "coupon_id": "c_1",
+            "is_active": True,
+            "created_at": "2026-09-19T10:00:00.123456789Z",
+        }
+    )
+    assert applied.created_at == datetime.datetime(
+        2026, 9, 19, 10, 0, 0, 123456, tzinfo=datetime.timezone.utc
+    )

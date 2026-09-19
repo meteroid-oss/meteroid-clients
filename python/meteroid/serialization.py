@@ -19,6 +19,7 @@ import dataclasses
 import datetime as _datetime
 import enum
 import json
+import re
 import typing as t
 from decimal import Decimal
 
@@ -114,13 +115,22 @@ def format_datetime(value: _datetime.datetime) -> str:
     return value.isoformat()
 
 
+_FRACTION_RE = re.compile(r"(?<=[Tt ]\d\d:\d\d:\d\d)\.(\d+)")
+
+
+def _normalize_fraction(match: "re.Match[str]") -> str:
+    return "." + match.group(1)[:6].ljust(6, "0")
+
+
 def parse_datetime(value: t.Any) -> _datetime.datetime:
     """Parse an ISO 8601 / RFC 3339 string into an aware :class:`datetime.datetime`.
 
     The result is always timezone-aware. The Meteroid API sends every
     date-time in UTC, but some fields carry no UTC offset (e.g.
     ``2026-09-19T10:00:00.123456``): those are read as UTC. A string with an
-    explicit offset (``Z``, ``+02:00``) keeps it. Microseconds are preserved.
+    explicit offset (``Z``, ``+02:00``) keeps it. Fractional seconds may have
+    1 to 9 digits: they are truncated to microseconds, the precision of
+    :class:`datetime.datetime`.
     """
     if isinstance(value, _datetime.datetime):
         parsed = value
@@ -129,6 +139,10 @@ def parse_datetime(value: t.Any) -> _datetime.datetime:
         # `fromisoformat` only learned about the `Z` suffix in Python 3.11.
         if text.endswith(("Z", "z")):
             text = text[:-1] + "+00:00"
+        # Before Python 3.11, `fromisoformat` only accepts exactly 3 or 6
+        # fractional digits, while the server sends anywhere from 1 to 9.
+        # Rewrite the fraction to 6 digits so every version parses alike.
+        text = _FRACTION_RE.sub(_normalize_fraction, text, count=1)
         try:
             parsed = _datetime.datetime.fromisoformat(text)
         except ValueError as exc:  # pragma: no cover - depends on server output
