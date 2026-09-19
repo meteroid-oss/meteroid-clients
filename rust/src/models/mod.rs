@@ -122,6 +122,7 @@ pub mod entitlement;
 pub mod entitlement_id;
 pub mod entitlement_product_ref;
 pub mod entitlement_value;
+pub mod error_code;
 pub mod event;
 pub mod event_id;
 pub mod event_type;
@@ -193,6 +194,8 @@ pub mod o_auth_app;
 pub mod o_auth_app_id;
 pub mod o_auth_app_with_secret;
 pub mod o_auth_apps_response;
+pub mod o_auth_error_code;
+pub mod o_auth_error_response;
 pub mod onboarding_link_response;
 pub mod onboarding_mode;
 pub mod one_time_fee;
@@ -262,6 +265,7 @@ pub mod reset_period;
 pub mod resolved_entitlement;
 pub mod resolved_entitlement_list_response;
 pub mod resolved_entitlement_value;
+pub mod rest_error_response;
 pub mod revocation_request;
 pub mod rotated_secret;
 pub mod select_option;
@@ -323,11 +327,6 @@ pub mod usage_pricing_model;
 pub mod usage_response;
 pub mod volume_plan_pricing;
 pub mod volume_pricing;
-// Manual types for error handling
-pub mod http_error_out;
-pub mod http_validation_error;
-pub mod validation_error;
-
 pub use self::{
     add_on::AddOn, add_on_event::AddOnEvent, add_on_event_data::AddOnEventData, add_on_id::AddOnId,
     add_on_list_response::AddOnListResponse, address::Address,
@@ -400,8 +399,9 @@ pub use self::{
     effective_entitlement_list_response::EffectiveEntitlementListResponse,
     effective_entitlement_value::EffectiveEntitlementValue, entitlement::Entitlement,
     entitlement_id::EntitlementId, entitlement_product_ref::EntitlementProductRef,
-    entitlement_value::EntitlementValue, event::Event, event_id::EventId, event_type::EventType,
-    existing_price_ref::ExistingPriceRef, existing_product_ref::ExistingProductRef,
+    entitlement_value::EntitlementValue, error_code::ErrorCode, event::Event, event_id::EventId,
+    event_type::EventType, existing_price_ref::ExistingPriceRef,
+    existing_product_ref::ExistingProductRef,
     external_payment_method_config::ExternalPaymentMethodConfig, extra_component::ExtraComponent,
     extra_recurring_billing_type_enum::ExtraRecurringBillingTypeEnum,
     extra_recurring_fee_structure::ExtraRecurringFeeStructure,
@@ -437,7 +437,8 @@ pub use self::{
     minimum_commitment_scope::MinimumCommitmentScope, never_reset_period::NeverResetPeriod,
     new_product_ref::NewProductRef, number_config_value::NumberConfigValue, o_auth_app::OAuthApp,
     o_auth_app_id::OAuthAppId, o_auth_app_with_secret::OAuthAppWithSecret,
-    o_auth_apps_response::OAuthAppsResponse, onboarding_link_response::OnboardingLinkResponse,
+    o_auth_apps_response::OAuthAppsResponse, o_auth_error_code::OAuthErrorCode,
+    o_auth_error_response::OAuthErrorResponse, onboarding_link_response::OnboardingLinkResponse,
     onboarding_mode::OnboardingMode, one_time_fee::OneTimeFee,
     one_time_fee_structure::OneTimeFeeStructure, one_time_plan_fee::OneTimePlanFee,
     one_time_pricing::OneTimePricing, online_method_config::OnlineMethodConfig,
@@ -468,8 +469,9 @@ pub use self::{
     recurring_fee::RecurringFee, replace_plan_request::ReplacePlanRequest,
     reset_period::ResetPeriod, resolved_entitlement::ResolvedEntitlement,
     resolved_entitlement_list_response::ResolvedEntitlementListResponse,
-    resolved_entitlement_value::ResolvedEntitlementValue, revocation_request::RevocationRequest,
-    rotated_secret::RotatedSecret, select_option::SelectOption, shipping_address::ShippingAddress,
+    resolved_entitlement_value::ResolvedEntitlementValue, rest_error_response::RestErrorResponse,
+    revocation_request::RevocationRequest, rotated_secret::RotatedSecret,
+    select_option::SelectOption, shipping_address::ShippingAddress,
     sliding_window_reset_period::SlidingWindowResetPeriod,
     slot_downgrade_policy_enum::SlotDowngradePolicyEnum, slot_fee::SlotFee,
     slot_fee_structure::SlotFeeStructure, slot_plan_fee::SlotPlanFee, slot_pricing::SlotPricing,
@@ -503,10 +505,4 @@ pub use self::{
     usage_plan_fee::UsagePlanFee, usage_pricing::UsagePricing,
     usage_pricing_model::UsagePricingModel, usage_response::UsageResponse,
     volume_plan_pricing::VolumePlanPricing, volume_pricing::VolumePricing,
-};
-
-// Manual types re-exports
-pub use self::{
-    http_error_out::HttpErrorOut, http_validation_error::HttpValidationError,
-    validation_error::ValidationError,
 };

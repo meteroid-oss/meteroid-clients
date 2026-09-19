@@ -146,6 +146,40 @@ public class WebhookTest {
     }
 
     @Test
+    public void verifyWebhookHeadersTakePrecedenceOverSvixHeaders()
+            throws WebhookVerificationException {
+        // Valid webhook-* headers, garbage svix-* headers: webhook-* wins, so this verifies.
+        TestPayload testPayload = new TestPayload(System.currentTimeMillis(), false);
+        testPayload.headerMap.put(
+                Webhook.SVIX_MSG_ID_KEY, new ArrayList<>(Arrays.asList("msg_garbage")));
+        testPayload.headerMap.put(
+                Webhook.SVIX_MSG_TIMESTAMP_KEY, new ArrayList<>(Arrays.asList("0")));
+        testPayload.headerMap.put(
+                Webhook.SVIX_MSG_SIGNATURE_KEY,
+                new ArrayList<>(Arrays.asList("v1,invalid_signature")));
+
+        Webhook webhook = new Webhook(testPayload.secret);
+        webhook.verify(testPayload.payload, testPayload.headers());
+    }
+
+    @Test
+    public void verifyGarbageWebhookHeadersShadowValidSvixHeaders() {
+        // Valid svix-* headers, garbage webhook-* headers: svix-* is only a fallback when
+        // the webhook-* header is absent, so the garbage primary headers are used and fail.
+        TestPayload testPayload = new TestPayload(System.currentTimeMillis(), true);
+        testPayload.headerMap.put(
+                Webhook.WEBHOOK_MSG_ID_KEY, new ArrayList<>(Arrays.asList("msg_garbage")));
+        testPayload.headerMap.put(
+                Webhook.WEBHOOK_MSG_TIMESTAMP_KEY,
+                new ArrayList<>(Arrays.asList(testPayload.timestamp)));
+        testPayload.headerMap.put(
+                Webhook.WEBHOOK_MSG_SIGNATURE_KEY,
+                new ArrayList<>(Arrays.asList("v1,invalid_signature")));
+
+        assertThrows(WebhookVerificationException.class, verify(testPayload));
+    }
+
+    @Test
     public void verifyWebhookSignWorks() throws WebhookSigningException {
         String key = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
         String msgId = "msg_p5jXN8AQM9LWM0D4loKWxJek";

@@ -43,13 +43,13 @@ pub(crate) fn from_referenced_components(
     let mut types = BTreeMap::new();
     let mut add_type = |schema_name: &str, extra_components: &mut BTreeSet<_>| {
         let Some(s) = schemas.swap_remove(schema_name) else {
-            tracing::warn!(schema_name, "schema not found");
+            tracing::error!(schema_name, "schema not found");
             return;
         };
 
         let obj = match s.json_schema {
             Schema::Bool(_) => {
-                tracing::warn!(schema_name, "found $ref'erenced bool schema, wat?!");
+                tracing::error!(schema_name, "found $ref'erenced bool schema, wat?!");
                 return;
             }
             Schema::Object(o) => o,
@@ -66,7 +66,7 @@ pub(crate) fn from_referenced_components(
                 types.insert(schema_name.to_owned(), ty);
             }
             Err(e) => {
-                tracing::warn!(schema_name, "unsupported schema: {e:#}");
+                tracing::error!(schema_name, "unsupported schema: {e:#}");
             }
         }
     };
@@ -1236,8 +1236,11 @@ impl FieldType {
             | Self::Int64
             | Self::UInt64
             | Self::Float
-            | Self::Double
-            | Self::Decimal => "number".into(),
+            | Self::Double => "number".into(),
+            // `format: decimal` values travel over the wire as JSON strings
+            // (`"12.50"`), and JS `number` cannot represent them losslessly, so
+            // the TypeScript SDK surfaces them as strings.
+            Self::Decimal => "string".into(),
             Self::String | Self::Uri => "string".into(),
             Self::DateTime => "Date".into(),
             Self::JsonObject => "any".into(),

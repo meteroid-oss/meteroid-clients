@@ -10,6 +10,8 @@ import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import com.meteroid.api.BatchJobsListBatchJobsOptions;
 import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.BatchJobStatus;
+import com.meteroid.models.ErrorCode;
+import com.meteroid.models.OAuthErrorCode;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
@@ -238,6 +240,111 @@ public class MeteroidClientTest {
 
         verify(getRequestedFor(urlEqualTo("/api/v1/test"))
                 .withHeader("x-meteroid-req-id", matching("\\d+")));
+    }
+
+    @Test
+    public void testRestErrorResponseIsParsed() {
+        stubFor(get(urlEqualTo("/api/v1/customers/nope"))
+                .willReturn(aResponse()
+                        .withStatus(404)
+                        .withBody("{\"code\":\"NOT_FOUND\",\"message\":\"no such customer\"}")));
+
+        HttpUrl url = client.newUrlBuilder().encodedPath("/api/v1/customers/nope").build();
+
+        assertThatThrownBy(() -> client.executeRequest("GET", url, null, null, TestResponse.class))
+                .isInstanceOf(ApiException.class)
+                .satisfies(e -> {
+                    ApiException apiException = (ApiException) e;
+                    assertThat(apiException.getCode()).isEqualTo(404);
+                    assertThat(apiException.getResponseBody()).contains("no such customer");
+                    assertThat(apiException.getError()).isPresent();
+                    assertThat(apiException.getError().get().getCode()).isEqualTo(ErrorCode.NOT_FOUND);
+                    assertThat(apiException.getError().get().getMessage()).isEqualTo("no such customer");
+                    assertThat(apiException.getOAuthError()).isEmpty();
+                });
+    }
+
+    @Test
+    public void testOAuthErrorResponseIsParsedOnFormRequest() {
+        stubFor(post(urlEqualTo("/oauth/token"))
+                .willReturn(aResponse()
+                        .withStatus(400)
+                        .withBody("{\"error\":\"invalid_grant\",\"error_description\":\"code expired\"}")));
+
+        HttpUrl url = client.newUrlBuilder().encodedPath("/oauth/token").build();
+        TestRequest req = new TestRequest();
+        req.name = "x";
+
+        assertThatThrownBy(() -> client.executeFormRequest("POST", url, null, req, TestResponse.class))
+                .isInstanceOf(ApiException.class)
+                .satisfies(e -> {
+                    ApiException apiException = (ApiException) e;
+                    assertThat(apiException.getCode()).isEqualTo(400);
+                    assertThat(apiException.getError()).isEmpty();
+                    assertThat(apiException.getOAuthError()).isPresent();
+                    assertThat(apiException.getOAuthError().get().getError())
+                            .isEqualTo(OAuthErrorCode.INVALID_GRANT);
+                    assertThat(apiException.getOAuthError().get().getErrorDescription())
+                            .isEqualTo("code expired");
+                });
+    }
+
+    @Test
+    public void testRestErrorResponseIsParsedOnFormRequest() {
+        stubFor(post(urlEqualTo("/api/v1/form"))
+                .willReturn(aResponse()
+                        .withStatus(409)
+                        .withBody("{\"code\":\"CONFLICT\",\"message\":\"already exists\"}")));
+
+        HttpUrl url = client.newUrlBuilder().encodedPath("/api/v1/form").build();
+        TestRequest req = new TestRequest();
+        req.name = "x";
+
+        assertThatThrownBy(() -> client.executeFormRequest("POST", url, null, req, TestResponse.class))
+                .isInstanceOf(ApiException.class)
+                .satisfies(e -> {
+                    ApiException apiException = (ApiException) e;
+                    assertThat(apiException.getCode()).isEqualTo(409);
+                    assertThat(apiException.getError().map(err -> err.getCode()))
+                            .contains(ErrorCode.CONFLICT);
+                });
+    }
+
+    @Test
+    public void testNonJsonErrorKeepsStatusAndBody() {
+        stubFor(get(urlEqualTo("/api/v1/html"))
+                .willReturn(aResponse().withStatus(418).withBody("<html>teapot</html>")));
+
+        HttpUrl url = client.newUrlBuilder().encodedPath("/api/v1/html").build();
+
+        assertThatThrownBy(() -> client.executeRequest("GET", url, null, null, TestResponse.class))
+                .isInstanceOf(ApiException.class)
+                .satisfies(e -> {
+                    ApiException apiException = (ApiException) e;
+                    assertThat(apiException.getCode()).isEqualTo(418);
+                    assertThat(apiException.getResponseBody()).isEqualTo("<html>teapot</html>");
+                    assertThat(apiException.getError()).isEmpty();
+                    assertThat(apiException.getOAuthError()).isEmpty();
+                });
+    }
+
+    @Test
+    public void test422GoesThroughTheSamePath() {
+        stubFor(get(urlEqualTo("/api/v1/unprocessable"))
+                .willReturn(aResponse()
+                        .withStatus(422)
+                        .withBody("{\"code\":\"BAD_REQUEST\",\"message\":\"invalid field\"}")));
+
+        HttpUrl url = client.newUrlBuilder().encodedPath("/api/v1/unprocessable").build();
+
+        assertThatThrownBy(() -> client.executeRequest("GET", url, null, null, TestResponse.class))
+                .isInstanceOf(ApiException.class)
+                .satisfies(e -> {
+                    ApiException apiException = (ApiException) e;
+                    assertThat(apiException.getCode()).isEqualTo(422);
+                    assertThat(apiException.getError().map(err -> err.getMessage()))
+                            .contains("invalid field");
+                });
     }
 
     // Test helper classes

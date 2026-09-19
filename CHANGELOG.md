@@ -1,5 +1,14 @@
 # Changelog
 
+## Next
+
+* **Breaking** (Rust) — API errors are now parsed with the models generated from the spec. `Error::Http` carries `HttpErrorContent<RestErrorResponse>` (`code: ErrorCode`, `message`), a new `Error::OAuth` carries `HttpErrorContent<OAuthErrorResponse>`, and `Error::Validation` is removed (the API returns no 422 validation body; any status goes through `Error::Http`/`Error::OAuth`). The hand-written `HttpErrorOut`, `HttpValidationError` and `ValidationError` models are removed. The old `HttpErrorOut` required a `detail` field the API never sends, so `payload` was `None` for every real API error: no working code could have depended on its fields. New `Error::status()`, `code()` and `message()` accessors. Status and raw body remain available on every HTTP error
+* Error response models are now generated from the spec: `RestErrorResponse`, `ErrorCode`, `OAuthErrorResponse`, `OAuthErrorCode`. A body with an error code unknown to the SDK version yields no typed payload; status and raw body are still available
+* Java: `ApiException` gains `getError()` (`Optional<RestErrorResponse>`) and `getOAuthError()` (`Optional<OAuthErrorResponse>`); the existing constructor and getters are unchanged
+* Java: webhook verification now gives `webhook-*` headers precedence, using `svix-*` only when the matching `webhook-*` header is absent, like the other SDKs. Previously `svix-*` headers overwrote `webhook-*` ones
+* Java: the published POM's project and SCM URLs, and the Rust crate's `repository`, now point at `meteroid-oss/meteroid-clients`
+* Codegen: generation fails loudly on unsupported operations or components instead of silently dropping them
+
 ## Version 0.26.0
 
 * Invoice lifecycle: new `CLOSED` invoice status (empty recurring invoice closed with nothing to bill) and the matching `invoice.closed` webhook event, plus a new `invoice.deleted` event for draft deletions

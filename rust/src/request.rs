@@ -207,8 +207,8 @@ impl Request {
 
             match res {
                 Ok(result) => return Ok(result),
-                e @ Err(Error::Validation(_)) => return e,
-                Err(Error::Http(err)) if err.status.as_u16() < 500 => return Err(Error::Http(err)),
+                // Client errors are not retried.
+                Err(e) if e.status().is_some_and(|s| s.as_u16() < 500) => return Err(e),
                 e @ Err(_) => {
                     if next_backoff.is_none() {
                         return e;

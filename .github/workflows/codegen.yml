@@ -24,9 +24,36 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The published image is only rebuilt after a push to main (codegen-docker.yml), so a PR
+      # that changes the codegen binary must be checked against an image built from its own
+      # source; otherwise it is validated against the previous binary and can never pass.
+      # Templates are bind-mounted by regen_openapi.py, so template-only changes keep the
+      # published image.
+      - name: Detect changes to the codegen binary
+        id: codegen
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+          # An unreachable base makes git diff fail, which falls through to a rebuild.
+          if git diff --quiet "$base" HEAD -- codegen/src codegen/Cargo.toml codegen/Cargo.lock codegen/Dockerfile; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Pull codegen Docker image
+        if: steps.codegen.outputs.changed == 'false'
         run: docker pull ghcr.io/meteroid-oss/openapi-codegen:latest
+
+      - name: Build codegen Docker image from this commit
+        if: steps.codegen.outputs.changed == 'true'
+        run: docker build -t ghcr.io/meteroid-oss/openapi-codegen:latest codegen/
 
       - name: Regen openapi libs
         run: ./regen_openapi.py

@@ -1,7 +1,8 @@
 use meteroid_rs::api::{
     BatchJobsListBatchJobsOptions, CustomersListCustomersOptions, Meteroid, MeteroidOptions,
 };
-use meteroid_rs::models::BatchJobStatus;
+use meteroid_rs::error::Error;
+use meteroid_rs::models::{BatchJobStatus, ErrorCode, OAuthErrorCode, RestErrorResponse};
 
 use wiremock::{
     matchers::{header, method, path, query_param},
@@ -286,29 +287,131 @@ async fn test_list_query_param_is_exploded() {
     mock_server.verify().await;
 }
 
-#[tokio::test]
-async fn test_http_error_handling() {
+async fn get_customer_error(status: u16, body: &str) -> meteroid_rs::error::Error {
     let mock_server = MockServer::start().await;
-
-    let error_body = r#"{
-        "code": "not_found",
-        "msg": "Customer not found"
-    }"#;
 
     Mock::given(method("GET"))
         .and(path("/api/v1/customers/nonexistent"))
-        .respond_with(ResponseTemplate::new(404).set_body_string(error_body))
+        .respond_with(ResponseTemplate::new(status).set_body_string(body))
         .expect(1)
         .mount(&mock_server)
         .await;
 
     let client = create_test_client(mock_server.uri());
-    let result = client
+    let err = client
         .customers()
         .get_customer("nonexistent".to_string())
-        .await;
-
-    assert!(result.is_err());
+        .await
+        .expect_err("non-2xx response must be an error");
 
     mock_server.verify().await;
+    err
+}
+
+#[tokio::test]
+async fn test_http_error_is_parsed_as_rest_error_response() {
+    let body = r#"{"code":"NOT_FOUND","message":"no such customer"}"#;
+    let err = get_customer_error(404, body).await;
+
+    assert_eq!(err.status(), Some(http1::StatusCode::NOT_FOUND));
+    assert_eq!(err.code(), Some(ErrorCode::NotFound));
+    assert_eq!(err.message(), Some("no such customer"));
+    match err {
+        Error::Http(content) => {
+            assert_eq!(content.status, http1::StatusCode::NOT_FOUND);
+            assert_eq!(
+                content.payload,
+                Some(RestErrorResponse::new(
+                    ErrorCode::NotFound,
+                    "no such customer".to_string()
+                ))
+            );
+            assert_eq!(content.body_as_str(), body);
+        }
+        other => panic!("expected Error::Http, got {other:?}"),
+    }
+}
+
+#[tokio::test]
+async fn test_oauth_error_is_parsed_as_oauth_error_response() {
+    let body = r#"{"error":"invalid_grant","error_description":"code expired"}"#;
+    let err = get_customer_error(400, body).await;
+
+    assert_eq!(err.status(), Some(http1::StatusCode::BAD_REQUEST));
+    assert_eq!(err.code(), None);
+    assert_eq!(err.message(), None);
+    match err {
+        Error::OAuth(content) => {
+            assert_eq!(content.status, http1::StatusCode::BAD_REQUEST);
+            assert_eq!(content.body_as_str(), body);
+            let payload = content.payload.expect("OAuth payload");
+            assert_eq!(payload.error, OAuthErrorCode::InvalidGrant);
+            assert_eq!(payload.error_description.as_deref(), Some("code expired"));
+            assert_eq!(payload.error_uri, None);
+        }
+        other => panic!("expected Error::OAuth, got {other:?}"),
+    }
+}
+
+#[tokio::test]
+async fn test_non_json_error_keeps_status_and_raw_body() {
+    let body = "<html>502 Bad Gateway</html>";
+    // 502 is retried; the mock answers every attempt.
+    let mock_server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/api/v1/customers/nonexistent"))
+        .respond_with(ResponseTemplate::new(502).set_body_string(body))
+        .mount(&mock_server)
+        .await;
+    let client = Meteroid::new(
+        "test-api-key".to_string(),
+        Some(MeteroidOptions {
+            server_url: Some(mock_server.uri()),
+            timeout: None,
+            num_retries: Some(0),
+            ..Default::default()
+        }),
+    );
+    let err = client
+        .customers()
+        .get_customer("nonexistent".to_string())
+        .await
+        .expect_err("non-2xx response must be an error");
+
+    assert_eq!(err.status(), Some(http1::StatusCode::BAD_GATEWAY));
+    assert_eq!(err.code(), None);
+    match err {
+        Error::Http(content) => {
+            assert_eq!(content.status, http1::StatusCode::BAD_GATEWAY);
+            assert_eq!(content.payload, None);
+            assert_eq!(&content.raw_body[..], body.as_bytes());
+        }
+        other => panic!("expected Error::Http, got {other:?}"),
+    }
+}
+
+#[tokio::test]
+async fn test_unknown_error_code_has_no_payload() {
+    let body = r#"{"code":"SOMETHING_NEW","message":"new server-side code"}"#;
+    let err = get_customer_error(409, body).await;
+
+    assert_eq!(err.status(), Some(http1::StatusCode::CONFLICT));
+    match err {
+        Error::Http(content) => {
+            assert_eq!(content.payload, None);
+            assert_eq!(content.body_as_str(), body);
+        }
+        other => panic!("expected Error::Http, got {other:?}"),
+    }
+}
+
+#[tokio::test]
+async fn test_422_goes_through_the_same_path() {
+    let body = r#"{"code":"BAD_REQUEST","message":"invalid field"}"#;
+    let err = get_customer_error(422, body).await;
+
+    assert_eq!(err.status(), Some(http1::StatusCode::UNPROCESSABLE_ENTITY));
+    assert_eq!(err.code(), Some(ErrorCode::BadRequest));
+    assert_eq!(err.message(), Some("invalid field"));
+    assert!(matches!(err, Error::Http(_)));
 }

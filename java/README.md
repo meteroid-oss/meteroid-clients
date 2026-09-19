@@ -173,8 +173,8 @@ The SDK provides utilities for verifying webhook signatures using the [Standard 
 
 **Supported headers:**
 
-- `svix-id`, `svix-timestamp`, `svix-signature` (Svix-branded)
 - `webhook-id`, `webhook-timestamp`, `webhook-signature` (Standard Webhooks)
+- `svix-id`, `svix-timestamp`, `svix-signature` (Svix-branded), used only when the matching `webhook-*` header is absent
 
 ```java
 import com.meteroid.Webhook;
@@ -240,7 +240,7 @@ public class WebhookController {
 
 ## Error Handling
 
-The SDK throws `ApiException` for API errors:
+The SDK throws `ApiException` for API errors. The status code and raw body are always available; the body is also parsed as a `RestErrorResponse` (`getError()`) or, failing that, an `OAuthErrorResponse` (`getOAuthError()`):
 
 ```java
 import com.meteroid.exceptions.ApiException;
@@ -251,6 +251,8 @@ try {
     System.out.println("Status code: " + e.getCode());
     System.out.println("Error message: " + e.getMessage());
     System.out.println("Response body: " + e.getResponseBody());
+    e.getError().ifPresent(err ->
+            System.out.println("Error code: " + err.getCode() + ", message: " + err.getMessage()));
 } catch (IOException e) {
     System.out.println("Network error: " + e.getMessage());
 }
