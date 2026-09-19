@@ -64,7 +64,10 @@ export class Webhook {
   }
 
   /**
-   * Verify a webhook payload and return the parsed JSON body.
+   * Verify a webhook payload's signature and timestamp.
+   *
+   * Only verifies: the payload is not parsed. On success, parse the raw body
+   * yourself (e.g. `JSON.parse(payload.toString())`).
    *
    * @param payload The raw webhook payload (string or Buffer), exactly as
    *   received: parsing and re-serializing it breaks the signature
@@ -72,12 +75,9 @@ export class Webhook {
    *   `webhook-signature` and `webhook-timestamp`, or their `svix-*` aliases),
    *   as a plain object such as Node's `IncomingHttpHeaders` or as a fetch
    *   `Headers` instance. Header names are matched case-insensitively.
-   * @returns The verified and parsed webhook payload (`undefined` for an empty
-   *   payload)
-   * @throws WebhookVerificationError if verification fails, or if the payload
-   *   is correctly signed but is not valid JSON
+   * @throws WebhookVerificationError if verification fails
    */
-  public verify(payload: string | Buffer, headers_: WebhookHeaders): unknown {
+  public verify(payload: string | Buffer, headers_: WebhookHeaders): void {
     const headers = normalizeHeaders(headers_);
 
     // Copy each `svix-*` header onto its `webhook-*` counterpart, but only when
@@ -86,20 +86,9 @@ export class Webhook {
     copyFallback(headers, HEADER_SIGNATURE, SVIX_SIGNATURE);
     copyFallback(headers, HEADER_TIMESTAMP, SVIX_TIMESTAMP);
 
-    // Parse the body here rather than in `standardwebhooks`, whose
-    // `JSON.parse` would surface a bare `SyntaxError`: callers only ever have
-    // to catch `WebhookVerificationError`.
+    // `jsonParse: false` stops `standardwebhooks` from parsing the body, which
+    // would surface a bare `SyntaxError` for a correctly signed non-JSON body.
     this.inner.verify(payload, headers, { jsonParse: false });
-
-    const body = payload.toString();
-    if (body === "") {
-      return undefined;
-    }
-    try {
-      return JSON.parse(body);
-    } catch {
-      throw new WebhookVerificationError("Payload is not valid JSON");
-    }
   }
 
   /**

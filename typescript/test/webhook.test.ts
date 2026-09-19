@@ -21,37 +21,31 @@ describe("Webhook.verify", () => {
   it("accepts Standard Webhooks (webhook-*) headers", () => {
     const { webhook, signature, timestamp } = sign();
 
-    const event = webhook.verify(PAYLOAD, {
+    webhook.verify(PAYLOAD, {
       "webhook-id": MSG_ID,
       "webhook-signature": signature,
       "webhook-timestamp": timestamp,
     });
-
-    assert.deepEqual(event, { test: "data" });
   });
 
   it("accepts Svix (svix-*) headers", () => {
     const { webhook, signature, timestamp } = sign();
 
-    const event = webhook.verify(PAYLOAD, {
+    webhook.verify(PAYLOAD, {
       "svix-id": MSG_ID,
       "svix-signature": signature,
       "svix-timestamp": timestamp,
     });
-
-    assert.deepEqual(event, { test: "data" });
   });
 
   it("normalizes header name casing", () => {
     const { webhook, signature, timestamp } = sign();
 
-    const event = webhook.verify(PAYLOAD, {
+    webhook.verify(PAYLOAD, {
       "Webhook-Id": MSG_ID,
       "Webhook-Signature": signature,
       "Webhook-Timestamp": timestamp,
     });
-
-    assert.deepEqual(event, { test: "data" });
   });
 
   it("rejects meteroid-* headers", () => {
@@ -91,7 +85,7 @@ describe("Webhook.verify", () => {
   it("uses the webhook-* headers when the svix-* ones are garbage", () => {
     const { webhook, signature, timestamp } = sign();
 
-    const event = webhook.verify(PAYLOAD, {
+    webhook.verify(PAYLOAD, {
       "webhook-id": MSG_ID,
       "webhook-signature": signature,
       "webhook-timestamp": timestamp,
@@ -99,8 +93,6 @@ describe("Webhook.verify", () => {
       "svix-signature": "v1,not-a-real-signature",
       "svix-timestamp": timestamp,
     });
-
-    assert.deepEqual(event, { test: "data" });
   });
 
   it("rejects an invalid signature", () => {
@@ -135,7 +127,7 @@ describe("Webhook.verify", () => {
   it("accepts string-array and undefined header values", () => {
     const { webhook, signature, timestamp } = sign();
 
-    const event = webhook.verify(PAYLOAD, {
+    webhook.verify(PAYLOAD, {
       "webhook-id": MSG_ID,
       // A header sent twice reaches Node as an array; the values are joined
       // with a space, like several signatures in a single header.
@@ -143,14 +135,12 @@ describe("Webhook.verify", () => {
       "webhook-timestamp": timestamp,
       "x-absent": undefined,
     });
-
-    assert.deepEqual(event, { test: "data" });
   });
 
   it("falls back to svix-* when the webhook-* value is undefined", () => {
     const { webhook, signature, timestamp } = sign();
 
-    const event = webhook.verify(PAYLOAD, {
+    webhook.verify(PAYLOAD, {
       "webhook-id": undefined,
       "webhook-signature": undefined,
       "webhook-timestamp": undefined,
@@ -158,8 +148,6 @@ describe("Webhook.verify", () => {
       "svix-signature": [signature],
       "svix-timestamp": timestamp,
     });
-
-    assert.deepEqual(event, { test: "data" });
   });
 
   it("accepts a fetch Headers instance", () => {
@@ -170,7 +158,7 @@ describe("Webhook.verify", () => {
     headers.set("Webhook-Signature", signature);
     headers.set("Webhook-Timestamp", timestamp);
 
-    assert.deepEqual(webhook.verify(PAYLOAD, headers), { test: "data" });
+    assert.doesNotThrow(() => webhook.verify(PAYLOAD, headers));
   });
 
   it("applies the svix-* fallback to a fetch Headers instance", () => {
@@ -182,7 +170,7 @@ describe("Webhook.verify", () => {
       "svix-timestamp": timestamp,
     });
 
-    assert.deepEqual(webhook.verify(PAYLOAD, headers), { test: "data" });
+    assert.doesNotThrow(() => webhook.verify(PAYLOAD, headers));
   });
 
   it("rejects a fetch Headers instance with a bad signature", () => {
@@ -197,46 +185,52 @@ describe("Webhook.verify", () => {
     assert.throws(() => webhook.verify(PAYLOAD, headers), WebhookVerificationError);
   });
 
-  it("rejects a correctly signed body that is not JSON", () => {
+  it("verifies a correctly signed non-JSON body", () => {
     const webhook = new Webhook(SECRET);
     const now = new Date();
     const payload = "not json";
 
-    assert.throws(
-      () =>
-        webhook.verify(payload, {
-          "webhook-id": MSG_ID,
-          "webhook-signature": webhook.sign(MSG_ID, now, payload),
-          "webhook-timestamp": Math.floor(now.getTime() / 1000).toString(),
-        }),
-      (err: unknown) =>
-        err instanceof WebhookVerificationError &&
-        /not valid JSON/.test((err as Error).message)
+    assert.doesNotThrow(() =>
+      webhook.verify(payload, {
+        "webhook-id": MSG_ID,
+        "webhook-signature": webhook.sign(MSG_ID, now, payload),
+        "webhook-timestamp": Math.floor(now.getTime() / 1000).toString(),
+      })
     );
   });
 
-  it("returns undefined for a correctly signed empty body", () => {
+  it("verifies a correctly signed empty body", () => {
     const webhook = new Webhook(SECRET);
     const now = new Date();
 
-    const event = webhook.verify(Buffer.from(""), {
-      "webhook-id": MSG_ID,
-      "webhook-signature": webhook.sign(MSG_ID, now, ""),
-      "webhook-timestamp": Math.floor(now.getTime() / 1000).toString(),
-    });
-
-    assert.equal(event, undefined);
+    assert.doesNotThrow(() =>
+      webhook.verify(Buffer.from(""), {
+        "webhook-id": MSG_ID,
+        "webhook-signature": webhook.sign(MSG_ID, now, ""),
+        "webhook-timestamp": Math.floor(now.getTime() / 1000).toString(),
+      })
+    );
   });
 
-  it("parses a correctly signed Buffer body", () => {
+  it("returns nothing", () => {
     const { webhook, signature, timestamp } = sign();
 
-    const event = webhook.verify(Buffer.from(PAYLOAD), {
+    const result = webhook.verify(PAYLOAD, {
       "webhook-id": MSG_ID,
       "webhook-signature": signature,
       "webhook-timestamp": timestamp,
     });
 
-    assert.deepEqual(event, { test: "data" });
+    assert.equal(result, undefined);
+  });
+
+  it("verifies a correctly signed Buffer body", () => {
+    const { webhook, signature, timestamp } = sign();
+
+    webhook.verify(Buffer.from(PAYLOAD), {
+      "webhook-id": MSG_ID,
+      "webhook-signature": signature,
+      "webhook-timestamp": timestamp,
+    });
   });
 });

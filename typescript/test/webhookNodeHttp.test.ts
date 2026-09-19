@@ -20,7 +20,8 @@ function handle(
   req: { body: Buffer; headers: IncomingHttpHeaders }
 ): { status: number; event?: unknown } {
   try {
-    const event = webhook.verify(req.body, req.headers);
+    webhook.verify(req.body, req.headers);
+    const event: unknown = JSON.parse(req.body.toString());
     return { status: 200, event };
   } catch (err) {
     if (err instanceof WebhookVerificationError) {

@@ -147,7 +147,8 @@ const webhook = new Webhook("whsec_your_webhook_secret");
 // `express.raw` keeps the body as the raw bytes that were signed.
 app.post("/webhooks/meteroid", express.raw({ type: "*/*" }), (req, res) => {
   try {
-    const event = webhook.verify(req.body, req.headers);
+    webhook.verify(req.body, req.headers);
+    const event: unknown = JSON.parse(req.body.toString());
     console.log("Received event:", event);
     res.status(200).send("OK");
   } catch (err) {
@@ -165,7 +166,9 @@ With the fetch API (Next.js route handlers, Cloudflare Workers, Deno, Bun), pass
 ```typescript
 export async function POST(request: Request): Promise<Response> {
   try {
-    const event = webhook.verify(await request.text(), request.headers);
+    const body = await request.text();
+    webhook.verify(body, request.headers);
+    const event: unknown = JSON.parse(body);
     console.log("Received event:", event);
     return new Response("OK");
   } catch (err) {
@@ -188,8 +191,9 @@ The `webhook-*` header wins when both are present:
 
 The payload must be the **raw** request body — parsing it first breaks the signature.
 
-`verify` returns the parsed JSON body (`unknown`). Every failure — missing headers, a bad or stale
-signature, or a correctly signed body that is not JSON — throws a `WebhookVerificationError`.
+`verify` only verifies: it returns nothing and does not parse the body, so parse the raw body
+yourself once it succeeds, as above. Every verification failure — missing headers, or a bad or
+stale signature — throws a `WebhookVerificationError`.
 
 ## Error handling
 
