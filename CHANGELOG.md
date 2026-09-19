@@ -8,6 +8,8 @@
 * Java: webhook verification now gives `webhook-*` headers precedence, using `svix-*` only when the matching `webhook-*` header is absent, like the other SDKs. Previously `svix-*` headers overwrote `webhook-*` ones
 * Java: the published POM's project and SCM URLs, and the Rust crate's `repository`, now point at `meteroid-oss/meteroid-clients`
 * Codegen: generation fails loudly on unsupported operations or components instead of silently dropping them
+* Java: `jackson-core`, `jackson-databind`, `jackson-annotations` and `standardwebhooks` are now `compile`-scope dependencies (Gradle `api`). `Webhook.verify`/`sign` throw standard-webhooks exceptions and every model's `fromJson`/`toJson` throws `JsonProcessingException`, so code catching them did not compile against the published artifact
+* Java: the `Meteroid` Javadoc example called `getCustomer()`; the getter is `getCustomers()`
 
 ## Version 0.26.0
 

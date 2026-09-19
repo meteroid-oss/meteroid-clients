@@ -26,7 +26,7 @@ import java.util.Map;
  * Meteroid meteroid = new Meteroid("your-api-key", options);
  *
  * // Access API resources
- * CustomerListResponse customers = meteroid.getCustomer().listCustomers();
+ * CustomerListResponse customers = meteroid.getCustomers().listCustomers();
  * }</pre>
  */
 @Getter

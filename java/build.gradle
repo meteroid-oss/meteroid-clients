@@ -23,12 +23,13 @@ sourceSets {
 }
 
 dependencies {
-    // JSON serialization
-    implementation "com.fasterxml.jackson.core:jackson-core:2.18.2"
+    // JSON serialization. `api`: the models' fromJson/toJson throw JsonProcessingException
+    // and Utils.getObjectMapper() returns an ObjectMapper, so consumers compile against them.
+    api "com.fasterxml.jackson.core:jackson-core:2.18.2"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.2"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2"
-    implementation "com.fasterxml.jackson.core:jackson-annotations:2.18.2"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.18.2"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.18.2"
+    api "com.fasterxml.jackson.core:jackson-databind:2.18.2"
 
     // HTTP client
     implementation "com.squareup.okhttp3:okhttp:4.12.0"
@@ -36,8 +37,9 @@ dependencies {
     // Annotations
     implementation "com.google.code.findbugs:jsr305:3.0.2"
 
-    // Webhook signature verification (standard-webhooks)
-    implementation "com.standardwebhooks:standardwebhooks:1.1.0"
+    // Webhook signature verification (standard-webhooks). `api`: Webhook.verify/sign
+    // throw its checked exceptions, which consumers must catch.
+    api "com.standardwebhooks:standardwebhooks:1.1.0"
 
     // Testing
     testImplementation 'junit:junit:4.13.2'
