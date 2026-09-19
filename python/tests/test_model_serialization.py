@@ -366,3 +366,47 @@ def test_json_keys_template_is_keyed_by_the_attribute_name() -> None:
     code = re.sub(r"\{#-?.*?-?#\}", "", block, flags=re.DOTALL)
     assert "py_ident(" in code
     assert "to_snake_case" not in code
+
+
+def test_offset_less_datetime_is_utc() -> None:
+    from meteroid.serialization import parse_datetime
+
+    naive = parse_datetime("2026-09-19T10:00:00.123456")
+    assert naive.tzinfo is not None
+    assert naive.utcoffset() == datetime.timedelta(0)
+    # Microseconds are kept.
+    assert naive == datetime.datetime(
+        2026, 9, 19, 10, 0, 0, 123456, tzinfo=datetime.timezone.utc
+    )
+
+    zulu = parse_datetime("2026-09-19T10:00:00.123Z")
+    assert zulu == datetime.datetime(
+        2026, 9, 19, 10, 0, 0, 123000, tzinfo=datetime.timezone.utc
+    )
+    # Offset-less and `Z` values can be compared and sorted together.
+    assert zulu < naive
+
+    paris = parse_datetime("2026-09-19T12:00:00+02:00")
+    assert paris.utcoffset() == datetime.timedelta(hours=2)
+    assert paris == datetime.datetime(2026, 9, 19, 10, 0, tzinfo=datetime.timezone.utc)
+
+    # Naive datetimes handed in directly are treated as UTC too.
+    assert parse_datetime(datetime.datetime(2026, 9, 19, 10)).tzinfo is not None
+
+
+def test_model_with_offset_less_datetime() -> None:
+    from meteroid.models import AppliedCoupon
+
+    applied = AppliedCoupon.from_dict(
+        {
+            "id": "ac_1",
+            "coupon_id": "c_1",
+            "is_active": True,
+            "created_at": "2026-09-19T10:00:00.123456",
+            "applied_amount": "1",
+        }
+    )
+    assert applied.created_at == datetime.datetime(
+        2026, 9, 19, 10, 0, 0, 123456, tzinfo=datetime.timezone.utc
+    )
+    assert applied.to_dict()["created_at"] == "2026-09-19T10:00:00.123456+00:00"

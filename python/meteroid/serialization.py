@@ -70,19 +70,29 @@ def format_datetime(value: _datetime.datetime) -> str:
 
 
 def parse_datetime(value: t.Any) -> _datetime.datetime:
-    """Parse an RFC 3339 string into an aware :class:`datetime.datetime`."""
+    """Parse an ISO 8601 / RFC 3339 string into an aware :class:`datetime.datetime`.
+
+    The result is always timezone-aware. The Meteroid API sends every
+    date-time in UTC, but some fields carry no UTC offset (e.g.
+    ``2026-09-19T10:00:00.123456``): those are read as UTC. A string with an
+    explicit offset (``Z``, ``+02:00``) keeps it. Microseconds are preserved.
+    """
     if isinstance(value, _datetime.datetime):
-        return value
-    if not isinstance(value, str):
+        parsed = value
+    elif isinstance(value, str):
+        text = value
+        # `fromisoformat` only learned about the `Z` suffix in Python 3.11.
+        if text.endswith(("Z", "z")):
+            text = text[:-1] + "+00:00"
+        try:
+            parsed = _datetime.datetime.fromisoformat(text)
+        except ValueError as exc:  # pragma: no cover - depends on server output
+            raise ModelParseError(f"invalid date-time string {value!r}") from exc
+    else:
         raise ModelParseError(f"expected a date-time string, got {type(value).__name__}")
-    text = value
-    # `fromisoformat` only learned about the `Z` suffix in Python 3.11.
-    if text.endswith(("Z", "z")):
-        text = text[:-1] + "+00:00"
-    try:
-        return _datetime.datetime.fromisoformat(text)
-    except ValueError as exc:  # pragma: no cover - depends on server output
-        raise ModelParseError(f"invalid date-time string {value!r}") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=_datetime.timezone.utc)
+    return parsed
 
 
 # --------------------------------------------------------------------------
