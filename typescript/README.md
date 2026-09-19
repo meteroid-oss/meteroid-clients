@@ -188,6 +188,9 @@ The `webhook-*` header wins when both are present:
 
 The payload must be the **raw** request body — parsing it first breaks the signature.
 
+`verify` returns the parsed JSON body (`unknown`). Every failure — missing headers, a bad or stale
+signature, or a correctly signed body that is not JSON — throws a `WebhookVerificationError`.
+
 ## Error handling
 
 ```typescript

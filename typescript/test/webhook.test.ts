@@ -196,4 +196,47 @@ describe("Webhook.verify", () => {
 
     assert.throws(() => webhook.verify(PAYLOAD, headers), WebhookVerificationError);
   });
+
+  it("rejects a correctly signed body that is not JSON", () => {
+    const webhook = new Webhook(SECRET);
+    const now = new Date();
+    const payload = "not json";
+
+    assert.throws(
+      () =>
+        webhook.verify(payload, {
+          "webhook-id": MSG_ID,
+          "webhook-signature": webhook.sign(MSG_ID, now, payload),
+          "webhook-timestamp": Math.floor(now.getTime() / 1000).toString(),
+        }),
+      (err: unknown) =>
+        err instanceof WebhookVerificationError &&
+        /not valid JSON/.test((err as Error).message)
+    );
+  });
+
+  it("returns undefined for a correctly signed empty body", () => {
+    const webhook = new Webhook(SECRET);
+    const now = new Date();
+
+    const event = webhook.verify(Buffer.from(""), {
+      "webhook-id": MSG_ID,
+      "webhook-signature": webhook.sign(MSG_ID, now, ""),
+      "webhook-timestamp": Math.floor(now.getTime() / 1000).toString(),
+    });
+
+    assert.equal(event, undefined);
+  });
+
+  it("parses a correctly signed Buffer body", () => {
+    const { webhook, signature, timestamp } = sign();
+
+    const event = webhook.verify(Buffer.from(PAYLOAD), {
+      "webhook-id": MSG_ID,
+      "webhook-signature": signature,
+      "webhook-timestamp": timestamp,
+    });
+
+    assert.deepEqual(event, { test: "data" });
+  });
 });

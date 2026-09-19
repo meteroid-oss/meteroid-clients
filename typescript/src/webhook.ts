@@ -72,8 +72,10 @@ export class Webhook {
    *   `webhook-signature` and `webhook-timestamp`, or their `svix-*` aliases),
    *   as a plain object such as Node's `IncomingHttpHeaders` or as a fetch
    *   `Headers` instance. Header names are matched case-insensitively.
-   * @returns The verified and parsed webhook payload
-   * @throws WebhookVerificationError if verification fails
+   * @returns The verified and parsed webhook payload (`undefined` for an empty
+   *   payload)
+   * @throws WebhookVerificationError if verification fails, or if the payload
+   *   is correctly signed but is not valid JSON
    */
   public verify(payload: string | Buffer, headers_: WebhookHeaders): unknown {
     const headers = normalizeHeaders(headers_);
@@ -84,7 +86,20 @@ export class Webhook {
     copyFallback(headers, HEADER_SIGNATURE, SVIX_SIGNATURE);
     copyFallback(headers, HEADER_TIMESTAMP, SVIX_TIMESTAMP);
 
-    return this.inner.verify(payload, headers);
+    // Parse the body here rather than in `standardwebhooks`, whose
+    // `JSON.parse` would surface a bare `SyntaxError`: callers only ever have
+    // to catch `WebhookVerificationError`.
+    this.inner.verify(payload, headers, { jsonParse: false });
+
+    const body = payload.toString();
+    if (body === "") {
+      return undefined;
+    }
+    try {
+      return JSON.parse(body);
+    } catch {
+      throw new WebhookVerificationError("Payload is not valid JSON");
+    }
   }
 
   /**
