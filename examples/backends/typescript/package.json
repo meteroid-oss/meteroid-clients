@@ -1,0 +1,25 @@
+{
+  "name": "scribe-backend-typescript",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Scribe demo backend — the Meteroid TypeScript SDK behind examples/openapi.yaml.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build:sdk": "npm --prefix ../../../typescript ci --no-audit --no-fund && npm --prefix ../../../typescript run build",
+    "start": "tsx src/main.ts",
+    "test": "node --import tsx --test --test-reporter=spec test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@meteroid/sdk": "file:../../../typescript"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3"
+  }
+}

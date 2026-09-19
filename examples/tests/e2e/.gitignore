@@ -1,0 +1,5 @@
+# Playwright run artifacts. Traces and videos are retained on failure and can be large.
+/test-results/
+/playwright-report/
+/blob-report/
+/.playwright/

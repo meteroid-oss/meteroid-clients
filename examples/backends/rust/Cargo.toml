@@ -1,0 +1,45 @@
+[package]
+name = "scribe-backend"
+version = "1.0.0"
+edition = "2021"
+publish = false
+description = "Scribe demo backend — the Meteroid Rust SDK behind examples/openapi.yaml."
+license = "Apache-2.0"
+
+[dependencies]
+# The SDK this example exists to demonstrate, taken from this repository so the
+# example always builds against the source it documents.
+meteroid-rs = { path = "../../../rust" }
+
+# HTTP server.
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal"] }
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+
+# Serialization. The contract's decimals are strings, so they are carried as
+# `String` in the DTOs and produced from `rust_decimal::Decimal`.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rust_decimal = "1"
+
+# Dates: RFC 3339 timestamps and `YYYY-MM-DD` billing dates.
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+
+# Session tokens: HMAC-SHA256 over the customer alias.
+hmac = "0.12"
+sha2 = "0.10"
+base64 = "0.22"
+
+uuid = { version = "1", features = ["v4"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+# Driving the router in-process, so the parts of the contract that need no Meteroid
+# tenant (health, auth, the error envelope, webhook signature verification) are
+# actually exercised rather than merely compiled.
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+
+[lints.rust]
+unsafe_code = "forbid"

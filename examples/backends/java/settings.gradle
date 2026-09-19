@@ -1,0 +1,14 @@
+rootProject.name = 'scribe-backend'
+
+// The SDK this example exists to demonstrate, taken from this repository so the example always
+// builds against the source it documents. This is the Gradle equivalent of the Rust backend's
+// `meteroid-rs = { path = "../../../rust" }`.
+//
+// The substitution is spelled out rather than left to Gradle's publication discovery: the SDK's
+// Gradle project is named `meteroid-java` but publishes as `com.meteroid:meteroid`, and being
+// explicit means the wiring works whether or not the publishing plugin has been configured.
+includeBuild('../../../java') {
+    dependencySubstitution {
+        substitute module('com.meteroid:meteroid') using project(':')
+    }
+}

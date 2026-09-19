@@ -1,0 +1,21 @@
+{
+  "name": "scribe-contract-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cross-backend conformance suite for the Scribe demo. Validates every response against examples/openapi.yaml.",
+  "scripts": {
+    "test": "vitest run",
+    "watch": "vitest",
+    "list": "vitest list",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.11",
+    "yaml": "^2.6.1"
+  }
+}

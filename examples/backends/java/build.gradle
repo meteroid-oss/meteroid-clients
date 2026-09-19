@@ -1,0 +1,75 @@
+plugins {
+    id 'application'
+}
+
+group = 'com.scribe'
+version = '1.0.0'
+description = 'Scribe demo backend — the Meteroid Java SDK behind examples/openapi.yaml.'
+
+// Javalin 6 requires Java 17. No toolchain block on purpose: the build runs on whatever JDK you
+// already have, as long as it is 17 or newer.
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // The SDK. Substituted onto ../../../java by settings.gradle, so there is nothing to publish
+    // or install first — edit the SDK and this example picks it up on the next build.
+    implementation 'com.meteroid:meteroid:0.26.0'
+
+    // HTTP server. Javalin is a thin layer over Jetty: a route is a lambda, so the Meteroid SDK
+    // call stays the most visible line in each handler.
+    implementation 'io.javalin:javalin:6.7.0'
+
+    // Serialization. The contract's decimals are strings, so they are carried as `String` in the
+    // DTOs and produced from `java.math.BigDecimal`.
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+
+    // `com.meteroid.Webhook.verify` declares `WebhookVerificationException`, which lives in
+    // standard-webhooks. The SDK depends on it with `implementation`, so it is not on our compile
+    // classpath transitively — but we have to name the exception to catch it. Declared explicitly
+    // and pinned to the same version the SDK uses.
+    implementation 'com.standardwebhooks:standardwebhooks:1.1.0'
+
+    // Logging.
+    implementation 'org.slf4j:slf4j-api:2.0.16'
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.16'
+
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Driving the router in-process, so the parts of the contract that need no Meteroid tenant
+    // (health, auth, the error envelope, webhook signature verification) are actually exercised
+    // rather than merely compiled.
+    testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.16'
+}
+
+application {
+    mainClass = 'com.scribe.Main'
+}
+
+// The strictness knob, and the moral equivalent of the Rust backend's `cargo clippy -D warnings`.
+// A newer JDK can add lint categories that did not exist when this was written; if one of those
+// fails your build, drop `-Werror` rather than silencing the warning.
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:all' << '-Werror'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
+
+// `./gradlew run` should behave like `cargo run`: inherit the terminal's environment (which is
+// where METEROID_API_KEY and friends live) and log to the console.
+run {
+    standardInput = System.in
+}

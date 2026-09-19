@@ -1,0 +1,29 @@
+# Local configuration. `.env` holds a live Meteroid API key — never commit it.
+# `.env.example` is the committed template and is deliberately not ignored.
+.env
+.env.*
+!.env.example
+
+# Rust backend.
+backends/rust/target/
+
+# Java backend. The Gradle wrapper (gradlew, gradle/wrapper/) IS committed on purpose:
+# it is what makes `make run-java` work without a preinstalled Gradle.
+backends/java/build/
+backends/java/.gradle/
+backends/java/bin/
+
+# Node — the SPA and both test suites. Lockfiles are committed; installs are not.
+node_modules/
+dist/
+.vite/
+
+# Test output.
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+tests/e2e/blob-report/
+tests/contract/*.json.log
+
+# Editors and OS noise.
+.DS_Store
+*.swp

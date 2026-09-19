@@ -1,0 +1,1845 @@
+openapi: 3.1.0
+
+info:
+  title: Scribe Demo API
+  version: 1.0.0
+  summary: Backend contract for the Scribe metered-AI-transcription demo.
+  description: |
+    This is the contract for the **demo application's own backend** — not Meteroid's REST API.
+
+    Scribe is a fictional metered AI transcription SaaS used to demonstrate the Meteroid SDKs.
+    Every backend under `examples/backends/<language>/` implements this contract by hand using the
+    Meteroid SDK for that language, and the single SPA under `examples/frontend/` consumes it.
+    The contract suite under `examples/tests/contract/` runs against any `BASE_URL` and validates
+    every response against the schemas below, so conformance is enforced here rather than by a
+    code generator.
+
+    ## Modelling rules this contract follows
+
+    * **Decimals are strings.** Everything Meteroid serializes as `format: decimal` (usage totals,
+      entitlement limits, consumed/remaining) stays a string here. Never a JSON number — the values
+      are exact decimals and must survive a round trip.
+    * **Money on invoices is an integer in minor units.** Meteroid's invoice amounts are `int64`
+      minor units (cents), *not* decimals; this contract keeps them integers and says so on each field.
+    * **Unions are explicitly tagged.** Entitlement values and config values are discriminated by a
+      literal `type` / `kind` property, mirroring Meteroid's own discriminators. No untagged `oneOf`.
+    * **Schemas are strict.** Every object lists `required` and sets `additionalProperties: false`.
+      The one deliberate exception is the inbound webhook envelope, whose shape Meteroid owns.
+    * **In responses, nullable means present-and-null — never absent.** Every property of every
+      response schema is listed in `required`; optionality is expressed by the type union
+      `[T, "null"]`, never by leaving a key out. A strict statically-typed deserializer therefore
+      never has to distinguish "missing" from "null", and `additionalProperties: false` plus a total
+      `required` list means the JSON shape of each response is fully determined.
+    * **In request bodies, absent and `null` are equivalent.** Request properties are optional *and*
+      nullable, and backends MUST treat an omitted key, an explicit `null`, and an entirely absent
+      request body as the same thing: "use the default". `POST /api/session` and
+      `POST /api/portal-session` therefore accept no body, an empty body, and `{}` alike.
+    * **Timestamps are RFC 3339 with an explicit offset** (`format: date-time`, in practice UTC
+      `…Z`); **dates are `YYYY-MM-DD`** (`format: date`) and carry no timezone, exactly as Meteroid
+      returns them. Billing period boundaries are dates, event and audit times are date-times.
+
+    ## Authentication
+
+    There is no real user auth to build — that is not what this demo teaches. Instead:
+
+    1. `POST /api/session` creates a fresh **demo workspace**: the backend creates a new Meteroid
+       customer with a generated alias (`scribe-demo-<random>`) and returns an opaque session token.
+    2. Every other `/api/*` operation takes that token as `Authorization: Bearer <session_token>`.
+
+    The token is expected to be a stateless HMAC-signed encoding of the customer alias
+    (`v1.<base64url(alias)>.<base64url(hmac_sha256(secret, alias))>`, secret from
+    `SCRIBE_SESSION_SECRET`) so that all backends mint and accept interchangeable tokens and the
+    contract suite can reuse one session across them. It is opaque to the frontend and to the tests.
+
+    ## Catalog resolution
+
+    The Meteroid catalog (product family, billable metric, plans, features, entitlements) is seeded
+    **once, by hand, out of band** — see `examples/CATALOG.md`. The demo never creates catalog
+    objects; it resolves them by their documented stable identifiers on every run and fails loudly
+    with `CATALOG_NOT_SEEDED` (HTTP 503) when something is missing. Only *customers* are created at
+    runtime, one per demo session.
+
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+
+servers:
+  - url: http://localhost:{port}
+    description: A locally running Scribe backend (any language).
+    variables:
+      port:
+        default: "8080"
+        description: 8080 for Rust, 8081 for Java, 8082 for TypeScript by convention.
+
+tags:
+  - name: session
+    description: Demo workspace lifecycle. Creates the Meteroid customer.
+  - name: catalog
+    description: Pricing table resolved from Meteroid plans.
+  - name: billing
+    description: Checkout, customer portal, invoices.
+  - name: entitlements
+    description: Feature gating — the normalized entitlement view.
+  - name: usage
+    description: The metered action and its usage reporting.
+  - name: webhooks
+    description: Signed inbound events from Meteroid.
+  - name: ops
+    description: Liveness and configuration reporting.
+
+security:
+  - sessionToken: []
+
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      tags: [ops]
+      summary: Liveness and configuration probe.
+      description: |
+        Unauthenticated. Reports which backend implementation is answering and whether it is
+        configured well enough to talk to Meteroid. The contract suite calls this first so a
+        misconfigured run fails with a clear message instead of a wall of 5xx.
+      security: []
+      responses:
+        "200":
+          description: The backend is up.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "500": { $ref: "#/components/responses/InternalError" }
+
+  /api/session:
+    post:
+      operationId: createSession
+      tags: [session]
+      summary: Create a demo workspace (and a Meteroid customer).
+      description: |
+        Creates a brand-new Meteroid customer with a generated, unique alias and returns a session
+        token bound to it. Every demo run gets its own customer; the same Meteroid API key is reused
+        indefinitely. No subscription exists yet — the workspace starts unsubscribed, and the
+        frontend drives the visitor to `POST /api/checkout`.
+
+        Meteroid's `CustomerCreateRequest` requires `name`, `invoicing_emails`, `currency` and
+        `custom_taxes`. The backend fills them from the (optional) request body plus generated
+        defaults, and takes the currency from `SCRIBE_DEFAULT_CURRENCY`. **That currency must equal
+        the currency of the seeded plans** — Meteroid rejects a checkout whose customer and plan
+        version disagree — so a mismatch is reported as `CATALOG_NOT_SEEDED` at checkout time.
+
+        The request body is optional: no body, an empty body and `{}` are all equivalent.
+
+        **SDK surface:** Rust `client.customers().create_customer(CustomerCreateRequest { .. })`;
+        Java `new Customers(httpClient).createCustomer(request)`.
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "201":
+          description: Workspace created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSessionResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+        # Deliberately no 503: creating a customer touches no catalog object. The
+        # currency mismatch described above is detected at `POST /api/checkout`, which
+        # is the first operation that has to reconcile the customer with a plan version.
+
+  /api/me:
+    get:
+      operationId: getMe
+      tags: [session]
+      summary: The current workspace, its subscription and its plan.
+      description: |
+        Resolves the session's customer, its most relevant subscription, and the plan that
+        subscription is on. `subscription` and `plan` are both `null` for a workspace that has
+        never checked out.
+
+        Subscriptions are fetched with `GET /api/v1/subscriptions?customer_id=<alias>`, which accepts
+        a customer id *or* alias, so no extra id lookup is needed.
+
+        **Which subscription is "the most relevant" one** is pinned down here so every backend
+        picks the same one, and so `GET /api/usage` and `POST /api/transcriptions` agree with this
+        endpoint: ask Meteroid with `order_by=created_at.desc`, take the first subscription whose
+        status is `ACTIVE` or `TRIAL_ACTIVE`, and otherwise the first of the list (the most
+        recently created, whatever its status).
+
+        The seeded catalog is consulted only when a subscription exists — it is what maps
+        Meteroid's `plan_id`/`plan_name` onto this contract's `plan_code`. A workspace that has
+        never subscribed therefore answers even on a tenant whose catalog is unreachable, while a
+        subscribed one reports `CATALOG_NOT_SEEDED`; that is deliberate, because this is the
+        frontend's boot call and an unseeded tenant should be visible immediately rather than
+        first surfacing at checkout.
+
+        **SDK surface:** Rust `client.customers().get_customer(alias)` and
+        `client.subscriptions().list_subscriptions(..)`; Java `getCustomer` / `listSubscriptions`.
+      responses:
+        "200":
+          description: Current workspace.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+        "503": { $ref: "#/components/responses/CatalogNotSeeded" }
+
+  /api/plans:
+    get:
+      operationId: listPlans
+      tags: [catalog]
+      summary: The pricing table.
+      description: |
+        The three seeded Scribe plans, each resolved to its latest published (non-draft) version,
+        with a flattened summary of that version's price components. Ordered `free`, `pro`, `scale`.
+
+        Meteroid plans have no user-supplied `code`, so the backend resolves each plan by its exact
+        seeded **name** (see `examples/CATALOG.md`) and maps it onto the stable `plan_code` this
+        contract uses. `GET /api/v1/plans?search=…` is a fuzzy name match, so the backend must
+        additionally require `name == <seeded name>` exactly. A missing or unpublished plan is a
+        seeding error, not a runtime condition: the backend returns `CATALOG_NOT_SEEDED` naming the
+        plan it could not resolve.
+
+        `GET /api/v1/plans` already returns full `Plan` objects, including `version_id` and
+        `price_components`, so the pricing table needs no per-plan follow-up call; the marketing
+        bullets in `features` come from `GET /api/v1/plan-versions/{version_id}/entitlements`, whose
+        `ResolvedEntitlement.feature` carries the feature `code`.
+
+        **SDK surface:** Rust `client.plans().list_plans(..)` and
+        `client.plans().list_plan_version_entitlements(plan_version_id)`; Java `listPlans` /
+        `listPlanVersionEntitlements`.
+      security: []
+      responses:
+        "200":
+          description: The pricing table.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlanListResponse"
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+        "503": { $ref: "#/components/responses/CatalogNotSeeded" }
+
+  /api/checkout:
+    post:
+      operationId: createCheckout
+      tags: [billing]
+      summary: Start a hosted checkout for a plan.
+      description: |
+        Creates a Meteroid checkout session for the workspace's customer against the requested
+        plan's published version and returns the hosted checkout URL to redirect to. Used both for
+        the first subscription and for upgrades — Meteroid decides the `checkout_type`.
+
+        A Meteroid checkout session may legitimately carry a null `checkout_url` (non-self-serve
+        checkout types). This contract treats that as a hard failure for the demo's purposes and
+        returns `CHECKOUT_UNAVAILABLE` rather than handing the frontend a null it cannot use.
+
+        Meteroid's `CreateCheckoutSessionRequest.customer_id` accepts a customer id *or* alias, so
+        the backend passes the workspace alias straight through.
+
+        **SDK surface:** Rust `client.checkout_sessions().create_checkout_session(req)`;
+        Java `createCheckoutSession(request)`. The response is `{ session: CheckoutSession }`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCheckoutRequest"
+      responses:
+        "201":
+          description: Checkout session created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCheckoutResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: |
+            Checkout cannot be started for this workspace and plan — for example the workspace is
+            already subscribed to the requested plan version.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              examples:
+                unavailable:
+                  value:
+                    code: CHECKOUT_UNAVAILABLE
+                    message: "Meteroid returned a checkout session without a hosted URL (checkout_type=PLAN_CHANGE)."
+                    quota: null
+                    upgrade_plan_code: null
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+        "503": { $ref: "#/components/responses/CatalogNotSeeded" }
+
+  /api/entitlements:
+    get:
+      operationId: listEntitlements
+      tags: [entitlements]
+      summary: Normalized entitlements for feature gating.
+      description: |
+        The workspace's effective entitlements, one entry per feature, normalized into an explicitly
+        tagged union the frontend can switch on. This is the view the SPA gates the UI with and the
+        same view `POST /api/transcriptions` enforces server-side.
+
+        Meteroid's `EffectiveEntitlementValue` is a `oneOf` discriminated on `type`
+        (`BOOLEAN` / `METERED` / `CONFIG`); this contract keeps that discriminator, flattens the
+        metered `spec`+`usage` pair into one object, and preserves every decimal as a string.
+
+        Note that Meteroid's `MeteredEntitlementUsage` declares *no* required properties, so
+        `consumed`, `remaining` and `reset_at` may be absent on the wire. Backends normalize an
+        absent value to an explicit `null` here, per this contract's response nullability rule.
+
+        Expected feature codes for the seeded Scribe catalog: `transcription_minutes` (metered),
+        `sso` (boolean), `retention_days` (config/number), `seats` (config/number). A workspace with
+        no subscription still returns the feature-level defaults Meteroid resolves, which may be an
+        empty list.
+
+        **SDK surface:** Rust `client.customers().get_effective_entitlements(alias)`;
+        Java `getEffectiveEntitlements(idOrAlias)`. The response is `{ data: EffectiveEntitlement[] }`.
+      responses:
+        "200":
+          description: Effective entitlements.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntitlementListResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+
+  /api/transcriptions:
+    get:
+      operationId: listTranscriptions
+      tags: [usage]
+      summary: Transcriptions created in this workspace.
+      description: |
+        Demo-local history, newest first. Backends keep this in memory; it is not persisted and it
+        resets when the process restarts. Meteroid is the source of truth for *usage*, not for the
+        application objects that produced it.
+      responses:
+        "200":
+          description: Transcription history.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranscriptionListResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalError" }
+
+    post:
+      operationId: createTranscription
+      tags: [usage]
+      summary: Transcribe audio — the metered action.
+      description: |
+        The centerpiece of the demo. In order:
+
+        1. Read the workspace's effective entitlements and find `transcription_minutes`.
+        2. If the entitlement is missing or `enabled` is `false` → **403 `FEATURE_NOT_ENTITLED`**.
+           Note that "missing" is ambiguous per-request: an unsubscribed workspace and an unseeded
+           tenant both produce an empty entitlement list. Backends resolve the ambiguity once at
+           startup with `GET /api/v1/features/{code}` for the four seeded codes, and report an
+           unseeded tenant as `CATALOG_NOT_SEEDED` rather than letting it masquerade as a 403.
+
+           If the entitlement is *present but not `METERED`* — the feature exists in the tenant but
+           was created as boolean or config in the dashboard — that is a seeding mistake, not a
+           customer-facing paywall, and it is **503 `CATALOG_NOT_SEEDED`**. Never a 403: an
+           operator error must not look like "your plan doesn't include that".
+        3. If it has a `limit` and the requested minutes exceed the remaining balance →
+           **402 `QUOTA_EXHAUSTED`**, with the live quota snapshot and the plan to upgrade to
+           echoed back in the error body so the frontend can render an upgrade prompt without a
+           second round trip. A `null` limit means unlimited and never trips this branch.
+
+           The remaining balance is Meteroid's `remaining`; because Meteroid may supply a `limit`
+           with no counter yet, backends fall back to `limit - consumed` when `remaining` is null,
+           and to `limit` when both are null. All three are decimal strings and the arithmetic must
+           be exact decimal arithmetic (`rust_decimal`, `BigDecimal`) — never binary floating point,
+           which is how a 0.1-minute clip eventually bills wrong.
+        4. Otherwise produce the (fake) transcript and report consumption to Meteroid by ingesting
+           one event with `code: transcription_minutes`, the workspace's customer alias, and
+           `properties.minutes` set to the billed minutes as a decimal string.
+
+        Because step 2 turns a missing or disabled entitlement into a 403, a 201 always carries a
+        `quota` — an unlimited entitlement is reported as `unlimited: true` with `limit`,
+        `remaining` and `reset_at` null, never as an absent quota.
+
+        Meteroid usage counters are eventually consistent: `quota` in the 201 body is the backend's
+        optimistic local projection of the entitlement it just read, and `GET /api/usage` may lag by
+        a few seconds. Callers must not treat the two as transactionally consistent.
+
+        The ingest is a batch call (`{ events: [ … ] }`, 1–100 events); the demo sends exactly one,
+        with `timestamp` set to now — Meteroid rejects timestamps outside `24h ago .. 1h ahead`
+        unless `allow_backfilling` is set, which this demo never does.
+
+        **SDK surface:** Rust `client.customers().get_effective_entitlements(alias)` then
+        `client.events().ingest_events(IngestEventsRequest { events, .. })`;
+        Java `getEffectiveEntitlements` then `ingestEvents`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTranscriptionRequest"
+      responses:
+        "201":
+          description: Transcribed, and the consumed minutes were reported to Meteroid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTranscriptionResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "402": { $ref: "#/components/responses/QuotaExhausted" }
+        "403": { $ref: "#/components/responses/FeatureNotEntitled" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+        "503": { $ref: "#/components/responses/CatalogNotSeeded" }
+
+  /api/usage:
+    get:
+      operationId: getUsage
+      tags: [usage]
+      summary: Current-period usage for the workspace.
+      description: |
+        Usage for the current billing period, per billable metric, straight from Meteroid. Queried
+        by subscription when the workspace has one (so the period matches the billing cycle),
+        falling back to the customer-scoped query otherwise. `scope` says which happened.
+
+        The two Meteroid endpoints differ in an important way:
+
+        * `GET /api/v1/usage/subscription/{id}` takes `start_date`/`end_date` as **optional** query
+          params; omitting them makes Meteroid use the subscription's current billing period. The
+          backend omits them, so `period_start`/`period_end` are Meteroid's, not the demo's.
+        * `GET /api/v1/usage/customer/{id_or_alias}` **requires** `start_date` and `end_date`. With
+          no subscription there is no billing period to borrow, so the backend supplies the current
+          calendar month (first of the month .. today, UTC) and echoes exactly that back. Treat a
+          `customer`-scoped period as a demo convention, not a billing period.
+
+        `total_value` and every grouped `value` are decimal strings.
+
+        **SDK surface:** Rust `client.usage().get_subscription_usage(..)` /
+        `client.usage().get_customer_usage(..)`; Java `getSubscriptionUsage` / `getCustomerUsage`.
+      responses:
+        "200":
+          description: Usage for the current period.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+
+  /api/portal-session:
+    post:
+      operationId: createPortalSession
+      tags: [billing]
+      summary: Mint a customer-portal token.
+      description: |
+        Issues a short-lived Meteroid customer-portal token for the workspace's customer, so the
+        visitor can manage their payment method and download invoices without the demo implementing
+        any of it. The frontend opens `portal_url` with the `token`.
+
+        Meteroid documents the valid lifetime as 60..2592000 seconds but types the field only as a
+        non-negative int32, so the backend validates the range itself and returns `BAD_REQUEST`
+        rather than forwarding a value Meteroid would reject. The request body is optional: no body,
+        an empty body and `{}` all mean "use Meteroid's default of 86400 seconds".
+
+        **SDK surface:** Rust `client.customers().create_portal_token(alias, req)`;
+        Java `createPortalToken(idOrAlias, request)`. The response is `{ token, portal_url }` —
+        Meteroid returns no expiry, so `expires_in_seconds` below is the value the backend asked for.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePortalSessionRequest"
+      responses:
+        "201":
+          description: Portal token minted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePortalSessionResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+
+  /api/invoices:
+    get:
+      operationId: listInvoices
+      tags: [billing]
+      summary: Invoices for the workspace.
+      description: |
+        The workspace customer's invoices, newest first. A fresh workspace has none, and a workspace
+        that just checked out usually has a `DRAFT` one.
+
+        Amounts are integers in the currency's **minor units** (cents), matching Meteroid.
+
+        Fetched with `GET /api/v1/invoices?customer_id=<alias>&order_by=invoice_date.desc`;
+        `customer_id` accepts an id or an alias, and `limit` below maps onto Meteroid's `per_page`
+        (which also caps at 100).
+
+        **SDK surface:** Rust `client.invoices().list_invoices(..)`; Java `listInvoices(options)`.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of invoices to return.
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Invoices.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvoiceListResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamError" }
+
+  /api/webhooks/meteroid:
+    post:
+      operationId: receiveMeteroidWebhook
+      tags: [webhooks]
+      summary: Signed webhook receiver.
+      description: |
+        Receives Meteroid webhook events, verifying the Standard Webhooks signature over the **raw**
+        request body before parsing it. `svix-*` headers are accepted as aliases for `webhook-*`;
+        timestamps outside a five-minute tolerance are rejected.
+
+        Verification failures return **400 `WEBHOOK_SIGNATURE_INVALID`** — deliberately not 401,
+        which this contract reserves for a bad session token.
+
+        The demo handles `invoice.*` and `subscription.*` events by logging them and surfacing the
+        last few in the frontend's activity feed; every other event type is acknowledged with
+        `handled: false`. Unknown event types are never an error — new Meteroid event types must not
+        break a receiver.
+
+        **The event envelope is not part of `spec/openapi.json`** — webhook endpoints and their
+        payloads are configured in the dashboard and Meteroid publishes no schema for them, so the
+        body schema below is a best-effort description with **no required properties**. A receiver
+        must never reject a correctly signed body for its shape: parse what it recognizes, ack the
+        rest with `handled: false`. `400` is reserved for a failed/absent signature and for a body
+        that is not JSON at all.
+
+        **SDK surface:** Rust `meteroid_rs::webhooks::Webhook::new(secret)?.verify(raw_body, &headers)`;
+        Java `new Webhook(secret).verify(payload, headers)`. Both SDKs also expose a *signer*
+        (`Webhook::sign` / `Webhook.sign(msgId, timestamp, payload)`), which is how the contract
+        suite exercises this endpoint with validly signed payloads and no live tenant.
+
+        Verification runs over the **raw bytes** of the body. A backend that re-serializes the parsed
+        JSON before verifying will fail on any payload whose key order or spacing differs.
+      security: []
+      parameters:
+        - name: webhook-id
+          in: header
+          required: true
+          description: Unique message id. `svix-id` is accepted as an alias.
+          schema: { type: string }
+        - name: webhook-timestamp
+          in: header
+          required: true
+          description: Unix seconds. `svix-timestamp` is accepted as an alias.
+          schema: { type: string }
+        - name: webhook-signature
+          in: header
+          required: true
+          description: Space-separated list of `v1,<base64>` signatures. `svix-signature` is accepted as an alias.
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeteroidWebhookEvent"
+      responses:
+        "202":
+          description: Signature verified and the event was accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookAck"
+        "400":
+          description: |
+            The signature is missing, malformed, expired, or does not match the raw body; or the
+            body is not a Meteroid event envelope.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              examples:
+                bad_signature:
+                  value:
+                    code: WEBHOOK_SIGNATURE_INVALID
+                    message: "Webhook signature verification failed."
+                    quota: null
+                    upgrade_plan_code: null
+        "500": { $ref: "#/components/responses/InternalError" }
+
+components:
+  securitySchemes:
+    sessionToken:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: |
+        The `session_token` returned by `POST /api/session`. Opaque to clients. Not a Meteroid
+        credential — the Meteroid API key never leaves the backend.
+
+  responses:
+    BadRequest:
+      description: The request body or query is invalid.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            invalid:
+              value:
+                code: BAD_REQUEST
+                message: "duration_seconds must be between 1 and 7200."
+                quota: null
+                upgrade_plan_code: null
+
+    Unauthorized:
+      description: The session token is missing, malformed, or not signed by this deployment.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            missing:
+              value:
+                code: UNAUTHORIZED
+                message: "Missing Authorization: Bearer <session_token> header."
+                quota: null
+                upgrade_plan_code: null
+
+    RateLimited:
+      description: |
+        Meteroid throttled the backend (it returns `429` on every endpoint this demo calls) or the
+        backend is throttling itself. Retry after a short backoff; the demo does not add a
+        `Retry-After` header.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            throttled:
+              value:
+                code: RATE_LIMITED
+                message: "Meteroid responded 429. Retry shortly."
+                quota: null
+                upgrade_plan_code: null
+
+    InternalError:
+      description: |
+        An unhandled failure in the demo backend itself — a bug, not a Meteroid or configuration
+        problem. Declared on every operation so the contract suite validates the envelope instead of
+        hitting an untyped framework error page.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            internal:
+              value:
+                code: INTERNAL
+                message: "Unexpected error handling the request."
+                quota: null
+                upgrade_plan_code: null
+
+    QuotaExhausted:
+      description: |
+        The metered entitlement's remaining balance is smaller than the requested amount. The body
+        carries the live quota snapshot and the plan the frontend should offer as an upgrade.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            exhausted:
+              value:
+                code: QUOTA_EXHAUSTED
+                message: "This request needs 12 transcription minutes but only 3.5 remain in the current period."
+                quota:
+                  feature_code: transcription_minutes
+                  enabled: true
+                  limit: "60"
+                  consumed: "56.5"
+                  remaining: "3.5"
+                  reset_at: "2026-10-01T00:00:00Z"
+                  unlimited: false
+                upgrade_plan_code: pro
+
+    FeatureNotEntitled:
+      description: |
+        The workspace's plan does not grant the feature at all, or the entitlement is explicitly
+        disabled. Distinct from `QUOTA_EXHAUSTED`, which means "granted, but used up".
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            not_entitled:
+              value:
+                code: FEATURE_NOT_ENTITLED
+                message: "The transcription_minutes entitlement is not enabled for this workspace."
+                quota: null
+                upgrade_plan_code: pro
+
+    UpstreamError:
+      description: |
+        The Meteroid API returned an error or was unreachable. `UPSTREAM_UNAUTHORIZED` specifically
+        means the backend's `METEROID_API_KEY` is missing, wrong, or revoked — an operator problem.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            upstream:
+              value:
+                code: UPSTREAM_ERROR
+                message: "Meteroid responded 500 to POST /api/v1/events/ingest."
+                quota: null
+                upgrade_plan_code: null
+            bad_key:
+              value:
+                code: UPSTREAM_UNAUTHORIZED
+                message: "Meteroid rejected the API key. Check METEROID_API_KEY."
+                quota: null
+                upgrade_plan_code: null
+
+    CatalogNotSeeded:
+      description: |
+        A catalog object this demo requires is missing from the Meteroid tenant. The demo never
+        creates catalog objects — see `examples/CATALOG.md` and seed them once in the dashboard.
+        The message always names the missing object using the exact identifier the backend looked up.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            missing_plan:
+              value:
+                code: CATALOG_NOT_SEEDED
+                message: 'No published plan named "Scribe Pro" (plan_code=pro). Seed the catalog per examples/CATALOG.md.'
+                quota: null
+                upgrade_plan_code: null
+            missing_feature:
+              value:
+                code: CATALOG_NOT_SEEDED
+                message: 'No feature with code "transcription_minutes". Features cannot be created over the REST API; create it in the Meteroid dashboard.'
+                quota: null
+                upgrade_plan_code: null
+            currency_mismatch:
+              value:
+                code: CATALOG_NOT_SEEDED
+                message: 'Plan "Scribe Pro" is priced in EUR but SCRIBE_DEFAULT_CURRENCY is USD; Meteroid will not check out a customer against a plan in another currency.'
+                quota: null
+                upgrade_plan_code: null
+
+  schemas:
+    # ---------------------------------------------------------------- errors
+
+    ErrorCode:
+      type: string
+      description: |
+        Machine-readable error identifier. Clients switch on this, never on `message`.
+
+        * `BAD_REQUEST` — malformed body or query.
+        * `UNAUTHORIZED` — missing/invalid session token.
+        * `NOT_FOUND` — unmatched route. No operation in this contract takes a path or lookup
+          parameter, so this cannot arise from a documented operation; it exists so that a 404 from
+          a typo still arrives in the standard envelope.
+        * `NO_SUBSCRIPTION` — the operation needs an active subscription and the workspace has none.
+          Reserved: no operation in this contract currently requires one (`GET /api/usage` falls
+          back to the customer scope instead of failing).
+        * `FEATURE_NOT_ENTITLED` — the feature is not granted, or its entitlement is disabled.
+        * `QUOTA_EXHAUSTED` — granted but used up; `quota` is populated.
+        * `CHECKOUT_UNAVAILABLE` — Meteroid produced no hosted checkout URL for this request.
+        * `CATALOG_NOT_SEEDED` — a required catalog object is missing from the tenant.
+        * `WEBHOOK_SIGNATURE_INVALID` — webhook signature verification failed.
+        * `UPSTREAM_UNAUTHORIZED` — the backend's Meteroid API key was rejected.
+        * `UPSTREAM_ERROR` — Meteroid errored or was unreachable.
+        * `RATE_LIMITED` — Meteroid (or the demo) is throttling.
+        * `INTERNAL` — unexpected backend failure.
+      enum:
+        - BAD_REQUEST
+        - UNAUTHORIZED
+        - NOT_FOUND
+        - NO_SUBSCRIPTION
+        - FEATURE_NOT_ENTITLED
+        - QUOTA_EXHAUSTED
+        - CHECKOUT_UNAVAILABLE
+        - CATALOG_NOT_SEEDED
+        - WEBHOOK_SIGNATURE_INVALID
+        - UPSTREAM_UNAUTHORIZED
+        - UPSTREAM_ERROR
+        - RATE_LIMITED
+        - INTERNAL
+
+    Error:
+      type: object
+      description: |
+        The single error envelope every non-2xx response in this contract uses. `quota` and
+        `upgrade_plan_code` are typed rather than free-form so the contract suite can assert on the
+        quota-exhausted path. Both are **always present** and are `null` for errors where they do
+        not apply — a client never has to distinguish an absent key from a null one.
+      required: [code, message, quota, upgrade_plan_code]
+      additionalProperties: false
+      properties:
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        message:
+          type: string
+          description: Human-readable explanation. Safe to show in the demo UI; never parsed.
+          examples: ["Missing Authorization: Bearer <session_token> header."]
+        quota:
+          description: Live quota snapshot. Populated only for `QUOTA_EXHAUSTED`.
+          oneOf:
+            - $ref: "#/components/schemas/QuotaSnapshot"
+            - type: "null"
+        upgrade_plan_code:
+          description: |
+            The plan the frontend should offer as the fix. Populated for `QUOTA_EXHAUSTED` and
+            `FEATURE_NOT_ENTITLED`; `null` for every other error code.
+
+            **Resolution rule**, fixed here so that every backend offers the same upsell: it is one
+            plan up the ladder `free` → `pro` → `scale` from the workspace's current plan, where
+            "current plan" is the plan of the subscription `GET /api/me` would report.
+
+            * no subscription, or a subscription on a plan outside the Scribe catalog → `pro`
+            * `free` → `pro`; `pro` → `scale`; `scale` → `null` (nothing left to sell)
+            * the lookup itself failing → `null`
+
+            That last case matters: this field decorates an error response, so a failure while
+            resolving it must never replace the error the caller actually hit. Backends resolve it
+            lazily, on the `402`/`403` paths only, so the successful path stays at two Meteroid
+            calls.
+          oneOf:
+            - $ref: "#/components/schemas/PlanCode"
+            - type: "null"
+
+    # ---------------------------------------------------------------- shared
+
+    PlanCode:
+      type: string
+      description: |
+        Stable identifier for a Scribe plan, used everywhere in this contract. Meteroid plans carry
+        no user-supplied code, so backends map each of these onto the exact seeded plan **name**
+        documented in `examples/CATALOG.md`.
+      enum: [free, pro, scale]
+
+    Decimal:
+      type: string
+      description: |
+        An exact decimal, serialized as a string — matching Meteroid's `format: decimal`. Never a
+        JSON number.
+      pattern: '^-?\d+(\.\d+)?$'
+      examples: ["60", "3.5", "0"]
+
+    Currency:
+      type: string
+      description: |
+        ISO 4217 currency code, uppercase. Meteroid types this as a closed enum of ~160 codes on
+        customers and subscriptions, but as a bare string on `Plan`; this contract validates the
+        shape only and passes through whatever Meteroid returned.
+      pattern: "^[A-Z]{3}$"
+      examples: ["USD"]
+
+    Health:
+      type: object
+      required: [status, backend, meteroid_configured, version]
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        backend:
+          type: string
+          description: Which implementation is answering. Used in contract-suite reporting.
+          enum: [rust, java, typescript, python, go]
+        meteroid_configured:
+          type: boolean
+          description: |
+            True when `METEROID_API_KEY` and `METEROID_BASE_URL` are set. False means every
+            Meteroid-backed operation will fail with `UPSTREAM_UNAUTHORIZED`.
+        version:
+          description: Backend build version, if it has one.
+          type: [string, "null"]
+
+    # ---------------------------------------------------------------- session
+
+    CreateSessionRequest:
+      type: object
+      description: |
+        All fields optional; the backend generates whatever is not supplied. Omitting a key, sending
+        it as `null`, and sending no body at all are equivalent.
+      additionalProperties: false
+      properties:
+        workspace_name:
+          description: Display name for the workspace, also used as the Meteroid customer name.
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 120
+        email:
+          description: |
+            Invoicing email for the Meteroid customer — Meteroid requires a non-empty
+            `invoicing_emails` array, so the backend generates a demo address when this is omitted.
+          type: [string, "null"]
+          format: email
+          maxLength: 254
+
+    Workspace:
+      type: object
+      description: |
+        A demo workspace — one-to-one with a Meteroid customer.
+
+        There is deliberately **no `created_at`**: Meteroid's `Customer` schema carries no
+        creation timestamp (check `spec/openapi.json` — it has neither `created_at` nor
+        `updated_at`), so `GET /api/me` would have nothing truthful to put there. Every field
+        below is a 1:1 projection of a Meteroid customer field.
+      required: [id, name, customer_id, customer_alias, currency]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Workspace identifier. Equal to `customer_alias`.
+          examples: ["scribe-demo-8f2a1c"]
+        name:
+          type: string
+        customer_id:
+          type: string
+          description: Meteroid customer id.
+          examples: ["cus_7n42DGM5Tflk9n8mt7Fhc7"]
+        customer_alias:
+          type: string
+          description: |
+            Meteroid customer alias. The demo uses the alias — not the id — as the `customer_id`
+            field of ingested events, to show that events can reference your own identifier.
+          examples: ["scribe-demo-8f2a1c"]
+        currency:
+          allOf:
+            - $ref: "#/components/schemas/Currency"
+          description: |
+            The customer's billing currency, from `SCRIBE_DEFAULT_CURRENCY`. Must match the seeded
+            plans' currency or checkout will fail.
+
+    CreateSessionResponse:
+      type: object
+      required: [session_token, workspace]
+      additionalProperties: false
+      properties:
+        session_token:
+          type: string
+          description: "Send as `Authorization: Bearer <session_token>`. Opaque."
+          minLength: 1
+        workspace:
+          $ref: "#/components/schemas/Workspace"
+
+    SubscriptionStatus:
+      type: string
+      description: Mirrors Meteroid's subscription status enum verbatim.
+      enum:
+        - PENDING_ACTIVATION
+        - PENDING_CHARGE
+        - TRIAL_ACTIVE
+        - ACTIVE
+        - TRIAL_EXPIRED
+        - PAUSED
+        - SUSPENDED
+        - CANCELLED
+        - ABORTED
+        - COMPLETED
+        - SUPERSEDED
+        - ERRORED
+
+    Subscription:
+      type: object
+      description: |
+        A projection of Meteroid's `Subscription`. Every field maps 1:1 onto one Meteroid field —
+        nothing here is derived, so the two can never drift.
+      required:
+        [id, status, plan_code, plan_name, plan_version_id, currency, current_period_start,
+         current_period_end, trial_duration_days, created_at]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          examples: ["sub_7n42DGM5Tflk9n8mt7Fhc7"]
+        status:
+          $ref: "#/components/schemas/SubscriptionStatus"
+        plan_code:
+          description: |
+            Null when the subscription is on a plan outside the seeded Scribe catalog — possible if
+            an operator subscribes the customer by hand. Resolved by matching Meteroid's `plan_name`
+            against the seeded names, since Meteroid subscriptions carry no plan code.
+          oneOf:
+            - $ref: "#/components/schemas/PlanCode"
+            - type: "null"
+        plan_name:
+          type: string
+          description: Meteroid's `plan_name`, verbatim.
+        plan_version_id:
+          type: string
+        currency:
+          $ref: "#/components/schemas/Currency"
+        current_period_start:
+          type: string
+          format: date
+          description: Meteroid's `current_period_start` — a date, not a timestamp.
+        current_period_end:
+          description: Meteroid's `current_period_end`. Null for an open-ended period.
+          type: [string, "null"]
+          format: date
+        trial_duration_days:
+          description: |
+            Meteroid's `trial_duration`, in days; null when the subscription has no trial. This is a
+            *duration*, deliberately not a computed trial end date — Meteroid exposes no trial-end
+            field, and deriving one from `start_date` would silently disagree with Meteroid's own
+            anchoring rules.
+          type: [integer, "null"]
+          format: int32
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+
+    MeResponse:
+      type: object
+      required: [workspace, subscription, plan]
+      additionalProperties: false
+      properties:
+        workspace:
+          $ref: "#/components/schemas/Workspace"
+        subscription:
+          description: The workspace's active subscription, or the most recent one. Null if never subscribed.
+          oneOf:
+            - $ref: "#/components/schemas/Subscription"
+            - type: "null"
+        plan:
+          description: The plan `subscription` is on, resolved from the catalog. Null when there is no subscription.
+          oneOf:
+            - $ref: "#/components/schemas/Plan"
+            - type: "null"
+
+    # ---------------------------------------------------------------- catalog
+
+    BillingPeriod:
+      type: string
+      description: Mirrors Meteroid's billing period enum.
+      enum: [MONTHLY, QUARTERLY, SEMIANNUAL, ANNUAL]
+
+    PriceKind:
+      type: string
+      description: |
+        Which Meteroid fee type a price component is — the `type` tag of Meteroid's `Fee` union.
+        `RATE` is a flat recurring price, `USAGE` is pay-as-you-go on a metric, `CAPACITY` is a
+        committed bundle with overage, `SLOT` is per-seat.
+      enum: [RATE, SLOT, CAPACITY, USAGE, EXTRA_RECURRING, ONE_TIME]
+
+    UsagePricingModel:
+      type: string
+      description: |
+        The pricing model of a `USAGE` component, mirroring Meteroid's `PlanUsagePricingModel` tag.
+        Only `PER_UNIT` has a single unit price; for every other model `unit_amount` is `null` and
+        the frontend renders the model name instead of a number.
+      enum: [PER_UNIT, TIERED, VOLUME, PACKAGE, MATRIX]
+
+    PlanPrice:
+      type: object
+      description: |
+        A flattened, display-oriented summary of one Meteroid price component. Deliberately lossy —
+        it exists to render a pricing table, not to reprice anything. Fields that do not apply to
+        the component's `kind` are `null`.
+
+        **Flattening rules** (identical in every backend, so the contract suite can compare them):
+
+        * Meteroid's `PriceComponent.fee` is nullable. A component with no fee has no price to show
+          and is **omitted** from `Plan.prices` entirely.
+        * `RATE` and `SLOT` fees carry `rates: TermRate[]` — one price per billing term. The backend
+          picks the term matching the plan's own cadence when present, else the first entry, and
+          reports that term in `cadence`. Other terms are dropped: this is a pricing *table*.
+        * `CAPACITY` fees carry `thresholds: CapacityThreshold[]`. The backend takes the first
+          threshold: `amount` = its `price`, `included_amount` = its `included_amount`,
+          `unit_amount` = its `per_unit_overage`.
+        * `EXTRA_RECURRING` reports `unit_price` as `amount`; its `quantity` is dropped.
+        * `USAGE` and `CAPACITY` fees name their metric by `metric_id` only, so `unit_name` is
+          resolved through the same `metric_id` → `metric_code` map the entitlement view uses, and
+          is `null` when the metric cannot be resolved.
+      required:
+        [component_id, name, kind, cadence, amount, unit_amount, included_amount, unit_name,
+         pricing_model]
+      additionalProperties: false
+      properties:
+        component_id:
+          type: string
+        name:
+          type: string
+          examples: ["Pro monthly", "Included transcription minutes"]
+        kind:
+          $ref: "#/components/schemas/PriceKind"
+        cadence:
+          description: Billing cadence. Null for `ONE_TIME`, which has no cadence in Meteroid.
+          oneOf:
+            - $ref: "#/components/schemas/BillingPeriod"
+            - type: "null"
+        amount:
+          description: |
+            Recurring or one-off price for `RATE` / `SLOT` (per slot) / `EXTRA_RECURRING` /
+            `ONE_TIME`, or the committed price of the first threshold for `CAPACITY`. Null for
+            `USAGE`.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        unit_amount:
+          description: |
+            Price per unit: the `PER_UNIT` rate for `USAGE`, or `per_unit_overage` for `CAPACITY`.
+            Null for every other kind, and for a `USAGE` component whose `pricing_model` is not
+            `PER_UNIT`.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        included_amount:
+          description: |
+            Units included before overage, for `CAPACITY`. Meteroid types this as an integer count;
+            it is carried as a decimal string here so that every quantity in this contract has one
+            representation. Null for every other kind.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        unit_name:
+          description: |
+            What a unit is called — the resolved metric code for `USAGE`/`CAPACITY`, the fee's
+            `slot_unit_name` for `SLOT`. Null for the other kinds and when a metric code cannot be
+            resolved.
+          type: [string, "null"]
+          examples: ["transcription_minutes", "seat"]
+        pricing_model:
+          description: Set for `USAGE` components; null for every other kind.
+          oneOf:
+            - $ref: "#/components/schemas/UsagePricingModel"
+            - type: "null"
+
+    Plan:
+      type: object
+      description: A seeded Scribe plan, resolved to its latest published version.
+      required:
+        [code, name, description, plan_id, plan_version_id, version, currency, is_free, trial_days,
+         prices, features]
+      additionalProperties: false
+      properties:
+        code:
+          $ref: "#/components/schemas/PlanCode"
+        name:
+          type: string
+          description: The plan's exact Meteroid name — the key the backend resolved it by.
+          examples: ["Scribe Pro"]
+        description:
+          type: [string, "null"]
+        plan_id:
+          type: string
+        plan_version_id:
+          type: string
+          description: |
+            Meteroid's `Plan.version_id` for the active (published) version. This is what
+            `POST /api/checkout` sends as `plan_version_id`.
+        version:
+          type: integer
+          format: int32
+          minimum: 0
+        currency:
+          $ref: "#/components/schemas/Currency"
+        is_free:
+          type: boolean
+          description: True when Meteroid's `plan_type` is `FREE`.
+        trial_days:
+          description: |
+            `trial.duration_days` from Meteroid's `TrialConfig`; null when the plan has no trial.
+          type: [integer, "null"]
+          format: int32
+          minimum: 0
+        prices:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlanPrice"
+        features:
+          type: array
+          description: |
+            Marketing bullets for the pricing table, derived from the plan version's entitlements
+            (`GET /api/v1/plan-versions/{id}/entitlements`) so the pricing page and the enforcement
+            path cannot drift apart.
+          items:
+            $ref: "#/components/schemas/PlanFeatureLine"
+
+    PlanFeatureLine:
+      type: object
+      description: One entitlement of a plan version, rendered for humans.
+      required: [feature_code, label]
+      additionalProperties: false
+      properties:
+        feature_code:
+          type: string
+          examples: ["transcription_minutes", "sso", "retention_days", "seats"]
+        label:
+          type: string
+          examples: ["600 transcription minutes / month", "SSO included", "90-day retention"]
+
+    PlanListResponse:
+      type: object
+      required: [plans]
+      additionalProperties: false
+      properties:
+        plans:
+          type: array
+          description: Ordered cheapest-first — `free`, `pro`, `scale`.
+          items:
+            $ref: "#/components/schemas/Plan"
+
+    # ---------------------------------------------------------------- checkout
+
+    CreateCheckoutRequest:
+      type: object
+      required: [plan_code]
+      additionalProperties: false
+      properties:
+        plan_code:
+          $ref: "#/components/schemas/PlanCode"
+        coupon_code:
+          description: Optional promotion code, passed straight through to Meteroid.
+          type: [string, "null"]
+          minLength: 1
+          maxLength: 64
+
+    CreateCheckoutResponse:
+      type: object
+      required: [checkout_url, checkout_session_id, plan_code, plan_version_id, expires_at]
+      additionalProperties: false
+      properties:
+        checkout_url:
+          type: string
+          format: uri
+          description: |
+            Hosted Meteroid checkout page. Never null — a null URL from Meteroid becomes a
+            `CHECKOUT_UNAVAILABLE` error instead.
+        checkout_session_id:
+          type: string
+        plan_code:
+          $ref: "#/components/schemas/PlanCode"
+        plan_version_id:
+          type: string
+        expires_at:
+          description: Meteroid's `expires_at`. Null means the session does not expire.
+          type: [string, "null"]
+          format: date-time
+
+    # ----------------------------------------------------------- entitlements
+
+    ResetPeriodType:
+      type: string
+      description: Mirrors Meteroid's reset-period discriminator.
+      enum: [BILLING_CYCLE, CALENDAR, FIXED_WINDOW, SLIDING_WINDOW, NEVER]
+
+    CalendarUnit:
+      type: string
+      description: Mirrors Meteroid's `CalendarUnit` enum verbatim.
+      enum: [HOUR, DAY, WEEK, MONTH, YEAR]
+
+    ResetPeriod:
+      type: object
+      description: |
+        Flattened reset period. Meteroid models this as its own tagged union
+        (`BillingCycleResetPeriod`, `CalendarResetPeriod`, `FixedWindowResetPeriod`,
+        `SlidingWindowResetPeriod`, `NeverResetPeriod`); every variant beyond the tag carries at
+        most an `interval`+`unit` pair, so this contract keeps the tag and makes both fields
+        nullable rather than nesting a second union inside the entitlement union.
+
+        `interval` and `unit` are non-null together, for `CALENDAR`, `FIXED_WINDOW` and
+        `SLIDING_WINDOW`, and both null for `BILLING_CYCLE` and `NEVER`.
+      required: [type, interval, unit]
+      additionalProperties: false
+      properties:
+        type:
+          $ref: "#/components/schemas/ResetPeriodType"
+        interval:
+          description: |
+            Null for `BILLING_CYCLE` and `NEVER`. Meteroid's own minimum is 0, not 1.
+          type: [integer, "null"]
+          format: int32
+          minimum: 0
+        unit:
+          description: Calendar unit for the interval. Null for `BILLING_CYCLE` and `NEVER`.
+          oneOf:
+            - $ref: "#/components/schemas/CalendarUnit"
+            - type: "null"
+
+    QuotaSnapshot:
+      type: object
+      description: |
+        The consumption state of one metered entitlement at a point in time. Returned inside
+        successful metered actions and inside `QUOTA_EXHAUSTED` errors, so the frontend renders the
+        same widget either way. All amounts are decimal strings.
+
+        When `unlimited` is `true`, `limit` and `remaining` are both `null` and `consumed` may still
+        carry a running total.
+      required: [feature_code, enabled, limit, consumed, remaining, reset_at, unlimited]
+      additionalProperties: false
+      properties:
+        feature_code:
+          type: string
+          examples: ["transcription_minutes"]
+        enabled:
+          type: boolean
+          description: The entitlement's kill switch. False means the feature is off entirely.
+        limit:
+          description: Cap for the period. Null means unlimited.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        consumed:
+          description: Amount consumed in the current period. Null when Meteroid has no counter yet.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        remaining:
+          description: |
+            Amount left in the period. Null when `limit` is null (unlimited). When Meteroid supplies
+            a `limit` but no `remaining`, backends fill this in as `limit - consumed` (or `limit`
+            when `consumed` is also null), so a limited entitlement always reports a balance here —
+            it is the number the quota check compares against.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        reset_at:
+          description: |
+            When the counter next resets, from Meteroid's `MeteredEntitlementUsage.reset_at`. Null
+            for `NEVER` reset periods and whenever Meteroid does not supply one.
+          type: [string, "null"]
+          format: date-time
+        unlimited:
+          type: boolean
+          description: Convenience mirror of `limit == null`, so clients need not special-case null.
+
+    NumberConfigValue:
+      type: object
+      description: |
+        A numeric config value. Meteroid's `NumberConfigValue.value` is `type: string,
+        format: decimal`, so this stays a decimal string — `retention_days: "90"`, not `90`.
+      required: [kind, value]
+      additionalProperties: false
+      properties:
+        kind:
+          type: string
+          const: NUMBER
+        value:
+          $ref: "#/components/schemas/Decimal"
+
+    BooleanConfigValue:
+      type: object
+      required: [kind, value]
+      additionalProperties: false
+      properties:
+        kind:
+          type: string
+          const: BOOLEAN
+        value:
+          type: boolean
+
+    TextConfigValue:
+      type: object
+      required: [kind, value]
+      additionalProperties: false
+      properties:
+        kind:
+          type: string
+          const: TEXT
+        value:
+          type: string
+
+    JsonConfigValue:
+      type: object
+      required: [kind, value]
+      additionalProperties: false
+      properties:
+        kind:
+          type: string
+          const: JSON
+        value:
+          description: |
+            Arbitrary JSON, passed through unchanged — any JSON value, `null` included. Deserialize
+            it as an untyped JSON value (`serde_json::Value`, `JsonNode`), never as a struct.
+
+    ConfigValue:
+      description: |
+        A typed configuration value, tagged by `kind`. Meteroid's `ConfigValueType` also has `MAP`
+        and `SELECT`; backends normalize `MAP` onto `JSON` and `SELECT` onto `TEXT`, so clients only
+        ever see the four kinds below.
+
+        Meteroid discriminates its own `ConfigValue` on `kind` but omits that property from the
+        variant schemas; this contract declares it explicitly as a `const`, so the union is
+        deserializable by a strict internally-tagged decoder without any generator-specific
+        discriminator support.
+      oneOf:
+        - $ref: "#/components/schemas/NumberConfigValue"
+        - $ref: "#/components/schemas/BooleanConfigValue"
+        - $ref: "#/components/schemas/TextConfigValue"
+        - $ref: "#/components/schemas/JsonConfigValue"
+      discriminator:
+        propertyName: kind
+        mapping:
+          NUMBER: "#/components/schemas/NumberConfigValue"
+          BOOLEAN: "#/components/schemas/BooleanConfigValue"
+          TEXT: "#/components/schemas/TextConfigValue"
+          JSON: "#/components/schemas/JsonConfigValue"
+
+    BooleanEntitlementValue:
+      type: object
+      description: An on/off feature — Scribe uses this for `sso`.
+      required: [type, enabled]
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: BOOLEAN
+        enabled:
+          type: boolean
+
+    MeteredEntitlementValue:
+      type: object
+      description: |
+        A consumption-limited feature — Scribe uses this for `transcription_minutes`. Flattens
+        Meteroid's `spec` (limit, reset period, kill switch) and `usage` (consumed, remaining,
+        reset_at) into one object. All amounts are decimal strings.
+
+        Meteroid's `MeteredEntitlementUsage` requires none of its three properties, so `consumed`,
+        `remaining` and `reset_at` arrive absent for an entitlement with no counter yet; they are
+        normalized to explicit nulls here.
+      required:
+        [type, enabled, limit, consumed, remaining, unlimited, reset_at, reset_period, metric_code]
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: METERED
+        enabled:
+          type: boolean
+          description: Meteroid's per-entitlement kill switch. False means the feature is off.
+        limit:
+          description: Cap for the period. Null means unlimited.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        consumed:
+          description: Consumed in the current period. Null when Meteroid has no counter yet.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        remaining:
+          description: |
+            Remaining in the current period. Null **only** when `limit` is null (unlimited).
+
+            This is the same derived balance `QuotaSnapshot.remaining` carries, and it is derived
+            the same way: Meteroid's `remaining` when it supplies one, else `limit - consumed`,
+            else `limit`. The two must agree — the SPA's usage bar reads this field and the `402`
+            error body reads `QuotaSnapshot`, and a limited entitlement that reported a balance in
+            one place and `null` in the other would make them contradict each other.
+          oneOf:
+            - $ref: "#/components/schemas/Decimal"
+            - type: "null"
+        unlimited:
+          type: boolean
+          description: Convenience mirror of `limit == null`.
+        reset_at:
+          description: When the counter next resets. Null when Meteroid does not supply one.
+          type: [string, "null"]
+          format: date-time
+        reset_period:
+          $ref: "#/components/schemas/ResetPeriod"
+        metric_code:
+          description: |
+            Code of the billable metric this entitlement counts. Meteroid returns only a
+            `metric_id`, so backends resolve it through a `metric_id` → `metric_code` map built once
+            at startup from `GET /api/v1/metrics` and refreshed on a miss. Null when the metric
+            cannot be resolved — this is deliberately not fatal, because the code is presentational
+            (it lines entitlements up with `GET /api/usage`) and the quota check never uses it.
+          type: [string, "null"]
+          examples: ["transcription_minutes"]
+
+    ConfigEntitlementValue:
+      type: object
+      description: A static typed value — Scribe uses this for `retention_days` and `seats`.
+      required: [type, value]
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          const: CONFIG
+        value:
+          $ref: "#/components/schemas/ConfigValue"
+
+    EntitlementValue:
+      description: |
+        The three-way entitlement union, tagged by `type` exactly as Meteroid tags it. Clients
+        switch on `type` and never guess from the shape.
+
+        As with `ConfigValue`, the tag is declared explicitly on each variant, so the union survives
+        a strict internally-tagged deserializer even without discriminator support.
+      oneOf:
+        - $ref: "#/components/schemas/BooleanEntitlementValue"
+        - $ref: "#/components/schemas/MeteredEntitlementValue"
+        - $ref: "#/components/schemas/ConfigEntitlementValue"
+      discriminator:
+        propertyName: type
+        mapping:
+          BOOLEAN: "#/components/schemas/BooleanEntitlementValue"
+          METERED: "#/components/schemas/MeteredEntitlementValue"
+          CONFIG: "#/components/schemas/ConfigEntitlementValue"
+
+    Entitlement:
+      type: object
+      required: [feature_code, feature_name, value]
+      additionalProperties: false
+      properties:
+        feature_code:
+          type: string
+          description: The stable code the operator seeded. This is what application code gates on.
+          examples: ["transcription_minutes", "sso", "retention_days", "seats"]
+        feature_name:
+          type: string
+          examples: ["Transcription minutes"]
+        value:
+          $ref: "#/components/schemas/EntitlementValue"
+
+    EntitlementListResponse:
+      type: object
+      required: [entitlements]
+      additionalProperties: false
+      properties:
+        entitlements:
+          type: array
+          description: |
+            One entry per feature the customer is entitled to, in the order Meteroid returned them.
+            May be empty for a workspace with no subscription and no feature-level defaults.
+          items:
+            $ref: "#/components/schemas/Entitlement"
+
+    # ----------------------------------------------------------- transcription
+
+    CreateTranscriptionRequest:
+      type: object
+      required: [title, duration_seconds]
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          examples: ["Weekly standup"]
+        duration_seconds:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 7200
+          description: |
+            Length of the (simulated) audio. Billed minutes are `duration_seconds / 60` rounded up
+            to two decimals and reported to Meteroid as a decimal string.
+          examples: [210]
+
+    Transcription:
+      type: object
+      required: [id, title, duration_seconds, minutes_billed, text, created_at, event_id]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          examples: ["tr_01J9Z4X0000000000000000000"]
+        title:
+          type: string
+        duration_seconds:
+          type: integer
+          format: int32
+          minimum: 1
+        minutes_billed:
+          allOf:
+            - $ref: "#/components/schemas/Decimal"
+          description: Minutes reported to Meteroid for this transcription.
+        text:
+          type: string
+          description: The (simulated) transcript. The demo does no real speech recognition.
+        created_at:
+          type: string
+          format: date-time
+        event_id:
+          type: string
+          maxLength: 255
+          description: |
+            The `event_id` of the usage event ingested into Meteroid (max 255 characters there).
+            Deterministic per transcription, which makes the ingest idempotent on retry.
+
+    CreateTranscriptionResponse:
+      type: object
+      required: [transcription, quota]
+      additionalProperties: false
+      properties:
+        transcription:
+          $ref: "#/components/schemas/Transcription"
+        quota:
+          allOf:
+            - $ref: "#/components/schemas/QuotaSnapshot"
+          description: |
+            The backend's projection of the metered entitlement after this call: the entitlement it
+            read, minus the minutes it just billed. **Never null on a 201** — a request that got
+            this far had a metered entitlement, since a missing or disabled one is a 403. An
+            unlimited entitlement is reported with `unlimited: true` and null `limit`/`remaining`.
+
+            Meteroid's own counters are eventually consistent and may briefly disagree with this
+            projection; `GET /api/usage` is the authority once it catches up.
+
+    TranscriptionListResponse:
+      type: object
+      required: [transcriptions]
+      additionalProperties: false
+      properties:
+        transcriptions:
+          type: array
+          description: Newest first. In-memory only; empty after a backend restart.
+          items:
+            $ref: "#/components/schemas/Transcription"
+
+    # ---------------------------------------------------------------- usage
+
+    GroupedUsage:
+      type: object
+      required: [dimensions, value]
+      additionalProperties: false
+      properties:
+        dimensions:
+          type: object
+          description: Segmentation keys and values for this slice.
+          additionalProperties:
+            type: string
+        value:
+          $ref: "#/components/schemas/Decimal"
+
+    MetricUsage:
+      type: object
+      description: |
+        One metric's usage for the period. Meteroid's `MetricUsage` also carries `metric_id`, which
+        the demo drops: `metric_code` is the stable identifier application code uses.
+      required: [metric_code, metric_name, total_value, grouped_usage]
+      additionalProperties: false
+      properties:
+        metric_code:
+          type: string
+          examples: ["transcription_minutes"]
+        metric_name:
+          type: string
+        total_value:
+          allOf:
+            - $ref: "#/components/schemas/Decimal"
+          description: Total for the period. A decimal string, never a number.
+        grouped_usage:
+          type: array
+          description: Per-dimension breakdown. Empty when the metric has no segmentation.
+          items:
+            $ref: "#/components/schemas/GroupedUsage"
+
+    UsageResponse:
+      type: object
+      required: [period_start, period_end, scope, metrics]
+      additionalProperties: false
+      properties:
+        period_start:
+          type: string
+          format: date
+          description: |
+            Meteroid's `period_start` when `scope` is `subscription`; the first day of the current
+            UTC calendar month when `scope` is `customer`.
+        period_end:
+          type: string
+          format: date
+          description: |
+            Meteroid's `period_end` when `scope` is `subscription`; today (UTC) when `scope` is
+            `customer`.
+        scope:
+          type: string
+          description: |
+            Whether the period came from the workspace's subscription billing cycle or from the
+            customer-wide fallback used when there is no subscription. The customer-scoped Meteroid
+            endpoint requires an explicit date range, so a `customer` period is chosen by the demo,
+            not by Meteroid.
+          enum: [subscription, customer]
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricUsage"
+
+    # ---------------------------------------------------------------- portal
+
+    CreatePortalSessionRequest:
+      type: object
+      description: |
+        Optional in every sense: no body, an empty body, `{}`, and `{"expires_in_seconds": null}`
+        all mean "use the default".
+      additionalProperties: false
+      properties:
+        expires_in_seconds:
+          description: |
+            Token lifetime. Meteroid documents 60..2592000 and defaults to 86400. Values outside
+            that range are rejected here with `BAD_REQUEST` rather than forwarded.
+          type: [integer, "null"]
+          format: int32
+          minimum: 60
+          maximum: 2592000
+
+    CreatePortalSessionResponse:
+      type: object
+      required: [portal_url, token, expires_in_seconds]
+      additionalProperties: false
+      properties:
+        portal_url:
+          type: string
+          format: uri
+          description: Base URL of the Meteroid customer portal.
+        token:
+          type: string
+          description: Short-lived JWT granting portal access for this workspace's customer.
+        expires_in_seconds:
+          description: |
+            The lifetime the backend requested (the request value, or 86400). Meteroid returns only
+            `{ token, portal_url }`, so this is echoed, not read back from the token.
+          type: integer
+          format: int32
+          minimum: 60
+          maximum: 2592000
+
+    # ---------------------------------------------------------------- invoices
+
+    InvoiceStatus:
+      type: string
+      description: Mirrors Meteroid's invoice status enum.
+      enum: [DRAFT, FINALIZED, UNCOLLECTIBLE, VOID, CLOSED]
+
+    Invoice:
+      type: object
+      description: |
+        Invoice summary. `total` and `amount_due` are integers in the currency's **minor units**
+        (cents) — Meteroid models invoice money as an integer, not as a decimal, and this contract
+        does not convert. This is the one place the decimals-are-strings rule does not apply; do not
+        "fix" it for consistency.
+
+        Meteroid currently types these as `int32`; the contract widens them to `int64` so a future
+        Meteroid widening does not become a breaking change here. Backends widen on the way out.
+      required:
+        [id, invoice_number, status, currency, invoice_date, due_date, total, amount_due]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        invoice_number:
+          type: string
+        status:
+          $ref: "#/components/schemas/InvoiceStatus"
+        currency:
+          $ref: "#/components/schemas/Currency"
+        invoice_date:
+          type: string
+          format: date
+          description: Meteroid's `invoice_date` — the emission date.
+        due_date:
+          description: Null when the invoice has no due date (net terms 0, or a draft).
+          type: [string, "null"]
+          format: date
+        total:
+          type: integer
+          format: int64
+          description: Invoice total in minor units.
+        amount_due:
+          type: integer
+          format: int64
+          description: Outstanding amount in minor units.
+
+    InvoiceListResponse:
+      type: object
+      required: [invoices]
+      additionalProperties: false
+      properties:
+        invoices:
+          type: array
+          description: Newest first.
+          items:
+            $ref: "#/components/schemas/Invoice"
+
+    # ---------------------------------------------------------------- webhooks
+
+    MeteroidWebhookEvent:
+      type: object
+      description: |
+        A Meteroid webhook envelope. Meteroid owns this shape, adds event types over time, and —
+        importantly — **publishes no schema for it**: webhook payloads do not appear anywhere in
+        `spec/openapi.json`, because endpoints are configured in the dashboard.
+
+        So this is the one schema in the contract that stays open *and* has no required properties.
+        The three properties below are the demo's best-effort expectation, not a verified contract.
+        A receiver reads what it recognizes and acknowledges everything else; it must never reject a
+        correctly signed body because a property is missing or unexpected. Treat this schema as
+        documentation of intent, and the signature as the actual gate.
+      additionalProperties: true
+      properties:
+        id:
+          description: Meteroid event id, if present. Falls back to the `webhook-id` header.
+          type: [string, "null"]
+        type:
+          description: |
+            Dotted event type, e.g. `invoice.paid`, `subscription.created`. Not an enum here on
+            purpose — a receiver must not break when Meteroid adds a type. Null when the payload
+            carries no recognizable type, which is acknowledged with `handled: false`.
+          type: [string, "null"]
+          examples: ["invoice.paid", "subscription.created"]
+        timestamp:
+          description: Event time, if present. Not to be confused with the `webhook-timestamp` header.
+          type: [string, "null"]
+          format: date-time
+
+    WebhookAck:
+      type: object
+      description: |
+        Acknowledgement of a signed event. A 202 means "signature verified and body accepted", not
+        "the demo understood it" — that is what `handled` is for.
+      required: [received, event_id, type, handled]
+      additionalProperties: false
+      properties:
+        received:
+          type: boolean
+          const: true
+        event_id:
+          type: string
+          description: |
+            The event's `id`, or the `webhook-id` header when the body carries none. Never null:
+            `webhook-id` is a required header, so there is always a value to echo.
+        type:
+          description: The body's `type`, or null when it carries none.
+          type: [string, "null"]
+        handled:
+          type: boolean
+          description: |
+            True when the demo has a handler for this event type (`invoice.*`, `subscription.*`).
+            False means acknowledged and ignored — never an error, and the only outcome for a
+            payload with an unknown or absent `type`.
