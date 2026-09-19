@@ -135,11 +135,16 @@ await fs.promises.writeFile("invoice.pdf", pdf);
 
 ## Webhook verification
 
+With Express (or anything else built on Node's `http` module), pass `req.headers` as is:
+
 ```typescript
+import express from "express";
 import { Webhook, WebhookVerificationError } from "@meteroid/sdk";
 
+const app = express();
 const webhook = new Webhook("whsec_your_webhook_secret");
 
+// `express.raw` keeps the body as the raw bytes that were signed.
 app.post("/webhooks/meteroid", express.raw({ type: "*/*" }), (req, res) => {
   try {
     const event = webhook.verify(req.body, req.headers);
@@ -155,8 +160,27 @@ app.post("/webhooks/meteroid", express.raw({ type: "*/*" }), (req, res) => {
 });
 ```
 
-`verify` accepts both the Standard Webhooks headers and the legacy Svix aliases. The
-`webhook-*` header wins when both are present:
+With the fetch API (Next.js route handlers, Cloudflare Workers, Deno, Bun), pass the `Headers`:
+
+```typescript
+export async function POST(request: Request): Promise<Response> {
+  try {
+    const event = webhook.verify(await request.text(), request.headers);
+    console.log("Received event:", event);
+    return new Response("OK");
+  } catch (err) {
+    if (err instanceof WebhookVerificationError) {
+      return new Response("Invalid signature", { status: 400 });
+    }
+    throw err;
+  }
+}
+```
+
+`verify` takes either a plain header object (values may be `string`, `string[]` or `undefined`,
+as in Node's `IncomingHttpHeaders`) or a `Headers` instance, and matches header names
+case-insensitively. It accepts both the Standard Webhooks headers and the legacy Svix aliases.
+The `webhook-*` header wins when both are present:
 
 - `webhook-id` / `svix-id`
 - `webhook-signature` / `svix-signature`

@@ -131,4 +131,69 @@ describe("Webhook.verify", () => {
       WebhookVerificationError
     );
   });
+
+  it("accepts string-array and undefined header values", () => {
+    const { webhook, signature, timestamp } = sign();
+
+    const event = webhook.verify(PAYLOAD, {
+      "webhook-id": MSG_ID,
+      // A header sent twice reaches Node as an array; the values are joined
+      // with a space, like several signatures in a single header.
+      "webhook-signature": ["v1,not-a-real-signature", signature],
+      "webhook-timestamp": timestamp,
+      "x-absent": undefined,
+    });
+
+    assert.deepEqual(event, { test: "data" });
+  });
+
+  it("falls back to svix-* when the webhook-* value is undefined", () => {
+    const { webhook, signature, timestamp } = sign();
+
+    const event = webhook.verify(PAYLOAD, {
+      "webhook-id": undefined,
+      "webhook-signature": undefined,
+      "webhook-timestamp": undefined,
+      "svix-id": MSG_ID,
+      "svix-signature": [signature],
+      "svix-timestamp": timestamp,
+    });
+
+    assert.deepEqual(event, { test: "data" });
+  });
+
+  it("accepts a fetch Headers instance", () => {
+    const { webhook, signature, timestamp } = sign();
+
+    const headers = new Headers();
+    headers.set("Webhook-Id", MSG_ID);
+    headers.set("Webhook-Signature", signature);
+    headers.set("Webhook-Timestamp", timestamp);
+
+    assert.deepEqual(webhook.verify(PAYLOAD, headers), { test: "data" });
+  });
+
+  it("applies the svix-* fallback to a fetch Headers instance", () => {
+    const { webhook, signature, timestamp } = sign();
+
+    const headers = new Headers({
+      "svix-id": MSG_ID,
+      "svix-signature": signature,
+      "svix-timestamp": timestamp,
+    });
+
+    assert.deepEqual(webhook.verify(PAYLOAD, headers), { test: "data" });
+  });
+
+  it("rejects a fetch Headers instance with a bad signature", () => {
+    const { webhook, timestamp } = sign();
+
+    const headers = new Headers({
+      "webhook-id": MSG_ID,
+      "webhook-signature": "v1,invalid_signature_here",
+      "webhook-timestamp": timestamp,
+    });
+
+    assert.throws(() => webhook.verify(PAYLOAD, headers), WebhookVerificationError);
+  });
 });
