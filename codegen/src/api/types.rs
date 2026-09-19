@@ -1236,8 +1236,11 @@ impl FieldType {
             | Self::Int64
             | Self::UInt64
             | Self::Float
-            | Self::Double
-            | Self::Decimal => "number".into(),
+            | Self::Double => "number".into(),
+            // `format: decimal` values travel over the wire as JSON strings
+            // (`"12.50"`), and JS `number` cannot represent them losslessly, so
+            // the TypeScript SDK surfaces them as strings.
+            Self::Decimal => "string".into(),
             Self::String | Self::Uri => "string".into(),
             Self::DateTime => "Date".into(),
             Self::JsonObject => "any".into(),
