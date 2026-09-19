@@ -1,0 +1,42 @@
+[project]
+name = "scribe-backend-python"
+version = "1.0.0"
+description = "Scribe demo backend — the Meteroid Python SDK behind examples/openapi.yaml."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+# 3.11 for `tomllib`, `typing.assert_never`, and a `datetime.fromisoformat` that reads
+# every RFC 3339 timestamp Meteroid sends.
+requires-python = ">=3.11"
+dependencies = [
+    "meteroid",
+    "uvicorn==0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy==1.18.2",
+    "pytest==8.4.2",
+    "ruff==0.14.10",
+]
+
+[tool.uv]
+# An application, not a library: there is nothing to build or install but its dependencies.
+package = false
+
+[tool.uv.sources]
+# By path, the way the Rust backend uses `path = "../../../rust"`.
+meteroid = { path = "../../../python", editable = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+strict = true
+files = ["scribe", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,9 @@
+# The virtualenv `uv sync` builds. `uv.lock` IS committed: it is what pins the install.
+.venv/
+
+# Caches.
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/

@@ -44,6 +44,10 @@ GRADLE := backends/java/gradlew --quiet -p backends/java
 TS_BACKEND := backends/typescript
 TS_SDK     := ../typescript
 
+# The Python SDK is pure Python and linked by path, so `uv sync` is the whole install.
+PY_BACKEND := backends/python
+UV_PY      := uv run --locked --directory $(PY_BACKEND)
+
 .PHONY: help
 help: ## Show this help
 	@echo ''
@@ -52,8 +56,8 @@ help: ## Show this help
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
 	@echo ''
-	@echo '  Backends listen on: rust $(RUST_PORT) · java $(JAVA_PORT) · typescript $(TS_PORT)'
-	@echo '  Targets marked [BACKEND] take BACKEND=rust|java|typescript, e.g. make test-contract BACKEND=java'
+	@echo '  Backends listen on: rust $(RUST_PORT) · java $(JAVA_PORT) · typescript $(TS_PORT) · python $(PY_PORT)'
+	@echo '  Targets marked [BACKEND] take BACKEND=rust|java|typescript|python, e.g. make test-contract BACKEND=java'
 	@echo ''
 
 # ------------------------------------------------------------------ run
@@ -69,6 +73,10 @@ run-java: ## Run the Java backend (port 8081)
 .PHONY: run-typescript
 run-typescript: $(TS_BACKEND)/node_modules ## Run the TypeScript backend (port 8082)
 	PORT=$(TS_PORT) npm --prefix $(TS_BACKEND) start
+
+.PHONY: run-python
+run-python: ## Run the Python backend (port 8083)
+	PORT=$(PY_PORT) $(UV_PY) python -m scribe
 
 .PHONY: run-frontend
 run-frontend: frontend/node_modules ## Run the SPA against BACKEND (default rust)
@@ -86,6 +94,7 @@ test-contract-all: ## Contract suite against every running backend, in turn
 	@$(MAKE) test-contract BACKEND=rust
 	@$(MAKE) test-contract BACKEND=java
 	@$(MAKE) test-contract BACKEND=typescript
+	@$(MAKE) test-contract BACKEND=python
 
 .PHONY: test-e2e
 test-e2e: tests/e2e/node_modules ## [BACKEND] Playwright happy path (needs a running SPA)
@@ -96,6 +105,7 @@ test-backends: $(TS_BACKEND)/node_modules ## Every backend's own offline unit te
 	cargo test --manifest-path backends/rust/Cargo.toml
 	$(GRADLE) test
 	npm --prefix $(TS_BACKEND) test
+	$(UV_PY) pytest -q
 
 # ------------------------------------------------------------------ check
 
@@ -104,6 +114,8 @@ check: lint-contract typecheck ## Everything that can be verified without a tena
 	cargo clippy --manifest-path backends/rust/Cargo.toml --all-targets -- -D warnings
 	cargo fmt --manifest-path backends/rust/Cargo.toml --check
 	$(GRADLE) build
+	$(UV_PY) ruff check .
+	$(UV_PY) ruff format --check .
 
 .PHONY: lint-contract
 lint-contract: ## Validate openapi.yaml as OpenAPI and against the demo's modelling rules
@@ -111,11 +123,12 @@ lint-contract: ## Validate openapi.yaml as OpenAPI and against the demo's modell
 	python3 lint_contract.py
 
 .PHONY: typecheck
-typecheck: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules ## Typecheck the SPA, both suites and the TypeScript backend
+typecheck: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules ## Typecheck the SPA, both suites and the TypeScript and Python backends
 	npm --prefix frontend run typecheck
 	npm --prefix tests/contract run typecheck
 	npm --prefix tests/e2e run typecheck
 	npm --prefix $(TS_BACKEND) run typecheck
+	$(UV_PY) mypy
 
 .PHONY: generate-api
 generate-api: frontend/node_modules ## Regenerate the SPA's types from openapi.yaml
@@ -125,7 +138,8 @@ generate-api: frontend/node_modules ## Regenerate the SPA's types from openapi.y
 # ------------------------------------------------------------------ misc
 
 .PHONY: install
-install: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules ## Install every npm dependency
+install: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules ## Install every npm and Python dependency
+	uv sync --locked --directory $(PY_BACKEND)
 
 frontend/node_modules: frontend/package-lock.json
 	npm --prefix frontend ci
@@ -161,5 +175,6 @@ clean: ## Remove build output (keeps .env)
 	rm -rf frontend/dist frontend/node_modules
 	rm -rf tests/contract/node_modules tests/e2e/node_modules tests/e2e/test-results
 	rm -rf $(TS_BACKEND)/node_modules
+	rm -rf $(PY_BACKEND)/.venv $(PY_BACKEND)/.mypy_cache $(PY_BACKEND)/.pytest_cache $(PY_BACKEND)/.ruff_cache
 	cargo clean --manifest-path backends/rust/Cargo.toml
 	$(GRADLE) clean
