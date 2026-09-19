@@ -50,6 +50,9 @@ asyncio.run(main())
 | `client.plans`              | List available plans              |
 | `client.product_families`   | Manage product families           |
 | `client.events`             | Send usage events                 |
+| `client.metrics`            | Manage billable metrics           |
+| `client.usage`              | Read aggregated usage             |
+| `client.features`           | List features                     |
 | `client.checkout_sessions`  | Create checkout sessions          |
 
 The full list is exported from `meteroid.api`.
@@ -92,25 +95,76 @@ with open("invoice.pdf", "wb") as fh:
     fh.write(pdf_bytes)
 ```
 
-### Sending Usage Events
+## Metering and Entitlements
+
+The calls a usage-based integration needs: ingest events, read the metrics
+and features they feed, and check what a customer is entitled to.
 
 ```python
-from meteroid.models import Event, IngestEventsRequest
+import uuid
+from datetime import datetime, timezone
 
-client.events.ingest_events(
+from meteroid import Meteroid
+from meteroid.models import (
+    BooleanEffectiveEntitlementValue,
+    ConfigEffectiveEntitlementValue,
+    Event,
+    IngestEventsRequest,
+    MeteredEffectiveEntitlementValue,
+)
+
+client = Meteroid("your-api-key")
+
+# 1. Ingest usage events. `code` is the billable metric code; `properties` are
+#    string key-value pairs the metric can filter and aggregate on.
+result = client.events.ingest_events(
     IngestEventsRequest(
         events=[
             Event(
+                event_id=str(uuid.uuid4()),  # idempotency key for the event
                 code="api_call",
-                customer_id="customer_id",
-                event_id="unique_event_id",
-                timestamp="2024-01-15T10:30:00Z",
-                properties={"endpoint": "/api/v1/users", "method": "GET"},
+                customer_id="acme",  # customer ID or alias
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                properties={"endpoint": "/v1/users", "method": "GET"},
             )
-        ]
+        ],
+        allow_partial_failures=True,
     )
 )
+for failure in result.failures or []:
+    print(f"event {failure.event_id} rejected: {failure.reason}")
+
+# 2. Read the metrics and the usage they aggregate.
+metrics = client.metrics.list_metrics(search="api")
+for summary in metrics.data:
+    print(summary.code, summary.aggregation_type)
+
+usage = client.usage.get_customer_usage(
+    "acme", start_date="2026-09-01", end_date="2026-09-30"
+)
+for metric_usage in usage.usage:
+    print(metric_usage.metric_code, metric_usage.total_value)  # a Decimal
+
+# 3. List the features entitlements are granted on.
+features = client.features.list_features()
+for feature in features.data:
+    print(feature.code, feature.feature_type)
+
+# 4. Resolve what the customer is entitled to right now.
+entitlements = client.customers.get_effective_entitlements("acme")
+for entitlement in entitlements.data:
+    value = entitlement.value.content
+    if isinstance(value, BooleanEffectiveEntitlementValue):
+        print(entitlement.feature.code, "enabled" if value.enabled else "disabled")
+    elif isinstance(value, MeteredEffectiveEntitlementValue):
+        print(entitlement.feature.code, value.usage.consumed, "/", value.spec.limit)
+    elif isinstance(value, ConfigEffectiveEntitlementValue):
+        print(entitlement.feature.code, value.value.content.value)
 ```
+
+A feature is also available by ID or code with `client.features.get_feature(...)`,
+and a metric with `client.metrics.get_metric(...)`. `client.usage.get_subscription_usage`
+reads usage for a single subscription.
 
 ## Configuration
 
@@ -162,8 +216,10 @@ customer = Customer.from_json(raw_json)   # or Customer.from_dict(payload)
 payload = customer.to_dict()              # None-valued fields are omitted
 ```
 
-Discriminated unions (for example `Fee`) carry the discriminator and the decoded
-variant side by side:
+### Tagged unions
+
+Discriminated unions (for example `Fee` or `ConfigValue`) carry the
+discriminator and the decoded variant side by side:
 
 ```python
 from meteroid.models import Fee, RatePlanFee
@@ -171,6 +227,52 @@ from meteroid.models import Fee, RatePlanFee
 fee = Fee(type="RATE", content=RatePlanFee(rates=[]))
 assert fee.to_dict()["type"] == "RATE"
 ```
+
+To work with the variant, narrow on `content`, not on the discriminator: the
+type checker does not link the two fields, so checking `type == "RATE"` leaves
+`content` typed as the full union. `isinstance` works on every Python version:
+
+```python
+from meteroid.models import (
+    BooleanConfigValue,
+    ConfigValue,
+    JsonConfigValue,
+    NumberConfigValue,
+    TextConfigValue,
+)
+
+
+def describe(config: ConfigValue) -> str:
+    content = config.content
+    if isinstance(content, NumberConfigValue):
+        return f"number {content.value:f}"  # a Decimal
+    if isinstance(content, BooleanConfigValue):
+        return "on" if content.value else "off"
+    if isinstance(content, TextConfigValue):
+        return content.value.upper()
+    # Only `JsonConfigValue` is left; its value is any JSON (dict, list,
+    # scalar or None).
+    return f"json {content.value!r}"
+```
+
+On Python 3.10+, `match` does the same:
+
+```python
+def describe(config: ConfigValue) -> str:
+    match config.content:
+        case NumberConfigValue(value=number):
+            return f"number {number}"
+        case BooleanConfigValue(value=flag):
+            return "on" if flag else "off"
+        case TextConfigValue(value=text):
+            return text
+        case JsonConfigValue(value=data):
+            return f"json {data!r}"
+```
+
+A discriminator value this SDK version does not know raises
+`ModelParseError` (wrapped in `ResponseDecodeError` when it comes from an API
+response).
 
 ## Error Handling
 
@@ -198,6 +300,25 @@ not JSON, or an error code newer than this SDK -- `payload`, `code` and
 `meteroid.NetworkException` is raised when the request never reached the API
 (connection error or timeout, after retries are exhausted).
 
+Every exception the SDK raises derives from `meteroid.MeteroidError`, so a
+single `except MeteroidError` covers them all:
+
+```text
+MeteroidError
+├── ApiException               non-2xx response: status_code, raw_body, payload, code, message
+├── NetworkException           no response: connection error or timeout, after retries
+├── ResponseDecodeError        2xx body that is not JSON or does not match its model:
+│                              status_code, raw_body; the cause is chained (__cause__)
+├── ModelParseError            Model.from_dict / from_json got an invalid payload
+├── WebhookVerificationError   webhook signature missing, stale or invalid
+└── InvalidWebhookSecretError  Webhook(...) secret is not valid base64, or is empty
+```
+
+`ResponseDecodeError`, `ModelParseError` and `InvalidWebhookSecretError` are
+also `ValueError`s. Invalid arguments are rejected with the usual built-in
+exceptions before any request is sent: serializing a non-finite `Decimal`
+(`NaN`, `Infinity`) raises `ValueError`, for example.
+
 ## Webhooks
 
 Signature verification supports both Standard Webhooks (`webhook-*`) and Svix
@@ -213,6 +334,10 @@ except WebhookVerificationError:
     ...  # reject the delivery
 ```
 
+The secret is accepted with or without its `whsec_` prefix, or as the raw key
+bytes. A secret that is not valid base64, or decodes to an empty key, raises
+`InvalidWebhookSecretError` when the `Webhook` is built.
+
 ## Development
 
 ```bash
@@ -224,7 +349,7 @@ uv run pytest
 ```
 
 The `meteroid/api/*.py` and `meteroid/models/*.py` modules (except the
-hand-written `api/common.py` and `models/errors.py`) are generated from
+hand-written `api/common.py`) are generated from
 `spec/openapi.json` by `./regen_openapi.py` at the repository root.
 
 ## License
