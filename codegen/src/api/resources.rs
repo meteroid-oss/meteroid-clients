@@ -141,6 +141,12 @@ impl Resource {
             if let Some(name) = &operation.response_body_schema_name {
                 res.insert(name);
             }
+            res.extend(
+                operation
+                    .error_response_schema_names
+                    .iter()
+                    .map(String::as_str),
+            );
         }
 
         res
@@ -194,6 +200,12 @@ pub(crate) struct Operation {
     /// True if the response is text (e.g., text/plain, text/html).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     response_is_text: bool,
+    /// Schemas of the JSON bodies this operation returns on 4xx/5xx responses.
+    ///
+    /// Not rendered per operation: collected so that `referenced_components` pulls the error
+    /// schemas (e.g. `RestErrorResponse`) into the generated models alongside everything else.
+    #[serde(skip)]
+    error_response_schema_names: BTreeSet<String>,
 }
 
 impl Operation {
@@ -419,11 +431,17 @@ impl Operation {
             }
         });
 
-        let (response_body_schema_name, response_kind) = op
+        let (response_body_schema_name, response_kind, error_response_schema_names) = op
             .responses
             .map(|r| {
                 assert_eq!(r.default, None);
                 assert!(r.extensions.is_empty());
+                let error_response_schema_names: BTreeSet<String> = r
+                    .responses
+                    .iter()
+                    .filter(|(st, _)| matches!(st, openapi::StatusCode::Code(400..)))
+                    .filter_map(|(_, resp)| response_body_info(resp.clone()).0)
+                    .collect();
                 let mut success_responses = r.responses.into_iter().filter(|(st, _)| {
                     match st {
                         openapi::StatusCode::Code(c) => match c {
@@ -451,9 +469,9 @@ impl Operation {
                     assert_eq!(kind, other_kind);
                 }
 
-                (schema_name, kind)
+                (schema_name, kind, error_response_schema_names)
             })
-            .unwrap_or((None, ResponseKind::None));
+            .unwrap_or((None, ResponseKind::None, BTreeSet::new()));
 
         let op = Operation {
             id: op_id,
@@ -471,6 +489,7 @@ impl Operation {
             response_body_schema_name,
             response_is_binary: response_kind == ResponseKind::Binary,
             response_is_text: response_kind == ResponseKind::Text,
+            error_response_schema_names,
         };
         Some((res_path, op))
     }
