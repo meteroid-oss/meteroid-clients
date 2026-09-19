@@ -62,6 +62,12 @@ jobs:
         with:
           version: "0.8.13"
 
+      # The Go codegen tasks format with the host's gofmt; pin it so the output does not
+      # drift with the runner image's default Go.
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
       - name: Regen openapi libs
         run: ./regen_openapi.py
 

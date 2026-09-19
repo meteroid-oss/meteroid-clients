@@ -20,7 +20,10 @@ const filesPaths = [
     "typescript/src/request.ts",
     // Python
     "python/pyproject.toml",
-    "python/meteroid/_version.py"
+    "python/meteroid/_version.py",
+    // Go
+    "go/version.go",
+    "go/README.md"
 ];
 
 const rootDir = join(__dirname, "..");
