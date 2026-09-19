@@ -1,10 +1,12 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 type CustomPropertyDefinitionCreateRequest struct {
 	Config *PropertyConfig `json:"config,omitempty"`
 
-	DefaultValue map[string]any `json:"default_value,omitempty"`
+	DefaultValue json.RawMessage `json:"default_value,omitempty"`
 
 	Description *string `json:"description,omitempty"`
 

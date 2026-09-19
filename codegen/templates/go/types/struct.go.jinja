@@ -3,10 +3,17 @@
 {#- Collect every rendered Go type in this file so we know which standard library
     packages to import. Matching on the rendered type string keeps working for
     arbitrarily nested containers. -#}
-{% set rendered_types %}{% for field in type.fields %}{{ field.type.to_go() }} {% endfor %}{% endset -%}
+{% set rendered_types %}{% for field in type.fields %}{% if field.flatten %}{{ field.type.to_go() }}{% else %}{{ go_field_type(field) }}{% endif %} {% endfor %}{% endset -%}
 package meteroid
-{% if "time.Time" in rendered_types %}
+{% if "time.Time" in rendered_types and "json.RawMessage" in rendered_types %}
+import (
+	"encoding/json"
+	"time"
+)
+{% elif "time.Time" in rendered_types %}
 import "time"
+{% elif "json.RawMessage" in rendered_types %}
+import "encoding/json"
 {% endif %}
 {{ doc_comment }}
 {% if type.deprecated %}{{ go_deprecated("type") }}

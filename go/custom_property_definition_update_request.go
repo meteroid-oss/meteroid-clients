@@ -1,12 +1,14 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 // Update of a definition. `key`, `entity_type` and `property_type` are immutable and cannot be
 // changed here. Any field left absent is unchanged.
 type CustomPropertyDefinitionUpdateRequest struct {
 	Config *PropertyConfig `json:"config,omitempty"`
 
-	DefaultValue map[string]any `json:"default_value,omitempty"`
+	DefaultValue json.RawMessage `json:"default_value,omitempty"`
 
 	Description *string `json:"description,omitempty"`
 

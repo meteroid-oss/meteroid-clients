@@ -1,6 +1,8 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 type SubscriptionCreateRequest struct {
 	ActivationCondition SubscriptionActivationConditionEnum `json:"activation_condition"`
 
@@ -20,7 +22,7 @@ type SubscriptionCreateRequest struct {
 
 	// User-defined custom property values, keyed by definition `key`. Validated against the
 	// tenant's subscription definitions.
-	CustomProperties map[string]any `json:"custom_properties,omitempty"`
+	CustomProperties json.RawMessage `json:"custom_properties,omitempty"`
 
 	CustomerIdOrAlias string `json:"customer_id_or_alias"`
 

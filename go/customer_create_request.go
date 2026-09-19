@@ -1,6 +1,8 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 type CustomerCreateRequest struct {
 	Alias *string `json:"alias,omitempty"`
 
@@ -14,7 +16,7 @@ type CustomerCreateRequest struct {
 
 	// User-defined custom property values, keyed by definition `key`. Validated against the
 	// tenant's `CUSTOMER` property definitions. Omit to leave unset.
-	CustomProperties map[string]any `json:"custom_properties,omitempty"`
+	CustomProperties json.RawMessage `json:"custom_properties,omitempty"`
 
 	CustomTaxes RequiredSlice[CustomTaxRate] `json:"custom_taxes"`
 

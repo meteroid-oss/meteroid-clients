@@ -183,6 +183,25 @@ valid request. They are defined types over `[]T` and `map[string]V`: plain slice
 and map literals assign to them, and `len`, indexing, `range` and `append` all
 work as usual.
 
+Fields the API declares as arbitrary JSON (entitlement JSON config values,
+`custom_properties`, `metadata`, custom property `default_value`, ...) are
+`json.RawMessage`: the value may be an object, an array, a scalar or `null`, and
+it is kept exactly as received. Decode it into the type you expect, and set it
+with any JSON you like:
+
+```go
+if cfg := value.Config; cfg != nil && cfg.Value.Json != nil {
+	var settings struct{ Seats int `json:"seats"` }
+	if err := json.Unmarshal(cfg.Value.Json.Value, &settings); err != nil { /* ... */ }
+}
+
+props, _ := json.Marshal(map[string]string{"tier": "gold"})
+req.CustomProperties = props
+```
+
+An unset (`nil`) required one is sent as `null`; an unset optional one is
+omitted.
+
 Timestamps are `time.Time` and serialize as RFC 3339.
 
 ## Tagged unions

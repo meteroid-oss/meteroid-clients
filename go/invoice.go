@@ -1,7 +1,10 @@
 // this file is @generated
 package meteroid
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Invoice struct {
 	AmountDue int64 `json:"amount_due"`
@@ -23,7 +26,7 @@ type Invoice struct {
 	Currency Currency `json:"currency"`
 
 	// User-defined custom property values, keyed by definition `key`.
-	CustomProperties RequiredMap[any] `json:"custom_properties"`
+	CustomProperties json.RawMessage `json:"custom_properties"`
 
 	CustomerDetails CustomerDetails `json:"customer_details"`
 

@@ -1,6 +1,8 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 type CreateCheckoutSessionRequest struct {
 	AddOns []CreateSubscriptionAddOn `json:"add_ons,omitempty"`
 
@@ -35,7 +37,7 @@ type CreateCheckoutSessionRequest struct {
 
 	InvoiceThreshold *string `json:"invoice_threshold,omitempty"`
 
-	Metadata map[string]any `json:"metadata,omitempty"`
+	Metadata json.RawMessage `json:"metadata,omitempty"`
 
 	NetTerms *int32 `json:"net_terms,omitempty"`
 

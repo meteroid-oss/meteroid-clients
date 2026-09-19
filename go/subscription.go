@@ -1,7 +1,10 @@
 // this file is @generated
 package meteroid
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Subscription struct {
 	// When the subscription was activated (first payment or activation condition met)
@@ -32,7 +35,7 @@ type Subscription struct {
 	CurrentPeriodStart string `json:"current_period_start"`
 
 	// User-defined custom property values, keyed by definition `key`.
-	CustomProperties RequiredMap[any] `json:"custom_properties"`
+	CustomProperties json.RawMessage `json:"custom_properties"`
 
 	CustomerAlias *string `json:"customer_alias,omitempty"`
 

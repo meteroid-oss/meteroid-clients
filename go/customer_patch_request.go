@@ -1,6 +1,8 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 type CustomerPatchRequest struct {
 	Alias *string `json:"alias,omitempty"`
 
@@ -12,7 +14,7 @@ type CustomerPatchRequest struct {
 
 	// Partial update of custom property values (merge; send a key with `null` to remove it).
 	// Omit to leave unchanged.
-	CustomProperties map[string]any `json:"custom_properties,omitempty"`
+	CustomProperties json.RawMessage `json:"custom_properties,omitempty"`
 
 	CustomTaxes []CustomTaxRate `json:"custom_taxes,omitempty"`
 

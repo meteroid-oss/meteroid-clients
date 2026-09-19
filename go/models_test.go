@@ -16,7 +16,7 @@ func TestCustomerJSONRoundTrip(t *testing.T) {
 		"currency": "USD",
 		"alias": "acme",
 		"billing_address": {"city": "Paris", "country": "FR"},
-		"custom_properties": {"tier": "gold"},
+		"custom_properties": {"tier":"gold"},
 		"preferred_locales": ["fr-FR", "en"],
 		"custom_taxes": [],
 		"invoicing_emails": ["billing@acme.test"],
@@ -43,8 +43,9 @@ func TestCustomerJSONRoundTrip(t *testing.T) {
 	if customer.Phone != nil {
 		t.Errorf("phone = %v, want nil for an absent field", customer.Phone)
 	}
-	if got := customer.CustomProperties["tier"]; got != "gold" {
-		t.Errorf("custom_properties[tier] = %v, want gold", got)
+	var props map[string]string
+	if err := json.Unmarshal(customer.CustomProperties, &props); err != nil || props["tier"] != "gold" {
+		t.Errorf("custom_properties = %s (%v), want tier=gold", customer.CustomProperties, err)
 	}
 
 	encoded, err := json.Marshal(customer)
@@ -296,13 +297,23 @@ func TestRequiredCollectionsMarshalEmptyWhenNil(t *testing.T) {
 		t.Errorf("marshal = %s, want %s", encoded, want)
 	}
 
-	// The map counterpart: a required object field is `{}`, not `null`.
-	encoded, err = json.Marshal(CreditNoteCustomPropertiesRequest{})
+	// The map counterpart: a required map field is `{}`, not `null`.
+	encoded, err = json.Marshal(GroupedUsage{Value: "1"})
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
 	}
-	if string(encoded) != `{"custom_properties":{}}` {
-		t.Errorf("marshal = %s, want {\"custom_properties\":{}}", encoded)
+	if string(encoded) != `{"dimensions":{},"value":"1"}` {
+		t.Errorf("marshal = %s, want {\"dimensions\":{},\"value\":\"1\"}", encoded)
+	}
+
+	// A required any-JSON field left unset is `null`, which is itself a valid
+	// "any JSON" value.
+	encoded, err = json.Marshal(JsonConfigValue{})
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if string(encoded) != `{"value":null}` {
+		t.Errorf("marshal = %s, want {\"value\":null}", encoded)
 	}
 }
 
@@ -386,7 +397,70 @@ func TestFlattenedEmbedKeepsOuterFields(t *testing.T) {
 	if got, ok := fields["invoicing_emails"].([]any); !ok || len(got) != 0 {
 		t.Errorf("invoicing_emails = %v, want []: %s", fields["invoicing_emails"], encoded)
 	}
-	if got, ok := fields["custom_properties"].(map[string]any); !ok || len(got) != 0 {
-		t.Errorf("custom_properties = %v, want {}: %s", fields["custom_properties"], encoded)
+	// custom_properties is any-JSON (json.RawMessage): unset, it is `null`.
+	if got, ok := fields["custom_properties"]; !ok || got != nil {
+		t.Errorf("custom_properties = %v, want null: %s", got, encoded)
+	}
+}
+
+// A JSON config value is "any JSON" in the spec: an object, an array, a scalar
+// or null. Every one of them must decode, inside a full entitlements response,
+// without failing the rest of the response, and must re-encode unchanged.
+func TestJsonConfigValueAcceptsAnyJSON(t *testing.T) {
+	values := []struct {
+		name string
+		json string
+	}{
+		{"object", `{"seats":5,"tier":"gold","nested":{"a":[1,2]}}`},
+		{"array", `[1,"two",{"three":3}]`},
+		{"string", `"premium"`},
+		{"number", `12.5`},
+		{"bool", `true`},
+		{"null", `null`},
+	}
+
+	for _, tc := range values {
+		t.Run(tc.name, func(t *testing.T) {
+			payload := `{"data":[
+				{"feature":{"id":"feat_1","name":"Seats","code":"seats"},
+				 "value":{"type":"BOOLEAN","enabled":true}},
+				{"feature":{"id":"feat_2","name":"Metadata","code":"meta"},
+				 "value":{"type":"CONFIG","value":{"kind":"JSON","value":` + tc.json + `}}}
+			]}`
+
+			var resp EffectiveEntitlementListResponse
+			if err := json.Unmarshal([]byte(payload), &resp); err != nil {
+				t.Fatalf("unmarshal: %v", err)
+			}
+			if len(resp.Data) != 2 {
+				t.Fatalf("got %d entitlements, want 2", len(resp.Data))
+			}
+			if resp.Data[0].Value.Boolean == nil {
+				t.Fatalf("sibling entitlement not decoded: %+v", resp.Data[0].Value)
+			}
+
+			cfg := resp.Data[1].Value.Config
+			if cfg == nil || cfg.Value.Json == nil {
+				t.Fatalf("config value not decoded: %+v", resp.Data[1].Value)
+			}
+			if got := string(cfg.Value.Json.Value); got != tc.json {
+				t.Errorf("value = %s, want %s", got, tc.json)
+			}
+
+			encoded, err := json.Marshal(resp)
+			if err != nil {
+				t.Fatalf("marshal: %v", err)
+			}
+			var got, want any
+			if err := json.Unmarshal(encoded, &got); err != nil {
+				t.Fatalf("re-unmarshal: %v", err)
+			}
+			if err := json.Unmarshal([]byte(payload), &want); err != nil {
+				t.Fatalf("unmarshal payload: %v", err)
+			}
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("round trip changed the document:\n got %s\nwant %s", encoded, payload)
+			}
+		})
 	}
 }

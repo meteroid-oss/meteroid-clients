@@ -1,6 +1,8 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 type SubscriptionUpdateRequest struct {
 	// If false, invoices will stay in Draft until manually reviewed and finalized.
 	AutoAdvanceInvoices *bool `json:"auto_advance_invoices,omitempty"`
@@ -10,7 +12,7 @@ type SubscriptionUpdateRequest struct {
 
 	// Partial update of custom property values (merge; send a key with `null` to remove it).
 	// Validated against the tenant's `SUBSCRIPTION` property definitions. Omit to leave unchanged.
-	CustomProperties map[string]any `json:"custom_properties,omitempty"`
+	CustomProperties json.RawMessage `json:"custom_properties,omitempty"`
 
 	// Default memo for invoices
 	InvoiceMemo *string `json:"invoice_memo,omitempty"`

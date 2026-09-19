@@ -1,7 +1,10 @@
 // this file is @generated
 package meteroid
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // A connected account (relationship between platform and connected org)
 type ConnectedAccount struct {
@@ -16,7 +19,7 @@ type ConnectedAccount struct {
 
 	Id ConnectedAccountId `json:"id"`
 
-	Metadata map[string]any `json:"metadata,omitempty"`
+	Metadata json.RawMessage `json:"metadata,omitempty"`
 
 	// RFC 3339 timestamp.
 	OnboardingCompletedAt *time.Time `json:"onboarding_completed_at,omitempty"`

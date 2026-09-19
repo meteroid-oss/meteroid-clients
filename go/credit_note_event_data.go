@@ -1,7 +1,10 @@
 // this file is @generated
 package meteroid
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type CreditNoteEventData struct {
 	// RFC 3339 timestamp.
@@ -17,7 +20,7 @@ type CreditNoteEventData struct {
 	Currency string `json:"currency"`
 
 	// User-defined custom property values, keyed by definition key.
-	CustomProperties RequiredMap[any] `json:"custom_properties"`
+	CustomProperties json.RawMessage `json:"custom_properties"`
 
 	CustomerId CustomerId `json:"customer_id"`
 

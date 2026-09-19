@@ -1,6 +1,8 @@
 // this file is @generated
 package meteroid
 
+import "encoding/json"
+
 type Customer struct {
 	Alias *string `json:"alias,omitempty"`
 
@@ -13,7 +15,7 @@ type Customer struct {
 	Currency Currency `json:"currency"`
 
 	// User-defined custom property values, keyed by definition `key`.
-	CustomProperties RequiredMap[any] `json:"custom_properties"`
+	CustomProperties json.RawMessage `json:"custom_properties"`
 
 	CustomTaxes RequiredSlice[CustomTaxRate] `json:"custom_taxes"`
 
