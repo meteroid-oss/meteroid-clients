@@ -251,6 +251,35 @@ Unknown values decode as-is rather than failing.
 
 ## Error handling
 
+A failed call returns one of three error types, all usable with `errors.As`:
+
+| Type                         | When                                                                                     | Carries                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `*meteroid.APIError`         | Meteroid answered with a non-2xx status                                                  | `StatusCode`, `RawBody`, decoded payload |
+| `*meteroid.TransportError`   | No usable response: connection failure, unreadable body, cancelled or timed-out context | `Method`, `Path`, the wrapped `Err`      |
+| `*meteroid.DecodeError`      | Meteroid answered 2xx but the SDK could not decode the body                              | `StatusCode`, `RawBody`, the `json` error |
+
+`TransportError` and `DecodeError` wrap their cause, so
+`errors.Is(err, context.Canceled)` / `errors.Is(err, context.DeadlineExceeded)`
+keep working for cancellation, and `errors.As` reaches the underlying
+`*url.Error` or `*json.UnmarshalTypeError`. A `DecodeError` means the request
+succeeded on the server: don't blindly retry a non-idempotent call on it.
+
+```go
+var (
+	transportErr *meteroid.TransportError
+	decodeErr    *meteroid.DecodeError
+)
+switch {
+case errors.Is(err, context.Canceled):
+	// the caller gave up
+case errors.As(err, &transportErr):
+	log.Printf("Meteroid unreachable: %v", transportErr.Err)
+case errors.As(err, &decodeErr):
+	log.Printf("unexpected response (status %d): %s", decodeErr.StatusCode, decodeErr.RawBody)
+}
+```
+
 Every non-2xx response is returned as a `*meteroid.APIError`:
 
 ```go

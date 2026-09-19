@@ -100,6 +100,60 @@ func (e *APIError) Error() string {
 	return b.String()
 }
 
+// TransportError is returned when the request could not be completed at the
+// HTTP level: the connection failed, the server could not be reached, the
+// response body could not be read, or the context was cancelled or its
+// deadline (or the client's per-attempt [Options.Timeout]) expired. No usable
+// response was received, so there is no status code.
+//
+// It wraps the underlying error, so errors.Is(err, context.Canceled) and
+// errors.Is(err, context.DeadlineExceeded) keep working, and errors.As reaches
+// the *url.Error or net.Error underneath.
+//
+//	var transportErr *meteroid.TransportError
+//	if errors.As(err, &transportErr) {
+//		log.Printf("Meteroid unreachable (%s %s): %v", transportErr.Method, transportErr.Path, transportErr.Err)
+//	}
+type TransportError struct {
+	// Method is the HTTP method of the request.
+	Method string
+	// Path is the API path template of the operation, e.g.
+	// "/api/v1/customers/{id_or_alias}".
+	Path string
+	// Err is the underlying error, usually from net/http or the context.
+	Err error
+}
+
+func (e *TransportError) Error() string {
+	return fmt.Sprintf("meteroid: %s %s: %v", e.Method, e.Path, e.Err)
+}
+
+// Unwrap returns the underlying error.
+func (e *TransportError) Unwrap() error { return e.Err }
+
+// DecodeError is returned when the API answered with a 2xx status but the SDK
+// could not decode the response body into the expected type. The request
+// itself succeeded on the server side: retrying a non-idempotent operation may
+// repeat it.
+//
+// It wraps the error from encoding/json, so errors.As can reach e.g. a
+// *json.UnmarshalTypeError or *json.SyntaxError.
+type DecodeError struct {
+	// StatusCode is the HTTP status of the response.
+	StatusCode int
+	// RawBody is the response body exactly as received.
+	RawBody []byte
+	// Err is the decoding error.
+	Err error
+}
+
+func (e *DecodeError) Error() string {
+	return fmt.Sprintf("meteroid: decoding response body (status %d): %v", e.StatusCode, e.Err)
+}
+
+// Unwrap returns the underlying decoding error.
+func (e *DecodeError) Unwrap() error { return e.Err }
+
 // UnionError reports a tagged union that could not be encoded, because no
 // variant was set or because the discriminator is not one this SDK version
 // knows about.

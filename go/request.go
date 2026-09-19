@@ -114,7 +114,7 @@ func (r *request) url(serverURL string) (string, error) {
 // execute performs the request and decodes a JSON response body into out. Pass
 // a nil out for operations that return no content.
 func (c *Client) execute(ctx context.Context, req *request, out any) error {
-	body, err := c.do(ctx, req)
+	body, status, err := c.do(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (c *Client) execute(ctx context.Context, req *request, out any) error {
 		return nil
 	}
 	if err := json.Unmarshal(body, out); err != nil {
-		return fmt.Errorf("meteroid: decoding response body: %w", err)
+		return &DecodeError{StatusCode: status, RawBody: body, Err: err}
 	}
 	return nil
 }
@@ -130,27 +130,30 @@ func (c *Client) execute(ctx context.Context, req *request, out any) error {
 // executeBinary performs the request and returns the raw response body, for
 // endpoints that serve PDFs or other binary content.
 func (c *Client) executeBinary(ctx context.Context, req *request) ([]byte, error) {
-	return c.do(ctx, req)
+	body, _, err := c.do(ctx, req)
+	return body, err
 }
 
 // executeText performs the request and returns the response body as text.
 func (c *Client) executeText(ctx context.Context, req *request) (string, error) {
-	body, err := c.do(ctx, req)
+	body, _, err := c.do(ctx, req)
 	if err != nil {
 		return "", err
 	}
 	return string(body), nil
 }
 
-func (c *Client) do(ctx context.Context, req *request) ([]byte, error) {
+// do performs the request, retrying as configured, and returns the body and
+// HTTP status of the successful (2xx) response.
+func (c *Client) do(ctx context.Context, req *request) ([]byte, int, error) {
 	if req.err != nil {
-		return nil, req.err
+		return nil, 0, req.err
 	}
 
 	cfg := c.cfg
 	endpoint, err := req.url(cfg.serverURL)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	// POSTs are made idempotent by default so that a retried request cannot
@@ -158,40 +161,40 @@ func (c *Client) do(ctx context.Context, req *request) ([]byte, error) {
 	if req.method == http.MethodPost && req.headers.Get("idempotency-key") == "" {
 		key, err := randomHex(16)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		req.SetHeader("idempotency-key", "auto_"+key)
 	}
 	if req.headers.Get("meteroid-req-id") == "" {
 		id, err := randomHex(8)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		req.SetHeader("meteroid-req-id", id)
 	}
 
 	for attempt := 0; ; attempt++ {
-		body, retryable, err := c.attempt(ctx, req, endpoint, attempt)
+		body, status, retryable, err := c.attempt(ctx, req, endpoint, attempt)
 		if err == nil {
-			return body, nil
+			return body, status, nil
 		}
 		if !retryable || attempt >= len(cfg.retrySchedule) || ctx.Err() != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		timer := time.NewTimer(cfg.retrySchedule[attempt])
 		select {
 		case <-ctx.Done():
 			timer.Stop()
-			return nil, ctx.Err()
+			return nil, 0, &TransportError{Method: req.method, Path: req.path, Err: ctx.Err()}
 		case <-timer.C:
 		}
 	}
 }
 
-// attempt performs one HTTP round trip. The boolean result reports whether the
-// failure is worth retrying.
-func (c *Client) attempt(ctx context.Context, req *request, endpoint string, attempt int) ([]byte, bool, error) {
+// attempt performs one HTTP round trip and returns the response body and
+// status. The boolean result reports whether the failure is worth retrying.
+func (c *Client) attempt(ctx context.Context, req *request, endpoint string, attempt int) ([]byte, int, bool, error) {
 	cfg := c.cfg
 
 	if cfg.timeout > 0 {
@@ -207,7 +210,7 @@ func (c *Client) attempt(ctx context.Context, req *request, endpoint string, att
 
 	httpReq, err := http.NewRequestWithContext(ctx, req.method, endpoint, body)
 	if err != nil {
-		return nil, false, fmt.Errorf("meteroid: building request: %w", err)
+		return nil, 0, false, fmt.Errorf("meteroid: building request: %w", err)
 	}
 
 	for name, values := range req.headers {
@@ -233,13 +236,13 @@ func (c *Client) attempt(ctx context.Context, req *request, endpoint string, att
 
 	resp, err := cfg.httpClient.Do(httpReq)
 	if err != nil {
-		return nil, true, fmt.Errorf("meteroid: %s %s: %w", req.method, req.path, err)
+		return nil, 0, true, &TransportError{Method: req.method, Path: req.path, Err: err}
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, true, fmt.Errorf("meteroid: reading response body: %w", err)
+		return nil, 0, true, &TransportError{Method: req.method, Path: req.path, Err: fmt.Errorf("reading response body: %w", err)}
 	}
 
 	if cfg.debug {
@@ -249,10 +252,10 @@ func (c *Client) attempt(ctx context.Context, req *request, endpoint string, att
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		// Only server-side failures are worth another attempt; a 4xx will fail
 		// again the same way.
-		return nil, resp.StatusCode >= 500, newAPIError(resp.StatusCode, respBody)
+		return nil, resp.StatusCode, resp.StatusCode >= 500, newAPIError(resp.StatusCode, respBody)
 	}
 
-	return respBody, false, nil
+	return respBody, resp.StatusCode, false, nil
 }
 
 // formValues turns a struct into form fields by round-tripping it through its

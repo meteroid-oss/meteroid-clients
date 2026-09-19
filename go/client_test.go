@@ -406,8 +406,132 @@ func TestContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
 	defer cancel()
 
-	if _, err := client.Customers().GetCustomer(ctx, "cust_1"); err == nil {
+	_, err := client.Customers().GetCustomer(ctx, "cust_1")
+	if err == nil {
 		t.Fatal("expected the request to fail once the context is cancelled")
+	}
+	var transportErr *TransportError
+	if !errors.As(err, &transportErr) {
+		t.Fatalf("error is %T (%v), want *TransportError", err, err)
+	}
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Errorf("errors.Is(err, context.DeadlineExceeded) = false for %v", err)
+	}
+	if transportErr.Method != http.MethodGet || transportErr.Path != "/api/v1/customers/{id_or_alias}" {
+		t.Errorf("method/path = %s %s", transportErr.Method, transportErr.Path)
+	}
+}
+
+// An explicit cancel, both during the round trip and while waiting between
+// retries, surfaces as a *TransportError wrapping context.Canceled.
+func TestExplicitCancellationIsATransportError(t *testing.T) {
+	t.Run("in flight", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+			cancel()
+			<-r.Context().Done()
+		})
+
+		_, err := client.Customers().GetCustomer(ctx, "cust_1")
+		var transportErr *TransportError
+		if !errors.As(err, &transportErr) {
+			t.Fatalf("error is %T (%v), want *TransportError", err, err)
+		}
+		if !errors.Is(err, context.Canceled) {
+			t.Errorf("errors.Is(err, context.Canceled) = false for %v", err)
+		}
+	})
+
+	t.Run("between retries", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}))
+		defer server.Close()
+		client := New("test-api-key", &Options{ServerURL: server.URL, RetrySchedule: []time.Duration{time.Hour}})
+
+		// Cancel once the 503 is back and the client is waiting to retry.
+		timer := time.AfterFunc(50*time.Millisecond, cancel)
+		defer timer.Stop()
+
+		_, err := client.Customers().GetCustomer(ctx, "cust_1")
+		var transportErr *TransportError
+		if !errors.As(err, &transportErr) {
+			t.Fatalf("error is %T (%v), want *TransportError", err, err)
+		}
+		if !errors.Is(err, context.Canceled) {
+			t.Errorf("errors.Is(err, context.Canceled) = false for %v", err)
+		}
+	})
+}
+
+// A server that cannot be reached is a *TransportError wrapping the net/http
+// error, not an *APIError or a *DecodeError.
+func TestUnreachableServerIsATransportError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	serverURL := server.URL
+	server.Close()
+
+	client := New("test-api-key", &Options{ServerURL: serverURL, RetrySchedule: []time.Duration{}})
+	_, err := client.Customers().GetCustomer(context.Background(), "cust_1")
+
+	var transportErr *TransportError
+	if !errors.As(err, &transportErr) {
+		t.Fatalf("error is %T (%v), want *TransportError", err, err)
+	}
+	var urlErr *url.Error
+	if !errors.As(err, &urlErr) {
+		t.Errorf("TransportError does not unwrap to the *url.Error: %v", err)
+	}
+	var apiErr *APIError
+	var decodeErr *DecodeError
+	if errors.As(err, &apiErr) || errors.As(err, &decodeErr) {
+		t.Errorf("transport failure also matched APIError/DecodeError: %v", err)
+	}
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		t.Errorf("connection refused reported as a context error: %v", err)
+	}
+}
+
+// A 2xx response the SDK cannot decode is a *DecodeError carrying the status,
+// the raw body and the json error.
+func TestUndecodableResponseIsADecodeError(t *testing.T) {
+	const body = `{"id":"cust_1","name":42}`
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+		io.WriteString(w, body)
+	})
+
+	_, err := client.Customers().GetCustomer(context.Background(), "cust_1")
+
+	var decodeErr *DecodeError
+	if !errors.As(err, &decodeErr) {
+		t.Fatalf("error is %T (%v), want *DecodeError", err, err)
+	}
+	if decodeErr.StatusCode != http.StatusCreated {
+		t.Errorf("status = %d, want %d", decodeErr.StatusCode, http.StatusCreated)
+	}
+	if string(decodeErr.RawBody) != body {
+		t.Errorf("raw body = %s, want %s", decodeErr.RawBody, body)
+	}
+	var typeErr *json.UnmarshalTypeError
+	if !errors.As(err, &typeErr) {
+		t.Errorf("DecodeError does not unwrap to the *json.UnmarshalTypeError: %v", err)
+	}
+	var apiErr *APIError
+	var transportErr *TransportError
+	if errors.As(err, &apiErr) || errors.As(err, &transportErr) {
+		t.Errorf("decode failure also matched APIError/TransportError: %v", err)
+	}
+
+	// Malformed JSON too.
+	client = testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `<html>not json</html>`)
+	})
+	_, err = client.Customers().GetCustomer(context.Background(), "cust_1")
+	var syntaxErr *json.SyntaxError
+	if !errors.As(err, &decodeErr) || decodeErr.StatusCode != http.StatusOK || !errors.As(err, &syntaxErr) {
+		t.Errorf("malformed body: error is %T (%v), want *DecodeError wrapping *json.SyntaxError", err, err)
 	}
 }
 
