@@ -1,0 +1,254 @@
+"""Shared HTTP plumbing for the generated API resources.
+
+Mirrors ``rust/src/request.rs``: bearer auth, automatic idempotency keys on
+POST, a retry schedule for 5xx and transport failures, a per-request timeout,
+and typed error mapping.
+
+Known divergence from the Rust SDK
+---------------------------------
+Rust does *not* retry a client-side timeout: ``execute_with_backoff`` wraps each
+attempt in ``tokio::time::timeout(..)`` and propagates ``Elapsed`` with ``?``,
+leaving the retry schedule untouched. This client instead treats a timeout as an
+ordinary transport failure (``httpx.TimeoutException`` is an ``httpx.HTTPError``)
+and retries it like any other. That is deliberate: every retried request carries
+the same auto-generated ``idempotency-key``, so a retry after a timeout is safe
+and recovers from the failure mode timeouts most often signal. The observable
+difference is that a request can take up to ``timeout * (1 + len(retry_schedule))``
+plus the backoff delays before ``NetworkException`` is raised.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import dataclasses
+import datetime as _datetime
+import enum
+import random
+import time
+import typing as t
+import urllib.parse
+import uuid
+from decimal import Decimal
+
+import httpx
+
+from .._version import __version__
+from ..errors import ApiException, NetworkException
+from ..serialization import format_datetime
+
+__all__ = [
+    "ApiBase",
+    "ApiBaseAsync",
+    "ApiBaseSync",
+    "Configuration",
+    "DEFAULT_NUM_RETRIES",
+    "DEFAULT_SERVER_URL",
+    "DEFAULT_TIMEOUT",
+    "default_retry_schedule",
+    "serialize_query_params",
+]
+
+DEFAULT_SERVER_URL = "https://api.meteroid.com"
+DEFAULT_TIMEOUT = 15.0
+DEFAULT_NUM_RETRIES = 2
+_MAX_BACKOFF = 5.0
+
+QueryValue = t.Union[str, t.List[str]]
+
+
+def _serialize_scalar(value: t.Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, enum.Enum):
+        return _serialize_scalar(value.value)
+    if isinstance(value, _datetime.datetime):
+        return format_datetime(value)
+    if isinstance(value, _datetime.date):
+        return value.isoformat()
+    if isinstance(value, Decimal):
+        return str(value)
+    return str(value)
+
+
+def serialize_query_params(
+    params: t.Mapping[str, t.Any],
+    comma_joined: t.Sequence[str] = (),
+) -> t.Dict[str, QueryValue]:
+    """Render query parameters, dropping the ones left unset.
+
+    List values are exploded into repeated parameters (OpenAPI ``explode=true``)
+    unless their name is listed in ``comma_joined``.
+    """
+    out: t.Dict[str, QueryValue] = {}
+    for key, value in params.items():
+        if value is None:
+            continue
+        if isinstance(value, (list, tuple, set, frozenset)):
+            items = [_serialize_scalar(v) for v in value]
+            out[key] = ",".join(items) if key in comma_joined else items
+        else:
+            out[key] = _serialize_scalar(value)
+    return out
+
+
+def default_retry_schedule(num_retries: int) -> t.List[float]:
+    """Exponential backoff delays, matching the Rust client's defaults."""
+    schedule: t.List[float] = []
+    backoff = 0.02
+    for _ in range(num_retries):
+        schedule.append(backoff)
+        backoff = min(_MAX_BACKOFF, backoff * 2)
+    return schedule
+
+
+@dataclasses.dataclass
+class Configuration:
+    """Resolved client configuration, shared by every resource."""
+
+    base_path: str = DEFAULT_SERVER_URL
+    bearer_access_token: t.Optional[str] = None
+    user_agent: str = f"meteroid-python/{__version__}"
+    timeout: t.Optional[float] = DEFAULT_TIMEOUT
+    retry_schedule: t.List[float] = dataclasses.field(
+        default_factory=lambda: default_retry_schedule(DEFAULT_NUM_RETRIES)
+    )
+
+    def headers(self) -> t.Dict[str, str]:
+        headers = {"user-agent": self.user_agent, "accept": "application/json"}
+        if self.bearer_access_token is not None:
+            headers["authorization"] = f"Bearer {self.bearer_access_token}"
+        return headers
+
+
+def _raise_for_status(response: httpx.Response) -> httpx.Response:
+    if response.is_success:
+        return response
+    # Any other status -- 4xx, 5xx, or a 3xx left unfollowed -- is an error;
+    # see `ApiException` for how the body is decoded.
+    raise ApiException.from_response(response.status_code, response.content)
+
+
+class ApiBase:
+    """Turns one operation into ``httpx`` request keyword arguments."""
+
+    _cfg: Configuration
+
+    def __init__(self, cfg: Configuration) -> None:
+        self._cfg = cfg
+
+    def _request_kwargs(
+        self,
+        method: str,
+        path: str,
+        path_params: t.Optional[t.Mapping[str, str]] = None,
+        query_params: t.Optional[t.Mapping[str, QueryValue]] = None,
+        header_params: t.Optional[t.Mapping[str, t.Optional[str]]] = None,
+        json_body: t.Optional[t.Any] = None,
+        form_body: t.Optional[t.Mapping[str, t.Any]] = None,
+    ) -> t.Dict[str, t.Any]:
+        if path_params:
+            path = path.format(
+                **{
+                    key: urllib.parse.quote(str(value), safe="")
+                    for key, value in path_params.items()
+                }
+            )
+
+        headers = self._cfg.headers()
+        headers["meteroid-req-id"] = str(random.getrandbits(32))
+        if header_params:
+            headers.update(
+                {key: value for key, value in header_params.items() if value is not None}
+            )
+        if method.upper() == "POST" and "idempotency-key" not in headers:
+            headers["idempotency-key"] = f"auto_{uuid.uuid4()}"
+
+        kwargs: t.Dict[str, t.Any] = {
+            "method": method.upper(),
+            "url": f"{self._cfg.base_path}{path}",
+            "headers": headers,
+            # Passed per-request rather than only baked into the client we
+            # build ourselves, so `MeteroidOptions.timeout` is honoured even
+            # when the caller supplies their own `httpx` client. This mirrors
+            # `rust/src/request.rs`, which wraps every attempt in
+            # `tokio::time::timeout(conf.timeout, ..)` regardless of the
+            # `hyper` client in the configuration. `None` disables it.
+            "timeout": self._cfg.timeout,
+        }
+        if query_params:
+            kwargs["params"] = dict(query_params)
+        if json_body is not None:
+            kwargs["json"] = json_body
+        elif form_body is not None:
+            kwargs["data"] = dict(form_body)
+        return kwargs
+
+    def _delays(self) -> t.List[float]:
+        # The first attempt happens immediately, subsequent ones are delayed.
+        return [0.0, *self._cfg.retry_schedule]
+
+
+class ApiBaseSync(ApiBase):
+    _httpx_client: httpx.Client
+
+    def __init__(self, cfg: Configuration, httpx_client: httpx.Client) -> None:
+        super().__init__(cfg)
+        self._httpx_client = httpx_client
+
+    def _request_sync(self, **kwargs: t.Any) -> httpx.Response:
+        """Execute one operation, retrying 5xx and transport failures.
+
+        Unlike ``rust/src/request.rs``, a client-side timeout is retried rather
+        than propagated immediately -- see this module's docstring for why.
+        """
+        request_kwargs = self._request_kwargs(**kwargs)
+        delays = self._delays()
+        last_attempt = len(delays) - 1
+        last_error: t.Optional[httpx.HTTPError] = None
+
+        for attempt, delay in enumerate(delays):
+            if attempt:
+                time.sleep(delay)
+                request_kwargs["headers"]["meteroid-retry-count"] = str(attempt)
+            try:
+                response = self._httpx_client.request(**request_kwargs)
+            except httpx.HTTPError as exc:
+                last_error = exc
+                continue
+            if response.status_code < 500 or attempt == last_attempt:
+                return _raise_for_status(response)
+
+        raise NetworkException(str(last_error)) from last_error
+
+
+class ApiBaseAsync(ApiBase):
+    _httpx_client: httpx.AsyncClient
+
+    def __init__(self, cfg: Configuration, httpx_client: httpx.AsyncClient) -> None:
+        super().__init__(cfg)
+        self._httpx_client = httpx_client
+
+    async def _request_asyncio(self, **kwargs: t.Any) -> httpx.Response:
+        """Execute one operation, retrying 5xx and transport failures.
+
+        Unlike ``rust/src/request.rs``, a client-side timeout is retried rather
+        than propagated immediately -- see this module's docstring for why.
+        """
+        request_kwargs = self._request_kwargs(**kwargs)
+        delays = self._delays()
+        last_attempt = len(delays) - 1
+        last_error: t.Optional[httpx.HTTPError] = None
+
+        for attempt, delay in enumerate(delays):
+            if attempt:
+                await asyncio.sleep(delay)
+                request_kwargs["headers"]["meteroid-retry-count"] = str(attempt)
+            try:
+                response = await self._httpx_client.request(**request_kwargs)
+            except httpx.HTTPError as exc:
+                last_error = exc
+                continue
+            if response.status_code < 500 or attempt == last_attempt:
+                return _raise_for_status(response)
+
+        raise NetworkException(str(last_error)) from last_error
