@@ -43,3 +43,21 @@ output_dir = "typescript/src/models"
 [[typescript.task]]
 template = "templates/typescript/component_type.ts.jinja"
 output_dir = "typescript/src/models"
+
+[python]
+# The codegen image doesn't ship `ruff`, so formatting happens on the host
+# right after generation (see python/scripts/codegen_format.sh).
+extra_codegen_args = ["--no-postprocess"]
+extra_shell_commands = ["python/scripts/codegen_format.sh"]
+[[python.task]]
+template = "templates/python/api_resource.py.jinja"
+output_dir = "python/meteroid/api"
+[[python.task]]
+template = "templates/python/api_summary.py.jinja"
+output_dir = "python/meteroid/api"
+[[python.task]]
+template = "templates/python/component_type_summary.py.jinja"
+output_dir = "python/meteroid/models"
+[[python.task]]
+template = "templates/python/component_type.py.jinja"
+output_dir = "python/meteroid/models"

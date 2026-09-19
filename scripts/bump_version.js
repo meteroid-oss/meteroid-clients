@@ -17,7 +17,10 @@ const filesPaths = [
     "typescript/package.json",
     "typescript/package-lock.json",
     "typescript/README.md",
-    "typescript/src/request.ts"
+    "typescript/src/request.ts",
+    // Python
+    "python/pyproject.toml",
+    "python/meteroid/_version.py"
 ];
 
 const rootDir = join(__dirname, "..");

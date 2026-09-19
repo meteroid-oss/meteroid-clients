@@ -1,0 +1,55 @@
+{#
+    Shared helpers for the Python templates.
+-#}
+
+{#- Render `text` as a Python docstring literal.
+
+    The caller is responsible for indentation (pipe the result through
+    `| indent(n)`). Backslashes and embedded triple quotes are escaped so an
+    arbitrary OpenAPI description can never break out of the literal.
+-#}
+{% macro docstring(text) -%}
+    {%- set escaped = text | replace("\\", "\\\\") | replace('"""', '\\"\\"\\"') -%}
+    {%- if escaped is endingwith '"' -%}
+        {%- set escaped = escaped ~ " " -%}
+    {%- endif -%}
+    """{{ escaped }}"""
+{%- endmacro %}
+
+{#- Convert a spec name into a safe snake_case Python identifier. -#}
+{% macro py_ident(name) -%}
+    {%- set ident = name | to_snake_case -%}
+    {%- if ident in [
+        "False", "None", "True", "and", "as", "assert", "async", "await",
+        "break", "class", "continue", "def", "del", "elif", "else", "except",
+        "finally", "for", "from", "global", "if", "import", "in", "is",
+        "lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try",
+        "while", "with", "yield", "match", "case",
+    ] -%}
+        {{ ident }}_
+    {%- else -%}
+        {{ ident }}
+    {%- endif -%}
+{%- endmacro %}
+
+{#- The Python attribute name a struct field is exposed under.
+
+    Fields marked `flatten` carry a synthetic `__flatten_xxx` spec name; those
+    are named after the schema they inline instead.
+-#}
+{% macro field_ident(field) -%}
+    {%- if field.flatten -%}
+        {{ py_ident(field.type.to_python()) }}
+    {%- else -%}
+        {{ py_ident(field.name) }}
+    {%- endif -%}
+{%- endmacro %}
+
+{#- Python type of a struct field, wrapped in `t.Optional` when not mandatory. -#}
+{% macro field_type(field) -%}
+    {%- if field.required and not field.nullable -%}
+        {{ field.type.to_python() }}
+    {%- else -%}
+        t.Optional[{{ field.type.to_python() }}]
+    {%- endif -%}
+{%- endmacro %}

@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "meteroid"
+version = "0.26.0"
+description = "Meteroid Billing SDK for Python"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Meteroid", email = "support@meteroid.com" }]
+keywords = ["meteroid", "billing", "subscription", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+dependencies = ["httpx>=0.27,<1"]
+
+[project.urls]
+Homepage = "https://meteroid.com"
+Repository = "https://github.com/meteroid-oss/meteroid-clients"
+
+[project.optional-dependencies]
+dev = [
+    "mypy==1.18.2",
+    "pytest==8.4.2",
+    "pytest-asyncio==1.2.0",
+    "respx==0.22.0",
+    "ruff==0.14.10",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["meteroid"]
+
+[tool.hatch.build.targets.sdist]
+include = ["meteroid", "tests", "README.md"]
+
+[tool.ruff]
+line-length = 90
+target-version = "py39"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+# Generated barrel files re-export names for the public API surface.
+"meteroid/models/__init__.py" = ["F401"]
+"meteroid/api/__init__.py" = ["F401"]
+
+[tool.mypy]
+python_version = "3.9"
+files = ["meteroid", "tests"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+strict_equality = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+# anyio (pulled in by httpx) uses `match` statements, which mypy refuses to
+# parse under `python_version = "3.9"`. We only need its public types.
+module = ["anyio", "anyio.*"]
+follow_imports = "skip"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
