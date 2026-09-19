@@ -76,6 +76,7 @@ No backend answered ${BASE_URL}/api/health.
 Start one first, from the repository root:
   cargo run --manifest-path examples/backends/rust/Cargo.toml   # :8080
   ./gradlew -p examples/backends/java run                       # :8081
+  make -C examples run-typescript | run-python | run-go          # :8082 :8083 :8084
 
 The suite will still run — every test will fail with a connection error, which is not
 very informative. Aborting instead.

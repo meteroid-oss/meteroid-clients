@@ -1,0 +1,4 @@
+# `go build` with no -o writes the binary here, named after the module's last element
+# ("go"), and the Makefile/README builds name it explicitly.
+/go
+/scribe-backend-go

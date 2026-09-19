@@ -8,8 +8,10 @@ It is designed once and implemented N times — one backend per SDK, behind one 
 
 ```
                     ┌──────────────► backends/rust        :8080 ──┐
-one SPA ──► BASE_URL ├──────────────► backends/java        :8081 ──┼──► Meteroid
-                    └──────────────► backends/typescript  :8082 ──┘
+                    ├──────────────► backends/java        :8081 ──┤
+one SPA ──► BASE_URL ├──────────────► backends/typescript  :8082 ──┼──► Meteroid
+                    ├──────────────► backends/python      :8083 ──┤
+                    └──────────────► backends/go          :8084 ──┘
        ▲                                     ▲
        └── tests/e2e (Playwright)            └── tests/contract (schema-validating HTTP)
 ```
@@ -32,12 +34,12 @@ make help                     # every target, and which port each backend uses
 Then, in three terminals:
 
 ```bash
-make run-rust                 # or: make run-java / make run-typescript — the backend
+make run-rust                 # or run-java / run-typescript / run-python / run-go
 make run-frontend             # the SPA on :5173, pointed at the Rust backend
 make test-contract            # the contract suite, against the same backend
 ```
 
-Point everything at another backend instead by passing `BACKEND=java` or `BACKEND=typescript`:
+Point everything at another backend instead by passing `BACKEND=java`, `typescript`, `python` or `go`:
 
 ```bash
 make run-java
@@ -58,7 +60,8 @@ CATALOG.md.
 Everything that can be checked without a live tenant:
 
 ```bash
-make check      # contract lint + 4 typechecks + clippy -D warnings + fmt + gradle build
+make check      # contract lint, 4 tsc typechecks + mypy, clippy -D warnings + fmt, gradle build,
+                # ruff, gofmt + go vet
 ```
 
 ---
@@ -97,7 +100,9 @@ same groups and methods in camelCase, reached through Lombok-generated getters
 the getter**: the groups are plain properties and the method names are identical —
 `meteroid.customers.createCustomer(..)`, `meteroid.events.ingestEvents(..)` — so they are not
 repeated in the table. The one that differs is the webhook verifier, `new Webhook(secret).verify(..)`
-from `@meteroid/sdk`.
+from `@meteroid/sdk`. **Python** uses the Rust names on its asyncio client
+(`meteroid.customers.create_customer(..)`), and **Go** the exported form with a `context.Context`
+first (`client.Customers.CreateCustomer(ctx, ..)`).
 
 | Demo feature | Demo endpoint | Meteroid REST | SDK call (Rust · Java) |
 | --- | --- | --- | --- |
@@ -143,6 +148,8 @@ examples/
     rust/                 hand-written, uses meteroid-rs            (port 8080)
     java/                 hand-written, uses meteroid-java          (port 8081)
     typescript/           hand-written, uses @meteroid/sdk          (port 8082)
+    python/               hand-written, uses meteroid (asyncio)     (port 8083)
+    go/                   hand-written, uses meteroid-clients/go    (port 8084)
   tests/
     contract/             schema-validating HTTP suite, run once per BASE_URL
     e2e/                  Playwright happy path through the SPA
@@ -228,7 +235,7 @@ Two paths get special handling:
   `upgrade_plan_code` the `free → pro → scale` ladder dictates. This is the one behaviour every
   backend must get identically right, and it needs a plan with a finite limit — Free, whose limit
   CATALOG.md seeds at 30 for exactly this reason.
-* **Webhooks** — all three SDKs used here expose a webhook *signer* as well as a verifier, so the
+* **Webhooks** — every SDK used here exposes a webhook *signer* as well as a verifier, so the
   suite signs its own payloads with `METEROID_WEBHOOK_SECRET` and exercises the receiver like any
   other endpoint, with no live tenant and no tunnel. The negative cases matter most: tampered body,
   wrong secret, missing or malformed headers, stale and future timestamps — all must come back
@@ -295,9 +302,43 @@ And three in TypeScript:
   signature, but a bare `SyntaxError` for a correctly signed body that is not JSON, and it returns
   `undefined` for a signed empty body. A receiver has to map all three to the same `400`.
 
+Three in Python:
+
+* **Catching `MeteroidError` does not catch everything.** A 2xx body the SDK cannot decode raises
+  `json.JSONDecodeError` or `ModelParseError`, both plain `ValueError`s, so `scribe/error.py` wraps
+  the SDK line in a broader catch.
+* **Decimal fields accept more than decimals.** `"NaN"`, `"Infinity"` and a bare JSON number all
+  deserialize into a `Decimal` without complaint, and `str(Decimal)` can print an exponent.
+  `scribe/decimals.py` refuses non-finite values and renders plain digits.
+* **`Webhook.verify` returns `None`**, where TypeScript and Java hand back the parsed payload; parse
+  the raw bytes yourself, after verifying.
+
+And three in Go:
+
+* **`JsonConfigValue.Value` is a map**, but the spec allows any JSON. An array or scalar config value
+  fails to decode and takes the whole entitlements response with it.
+* **An unknown union variant decodes "successfully"** with every variant pointer nil. Every `switch`
+  over a union needs a `default:`, or it is a nil dereference the day Meteroid adds a variant.
+* **Transport and decode failures are both untyped `fmt.Errorf`s** with no status, so a backend
+  cannot tell "Meteroid is down" from "Meteroid answered something the SDK could not read".
+
 ---
 
-## The TypeScript slot
+## Adding a backend
+
+TypeScript, Python and Go were each added after the first two, and each took exactly what the layout
+promises: one more directory answering `openapi.yaml` on its own port, a value in the contract's
+`Health.backend` enum, and a few Makefile lines. The SPA and both suites were not touched.
+
+* **`backends/python`** is a bare ASGI app on uvicorn over the SDK's asyncio client; `uv` runs it.
+* **`backends/go`** is `net/http` and nothing else. `make` uses a local `go` when there is one and
+  the `golang` image otherwise, so no Go install is required.
+
+Each was checked the way TypeScript was, below: the contract suite against the new backend and an
+existing one with identical configuration, outcomes diffed per test, plus a hundred-odd raw error-path
+probes compared for status, headers and body shape. Session tokens are byte-identical across all five.
+
+### TypeScript
 
 `backends/typescript/` was a placeholder until the TypeScript SDK landed in this repository. Filling
 it took exactly what the layout promised: one more backend answering `openapi.yaml` on port 8082 —
@@ -347,6 +388,8 @@ No secret is committed, and nothing reads a credential from anywhere but the env
 | `backends/rust` | done — all 12 operations, `clippy -D warnings` clean, 28 offline tests |
 | `backends/java` | done — all 12 operations, `-Xlint:all -Werror` clean, 40 offline tests |
 | `backends/typescript` | done — all 12 operations, `tsc --strict` clean, 57 offline tests (incl. the metered path against a stubbed Meteroid) |
+| `backends/python` | done — all 12 operations, `mypy --strict` + ruff clean, 133 offline tests |
+| `backends/go` | done — all 12 operations, `gofmt` + `go vet` clean, 65 offline tests |
 | `frontend` | done — all 12 operations consumed, types generated from `openapi.yaml` and committed |
 | `tests/contract` | done — 110 tests over all 12 operations, every response validated against `openapi.yaml` |
 | `tests/e2e` | done — 3 specs; needs a browser (`npm --prefix tests/e2e run browsers`) and a hand-provisioned subscribed workspace |

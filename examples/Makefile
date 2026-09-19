@@ -48,6 +48,25 @@ TS_SDK     := ../typescript
 PY_BACKEND := backends/python
 UV_PY      := uv run --locked --directory $(PY_BACKEND)
 
+# The Go backend uses a local `go` when there is one and the golang image otherwise, so
+# nothing here requires a Go install. The container mounts the repository root because
+# the SDK is a path `replace` (../../../go); -buildvcs=false because a git worktree's
+# .git points outside that mount.
+GO_BACKEND := backends/go
+GO_IMAGE   ?= golang:1.24
+REPO_ROOT  := $(abspath ..)
+DOCKER_GO  := docker run --rm -u $$(id -u):$$(id -g) -e HOME=/tmp -e GOCACHE=/tmp/gocache \
+	-e GOFLAGS=-buildvcs=false -v $(REPO_ROOT):/w -w /w/examples/$(GO_BACKEND)
+ifeq ($(shell go version >/dev/null 2>&1 && echo yes),yes)
+GO_SH     = cd $(GO_BACKEND) && sh -c
+GO_RUN_SH = cd $(GO_BACKEND) && PORT=$(GO_PORT) sh -c
+else
+GO_SH     = $(DOCKER_GO) $(GO_IMAGE) sh -c
+GO_RUN_SH = $(DOCKER_GO) --network host $(if $(wildcard .env),--env-file .env) -e PORT=$(GO_PORT) \
+	$(foreach v,METEROID_API_KEY METEROID_BASE_URL METEROID_WEBHOOK_SECRET SCRIBE_SESSION_SECRET SCRIBE_DEFAULT_CURRENCY,$(if $($(v)),-e $(v))) \
+	$(GO_IMAGE) sh -c
+endif
+
 .PHONY: help
 help: ## Show this help
 	@echo ''
@@ -56,8 +75,8 @@ help: ## Show this help
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
 	@echo ''
-	@echo '  Backends listen on: rust $(RUST_PORT) · java $(JAVA_PORT) · typescript $(TS_PORT) · python $(PY_PORT)'
-	@echo '  Targets marked [BACKEND] take BACKEND=rust|java|typescript|python, e.g. make test-contract BACKEND=java'
+	@echo '  Backends listen on: rust $(RUST_PORT) · java $(JAVA_PORT) · typescript $(TS_PORT) · python $(PY_PORT) · go $(GO_PORT)'
+	@echo '  Targets marked [BACKEND] take BACKEND=rust|java|typescript|python|go, e.g. make test-contract BACKEND=java'
 	@echo ''
 
 # ------------------------------------------------------------------ run
@@ -78,6 +97,10 @@ run-typescript: $(TS_BACKEND)/node_modules ## Run the TypeScript backend (port 8
 run-python: ## Run the Python backend (port 8083)
 	PORT=$(PY_PORT) $(UV_PY) python -m scribe
 
+.PHONY: run-go
+run-go: ## Run the Go backend (port 8084; in Docker when there is no local go)
+	$(GO_RUN_SH) 'go run .'
+
 .PHONY: run-frontend
 run-frontend: frontend/node_modules ## Run the SPA against BACKEND (default rust)
 	VITE_API_BASE_URL=$(BACKEND_URL) npm --prefix frontend run dev
@@ -95,6 +118,7 @@ test-contract-all: ## Contract suite against every running backend, in turn
 	@$(MAKE) test-contract BACKEND=java
 	@$(MAKE) test-contract BACKEND=typescript
 	@$(MAKE) test-contract BACKEND=python
+	@$(MAKE) test-contract BACKEND=go
 
 .PHONY: test-e2e
 test-e2e: tests/e2e/node_modules ## [BACKEND] Playwright happy path (needs a running SPA)
@@ -106,6 +130,7 @@ test-backends: $(TS_BACKEND)/node_modules ## Every backend's own offline unit te
 	$(GRADLE) test
 	npm --prefix $(TS_BACKEND) test
 	$(UV_PY) pytest -q
+	$(GO_SH) 'go test ./...'
 
 # ------------------------------------------------------------------ check
 
@@ -116,6 +141,7 @@ check: lint-contract typecheck ## Everything that can be verified without a tena
 	$(GRADLE) build
 	$(UV_PY) ruff check .
 	$(UV_PY) ruff format --check .
+	$(GO_SH) 'test -z "$$(gofmt -l .)" && go vet ./...'
 
 .PHONY: lint-contract
 lint-contract: ## Validate openapi.yaml as OpenAPI and against the demo's modelling rules

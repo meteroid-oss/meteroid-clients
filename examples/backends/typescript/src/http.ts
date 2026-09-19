@@ -106,11 +106,11 @@ async function readRequest(incoming: IncomingMessage): Promise<ScribeRequest> {
 
 /** A request target `URL` cannot parse is simply a path nothing is routed on: a 404. */
 function parseTarget(target: string): { path: string; query: URLSearchParams } {
-  try {
-    // The host is irrelevant: only the path and the query are ever looked at.
-    const url = new URL(target, "http://localhost");
-    return { path: url.pathname, query: url.searchParams };
-  } catch {
+  // Split by hand rather than through `new URL`, which resolves dot-segments and
+  // backslashes: `/api/x/../health` must be the 404 it is on every other backend.
+  const mark = target.indexOf("?");
+  if (mark === -1) {
     return { path: target, query: new URLSearchParams() };
   }
+  return { path: target.slice(0, mark), query: new URLSearchParams(target.slice(mark + 1)) };
 }
