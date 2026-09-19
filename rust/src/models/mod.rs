@@ -327,11 +327,6 @@ pub mod usage_pricing_model;
 pub mod usage_response;
 pub mod volume_plan_pricing;
 pub mod volume_pricing;
-// Manual types for error handling
-pub mod http_error_out;
-pub mod http_validation_error;
-pub mod validation_error;
-
 pub use self::{
     add_on::AddOn, add_on_event::AddOnEvent, add_on_event_data::AddOnEventData, add_on_id::AddOnId,
     add_on_list_response::AddOnListResponse, address::Address,
@@ -510,10 +505,4 @@ pub use self::{
     usage_plan_fee::UsagePlanFee, usage_pricing::UsagePricing,
     usage_pricing_model::UsagePricingModel, usage_response::UsageResponse,
     volume_plan_pricing::VolumePlanPricing, volume_pricing::VolumePricing,
-};
-
-// Manual types re-exports
-pub use self::{
-    http_error_out::HttpErrorOut, http_validation_error::HttpValidationError,
-    validation_error::ValidationError,
 };

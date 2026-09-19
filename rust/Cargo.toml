@@ -4,7 +4,7 @@ version = "0.26.0"
 edition = "2021"
 license = "MIT"
 description = "Meteroid Billing SDK for Rust"
-repository = "https://github.com/meteroid-oss/meteroid"
+repository = "https://github.com/meteroid-oss/meteroid-clients"
 keywords = ["meteroid", "billing", "subscription", "api"]
 categories = ["api-bindings"]
 
