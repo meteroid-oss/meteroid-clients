@@ -34,7 +34,7 @@ import httpx
 
 from .._version import __version__
 from ..errors import ApiException, NetworkException
-from ..serialization import format_datetime
+from ..serialization import format_datetime, format_decimal
 
 __all__ = [
     "ApiBase",
@@ -66,7 +66,7 @@ def _serialize_scalar(value: t.Any) -> str:
     if isinstance(value, _datetime.date):
         return value.isoformat()
     if isinstance(value, Decimal):
-        return str(value)
+        return format_decimal(value)
     return str(value)
 
 

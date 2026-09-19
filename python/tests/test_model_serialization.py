@@ -415,3 +415,80 @@ def test_model_with_offset_less_datetime() -> None:
         2026, 9, 19, 10, 0, 0, 123456, tzinfo=datetime.timezone.utc
     )
     assert applied.to_dict()["created_at"] == "2026-09-19T10:00:00.123456+00:00"
+
+
+# --------------------------------------------------------------------------
+# Decimals
+# --------------------------------------------------------------------------
+
+_APPLIED_COUPON = {
+    "id": "ac_1",
+    "coupon_id": "c_1",
+    "is_active": True,
+    "created_at": "2024-01-15T10:30:00Z",
+}
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("12.34", "12.34"),
+        ("-0.5", "-0.5"),
+        ("1e3", "1E+3"),
+        ("1.5E-2", "0.015"),
+    ],
+)
+def test_decimal_strings_are_parsed(raw: str, expected: str) -> None:
+    from decimal import Decimal
+
+    from meteroid.models import AppliedCoupon
+
+    applied = AppliedCoupon.from_dict({**_APPLIED_COUPON, "applied_amount": raw})
+    assert applied.applied_amount == Decimal(expected)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    ["NaN", "nan", "sNaN", "-NaN", "Infinity", "-Infinity", "inf", "-inf"],
+)
+def test_non_finite_decimal_strings_are_rejected(raw: str) -> None:
+    from meteroid.models import AppliedCoupon
+
+    with pytest.raises(ModelParseError, match="AppliedCoupon.applied_amount"):
+        AppliedCoupon.from_dict({**_APPLIED_COUPON, "applied_amount": raw})
+
+
+@pytest.mark.parametrize("raw", [12.34, 12, True, None, ["1"], {"v": "1"}, "", "abc"])
+def test_decimal_fields_require_a_decimal_string(raw: object) -> None:
+    from meteroid.models import CapacityFee
+
+    valid = {"overage_rate": "1", "rate": "1", "included": 10, "metric_id": "m"}
+    assert CapacityFee.from_dict(valid).overage_rate == 1
+    with pytest.raises(ModelParseError, match="CapacityFee.overage_rate"):
+        CapacityFee.from_dict({**valid, "overage_rate": raw})
+
+
+def test_plain_string_fields_are_not_decimal_checked() -> None:
+    from meteroid.models import CustomTaxRate
+
+    # `CustomTaxRate.rate` is a plain `type: string` in the spec.
+    rate = CustomTaxRate.from_dict({"name": "vat", "rate": "NaN", "tax_code": "x"})
+    assert rate.rate == "NaN"
+
+
+@pytest.mark.parametrize("bad", ["NaN", "sNaN", "Infinity", "-Infinity"])
+def test_non_finite_decimals_are_never_serialized(bad: str) -> None:
+    from decimal import Decimal
+
+    from meteroid.api.common import serialize_query_params
+    from meteroid.models import AppliedCoupon
+    from meteroid.serialization import to_json_value
+
+    applied = AppliedCoupon.from_dict(_APPLIED_COUPON)
+    applied.applied_amount = Decimal(bad)
+    with pytest.raises(ValueError, match="non-finite decimal"):
+        applied.to_dict()
+    with pytest.raises(ValueError, match="non-finite decimal"):
+        to_json_value([Decimal(bad)])
+    with pytest.raises(ValueError, match="non-finite decimal"):
+        serialize_query_params({"amount": Decimal(bad)})

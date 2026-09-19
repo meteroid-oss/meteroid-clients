@@ -9,7 +9,8 @@ Conventions mirrored from the Rust SDK:
   ``#[serde(skip_serializing_if = "Option::is_none")]``).
 * Unknown JSON keys are ignored when deserializing.
 * ``Decimal`` values travel as JSON strings, ``datetime`` values as RFC 3339
-  strings.
+  strings. Only finite decimals are valid: ``NaN`` and ``Infinity`` are
+  rejected in both directions.
 """
 
 from __future__ import annotations
@@ -25,7 +26,9 @@ __all__ = [
     "BaseModel",
     "TaggedUnionModel",
     "ModelParseError",
+    "format_decimal",
     "parse_datetime",
+    "parse_decimal",
     "to_json_value",
 ]
 
@@ -50,7 +53,7 @@ def to_json_value(value: t.Any) -> t.Any:
     if isinstance(value, enum.Enum):
         return to_json_value(value.value)
     if isinstance(value, Decimal):
-        return str(value)
+        return format_decimal(value)
     if isinstance(value, _datetime.datetime):
         return format_datetime(value)
     if isinstance(value, _datetime.date):
@@ -60,6 +63,35 @@ def to_json_value(value: t.Any) -> t.Any:
     if isinstance(value, dict):
         return {str(k): to_json_value(v) for k, v in value.items()}
     return value
+
+
+def format_decimal(value: Decimal) -> str:
+    """Render a decimal as its JSON string form.
+
+    Raises :class:`ValueError` for ``NaN`` and infinities, which the API does
+    not accept and no other Meteroid SDK can represent.
+    """
+    if not value.is_finite():
+        raise ValueError(f"cannot serialize non-finite decimal {value!r}")
+    return str(value)
+
+
+def parse_decimal(value: t.Any) -> Decimal:
+    """Parse a ``format: decimal`` JSON value into a finite :class:`Decimal`.
+
+    The API sends decimals as JSON strings (``"12.50"``, ``"1e3"``). JSON
+    numbers are rejected, since they may already have lost precision, and so
+    are ``NaN``/``Infinity``, which are not decimals the API can produce.
+    """
+    if not isinstance(value, str):
+        raise ModelParseError(f"expected a decimal string, got {value!r}")
+    try:
+        parsed = Decimal(value)
+    except ArithmeticError as exc:  # `decimal.InvalidOperation`
+        raise ModelParseError(f"invalid decimal {value!r}") from exc
+    if not parsed.is_finite():
+        raise ModelParseError(f"non-finite decimal {value!r}")
+    return parsed
 
 
 def format_datetime(value: _datetime.datetime) -> str:
@@ -170,9 +202,9 @@ def _from_json_value(annotation: t.Any, value: t.Any, ctx: str) -> t.Any:
             return _datetime.date.fromisoformat(str(value))
         if annotation is Decimal:
             try:
-                return Decimal(str(value))
-            except Exception as exc:
-                raise ModelParseError(f"{ctx}: invalid decimal {value!r}") from exc
+                return parse_decimal(value)
+            except ModelParseError as exc:
+                raise ModelParseError(f"{ctx}: {exc}") from exc
         if annotation is bool:
             if not isinstance(value, bool):
                 raise ModelParseError(f"{ctx}: expected a boolean, got {value!r}")
