@@ -8,6 +8,7 @@ from .coupon_line_item import CouponLineItem
 from .currency import Currency
 from .customer_details import CustomerDetails
 from .customer_id import CustomerId
+from .e_invoicing_status import EInvoicingStatus
 from .invoice_id import InvoiceId
 from .invoice_line_item import InvoiceLineItem
 from .invoice_payment_status import InvoicePaymentStatus
@@ -73,6 +74,8 @@ class Invoice(BaseModel):
     child_invoice_id: t.Optional[InvoiceId] = None
 
     due_date: t.Optional[str] = None
+
+    einvoicing_status: t.Optional[EInvoicingStatus] = None
 
     finalized_at: t.Optional[datetime] = None
 

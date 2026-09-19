@@ -7,6 +7,7 @@ class TaxExemptionType(str, enum.Enum):
     TAX_EXEMPT = "TAX_EXEMPT"
     NOT_REGISTERED = "NOT_REGISTERED"
     EXPORT = "EXPORT"
+    NO_VAT_TERRITORY = "NO_VAT_TERRITORY"
 
     def __str__(self) -> str:
         return str(self.value)

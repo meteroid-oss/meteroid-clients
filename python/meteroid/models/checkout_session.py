@@ -31,6 +31,8 @@ class CheckoutSession(BaseModel):
 
     billing_start_date: t.Optional[str] = None
 
+    cancel_url: t.Optional[str] = None
+
     checkout_url: t.Optional[str] = None
 
     completed_at: t.Optional[datetime] = None
@@ -45,5 +47,7 @@ class CheckoutSession(BaseModel):
     payment_methods_config: t.Optional[PaymentMethodsConfig] = None
 
     subscription_id: t.Optional[SubscriptionId] = None
+
+    success_url: t.Optional[str] = None
 
     trial_duration_days: t.Optional[int] = None

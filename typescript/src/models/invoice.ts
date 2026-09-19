@@ -4,6 +4,7 @@ import { type CouponLineItem, CouponLineItemSerializer } from "./couponLineItem"
 import { type Currency, CurrencySerializer } from "./currency";
 import { type CustomerDetails, CustomerDetailsSerializer } from "./customerDetails";
 import { type CustomerId, CustomerIdSerializer } from "./customerId";
+import { type EInvoicingStatus, EInvoicingStatusSerializer } from "./eInvoicingStatus";
 import { type InvoiceId, InvoiceIdSerializer } from "./invoiceId";
 import { type InvoiceLineItem, InvoiceLineItemSerializer } from "./invoiceLineItem";
 import {
@@ -44,6 +45,8 @@ export interface Invoice {
   customerId: CustomerId;
 
   dueDate?: string | null;
+
+  einvoicingStatus?: EInvoicingStatus | null;
 
   finalizedAt?: Date | null;
 
@@ -115,6 +118,10 @@ export const InvoiceSerializer = {
       ),
       customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
       dueDate: object["due_date"],
+      einvoicingStatus:
+        object["einvoicing_status"] != null
+          ? EInvoicingStatusSerializer._fromJsonObject(object["einvoicing_status"])
+          : undefined,
       finalizedAt:
         object["finalized_at"] != null
           ? parseDateTime(object["finalized_at"])
@@ -182,6 +189,10 @@ export const InvoiceSerializer = {
       customer_details: CustomerDetailsSerializer._toJsonObject(self.customerDetails),
       customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
       due_date: self.dueDate,
+      einvoicing_status:
+        self.einvoicingStatus != null
+          ? EInvoicingStatusSerializer._toJsonObject(self.einvoicingStatus)
+          : undefined,
       finalized_at: self.finalizedAt,
       id: InvoiceIdSerializer._toJsonObject(self.id),
       invoice_date: self.invoiceDate,

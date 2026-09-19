@@ -16,6 +16,7 @@ class EventType(str, enum.Enum):
     INVOICE_CLOSED = "invoice.closed"
     INVOICE_CONSOLIDATED = "invoice.consolidated"
     INVOICE_DELETED = "invoice.deleted"
+    INVOICE_ACCOUNTING_PDF_GENERATED = "invoice.accounting_pdf_generated"
     QUOTE_ACCEPTED = "quote.accepted"
     QUOTE_CONVERTED = "quote.converted"
     CREDIT_NOTE_CREATED = "credit_note.created"

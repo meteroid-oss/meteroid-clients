@@ -18,6 +18,10 @@ type InvoicesListInvoicesOptions struct {
 
 	Statuses []InvoiceStatus
 
+	// Only invoices whose e-invoice was generated, or failed. Invoices from entities that
+	// had not opted in carry no status and match neither.
+	EinvoicingStatus *EInvoicingStatus
+
 	// Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`, `amount`, `invoice_date`, `status`, `payment_status`. Direction: `asc` or `desc`. Default: `invoice_date.desc`.
 	OrderBy *string
 
@@ -49,6 +53,9 @@ func (a *Invoices) ListInvoices(ctx context.Context, options *InvoicesListInvoic
 			for _, item := range options.Statuses {
 				req.AddQueryParam("statuses", string(item))
 			}
+		}
+		if options.EinvoicingStatus != nil {
+			req.SetQueryParam("einvoicing_status", string(*options.EinvoicingStatus))
 		}
 		if options.OrderBy != nil {
 			req.SetQueryParam("order_by", *options.OrderBy)
@@ -100,6 +107,30 @@ func (a *Invoices) PatchInvoiceCustomProperties(ctx context.Context, invoiceId s
 // Download the PDF document for an invoice.
 func (a *Invoices) DownloadInvoicePdf(ctx context.Context, invoiceId string) ([]byte, error) {
 	req := newRequest(http.MethodGet, "/api/v1/invoices/{invoice_id}/download")
+	req.SetPathParam("invoice_id", invoiceId)
+
+	return a.client.executeBinary(ctx, req)
+}
+
+// Recompute a draft invoice against current usage, credits, coupons and tax, and return it.
+// Drafts are also refreshed periodically in the background; use this to force it, e.g. after
+// ingesting late events. Rejected while a payment for the invoice is in progress or when the
+// invoice was merged into a consolidated parent.
+func (a *Invoices) RefreshInvoice(ctx context.Context, invoiceId string) (*Invoice, error) {
+	req := newRequest(http.MethodPost, "/api/v1/invoices/{invoice_id}/refresh")
+	req.SetPathParam("invoice_id", invoiceId)
+
+	var out Invoice
+	if err := a.client.execute(ctx, req, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// Download the structured e-invoice (EN 16931 XML) issued with an invoice. For
+// Factur-X the same XML is also embedded in the PDF.
+func (a *Invoices) DownloadInvoiceXml(ctx context.Context, invoiceId string) ([]byte, error) {
+	req := newRequest(http.MethodGet, "/api/v1/invoices/{invoice_id}/xml")
 	req.SetPathParam("invoice_id", invoiceId)
 
 	return a.client.executeBinary(ctx, req)

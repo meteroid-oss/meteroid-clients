@@ -15,23 +15,38 @@ type CustomerUpdateRequest struct {
 
 	CustomTaxes RequiredSlice[CustomTaxRate] `json:"custom_taxes"`
 
+	CustomerType *CustomerType `json:"customer_type,omitempty"`
+
 	// Free-text legal exemption mention surfaced on exempt invoices.
 	ExemptionReason *string `json:"exemption_reason,omitempty"`
+
+	// Omit to keep the stored value (a full replace does not blank a person's name).
+	FirstName *string `json:"first_name,omitempty"`
 
 	InvoicingEmails RequiredSlice[string] `json:"invoicing_emails"`
 
 	InvoicingEntityId InvoicingEntityId `json:"invoicing_entity_id"`
 
-	// Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
-	// Omit or send `""` to reset to the invoicing entity default (full-replace update).
-	// Unsupported languages fall back to `en-US` when rendering.
+	// Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.
+	// Deprecated: this field is deprecated in the Meteroid API.
 	InvoicingLanguage *string `json:"invoicing_language,omitempty"`
 
 	IsTaxExempt *bool `json:"is_tax_exempt,omitempty"`
 
-	Name string `json:"name"`
+	LastName *string `json:"last_name,omitempty"`
+
+	// BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB).
+	LegalNumber *string `json:"legal_number,omitempty"`
+
+	// Required for `COMPANY`. Ignored for `INDIVIDUAL`: derived from `first_name` + `last_name`.
+	Name *string `json:"name,omitempty"`
 
 	Phone *string `json:"phone,omitempty"`
+
+	// Preferred document languages, most-preferred first (BCP-47 tags, e.g.
+	// `["fr-FR", "en"]`); overrides the invoicing entity default. Omit or send `[]` to
+	// reset to that default (full-replace update).
+	PreferredLocales []string `json:"preferred_locales,omitempty"`
 
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 

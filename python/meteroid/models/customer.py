@@ -7,6 +7,7 @@ from .address import Address
 from .currency import Currency
 from .custom_tax_rate import CustomTaxRate
 from .customer_id import CustomerId
+from .customer_type import CustomerType
 from .invoicing_entity_id import InvoicingEntityId
 from .shipping_address import ShippingAddress
 
@@ -28,6 +29,10 @@ class Customer(BaseModel):
 
     name: str
 
+    preferred_locales: t.List[str]
+    """Preferred document languages, most-preferred first (BCP-47 tags, e.g.
+    `["fr-FR", "en"]`); overrides the invoicing entity default."""
+
     alias: t.Optional[str] = None
 
     billing_address: t.Optional[Address] = None
@@ -36,8 +41,17 @@ class Customer(BaseModel):
 
     connected_account_id: t.Optional[str] = None
 
+    customer_type: t.Optional[CustomerType] = None
+
+    first_name: t.Optional[str] = None
+
     invoicing_language: t.Optional[str] = None
-    """Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default."""
+    """Deprecated: the first entry of `preferred_locales`."""
+
+    last_name: t.Optional[str] = None
+
+    legal_number: t.Optional[str] = None
+    """BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB)."""
 
     phone: t.Optional[str] = None
 

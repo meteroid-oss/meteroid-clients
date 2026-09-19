@@ -11,6 +11,9 @@ type CreateCheckoutSessionRequest struct {
 
 	BillingStartDate *string `json:"billing_start_date,omitempty"`
 
+	// Absolute http(s) URL offered to the customer to leave the checkout without paying.
+	CancelUrl *string `json:"cancel_url,omitempty"`
+
 	// Automatically try to charge the customer's configured payment method on finalize. Default is true.
 	ChargeAutomatically *bool `json:"charge_automatically,omitempty"`
 
@@ -41,6 +44,11 @@ type CreateCheckoutSessionRequest struct {
 	PlanVersionId PlanVersionId `json:"plan_version_id"`
 
 	PurchaseOrder *string `json:"purchase_order,omitempty"`
+
+	// Absolute http(s) URL the customer is sent to after a successful checkout.
+	// `checkout_session_id` is appended as a query parameter. Without it the customer stays on
+	// the hosted confirmation page.
+	SuccessUrl *string `json:"success_url,omitempty"`
 
 	TrialDurationDays *int32 `json:"trial_duration_days,omitempty"`
 }

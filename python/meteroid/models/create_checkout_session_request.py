@@ -27,6 +27,9 @@ class CreateCheckoutSessionRequest(BaseModel):
 
     billing_start_date: t.Optional[str] = None
 
+    cancel_url: t.Optional[str] = None
+    """Absolute http(s) URL offered to the customer to leave the checkout without paying."""
+
     charge_automatically: t.Optional[bool] = None
     """Automatically try to charge the customer's configured payment method on finalize. Default is true."""
 
@@ -52,5 +55,10 @@ class CreateCheckoutSessionRequest(BaseModel):
     payment_methods_config: t.Optional[PaymentMethodsConfig] = None
 
     purchase_order: t.Optional[str] = None
+
+    success_url: t.Optional[str] = None
+    """Absolute http(s) URL the customer is sent to after a successful checkout.
+    `checkout_session_id` is appended as a query parameter. Without it the customer stays on
+    the hosted confirmation page."""
 
     trial_duration_days: t.Optional[int] = None

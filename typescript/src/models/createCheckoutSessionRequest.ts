@@ -24,6 +24,9 @@ export interface CreateCheckoutSessionRequest {
 
   billingStartDate?: string | null;
 
+  /** Absolute http(s) URL offered to the customer to leave the checkout without paying. */
+  cancelUrl?: string | null;
+
   /** Automatically try to charge the customer's configured payment method on finalize. Default is true. */
   chargeAutomatically?: boolean | null;
 
@@ -55,6 +58,13 @@ export interface CreateCheckoutSessionRequest {
 
   purchaseOrder?: string | null;
 
+  /**
+   * Absolute http(s) URL the customer is sent to after a successful checkout.
+   * `checkout_session_id` is appended as a query parameter. Without it the customer stays on
+   * the hosted confirmation page.
+   */
+  successUrl?: string | null;
+
   trialDurationDays?: number | null;
 }
 
@@ -70,6 +80,7 @@ export const CreateCheckoutSessionRequestSerializer = {
       autoAdvanceInvoices: object["auto_advance_invoices"],
       billingDayAnchor: object["billing_day_anchor"],
       billingStartDate: object["billing_start_date"],
+      cancelUrl: object["cancel_url"],
       chargeAutomatically: object["charge_automatically"],
       components:
         object["components"] != null
@@ -97,6 +108,7 @@ export const CreateCheckoutSessionRequestSerializer = {
           : undefined,
       planVersionId: PlanVersionIdSerializer._fromJsonObject(object["plan_version_id"]),
       purchaseOrder: object["purchase_order"],
+      successUrl: object["success_url"],
       trialDurationDays: object["trial_duration_days"],
     };
   },
@@ -112,6 +124,7 @@ export const CreateCheckoutSessionRequestSerializer = {
       auto_advance_invoices: self.autoAdvanceInvoices,
       billing_day_anchor: self.billingDayAnchor,
       billing_start_date: self.billingStartDate,
+      cancel_url: self.cancelUrl,
       charge_automatically: self.chargeAutomatically,
       components:
         self.components != null
@@ -135,6 +148,7 @@ export const CreateCheckoutSessionRequestSerializer = {
           : undefined,
       plan_version_id: PlanVersionIdSerializer._toJsonObject(self.planVersionId),
       purchase_order: self.purchaseOrder,
+      success_url: self.successUrl,
       trial_duration_days: self.trialDurationDays,
     };
   },

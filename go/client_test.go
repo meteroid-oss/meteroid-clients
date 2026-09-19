@@ -34,6 +34,7 @@ func TestListCustomers(t *testing.T) {
 				"name": "Test Customer",
 				"currency": "USD",
 				"custom_properties": {},
+				"preferred_locales": [],
 				"custom_taxes": [],
 				"invoicing_emails": [],
 				"invoicing_entity_id": "inv_1"
@@ -121,11 +122,11 @@ func TestCreateCustomer(t *testing.T) {
 		gotBody, _ = io.ReadAll(r.Body)
 		gotKey = r.Header.Get("idempotency-key")
 		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1"}`)
+		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1","preferred_locales":[]}`)
 	})
 
 	customer, err := client.Customers().CreateCustomer(context.Background(), CustomerCreateRequest{
-		Name:     "Acme",
+		Name:     Ptr("Acme"),
 		Currency: CurrencyEur,
 	})
 	if err != nil {
@@ -191,7 +192,7 @@ func TestPathParameterEscaping(t *testing.T) {
 	var gotPath string
 	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 		gotPath = r.URL.Path
-		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1"}`)
+		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1","preferred_locales":[]}`)
 	})
 
 	if _, err := client.Customers().GetCustomer(context.Background(), "alias with spaces/and-slash"); err != nil {
@@ -364,7 +365,7 @@ func TestRetries(t *testing.T) {
 			io.WriteString(w, `{"code":"INTERNAL_SERVER_ERROR","message":"transient"}`)
 			return
 		}
-		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1"}`)
+		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1","preferred_locales":[]}`)
 	}))
 	defer server.Close()
 
@@ -414,7 +415,7 @@ func TestWithToken(t *testing.T) {
 	var gotAuth string
 	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 		gotAuth = r.Header.Get("Authorization")
-		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1"}`)
+		io.WriteString(w, `{"id":"cust_1","name":"Acme","currency":"EUR","custom_properties":{},"custom_taxes":[],"invoicing_emails":[],"invoicing_entity_id":"inv_1","preferred_locales":[]}`)
 	})
 
 	if _, err := client.WithToken("other-key").Customers().GetCustomer(context.Background(), "cust_1"); err != nil {

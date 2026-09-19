@@ -35,6 +35,7 @@ async fn test_list_customers() {
                     "name": "Test Customer",
                     "currency": "USD",
                     "custom_properties": {},
+                    "preferred_locales": [],
                     "custom_taxes": [],
                     "invoicing_emails": [],
                     "invoicing_entity_id": "inv_1"
@@ -102,6 +103,7 @@ async fn test_create_customer() {
         "name": "New Customer",
         "currency": "USD",
         "custom_properties": {},
+        "preferred_locales": [],
         "custom_taxes": [],
         "invoicing_emails": ["billing@new.com"],
         "invoicing_entity_id": "inv_1"
@@ -117,12 +119,12 @@ async fn test_create_customer() {
 
     let client = create_test_client(mock_server.uri());
 
-    let request = meteroid_rs::models::CustomerCreateRequest::new(
+    let mut request = meteroid_rs::models::CustomerCreateRequest::new(
         meteroid_rs::models::Currency::Usd,
         vec![],
         vec!["billing@new.com".to_string()],
-        "New Customer".to_string(),
     );
+    request.name = Some("New Customer".to_string());
 
     let customer = client.customers().create_customer(request).await.unwrap();
 
@@ -162,6 +164,7 @@ async fn test_idempotency_key_is_sent_for_post_request() {
         "name": "New Customer",
         "currency": "USD",
         "custom_properties": {},
+        "preferred_locales": [],
         "custom_taxes": [],
         "invoicing_emails": [],
         "invoicing_entity_id": "inv_1"
@@ -175,12 +178,12 @@ async fn test_idempotency_key_is_sent_for_post_request() {
 
     let client = create_test_client(mock_server.uri());
 
-    let request = meteroid_rs::models::CustomerCreateRequest::new(
+    let mut request = meteroid_rs::models::CustomerCreateRequest::new(
         meteroid_rs::models::Currency::Usd,
         vec![],
         vec![],
-        "New Customer".to_string(),
     );
+    request.name = Some("New Customer".to_string());
 
     client.customers().create_customer(request).await.unwrap();
 

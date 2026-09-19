@@ -5,6 +5,7 @@ export enum TaxExemptionType {
   TaxExempt = "TAX_EXEMPT",
   NotRegistered = "NOT_REGISTERED",
   Export = "EXPORT",
+  NoVatTerritory = "NO_VAT_TERRITORY",
 }
 
 export const TaxExemptionTypeSerializer = {

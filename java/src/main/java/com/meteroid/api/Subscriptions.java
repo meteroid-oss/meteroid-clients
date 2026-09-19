@@ -7,6 +7,7 @@ import com.meteroid.exceptions.ApiException;
 import com.meteroid.models.CancelSubscriptionRequest;
 import com.meteroid.models.CancelSubscriptionResponse;
 import com.meteroid.models.EffectiveEntitlementListResponse;
+import com.meteroid.models.Subscription;
 import com.meteroid.models.SubscriptionCreateRequest;
 import com.meteroid.models.SubscriptionDetails;
 import com.meteroid.models.SubscriptionListResponse;
@@ -122,5 +123,19 @@ public class Subscriptions {
                                         "/api/v1/subscriptions/%s/entitlements", subscriptionId));
         return this.client.executeRequest(
                 "GET", url.build(), null, null, EffectiveEntitlementListResponse.class);
+    }
+
+    /**
+     * Retrieve a subscription without its components, add-ons, coupons and entitlements: the same
+     * shape as list items, for callers that only need status and billing dates.
+     */
+    public Subscription subscriptionSummary(final String subscriptionId)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(
+                                String.format("/api/v1/subscriptions/%s/summary", subscriptionId));
+        return this.client.executeRequest("GET", url.build(), null, null, Subscription.class);
     }
 }

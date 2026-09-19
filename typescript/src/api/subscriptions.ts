@@ -12,6 +12,7 @@ import {
   EffectiveEntitlementListResponseSerializer,
 } from "../models/effectiveEntitlementListResponse";
 import type { PlanId } from "../models/planId";
+import { type Subscription, SubscriptionSerializer } from "../models/subscription";
 import {
   type SubscriptionCreateRequest,
   SubscriptionCreateRequestSerializer,
@@ -146,5 +147,19 @@ export class Subscriptions {
       this.requestCtx,
       EffectiveEntitlementListResponseSerializer._fromJsonObject
     );
+  }
+
+  /**
+   * Retrieve a subscription without its components, add-ons, coupons and entitlements: the same
+   * shape as list items, for callers that only need status and billing dates.
+   */
+  public subscriptionSummary(subscriptionId: string): Promise<Subscription> {
+    const request = new MeteroidRequest(
+      HttpMethod.GET,
+      "/api/v1/subscriptions/{subscription_id}/summary"
+    );
+
+    request.setPathParam("subscription_id", subscriptionId);
+    return request.send(this.requestCtx, SubscriptionSerializer._fromJsonObject);
   }
 }

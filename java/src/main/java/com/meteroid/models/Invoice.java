@@ -51,6 +51,9 @@ public class Invoice {
     @JsonProperty("due_date")
     private String dueDate;
 
+    @JsonProperty("einvoicing_status")
+    private EInvoicingStatus einvoicingStatus;
+
     @JsonProperty("finalized_at")
     private OffsetDateTime finalizedAt;
 
@@ -334,6 +337,25 @@ public class Invoice {
 
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Invoice einvoicingStatus(EInvoicingStatus einvoicingStatus) {
+        this.einvoicingStatus = einvoicingStatus;
+        return this;
+    }
+
+    /**
+     * Get einvoicingStatus
+     *
+     * @return einvoicingStatus
+     */
+    @javax.annotation.Nullable
+    public EInvoicingStatus getEinvoicingStatus() {
+        return einvoicingStatus;
+    }
+
+    public void setEinvoicingStatus(EInvoicingStatus einvoicingStatus) {
+        this.einvoicingStatus = einvoicingStatus;
     }
 
     public Invoice finalizedAt(OffsetDateTime finalizedAt) {

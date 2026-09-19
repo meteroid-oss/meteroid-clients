@@ -19,6 +19,8 @@ export interface CheckoutSession {
 
   billingStartDate?: string | null;
 
+  cancelUrl?: string | null;
+
   checkoutType: CheckoutType;
 
   checkoutUrl?: string | null;
@@ -46,6 +48,8 @@ export interface CheckoutSession {
 
   subscriptionId?: SubscriptionId | null;
 
+  successUrl?: string | null;
+
   trialDurationDays?: number | null;
 }
 
@@ -54,6 +58,7 @@ export const CheckoutSessionSerializer = {
     return {
       billingDayAnchor: object["billing_day_anchor"],
       billingStartDate: object["billing_start_date"],
+      cancelUrl: object["cancel_url"],
       checkoutType: CheckoutTypeSerializer._fromJsonObject(object["checkout_type"]),
       checkoutUrl: object["checkout_url"],
       completedAt:
@@ -79,6 +84,7 @@ export const CheckoutSessionSerializer = {
         object["subscription_id"] != null
           ? SubscriptionIdSerializer._fromJsonObject(object["subscription_id"])
           : undefined,
+      successUrl: object["success_url"],
       trialDurationDays: object["trial_duration_days"],
     };
   },
@@ -87,6 +93,7 @@ export const CheckoutSessionSerializer = {
     return {
       billing_day_anchor: self.billingDayAnchor,
       billing_start_date: self.billingStartDate,
+      cancel_url: self.cancelUrl,
       checkout_type: CheckoutTypeSerializer._toJsonObject(self.checkoutType),
       checkout_url: self.checkoutUrl,
       completed_at: self.completedAt,
@@ -106,6 +113,7 @@ export const CheckoutSessionSerializer = {
         self.subscriptionId != null
           ? SubscriptionIdSerializer._toJsonObject(self.subscriptionId)
           : undefined,
+      success_url: self.successUrl,
       trial_duration_days: self.trialDurationDays,
     };
   },

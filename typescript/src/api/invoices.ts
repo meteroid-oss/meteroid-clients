@@ -1,4 +1,5 @@
 // this file is @generated
+import type { EInvoicingStatus } from "../models/eInvoicingStatus";
 import { type Invoice, InvoiceSerializer } from "../models/invoice";
 import {
   type InvoiceCustomPropertiesRequest,
@@ -17,6 +18,11 @@ export interface InvoicesListInvoicesOptions {
   customerId?: string;
   subscriptionId?: SubscriptionId;
   statuses?: InvoiceStatus[];
+  /**
+   * Only invoices whose e-invoice was generated, or failed. Invoices from entities that
+   * had not opted in carry no status and match neither.
+   */
+  einvoicingStatus?: EInvoicingStatus;
   /** Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`, `amount`, `invoice_date`, `status`, `payment_status`. Direction: `asc` or `desc`. Default: `invoice_date.desc`. */
   orderBy?: string;
   /** Page number (0-indexed) */
@@ -37,6 +43,7 @@ export class Invoices {
     request.setQueryParam("customer_id", options?.customerId);
     request.setQueryParam("subscription_id", options?.subscriptionId);
     request.setExplodedQueryParam("statuses", options?.statuses);
+    request.setQueryParam("einvoicing_status", options?.einvoicingStatus);
     request.setQueryParam("order_by", options?.orderBy);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
@@ -80,6 +87,36 @@ export class Invoices {
     const request = new MeteroidRequest(
       HttpMethod.GET,
       "/api/v1/invoices/{invoice_id}/download"
+    );
+
+    request.setPathParam("invoice_id", invoiceId);
+    return request.sendBinary(this.requestCtx);
+  }
+
+  /**
+   * Recompute a draft invoice against current usage, credits, coupons and tax, and return it.
+   * Drafts are also refreshed periodically in the background; use this to force it, e.g. after
+   * ingesting late events. Rejected while a payment for the invoice is in progress or when the
+   * invoice was merged into a consolidated parent.
+   */
+  public refreshInvoice(invoiceId: string): Promise<Invoice> {
+    const request = new MeteroidRequest(
+      HttpMethod.POST,
+      "/api/v1/invoices/{invoice_id}/refresh"
+    );
+
+    request.setPathParam("invoice_id", invoiceId);
+    return request.send(this.requestCtx, InvoiceSerializer._fromJsonObject);
+  }
+
+  /**
+   * Download the structured e-invoice (EN 16931 XML) issued with an invoice. For
+   * Factur-X the same XML is also embedded in the PDF.
+   */
+  public downloadInvoiceXml(invoiceId: string): Promise<Uint8Array> {
+    const request = new MeteroidRequest(
+      HttpMethod.GET,
+      "/api/v1/invoices/{invoice_id}/xml"
     );
 
     request.setPathParam("invoice_id", invoiceId);

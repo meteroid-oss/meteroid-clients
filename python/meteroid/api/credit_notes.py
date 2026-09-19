@@ -97,6 +97,21 @@ class CreditNotesAsync(ApiBaseAsync):
         )
         return response.content
 
+    async def download_credit_note_xml(
+        self,
+        credit_note_id: str,
+    ) -> bytes:
+        """Download the structured e-invoice (EN 16931 XML) issued with a credit note. For
+        Factur-X the same XML is also embedded in the PDF."""
+        response = await self._request_asyncio(
+            method="get",
+            path="/api/v1/credit-notes/{credit_note_id}/xml",
+            path_params={
+                "credit_note_id": credit_note_id,
+            },
+        )
+        return response.content
+
 
 class CreditNotes(ApiBaseSync):
     """credit notes API."""
@@ -177,6 +192,21 @@ class CreditNotes(ApiBaseSync):
         response = self._request_sync(
             method="get",
             path="/api/v1/credit-notes/{credit_note_id}/download",
+            path_params={
+                "credit_note_id": credit_note_id,
+            },
+        )
+        return response.content
+
+    def download_credit_note_xml(
+        self,
+        credit_note_id: str,
+    ) -> bytes:
+        """Download the structured e-invoice (EN 16931 XML) issued with a credit note. For
+        Factur-X the same XML is also embedded in the PDF."""
+        response = self._request_sync(
+            method="get",
+            path="/api/v1/credit-notes/{credit_note_id}/xml",
             path_params={
                 "credit_note_id": credit_note_id,
             },

@@ -8,6 +8,8 @@ type CheckoutSession struct {
 
 	BillingStartDate *string `json:"billing_start_date,omitempty"`
 
+	CancelUrl *string `json:"cancel_url,omitempty"`
+
 	CheckoutType CheckoutType `json:"checkout_type"`
 
 	CheckoutUrl *string `json:"checkout_url,omitempty"`
@@ -37,6 +39,8 @@ type CheckoutSession struct {
 	Status CheckoutSessionStatus `json:"status"`
 
 	SubscriptionId *SubscriptionId `json:"subscription_id,omitempty"`
+
+	SuccessUrl *string `json:"success_url,omitempty"`
 
 	TrialDurationDays *int32 `json:"trial_duration_days,omitempty"`
 }

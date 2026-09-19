@@ -14,6 +14,7 @@ export enum EventType {
   InvoiceClosed = "invoice.closed",
   InvoiceConsolidated = "invoice.consolidated",
   InvoiceDeleted = "invoice.deleted",
+  InvoiceAccountingPdfGenerated = "invoice.accounting_pdf_generated",
   QuoteAccepted = "quote.accepted",
   QuoteConverted = "quote.converted",
   CreditNoteCreated = "credit_note.created",

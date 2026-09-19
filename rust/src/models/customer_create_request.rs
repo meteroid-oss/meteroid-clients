@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     address::Address, currency::Currency, custom_tax_rate::CustomTaxRate,
-    invoicing_entity_id::InvoicingEntityId, shipping_address::ShippingAddress,
+    customer_type::CustomerType, invoicing_entity_id::InvoicingEntityId,
+    shipping_address::ShippingAddress,
 };
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
@@ -29,27 +30,50 @@ pub struct CustomerCreateRequest {
 
     pub custom_taxes: Vec<CustomTaxRate>,
 
+    /// `INDIVIDUAL` requires `first_name`, `last_name`, and a billing-address country.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub customer_type: Option<CustomerType>,
+
     /// Free-text legal exemption mention surfaced on exempt invoices.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exemption_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_name: Option<String>,
 
     pub invoicing_emails: Vec<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invoicing_entity_id: Option<InvoicingEntityId>,
 
-    /// Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
-    /// Unsupported languages fall back to `en-US` when rendering.
+    /// Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.
+    #[deprecated]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invoicing_language: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_tax_exempt: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_name: Option<String>,
+
+    /// BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub legal_number: Option<String>,
+
+    /// Required for `COMPANY`. Ignored for `INDIVIDUAL`: derived from `first_name` + `last_name`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
+
+    /// Preferred document languages, most-preferred first (BCP-47 tags, e.g.
+    /// `["fr-FR", "en"]`); overrides the invoicing entity default. The first one the
+    /// renderer has a template for wins, so an unsupported entry alongside a supported
+    /// one just falls through; a list of only unsupported ones is rejected.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub preferred_locales: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shipping_address: Option<ShippingAddress>,
@@ -63,8 +87,8 @@ impl CustomerCreateRequest {
         currency: Currency,
         custom_taxes: Vec<CustomTaxRate>,
         invoicing_emails: Vec<String>,
-        name: String,
     ) -> Self {
+        #[allow(deprecated)]
         Self {
             alias: None,
             billing_address: None,
@@ -73,13 +97,18 @@ impl CustomerCreateRequest {
             currency,
             custom_properties: None,
             custom_taxes,
+            customer_type: None,
             exemption_reason: None,
+            first_name: None,
             invoicing_emails,
             invoicing_entity_id: None,
             invoicing_language: None,
             is_tax_exempt: None,
-            name,
+            last_name: None,
+            legal_number: None,
+            name: None,
             phone: None,
+            preferred_locales: None,
             shipping_address: None,
             vat_number: None,
         }

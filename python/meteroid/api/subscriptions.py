@@ -6,6 +6,7 @@ from ..models import (
     CancelSubscriptionResponse,
     EffectiveEntitlementListResponse,
     PlanId,
+    Subscription,
     SubscriptionCreateRequest,
     SubscriptionDetails,
     SubscriptionListResponse,
@@ -122,6 +123,21 @@ class SubscriptionsAsync(ApiBaseAsync):
         )
         return EffectiveEntitlementListResponse.from_dict(response.json())
 
+    async def subscription_summary(
+        self,
+        subscription_id: str,
+    ) -> Subscription:
+        """Retrieve a subscription without its components, add-ons, coupons and entitlements: the same
+        shape as list items, for callers that only need status and billing dates."""
+        response = await self._request_asyncio(
+            method="get",
+            path="/api/v1/subscriptions/{subscription_id}/summary",
+            path_params={
+                "subscription_id": subscription_id,
+            },
+        )
+        return Subscription.from_dict(response.json())
+
 
 class Subscriptions(ApiBaseSync):
     """subscriptions API."""
@@ -228,3 +244,18 @@ class Subscriptions(ApiBaseSync):
             },
         )
         return EffectiveEntitlementListResponse.from_dict(response.json())
+
+    def subscription_summary(
+        self,
+        subscription_id: str,
+    ) -> Subscription:
+        """Retrieve a subscription without its components, add-ons, coupons and entitlements: the same
+        shape as list items, for callers that only need status and billing dates."""
+        response = self._request_sync(
+            method="get",
+            path="/api/v1/subscriptions/{subscription_id}/summary",
+            path_params={
+                "subscription_id": subscription_id,
+            },
+        )
+        return Subscription.from_dict(response.json())

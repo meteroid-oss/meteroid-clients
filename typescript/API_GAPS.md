@@ -1,27 +1,10 @@
 # Meteroid TypeScript SDK — known API gaps
 
 Things a user may reasonably expect that the API (and therefore this generated SDK) does not
-offer today. Everything here was re-verified against `spec/openapi.json` at SDK version 0.26.0.
+offer today. Everything here was re-verified against `spec/openapi.json`.
 
 If you need one of these, please open an issue at
 <https://github.com/meteroid-oss/meteroid/issues>.
-
-## Checkout sessions: no `successUrl` / `cancelUrl`
-
-`CreateCheckoutSessionRequest` has no redirect URLs. The response carries a `checkoutUrl`, but
-where the customer lands after completing or abandoning checkout is configured outside the SDK.
-
-## Invoices: no refresh / recalculate endpoint
-
-The `Invoices` resource exposes `listInvoices`, `getInvoiceById`,
-`patchInvoiceCustomProperties` and `downloadInvoicePdf`. There is no endpoint to force a draft
-invoice to recompute against current usage.
-
-## Subscriptions: only the detailed representation
-
-`subscriptionDetails(subscriptionId)` is the only per-subscription read, and it always returns
-the full `SubscriptionDetails` (components, add-ons, coupons, entitlements). There is no
-lightweight `getSubscription`.
 
 ## Dates are split between two representations
 

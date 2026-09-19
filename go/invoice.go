@@ -31,6 +31,8 @@ type Invoice struct {
 
 	DueDate *string `json:"due_date,omitempty"`
 
+	EinvoicingStatus *EInvoicingStatus `json:"einvoicing_status,omitempty"`
+
 	// RFC 3339 timestamp.
 	FinalizedAt *time.Time `json:"finalized_at,omitempty"`
 

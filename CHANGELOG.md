@@ -13,6 +13,13 @@
 * Codegen: generation fails loudly on unsupported operations or components instead of silently dropping them
 * Java: `jackson-core`, `jackson-databind`, `jackson-annotations` and `standardwebhooks` are now `compile`-scope dependencies (Gradle `api`). `Webhook.verify`/`sign` throw standard-webhooks exceptions and every model's `fromJson`/`toJson` throws `JsonProcessingException`, so code catching them did not compile against the published artifact
 * Java: the `Meteroid` Javadoc example called `getCustomer()`; the getter is `getCustomers()`
+* Invoices: new `refresh_invoice` (`POST /invoices/{invoice_id}/refresh`) to recompute a draft invoice, new `download_invoice_xml` for the e-invoice XML, and new `einvoicing_status` on `Invoice` (`EInvoicingStatus`, plus the `EInvoicingFinding` model)
+* Credit notes: new `download_credit_note_xml`. XML downloads return raw bytes in every SDK, like the PDF downloads
+* Subscriptions: new `subscription_summary` (`GET /subscriptions/{subscription_id}/summary`), a lightweight read returning the list-item shape
+* Checkout sessions: `success_url` and `cancel_url` on `CreateCheckoutSessionRequest` and `CheckoutSession`
+* Customers: `customer_type` (`CustomerType`: `COMPANY` / `INDIVIDUAL`), `first_name`, `last_name`, `legal_number` and `preferred_locales` on `Customer` and on the create, update and patch requests
+* New `invoice.accounting_pdf_generated` event type and `InvoiceDocumentsEvent` payload; `NO_VAT_TERRITORY` added to `TaxExemptionType`
+* **Breaking** (Rust) — `Customer::new` takes `preferred_locales`, and `CustomerCreateRequest::new` / `CustomerUpdateRequest::new` no longer take `name`, which is now optional (in Go, `Name` is a `*string`)
 
 ## Version 0.26.0
 

@@ -7,10 +7,11 @@ type TaxExemptionType string
 //
 // The API may add new values over time; unknown values round-trip unchanged.
 const (
-	TaxExemptionTypeReverseCharge TaxExemptionType = "REVERSE_CHARGE"
-	TaxExemptionTypeTaxExempt     TaxExemptionType = "TAX_EXEMPT"
-	TaxExemptionTypeNotRegistered TaxExemptionType = "NOT_REGISTERED"
-	TaxExemptionTypeExport        TaxExemptionType = "EXPORT"
+	TaxExemptionTypeReverseCharge  TaxExemptionType = "REVERSE_CHARGE"
+	TaxExemptionTypeTaxExempt      TaxExemptionType = "TAX_EXEMPT"
+	TaxExemptionTypeNotRegistered  TaxExemptionType = "NOT_REGISTERED"
+	TaxExemptionTypeExport         TaxExemptionType = "EXPORT"
+	TaxExemptionTypeNoVatTerritory TaxExemptionType = "NO_VAT_TERRITORY"
 )
 
 // AllTaxExemptionTypeValues lists every TaxExemptionType value known to this SDK version.
@@ -19,6 +20,7 @@ var AllTaxExemptionTypeValues = []TaxExemptionType{
 	TaxExemptionTypeTaxExempt,
 	TaxExemptionTypeNotRegistered,
 	TaxExemptionTypeExport,
+	TaxExemptionTypeNoVatTerritory,
 }
 
 // String returns the wire representation of the value.

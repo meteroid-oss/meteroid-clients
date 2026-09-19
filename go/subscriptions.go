@@ -131,3 +131,16 @@ func (a *Subscriptions) ListSubscriptionEntitlements(ctx context.Context, subscr
 	}
 	return &out, nil
 }
+
+// Retrieve a subscription without its components, add-ons, coupons and entitlements: the same
+// shape as list items, for callers that only need status and billing dates.
+func (a *Subscriptions) SubscriptionSummary(ctx context.Context, subscriptionId string) (*Subscription, error) {
+	req := newRequest(http.MethodGet, "/api/v1/subscriptions/{subscription_id}/summary")
+	req.SetPathParam("subscription_id", subscriptionId)
+
+	var out Subscription
+	if err := a.client.execute(ctx, req, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}

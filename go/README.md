@@ -79,7 +79,7 @@ Every method takes a `context.Context` as its first argument.
 
 ```go
 customer, err := client.Customers().CreateCustomer(ctx, meteroid.CustomerCreateRequest{
-	Name:            "Acme Corp",
+	Name:            meteroid.Ptr("Acme Corp"),
 	Currency:        meteroid.CurrencyEur,
 	Alias:           meteroid.Ptr("acme"),
 	InvoicingEmails: []string{"billing@acme.com"},

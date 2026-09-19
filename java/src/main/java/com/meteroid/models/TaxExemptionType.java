@@ -8,7 +8,8 @@ public enum TaxExemptionType implements ToQueryParam {
     REVERSE_CHARGE("REVERSE_CHARGE"),
     TAX_EXEMPT("TAX_EXEMPT"),
     NOT_REGISTERED("NOT_REGISTERED"),
-    EXPORT("EXPORT");
+    EXPORT("EXPORT"),
+    NO_VAT_TERRITORY("NO_VAT_TERRITORY");
     private final String value;
 
     TaxExemptionType(String value) {

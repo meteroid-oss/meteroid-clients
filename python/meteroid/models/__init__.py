@@ -117,8 +117,11 @@ from .customer_patch_request import CustomerPatchRequest
 from .customer_payment_method_id import CustomerPaymentMethodId
 from .customer_portal_token_request import CustomerPortalTokenRequest
 from .customer_portal_token_response import CustomerPortalTokenResponse
+from .customer_type import CustomerType
 from .customer_update_request import CustomerUpdateRequest
 from .double_segmentation_matrix import DoubleSegmentationMatrix
+from .e_invoicing_finding import EInvoicingFinding
+from .e_invoicing_status import EInvoicingStatus
 from .effective_entitlement import EffectiveEntitlement
 from .effective_entitlement_list_response import EffectiveEntitlementListResponse
 from .effective_entitlement_value import EffectiveEntitlementValue
@@ -155,6 +158,8 @@ from .ingest_failure import IngestFailure
 from .introspection_request import IntrospectionRequest
 from .invoice import Invoice
 from .invoice_custom_properties_request import InvoiceCustomPropertiesRequest
+from .invoice_documents_event import InvoiceDocumentsEvent
+from .invoice_documents_event_data import InvoiceDocumentsEventData
 from .invoice_event import InvoiceEvent
 from .invoice_event_data import InvoiceEventData
 from .invoice_id import InvoiceId
@@ -445,8 +450,11 @@ __all__ = [
     "CustomerPaymentMethodId",
     "CustomerPortalTokenRequest",
     "CustomerPortalTokenResponse",
+    "CustomerType",
     "CustomerUpdateRequest",
     "DoubleSegmentationMatrix",
+    "EInvoicingFinding",
+    "EInvoicingStatus",
     "EffectiveEntitlement",
     "EffectiveEntitlementListResponse",
     "EffectiveEntitlementValue",
@@ -483,6 +491,8 @@ __all__ = [
     "IntrospectionRequest",
     "Invoice",
     "InvoiceCustomPropertiesRequest",
+    "InvoiceDocumentsEvent",
+    "InvoiceDocumentsEventData",
     "InvoiceEvent",
     "InvoiceEventData",
     "InvoiceId",

@@ -17,6 +17,7 @@ func TestCustomerJSONRoundTrip(t *testing.T) {
 		"alias": "acme",
 		"billing_address": {"city": "Paris", "country": "FR"},
 		"custom_properties": {"tier": "gold"},
+		"preferred_locales": ["fr-FR", "en"],
 		"custom_taxes": [],
 		"invoicing_emails": ["billing@acme.test"],
 		"invoicing_entity_id": "inv_1"
@@ -284,7 +285,7 @@ func TestNullable(t *testing.T) {
 // schema-valid without the caller knowing which collections are required.
 func TestRequiredCollectionsMarshalEmptyWhenNil(t *testing.T) {
 	encoded, err := json.Marshal(CustomerCreateRequest{
-		Name:     "acme",
+		Name:     Ptr("acme"),
 		Currency: CurrencyEur,
 	})
 	if err != nil {
@@ -309,7 +310,7 @@ func TestRequiredCollectionsMarshalEmptyWhenNil(t *testing.T) {
 // explicitly empty one.
 func TestRequiredCollectionsKeepExplicitValues(t *testing.T) {
 	req := CustomerCreateRequest{
-		Name:            "acme",
+		Name:            Ptr("acme"),
 		Currency:        CurrencyEur,
 		InvoicingEmails: []string{"billing@acme.test", "ap@acme.test"},
 		CustomTaxes:     []CustomTaxRate{{Name: "VAT", Rate: "0.20"}},

@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     coupon_line_item::CouponLineItem, currency::Currency, customer_details::CustomerDetails,
-    customer_id::CustomerId, invoice_id::InvoiceId, invoice_line_item::InvoiceLineItem,
-    invoice_payment_status::InvoicePaymentStatus, invoice_status::InvoiceStatus,
-    invoice_type::InvoiceType, subscription_id::SubscriptionId,
+    customer_id::CustomerId, e_invoicing_status::EInvoicingStatus, invoice_id::InvoiceId,
+    invoice_line_item::InvoiceLineItem, invoice_payment_status::InvoicePaymentStatus,
+    invoice_status::InvoiceStatus, invoice_type::InvoiceType, subscription_id::SubscriptionId,
     tax_breakdown_item::TaxBreakdownItem, transaction::Transaction,
 };
 
@@ -39,6 +39,9 @@ pub struct Invoice {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub due_date: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub einvoicing_status: Option<EInvoicingStatus>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finalized_at: Option<String>,
@@ -136,6 +139,7 @@ impl Invoice {
             customer_details,
             customer_id,
             due_date: None,
+            einvoicing_status: None,
             finalized_at: None,
             id,
             invoice_date,

@@ -96,4 +96,18 @@ export class CreditNotes {
     request.setPathParam("credit_note_id", creditNoteId);
     return request.sendBinary(this.requestCtx);
   }
+
+  /**
+   * Download the structured e-invoice (EN 16931 XML) issued with a credit note. For
+   * Factur-X the same XML is also embedded in the PDF.
+   */
+  public downloadCreditNoteXml(creditNoteId: string): Promise<Uint8Array> {
+    const request = new MeteroidRequest(
+      HttpMethod.GET,
+      "/api/v1/credit-notes/{credit_note_id}/xml"
+    );
+
+    request.setPathParam("credit_note_id", creditNoteId);
+    return request.sendBinary(this.requestCtx);
+  }
 }
