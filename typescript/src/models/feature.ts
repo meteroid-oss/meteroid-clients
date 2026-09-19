@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type Entitlement, EntitlementSerializer } from "./entitlement";
 import {
   type EntitlementProductRef,
@@ -33,7 +34,7 @@ export const FeatureSerializer = {
   _fromJsonObject(object: any): Feature {
     return {
       code: object["code"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       description: object["description"],
       entitlement:
         object["entitlement"] != null

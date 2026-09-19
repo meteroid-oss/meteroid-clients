@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import {
   type ConnectedAccountId,
   ConnectedAccountIdSerializer,
@@ -57,12 +58,12 @@ export const ConnectedAccountSerializer = {
           ? TenantIdSerializer._fromJsonObject(object["connected_tenant_id"])
           : undefined,
       connectionType: ConnectionTypeSerializer._fromJsonObject(object["connection_type"]),
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       id: ConnectedAccountIdSerializer._fromJsonObject(object["id"]),
       metadata: object["metadata"],
       onboardingCompletedAt:
         object["onboarding_completed_at"] != null
-          ? new Date(object["onboarding_completed_at"])
+          ? parseDateTime(object["onboarding_completed_at"])
           : undefined,
       onboardingMode: OnboardingModeSerializer._fromJsonObject(object["onboarding_mode"]),
       pendingCountry:
@@ -79,7 +80,7 @@ export const ConnectedAccountSerializer = {
         object["platform_organization_id"]
       ),
       revokedAt:
-        object["revoked_at"] != null ? new Date(object["revoked_at"]) : undefined,
+        object["revoked_at"] != null ? parseDateTime(object["revoked_at"]) : undefined,
       status: ConnectionStatusSerializer._fromJsonObject(object["status"]),
     };
   },

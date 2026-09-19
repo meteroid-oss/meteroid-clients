@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import {
   type CustomerPaymentMethodId,
   CustomerPaymentMethodIdSerializer,
@@ -50,7 +51,9 @@ export const TransactionSerializer = {
           : undefined,
       paymentType: PaymentTypeEnumSerializer._fromJsonObject(object["payment_type"]),
       processedAt:
-        object["processed_at"] != null ? new Date(object["processed_at"]) : undefined,
+        object["processed_at"] != null
+          ? parseDateTime(object["processed_at"])
+          : undefined,
       providerTransactionId: object["provider_transaction_id"],
       status: PaymentStatusEnumSerializer._fromJsonObject(object["status"]),
     };

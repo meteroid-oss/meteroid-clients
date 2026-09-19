@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type EventId, EventIdSerializer } from "./eventId";
 import { type EventType, EventTypeSerializer } from "./eventType";
 import { type InvoiceEventData, InvoiceEventDataSerializer } from "./invoiceEventData";
@@ -20,7 +21,7 @@ export const InvoiceEventSerializer = {
         object["__flatten_invoiceeventdata"]
       ),
       id: EventIdSerializer._fromJsonObject(object["id"]),
-      timestamp: new Date(object["timestamp"]),
+      timestamp: parseDateTime(object["timestamp"]),
       type: EventTypeSerializer._fromJsonObject(object["type"]),
     };
   },

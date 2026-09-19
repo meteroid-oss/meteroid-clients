@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount";
 import { type CouponId, CouponIdSerializer } from "./couponId";
 /**
@@ -33,7 +34,7 @@ export const SubscriptionCouponSerializer = {
       disabled: object["disabled"],
       discount: CouponDiscountSerializer._fromJsonObject(object["discount"]),
       expiresAt:
-        object["expires_at"] != null ? new Date(object["expires_at"]) : undefined,
+        object["expires_at"] != null ? parseDateTime(object["expires_at"]) : undefined,
       id: CouponIdSerializer._fromJsonObject(object["id"]),
       recurringValue: object["recurring_value"],
       redemptionLimit: object["redemption_limit"],

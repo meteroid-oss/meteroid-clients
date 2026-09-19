@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type EntitlementId, EntitlementIdSerializer } from "./entitlementId";
 import { type EntitlementValue, EntitlementValueSerializer } from "./entitlementValue";
 import { type FeatureId, FeatureIdSerializer } from "./featureId";
@@ -18,10 +19,10 @@ export interface Entitlement {
 export const EntitlementSerializer = {
   _fromJsonObject(object: any): Entitlement {
     return {
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       featureId: FeatureIdSerializer._fromJsonObject(object["feature_id"]),
       id: EntitlementIdSerializer._fromJsonObject(object["id"]),
-      updatedAt: new Date(object["updated_at"]),
+      updatedAt: parseDateTime(object["updated_at"]),
       value: EntitlementValueSerializer._fromJsonObject(object["value"]),
     };
   },

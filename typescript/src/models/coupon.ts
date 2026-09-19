@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount";
 import { type CouponId, CouponIdSerializer } from "./couponId";
 import { type PlanId, PlanIdSerializer } from "./planId";
@@ -35,14 +36,14 @@ export const CouponSerializer = {
   _fromJsonObject(object: any): Coupon {
     return {
       archivedAt:
-        object["archived_at"] != null ? new Date(object["archived_at"]) : undefined,
+        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
       code: object["code"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       description: object["description"],
       disabled: object["disabled"],
       discount: CouponDiscountSerializer._fromJsonObject(object["discount"]),
       expiresAt:
-        object["expires_at"] != null ? new Date(object["expires_at"]) : undefined,
+        object["expires_at"] != null ? parseDateTime(object["expires_at"]) : undefined,
       id: CouponIdSerializer._fromJsonObject(object["id"]),
       planIds: object["plan_ids"].map((item: any) =>
         PlanIdSerializer._fromJsonObject(item)

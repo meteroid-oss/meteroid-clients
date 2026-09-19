@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type PlanId, PlanIdSerializer } from "./planId";
 import { type PlanStatusEnum, PlanStatusEnumSerializer } from "./planStatusEnum";
 import { type PlanTypeEnum, PlanTypeEnumSerializer } from "./planTypeEnum";
@@ -24,7 +25,7 @@ export interface PlanEventData {
 export const PlanEventDataSerializer = {
   _fromJsonObject(object: any): PlanEventData {
     return {
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       currency: object["currency"],
       description: object["description"],
       name: object["name"],

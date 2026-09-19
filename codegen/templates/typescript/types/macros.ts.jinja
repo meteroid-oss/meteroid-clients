@@ -34,9 +34,9 @@
     {%- set fallback = "null" if (field_required and field_nullable) else "undefined" -%}
     {%- if type.is_datetime() -%}
         {%- if guarded -%}
-            {{ field_expr }} != null ? new Date({{ field_expr }}) : {{ fallback }}
+            {{ field_expr }} != null ? parseDateTime({{ field_expr }}) : {{ fallback }}
         {%- else -%}
-            new Date({{ field_expr }})
+            parseDateTime({{ field_expr }})
         {%- endif -%}
     {%- elif type.is_schema_ref() -%}
         {%- if guarded -%}

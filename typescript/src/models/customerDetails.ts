@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type Address, AddressSerializer } from "./address";
 import { type CustomerId, CustomerIdSerializer } from "./customerId";
 
@@ -29,7 +30,7 @@ export const CustomerDetailsSerializer = {
       email: object["email"],
       id: CustomerIdSerializer._fromJsonObject(object["id"]),
       name: object["name"],
-      snapshotAt: new Date(object["snapshot_at"]),
+      snapshotAt: parseDateTime(object["snapshot_at"]),
       vatNumber: object["vat_number"],
     };
   },

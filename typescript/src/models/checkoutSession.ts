@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type CheckoutSessionId, CheckoutSessionIdSerializer } from "./checkoutSessionId";
 import {
   type CheckoutSessionStatus,
@@ -56,12 +57,14 @@ export const CheckoutSessionSerializer = {
       checkoutType: CheckoutTypeSerializer._fromJsonObject(object["checkout_type"]),
       checkoutUrl: object["checkout_url"],
       completedAt:
-        object["completed_at"] != null ? new Date(object["completed_at"]) : undefined,
+        object["completed_at"] != null
+          ? parseDateTime(object["completed_at"])
+          : undefined,
       couponCode: object["coupon_code"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
       expiresAt:
-        object["expires_at"] != null ? new Date(object["expires_at"]) : undefined,
+        object["expires_at"] != null ? parseDateTime(object["expires_at"]) : undefined,
       id: CheckoutSessionIdSerializer._fromJsonObject(object["id"]),
       netTerms: object["net_terms"],
       paymentMethodsConfig:

@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type CreditNoteId, CreditNoteIdSerializer } from "./creditNoteId";
 import { type CreditNoteStatus, CreditNoteStatusSerializer } from "./creditNoteStatus";
 import { type CreditType, CreditTypeSerializer } from "./creditType";
@@ -64,7 +65,7 @@ export interface CreditNote {
 export const CreditNoteSerializer = {
   _fromJsonObject(object: any): CreditNote {
     return {
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       creditNoteNumber: object["credit_note_number"],
       creditType: CreditTypeSerializer._fromJsonObject(object["credit_type"]),
       creditedAmountCents: object["credited_amount_cents"],
@@ -72,7 +73,9 @@ export const CreditNoteSerializer = {
       customProperties: object["custom_properties"],
       customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
       finalizedAt:
-        object["finalized_at"] != null ? new Date(object["finalized_at"]) : undefined,
+        object["finalized_at"] != null
+          ? parseDateTime(object["finalized_at"])
+          : undefined,
       id: CreditNoteIdSerializer._fromJsonObject(object["id"]),
       invoiceId: InvoiceIdSerializer._fromJsonObject(object["invoice_id"]),
       invoiceNumber: object["invoice_number"],
@@ -98,8 +101,9 @@ export const CreditNoteSerializer = {
       ),
       total: object["total"],
       updatedAt:
-        object["updated_at"] != null ? new Date(object["updated_at"]) : undefined,
-      voidedAt: object["voided_at"] != null ? new Date(object["voided_at"]) : undefined,
+        object["updated_at"] != null ? parseDateTime(object["updated_at"]) : undefined,
+      voidedAt:
+        object["voided_at"] != null ? parseDateTime(object["voided_at"]) : undefined,
     };
   },
 

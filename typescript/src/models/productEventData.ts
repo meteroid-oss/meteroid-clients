@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
 import {
   type ProductFeeTypeEnum,
@@ -23,7 +24,7 @@ export interface ProductEventData {
 export const ProductEventDataSerializer = {
   _fromJsonObject(object: any): ProductEventData {
     return {
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       description: object["description"],
       feeType: ProductFeeTypeEnumSerializer._fromJsonObject(object["fee_type"]),
       name: object["name"],

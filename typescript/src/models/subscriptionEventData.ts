@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
 import { type CustomerId, CustomerIdSerializer } from "./customerId";
 import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
@@ -71,7 +72,9 @@ export const SubscriptionEventDataSerializer = {
   _fromJsonObject(object: any): SubscriptionEventData {
     return {
       activatedAt:
-        object["activated_at"] != null ? new Date(object["activated_at"]) : undefined,
+        object["activated_at"] != null
+          ? parseDateTime(object["activated_at"])
+          : undefined,
       autoAdvanceInvoices: object["auto_advance_invoices"],
       billingDayAnchor: object["billing_day_anchor"],
       billingStartDate: object["billing_start_date"],
@@ -81,7 +84,7 @@ export const SubscriptionEventDataSerializer = {
           ? SubscriptionUpdateTypeSerializer._fromJsonObject(object["change_type"])
           : undefined,
       chargeAutomatically: object["charge_automatically"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       currency: object["currency"],
       customProperties: object["custom_properties"],
       customerAlias: object["customer_alias"],

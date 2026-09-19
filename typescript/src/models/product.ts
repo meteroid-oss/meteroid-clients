@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
 import {
   type ProductFeeStructure,
@@ -34,9 +35,9 @@ export const ProductSerializer = {
   _fromJsonObject(object: any): Product {
     return {
       archivedAt:
-        object["archived_at"] != null ? new Date(object["archived_at"]) : undefined,
+        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
       catalog: object["catalog"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       description: object["description"],
       feeStructure: ProductFeeStructureSerializer._fromJsonObject(
         object["fee_structure"]

@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 /** Result of creating an onboarding link */
 export interface OnboardingLinkResponse {
   expiresAt: Date;
@@ -9,7 +10,7 @@ export interface OnboardingLinkResponse {
 export const OnboardingLinkResponseSerializer = {
   _fromJsonObject(object: any): OnboardingLinkResponse {
     return {
-      expiresAt: new Date(object["expires_at"]),
+      expiresAt: parseDateTime(object["expires_at"]),
       url: object["url"],
     };
   },

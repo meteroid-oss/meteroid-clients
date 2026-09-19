@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type BatchJobId, BatchJobIdSerializer } from "./batchJobId";
 import { type BatchJobStatus, BatchJobStatusSerializer } from "./batchJobStatus";
 import { type BatchJobType, BatchJobTypeSerializer } from "./batchJobType";
@@ -29,8 +30,10 @@ export const BatchJobResponseSerializer = {
   _fromJsonObject(object: any): BatchJobResponse {
     return {
       completedAt:
-        object["completed_at"] != null ? new Date(object["completed_at"]) : undefined,
-      createdAt: new Date(object["created_at"]),
+        object["completed_at"] != null
+          ? parseDateTime(object["completed_at"])
+          : undefined,
+      createdAt: parseDateTime(object["created_at"]),
       createdBy: object["created_by"],
       failedItems: object["failed_items"],
       id: BatchJobIdSerializer._fromJsonObject(object["id"]),

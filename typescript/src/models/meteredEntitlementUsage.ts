@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 
 export interface MeteredEntitlementUsage {
   consumed?: string | null;
@@ -13,7 +14,7 @@ export const MeteredEntitlementUsageSerializer = {
     return {
       consumed: object["consumed"],
       remaining: object["remaining"],
-      resetAt: object["reset_at"] != null ? new Date(object["reset_at"]) : undefined,
+      resetAt: object["reset_at"] != null ? parseDateTime(object["reset_at"]) : undefined,
     };
   },
 

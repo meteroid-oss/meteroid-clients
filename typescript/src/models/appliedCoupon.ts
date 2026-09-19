@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type AppliedCouponId, AppliedCouponIdSerializer } from "./appliedCouponId";
 import { type CouponId, CouponIdSerializer } from "./couponId";
 
@@ -24,12 +25,12 @@ export const AppliedCouponSerializer = {
       appliedAmount: object["applied_amount"],
       appliedCount: object["applied_count"],
       couponId: CouponIdSerializer._fromJsonObject(object["coupon_id"]),
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       id: AppliedCouponIdSerializer._fromJsonObject(object["id"]),
       isActive: object["is_active"],
       lastAppliedAt:
         object["last_applied_at"] != null
-          ? new Date(object["last_applied_at"])
+          ? parseDateTime(object["last_applied_at"])
           : undefined,
     };
   },

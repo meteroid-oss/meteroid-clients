@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import {
   type AvailableParameters,
   AvailableParametersSerializer,
@@ -60,7 +61,7 @@ export const PlanSerializer = {
         object["available_parameters"]
       ),
       billingCycles: object["billing_cycles"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       currency: object["currency"],
       description: object["description"],
       entitlements:

@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type CustomerId, CustomerIdSerializer } from "./customerId";
 import { type InvoiceId, InvoiceIdSerializer } from "./invoiceId";
 import { type InvoiceStatus, InvoiceStatusSerializer } from "./invoiceStatus";
@@ -36,7 +37,7 @@ export const InvoiceEventDataSerializer = {
         object["consolidated_into_invoice_id"] != null
           ? InvoiceIdSerializer._fromJsonObject(object["consolidated_into_invoice_id"])
           : undefined,
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       currency: object["currency"],
       customProperties: object["custom_properties"],
       customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),

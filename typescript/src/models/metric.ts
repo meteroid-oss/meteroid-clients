@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
 import {
   type BillingMetricAggregateEnum,
@@ -51,9 +52,9 @@ export const MetricSerializer = {
         object["aggregation_type"]
       ),
       archivedAt:
-        object["archived_at"] != null ? new Date(object["archived_at"]) : undefined,
+        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
       code: object["code"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       description: object["description"],
       filters:
         object["filters"] != null

@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type CouponLineItem, CouponLineItemSerializer } from "./couponLineItem";
 import { type Currency, CurrencySerializer } from "./currency";
 import { type CustomerDetails, CustomerDetailsSerializer } from "./customerDetails";
@@ -106,7 +107,7 @@ export const InvoiceSerializer = {
       coupons: object["coupons"].map((item: any) =>
         CouponLineItemSerializer._fromJsonObject(item)
       ),
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       currency: CurrencySerializer._fromJsonObject(object["currency"]),
       customProperties: object["custom_properties"],
       customerDetails: CustomerDetailsSerializer._fromJsonObject(
@@ -115,7 +116,9 @@ export const InvoiceSerializer = {
       customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
       dueDate: object["due_date"],
       finalizedAt:
-        object["finalized_at"] != null ? new Date(object["finalized_at"]) : undefined,
+        object["finalized_at"] != null
+          ? parseDateTime(object["finalized_at"])
+          : undefined,
       id: InvoiceIdSerializer._fromJsonObject(object["id"]),
       invoiceDate: object["invoice_date"],
       invoiceNumber: object["invoice_number"],
@@ -125,11 +128,11 @@ export const InvoiceSerializer = {
       ),
       markedAsUncollectibleAt:
         object["marked_as_uncollectible_at"] != null
-          ? new Date(object["marked_as_uncollectible_at"])
+          ? parseDateTime(object["marked_as_uncollectible_at"])
           : undefined,
       memo: object["memo"],
       netTerms: object["net_terms"],
-      paidAt: object["paid_at"] != null ? new Date(object["paid_at"]) : undefined,
+      paidAt: object["paid_at"] != null ? parseDateTime(object["paid_at"]) : undefined,
       parentInvoiceId:
         object["parent_invoice_id"] != null
           ? InvoiceIdSerializer._fromJsonObject(object["parent_invoice_id"])
@@ -155,8 +158,9 @@ export const InvoiceSerializer = {
         TransactionSerializer._fromJsonObject(item)
       ),
       updatedAt:
-        object["updated_at"] != null ? new Date(object["updated_at"]) : undefined,
-      voidedAt: object["voided_at"] != null ? new Date(object["voided_at"]) : undefined,
+        object["updated_at"] != null ? parseDateTime(object["updated_at"]) : undefined,
+      voidedAt:
+        object["voided_at"] != null ? parseDateTime(object["voided_at"]) : undefined,
     };
   },
 

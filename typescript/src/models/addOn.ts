@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type AddOnId, AddOnIdSerializer } from "./addOnId";
 import { type Entitlement, EntitlementSerializer } from "./entitlement";
 import { type PriceId, PriceIdSerializer } from "./priceId";
@@ -36,8 +37,8 @@ export const AddOnSerializer = {
   _fromJsonObject(object: any): AddOn {
     return {
       archivedAt:
-        object["archived_at"] != null ? new Date(object["archived_at"]) : undefined,
-      createdAt: new Date(object["created_at"]),
+        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
+      createdAt: parseDateTime(object["created_at"]),
       description: object["description"],
       entitlements:
         object["entitlements"] != null

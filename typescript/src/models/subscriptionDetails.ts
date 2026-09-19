@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import {
   type AppliedCouponDetailed,
   AppliedCouponDetailedSerializer,
@@ -112,7 +113,9 @@ export const SubscriptionDetailsSerializer = {
   _fromJsonObject(object: any): SubscriptionDetails {
     return {
       activatedAt:
-        object["activated_at"] != null ? new Date(object["activated_at"]) : undefined,
+        object["activated_at"] != null
+          ? parseDateTime(object["activated_at"])
+          : undefined,
       addOns: object["add_ons"].map((item: any) =>
         SubscriptionAddOnSerializer._fromJsonObject(item)
       ),
@@ -127,7 +130,7 @@ export const SubscriptionDetailsSerializer = {
       components: object["components"].map((item: any) =>
         SubscriptionComponentSerializer._fromJsonObject(item)
       ),
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       currency: CurrencySerializer._fromJsonObject(object["currency"]),
       currentPeriodEnd: object["current_period_end"],
       currentPeriodStart: object["current_period_start"],

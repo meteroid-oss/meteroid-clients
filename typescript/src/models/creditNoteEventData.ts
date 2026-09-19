@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type CreditNoteId, CreditNoteIdSerializer } from "./creditNoteId";
 import { type CreditNoteStatus, CreditNoteStatusSerializer } from "./creditNoteStatus";
 import { type CustomerId, CustomerIdSerializer } from "./customerId";
@@ -52,7 +53,7 @@ export interface CreditNoteEventData {
 export const CreditNoteEventDataSerializer = {
   _fromJsonObject(object: any): CreditNoteEventData {
     return {
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       creditNoteId: CreditNoteIdSerializer._fromJsonObject(object["credit_note_id"]),
       creditNoteNumber: object["credit_note_number"],
       creditedAmountCents: object["credited_amount_cents"],

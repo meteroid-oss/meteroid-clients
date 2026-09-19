@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type AddOnId, AddOnIdSerializer } from "./addOnId";
 import { type PriceId, PriceIdSerializer } from "./priceId";
 import {
@@ -31,7 +32,7 @@ export const AddOnEventDataSerializer = {
   _fromJsonObject(object: any): AddOnEventData {
     return {
       addOnId: AddOnIdSerializer._fromJsonObject(object["add_on_id"]),
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       description: object["description"],
       feeType:
         object["fee_type"] != null

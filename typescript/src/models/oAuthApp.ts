@@ -1,4 +1,5 @@
 // this file is @generated
+import { parseDateTime } from "../datetime";
 import { type OAuthAppId, OAuthAppIdSerializer } from "./oAuthAppId";
 import { type OrganizationId, OrganizationIdSerializer } from "./organizationId";
 /** An OAuth application registered by a platform */
@@ -29,7 +30,7 @@ export const OAuthAppSerializer = {
     return {
       clientId: object["client_id"],
       clientSecretHint: object["client_secret_hint"],
-      createdAt: new Date(object["created_at"]),
+      createdAt: parseDateTime(object["created_at"]),
       id: OAuthAppIdSerializer._fromJsonObject(object["id"]),
       isActive: object["is_active"],
       name: object["name"],
@@ -37,7 +38,7 @@ export const OAuthAppSerializer = {
       redirectUris: object["redirect_uris"],
       scopes: object["scopes"],
       updatedAt:
-        object["updated_at"] != null ? new Date(object["updated_at"]) : undefined,
+        object["updated_at"] != null ? parseDateTime(object["updated_at"]) : undefined,
     };
   },
 
