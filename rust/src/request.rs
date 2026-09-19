@@ -3,7 +3,9 @@
 
 use std::{collections::HashMap, time::Duration};
 
-use http1::header::{HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
+use http1::header::{
+    HeaderName, HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT,
+};
 use http_body_util::{BodyExt as _, Full};
 use hyper::body::Bytes;
 use itertools::Itertools as _;
@@ -12,6 +14,9 @@ use rand::Rng;
 use serde::de::DeserializeOwned;
 
 use crate::{error::Error, Configuration};
+
+/// Pins the API version the SDK was generated against.
+const API_VERSION_HEADER: HeaderName = HeaderName::from_static("meteroid-version");
 
 pub(crate) enum Auth {
     None,
@@ -292,6 +297,11 @@ impl Request {
             let value = user_agent.try_into().map_err(Error::generic)?;
             request_headers.insert(USER_AGENT, value);
         }
+
+        request_headers.insert(
+            API_VERSION_HEADER,
+            HeaderValue::from_static(crate::API_VERSION),
+        );
 
         for (k, v) in self.header_params {
             let v = v.try_into().map_err(Error::generic)?;

@@ -94,6 +94,7 @@ public class Meteroid {
         Map<String, String> defaultHeaders =
                 Map.of(
                         "User-Agent", "meteroid-java/" + Version.VERSION,
+                        "Meteroid-Version", ApiVersion.API_VERSION,
                         "Authorization", "Bearer " + apiKey);
 
         MeteroidHttpClient httpClient =
