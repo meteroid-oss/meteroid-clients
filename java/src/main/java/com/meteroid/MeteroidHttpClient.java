@@ -89,7 +89,10 @@ public class MeteroidHttpClient {
         }
 
         throw new ApiException(
-                "Non 200 status code: `" + response.code() + "`", response.code(), bodyString);
+                "Non 200 status code: `" + response.code() + "`",
+                response.code(),
+                bodyString,
+                objectMapper);
     }
 
     /**
@@ -155,7 +158,10 @@ public class MeteroidHttpClient {
         }
 
         throw new ApiException(
-                "Non 200 status code: `" + response.code() + "`", response.code(), bodyString);
+                "Non 200 status code: `" + response.code() + "`",
+                response.code(),
+                bodyString,
+                objectMapper);
     }
 
     /**
@@ -201,7 +207,10 @@ public class MeteroidHttpClient {
 
         String bodyString = response.body().string();
         throw new ApiException(
-                "Non 200 status code: `" + response.code() + "`", response.code(), bodyString);
+                "Non 200 status code: `" + response.code() + "`",
+                response.code(),
+                bodyString,
+                objectMapper);
     }
 
     private Response executeRequestWithRetry(Request request, String body) throws IOException {

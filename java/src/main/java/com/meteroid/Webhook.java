@@ -15,10 +15,11 @@ import java.util.Map;
  * verification for Meteroid webhooks. It supports both Svix-branded headers (svix-*)
  * and standard webhook headers (webhook-*).
  *
- * <p>Header lookup order:
+ * <p>Header lookup order, per header:
  * <ol>
- *   <li>svix-id, svix-signature, svix-timestamp (Svix branded)</li>
  *   <li>webhook-id, webhook-signature, webhook-timestamp (standard)</li>
+ *   <li>svix-id, svix-signature, svix-timestamp (Svix branded), only if the
+ *       matching webhook-* header is absent</li>
  * </ol>
  *
  * <p>Example usage:
@@ -34,12 +35,12 @@ import java.util.Map;
 public final class Webhook {
     public static final String SECRET_PREFIX = "whsec_";
 
-    // Svix-branded header keys (primary)
+    // Svix-branded header keys (fallback)
     public static final String SVIX_MSG_ID_KEY = "svix-id";
     public static final String SVIX_MSG_SIGNATURE_KEY = "svix-signature";
     public static final String SVIX_MSG_TIMESTAMP_KEY = "svix-timestamp";
 
-    // Standard webhook header keys (fallback)
+    // Standard webhook header keys (primary)
     public static final String WEBHOOK_MSG_ID_KEY = "webhook-id";
     public static final String WEBHOOK_MSG_SIGNATURE_KEY = "webhook-signature";
     public static final String WEBHOOK_MSG_TIMESTAMP_KEY = "webhook-timestamp";
@@ -117,7 +118,8 @@ public final class Webhook {
 
     /**
      * Normalize headers by converting svix-* headers to webhook-* format.
-     * If svix-* headers are present, they take precedence over webhook-* headers.
+     * Standard webhook-* headers take precedence: a svix-* header is only used when the
+     * matching webhook-* header is absent.
      */
     private Map<String, List<String>> normalizeHeaders(final Map<String, List<String>> headers) {
         Map<String, List<String>> normalized = new HashMap<>();
@@ -127,7 +129,7 @@ public final class Webhook {
             normalized.put(entry.getKey().toLowerCase(), new ArrayList<>(entry.getValue()));
         }
 
-        // Map svix-* headers to webhook-* headers (svix takes precedence)
+        // Fall back to svix-* headers when the webhook-* header is missing
         mapHeader(normalized, SVIX_MSG_ID_KEY, WEBHOOK_MSG_ID_KEY);
         mapHeader(normalized, SVIX_MSG_SIGNATURE_KEY, WEBHOOK_MSG_SIGNATURE_KEY);
         mapHeader(normalized, SVIX_MSG_TIMESTAMP_KEY, WEBHOOK_MSG_TIMESTAMP_KEY);
@@ -136,9 +138,14 @@ public final class Webhook {
     }
 
     /**
-     * If the source header exists, copy its value to the target header.
+     * If the target header is absent and the source header exists, copy the source value to the
+     * target header.
      */
     private void mapHeader(Map<String, List<String>> headers, String source, String target) {
+        List<String> targetValue = headers.get(target);
+        if (targetValue != null && !targetValue.isEmpty()) {
+            return;
+        }
         List<String> sourceValue = headers.get(source);
         if (sourceValue != null && !sourceValue.isEmpty()) {
             headers.put(target, sourceValue);
