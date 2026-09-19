@@ -10,7 +10,7 @@ from .customer_id import CustomerId
 class CustomerEventData(BaseModel):
     currency: str
 
-    custom_properties: t.Dict[str, t.Any]
+    custom_properties: t.Any
     """User-defined custom property values, keyed by definition key."""
 
     customer_id: CustomerId

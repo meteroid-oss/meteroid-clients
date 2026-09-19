@@ -27,7 +27,7 @@ class CustomerUpdateRequest(BaseModel):
 
     billing_email: t.Optional[str] = None
 
-    custom_properties: t.Optional[t.Dict[str, t.Any]] = None
+    custom_properties: t.Optional[t.Any] = None
     """User-defined custom property values (full replace). Omit to leave unchanged."""
 
     customer_type: t.Optional[CustomerType] = None

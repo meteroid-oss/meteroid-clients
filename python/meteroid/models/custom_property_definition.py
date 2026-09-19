@@ -29,6 +29,6 @@ class CustomPropertyDefinition(BaseModel):
 
     required: bool
 
-    default_value: t.Optional[t.Dict[str, t.Any]] = None
+    default_value: t.Optional[t.Any] = None
 
     description: t.Optional[str] = None

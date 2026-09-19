@@ -27,7 +27,7 @@ class CustomerCreateRequest(BaseModel):
 
     connected_account_id: t.Optional[str] = None
 
-    custom_properties: t.Optional[t.Dict[str, t.Any]] = None
+    custom_properties: t.Optional[t.Any] = None
     """User-defined custom property values, keyed by definition `key`. Validated against the
     tenant's `CUSTOMER` property definitions. Omit to leave unset."""
 

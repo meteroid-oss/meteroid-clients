@@ -1,4 +1,4 @@
-{% from "types/macros.py.jinja" import docstring, py_ident -%}
+{% from "types/macros.py.jinja" import docstring, py_ident, py_type -%}
 # this file is @generated
 {% if resource.subresources | length > 0 -%}
     {{ panic("resource `" ~ resource.name ~ "` has subresources, which the Python templates do not support yet") }}
@@ -55,7 +55,7 @@ class {{ resource_class_name }}{{ class_suffix }}({{ base_class }}):
     keyword-only, so the ordering carries no semantics. -#}
 {%- for required_pass in [true, false] %}
 {%- for p in op.query_params if p.required == required_pass %}
-        {{ py_ident(p.name) }}: {% if p.required %}{{ p.type.to_python() }},{% else %}t.Optional[{{ p.type.to_python() }}] = None,{% endif %}
+        {{ py_ident(p.name) }}: {% if p.required %}{{ py_type(p.type) }},{% else %}t.Optional[{{ py_type(p.type) }}] = None,{% endif %}
 {%- endfor %}
 {%- for p in op.header_params if p.required == required_pass %}
         {{ py_ident(p.name) }}: {% if p.required %}str,{% else %}t.Optional[str] = None,{% endif %}

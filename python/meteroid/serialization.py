@@ -6,7 +6,8 @@ here so the generated code stays declarative and dependency free.
 Conventions mirrored from the Rust SDK:
 
 * ``None`` valued fields are omitted from the serialized payload (equivalent to
-  ``#[serde(skip_serializing_if = "Option::is_none")]``).
+  ``#[serde(skip_serializing_if = "Option::is_none")]``), except required
+  any-JSON (``t.Any``) fields, where ``None`` is a JSON ``null``.
 * Unknown JSON keys are ignored when deserializing.
 * ``Decimal`` values travel as JSON strings, ``datetime`` values as RFC 3339
   strings. Only finite decimals are valid: ``NaN`` and ``Infinity`` are
@@ -271,11 +272,16 @@ class BaseModel:
         return cls._JSON_KEYS.get(name, name)
 
     def to_dict(self) -> t.Dict[str, t.Any]:
-        """Serialize into a JSON-compatible dict, omitting ``None`` fields."""
+        """Serialize into a JSON-compatible dict, omitting ``None`` fields.
+
+        The exception is a required any-JSON field (annotated ``t.Any``), where
+        ``None`` is the JSON ``null`` value rather than "unset".
+        """
         out: t.Dict[str, t.Any] = {}
+        hints = _type_hints(type(self))
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            if value is None:
+            if value is None and hints.get(field.name) is not t.Any:
                 continue
             if field.name in self._FLATTENED:
                 flattened = to_json_value(value)

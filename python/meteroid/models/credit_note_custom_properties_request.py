@@ -10,4 +10,4 @@ class CreditNoteCustomPropertiesRequest(BaseModel):
     """Merge update of a credit note's custom property values (send a key with `null` to remove it).
     Allowed at any status — custom properties stay editable after the credit note is finalized."""
 
-    custom_properties: t.Dict[str, t.Any]
+    custom_properties: t.Any

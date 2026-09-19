@@ -34,7 +34,7 @@ class SubscriptionCreateRequest(BaseModel):
 
     coupon_codes: t.Optional[t.List[str]] = None
 
-    custom_properties: t.Optional[t.Dict[str, t.Any]] = None
+    custom_properties: t.Optional[t.Any] = None
     """User-defined custom property values, keyed by definition `key`. Validated against the
     tenant's subscription definitions."""
 

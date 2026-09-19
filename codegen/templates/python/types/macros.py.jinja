@@ -45,11 +45,30 @@
     {%- endif -%}
 {%- endmacro %}
 
+{#- The Python annotation for a field type.
+
+    Same as `ty.to_python()`, except that an any-JSON schema (`{}`, which the
+    codegen classifies as `JsonObject`) is `t.Any` rather than a dict: its
+    value may just as well be a list, a scalar or `null`. Maps
+    (`additionalProperties: <schema>`) keep their `t.Dict[str, ...]` type.
+-#}
+{% macro py_type(ty) -%}
+    {%- if ty.is_json_object() -%}
+        t.Any
+    {%- elif ty.is_list() or ty.is_set() -%}
+        t.List[{{ py_type(ty.inner_type()) }}]
+    {%- elif ty.is_map() -%}
+        t.Dict[str, {{ py_type(ty.value_type()) }}]
+    {%- else -%}
+        {{ ty.to_python() }}
+    {%- endif -%}
+{%- endmacro %}
+
 {#- Python type of a struct field, wrapped in `t.Optional` when not mandatory. -#}
 {% macro field_type(field) -%}
     {%- if field.required and not field.nullable -%}
-        {{ field.type.to_python() }}
+        {{ py_type(field.type) }}
     {%- else -%}
-        t.Optional[{{ field.type.to_python() }}]
+        t.Optional[{{ py_type(field.type) }}]
     {%- endif -%}
 {%- endmacro %}

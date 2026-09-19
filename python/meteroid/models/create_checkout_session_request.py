@@ -48,7 +48,7 @@ class CreateCheckoutSessionRequest(BaseModel):
 
     invoice_threshold: t.Optional[Decimal] = None
 
-    metadata: t.Optional[t.Dict[str, t.Any]] = None
+    metadata: t.Optional[t.Any] = None
 
     net_terms: t.Optional[int] = None
 

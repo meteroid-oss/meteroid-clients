@@ -553,3 +553,38 @@ def test_model_with_nanosecond_datetime() -> None:
     assert applied.created_at == datetime.datetime(
         2026, 9, 19, 10, 0, 0, 123456, tzinfo=datetime.timezone.utc
     )
+
+
+# --------------------------------------------------------------------------
+# Any-JSON fields
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "value",
+    [{"tier": "gold", "limits": [1, 2]}, [1, "two", None], "text", 42, 1.5, True, None],
+)
+def test_json_config_value_round_trips_any_json(value: t.Any) -> None:
+    import json
+
+    from meteroid.models import ConfigValue, JsonConfigValue
+
+    parsed = JsonConfigValue.from_dict({"value": value})
+    assert parsed.value == value
+    assert parsed.to_dict() == {"value": value}
+    assert JsonConfigValue.from_json(parsed.to_json()) == parsed
+
+    # Through the tagged union, as `get_effective_entitlements` returns it.
+    wire = {"kind": "JSON", "value": value}
+    config = ConfigValue.from_dict(json.loads(json.dumps(wire)))
+    assert isinstance(config.content, JsonConfigValue)
+    assert config.content.value == value
+    assert config.to_dict() == wire
+
+
+def test_optional_any_json_field_none_is_omitted() -> None:
+    from meteroid.models import CustomerPatchRequest
+
+    assert "custom_properties" not in CustomerPatchRequest().to_dict()
+    patched = CustomerPatchRequest(custom_properties={"plan": "gold"})
+    assert patched.to_dict()["custom_properties"] == {"plan": "gold"}

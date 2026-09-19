@@ -21,7 +21,7 @@ class CustomerPatchRequest(BaseModel):
 
     currency: t.Optional[Currency] = None
 
-    custom_properties: t.Optional[t.Dict[str, t.Any]] = None
+    custom_properties: t.Optional[t.Any] = None
     """Partial update of custom property values (merge; send a key with `null` to remove it).
     Omit to leave unchanged."""
 

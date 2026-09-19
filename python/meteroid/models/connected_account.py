@@ -34,7 +34,7 @@ class ConnectedAccount(BaseModel):
 
     connected_tenant_id: t.Optional[TenantId] = None
 
-    metadata: t.Optional[t.Dict[str, t.Any]] = None
+    metadata: t.Optional[t.Any] = None
 
     onboarding_completed_at: t.Optional[datetime] = None
 

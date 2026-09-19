@@ -14,7 +14,7 @@ class SubscriptionUpdateRequest(BaseModel):
     charge_automatically: t.Optional[bool] = None
     """Automatically try to charge the customer's configured payment method on finalize."""
 
-    custom_properties: t.Optional[t.Dict[str, t.Any]] = None
+    custom_properties: t.Optional[t.Any] = None
     """Partial update of custom property values (merge; send a key with `null` to remove it).
     Validated against the tenant's `SUBSCRIPTION` property definitions. Omit to leave unchanged."""
 

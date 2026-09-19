@@ -16,7 +16,7 @@ from .shipping_address import ShippingAddress
 class Customer(BaseModel):
     currency: Currency
 
-    custom_properties: t.Dict[str, t.Any]
+    custom_properties: t.Any
     """User-defined custom property values, keyed by definition `key`."""
 
     custom_taxes: t.List[CustomTaxRate]

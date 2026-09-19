@@ -13,6 +13,6 @@ class CreateConnectedAccountRequest(BaseModel):
 
     connection_type: t.Optional[ConnectionType] = None
 
-    metadata: t.Optional[t.Dict[str, t.Any]] = None
+    metadata: t.Optional[t.Any] = None
 
     platform_customer_id: t.Optional[CustomerId] = None
