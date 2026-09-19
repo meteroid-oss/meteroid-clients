@@ -190,18 +190,22 @@ meteroid-rs = { version = "0.26.0", default-features = false, features = ["nativ
 
 ## Error Handling
 
-All API methods return `Result<T, meteroid_rs::error::Error>`. The `Error` type provides detailed information about what went wrong:
+All API methods return `Result<T, meteroid_rs::error::Error>`. For a non-2xx response the body is parsed as a `RestErrorResponse` (`Error::Http`), then as an `OAuthErrorResponse` (`Error::OAuth`); if it matches neither, `Error::Http` has `payload: None`. The HTTP status and raw body are always available:
 
 ```rust
 use meteroid_rs::api::Meteroid;
 use meteroid_rs::error::Error;
+use meteroid_rs::models::ErrorCode;
 
 let client = Meteroid::new("your-api-key".to_string(), None);
 
 match client.customers().get_customer("invalid-id".to_string()).await {
     Ok(customer) => println!("Found: {}", customer.name),
+    Err(e) if e.code() == Some(ErrorCode::NotFound) => {
+        println!("Not found: {}", e.message().unwrap_or_default());
+    }
     Err(Error::Http(e)) => {
-        println!("HTTP error {}: {}", e.status, e.body.message);
+        println!("HTTP error {}: {:?} body={}", e.status, e.payload, e.body_as_str());
     }
     Err(e) => println!("Other error: {}", e),
 }
