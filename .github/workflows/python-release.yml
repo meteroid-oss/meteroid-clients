@@ -1,11 +1,9 @@
 name: Python Release
 
-# DRAFT: this workflow is untested because publishing needs credentials that do
-# not exist yet. Before enabling it, either
-#   (a) set the `PYPI_API_TOKEN` secret on the `release` environment, or
-#   (b) preferably, configure PyPI Trusted Publishing for this repository and
-#       replace the `password:` line below with nothing (OIDC is used
-#       automatically when `id-token: write` is granted).
+# Publishes with PyPI Trusted Publishing: PyPI trusts this workflow's GitHub OIDC
+# identity, so no API token is stored. Configure it once on PyPI (project
+# `meteroid`, owner `meteroid-oss`, repository `meteroid-clients`, workflow
+# `python-release.yml`, environment `release`).
 
 on:
   workflow_dispatch:
@@ -21,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     environment: release
     permissions:
-      # Required for PyPI Trusted Publishing (option (b) above).
+      # Lets the job request the OIDC token PyPI Trusted Publishing verifies.
       id-token: write
 
     steps:
@@ -37,8 +35,8 @@ jobs:
         run: uv build
         working-directory: python
 
+      # `always` fails if Trusted Publishing is not configured, instead of falling
+      # back to other credentials.
       - name: Publish to PyPI
-        run: uv publish
+        run: uv publish --trusted-publishing always
         working-directory: python
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
