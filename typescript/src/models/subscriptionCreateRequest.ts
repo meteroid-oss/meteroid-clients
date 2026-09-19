@@ -40,7 +40,7 @@ export interface SubscriptionCreateRequest {
    * User-defined custom property values, keyed by definition `key`. Validated against the
    * tenant's subscription definitions.
    */
-  customProperties?: any;
+  customProperties?: unknown;
 
   customerIdOrAlias: string;
 

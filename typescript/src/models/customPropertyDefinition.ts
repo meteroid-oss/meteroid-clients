@@ -18,7 +18,7 @@ export interface CustomPropertyDefinition {
 
   config: PropertyConfig;
 
-  defaultValue?: any;
+  defaultValue?: unknown;
 
   description?: string | null;
 

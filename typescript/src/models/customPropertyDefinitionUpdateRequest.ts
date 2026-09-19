@@ -7,7 +7,7 @@ import { type PropertyConfig, PropertyConfigSerializer } from "./propertyConfig"
 export interface CustomPropertyDefinitionUpdateRequest {
   config?: PropertyConfig | null;
 
-  defaultValue?: any;
+  defaultValue?: unknown;
 
   description?: string | null;
 

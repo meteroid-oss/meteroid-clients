@@ -19,7 +19,7 @@ export interface CustomerPatchRequest {
    * Partial update of custom property values (merge; send a key with `null` to remove it).
    * Omit to leave unchanged.
    */
-  customProperties?: any;
+  customProperties?: unknown;
 
   customTaxes?: CustomTaxRate[] | null;
 

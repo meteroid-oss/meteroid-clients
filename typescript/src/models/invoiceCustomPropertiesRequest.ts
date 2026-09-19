@@ -4,7 +4,7 @@
  * Allowed at any status — custom properties stay editable after the invoice is finalized.
  */
 export interface InvoiceCustomPropertiesRequest {
-  customProperties: any;
+  customProperties: unknown;
 }
 
 export const InvoiceCustomPropertiesRequestSerializer = {

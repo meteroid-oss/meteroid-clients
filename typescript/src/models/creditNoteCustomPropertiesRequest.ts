@@ -4,7 +4,7 @@
  * Allowed at any status — custom properties stay editable after the credit note is finalized.
  */
 export interface CreditNoteCustomPropertiesRequest {
-  customProperties: any;
+  customProperties: unknown;
 }
 
 export const CreditNoteCustomPropertiesRequestSerializer = {

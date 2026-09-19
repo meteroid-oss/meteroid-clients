@@ -38,7 +38,7 @@ export interface Invoice {
   currency: Currency;
 
   /** User-defined custom property values, keyed by definition `key`. */
-  customProperties: any;
+  customProperties: unknown;
 
   customerDetails: CustomerDetails;
 

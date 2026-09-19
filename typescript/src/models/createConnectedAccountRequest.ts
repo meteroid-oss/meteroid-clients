@@ -7,7 +7,7 @@ export interface CreateConnectedAccountRequest {
 
   connectionType?: ConnectionType | null;
 
-  metadata?: any;
+  metadata?: unknown;
 
   platformCustomerId?: CustomerId | null;
 }

@@ -19,7 +19,7 @@ export interface Customer {
   currency: Currency;
 
   /** User-defined custom property values, keyed by definition `key`. */
-  customProperties: any;
+  customProperties: unknown;
 
   customTaxes: CustomTaxRate[];
 

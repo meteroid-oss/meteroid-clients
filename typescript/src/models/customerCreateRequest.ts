@@ -21,7 +21,7 @@ export interface CustomerCreateRequest {
    * User-defined custom property values, keyed by definition `key`. Validated against the
    * tenant's `CUSTOMER` property definitions. Omit to leave unset.
    */
-  customProperties?: any;
+  customProperties?: unknown;
 
   customTaxes: CustomTaxRate[];
 

@@ -42,7 +42,7 @@ export interface Subscription {
   currentPeriodStart: string;
 
   /** User-defined custom property values, keyed by definition `key`. */
-  customProperties: any;
+  customProperties: unknown;
 
   customerAlias?: string | null;
 

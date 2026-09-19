@@ -48,7 +48,7 @@ export interface CreateCheckoutSessionRequest {
 
   invoiceThreshold?: string | null;
 
-  metadata?: any;
+  metadata?: unknown;
 
   netTerms?: number | null;
 

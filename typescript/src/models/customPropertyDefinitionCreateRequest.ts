@@ -12,7 +12,7 @@ import { type PropertyConfig, PropertyConfigSerializer } from "./propertyConfig"
 export interface CustomPropertyDefinitionCreateRequest {
   config?: PropertyConfig;
 
-  defaultValue?: any;
+  defaultValue?: unknown;
 
   description?: string | null;
 

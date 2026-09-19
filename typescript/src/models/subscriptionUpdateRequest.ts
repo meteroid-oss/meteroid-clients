@@ -15,7 +15,7 @@ export interface SubscriptionUpdateRequest {
    * Partial update of custom property values (merge; send a key with `null` to remove it).
    * Validated against the tenant's `SUBSCRIPTION` property definitions. Omit to leave unchanged.
    */
-  customProperties?: any;
+  customProperties?: unknown;
 
   /** Default memo for invoices */
   invoiceMemo?: string | null;

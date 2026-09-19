@@ -144,6 +144,31 @@ describe("ConfigValue (tagged union)", () => {
     }
   });
 
+  it("round-trips a JSON value of any shape", () => {
+    const values: unknown[] = [
+      { nested: { a: [1, "two", null] } },
+      [1, { b: false }, "c"],
+      "text",
+      12.5,
+      true,
+      false,
+      null,
+    ];
+
+    for (const value of values) {
+      const wire = JSON.parse(JSON.stringify({ kind: "JSON", value }));
+      const parsed = ConfigValueSerializer._fromJsonObject(wire);
+      assert.equal(parsed.kind, "JSON");
+      // `value` is `unknown`: it has to be narrowed before use.
+      const inner: unknown = parsed.kind === "JSON" ? parsed.value : undefined;
+      assert.deepEqual(inner, value);
+      const back = JSON.parse(
+        JSON.stringify(ConfigValueSerializer._toJsonObject(parsed))
+      );
+      assert.deepEqual(back, { kind: "JSON", value });
+    }
+  });
+
   it("rejects an unknown discriminant", () => {
     assert.throws(
       () => ConfigValueSerializer._fromJsonObject({ kind: "NOPE" }),

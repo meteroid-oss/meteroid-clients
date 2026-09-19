@@ -16,7 +16,7 @@ export interface CustomerUpdateRequest {
   currency: Currency;
 
   /** User-defined custom property values (full replace). Omit to leave unchanged. */
-  customProperties?: any;
+  customProperties?: unknown;
 
   customTaxes: CustomTaxRate[];
 

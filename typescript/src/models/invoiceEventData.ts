@@ -12,7 +12,7 @@ export interface InvoiceEventData {
   currency: string;
 
   /** User-defined custom property values, keyed by definition key. */
-  customProperties: any;
+  customProperties: unknown;
 
   customerId: CustomerId;
 

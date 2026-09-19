@@ -23,7 +23,7 @@ export interface ConnectedAccount {
 
   id: ConnectedAccountId;
 
-  metadata?: any;
+  metadata?: unknown;
 
   onboardingCompletedAt?: Date | null;
 
