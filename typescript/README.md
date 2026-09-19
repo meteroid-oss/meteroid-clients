@@ -1,0 +1,279 @@
+# Meteroid TypeScript SDK
+
+The official TypeScript/JavaScript SDK for the [Meteroid](https://meteroid.com) billing and
+subscription management API.
+
+Everything under `src/api` and `src/models` is generated from `spec/openapi.json` by
+`./regen_openapi.py` at the root of this repository — edit the templates in
+`codegen/templates/typescript`, not the generated files.
+
+## Installation
+
+```bash
+npm install @meteroid/sdk
+# or
+yarn add @meteroid/sdk
+# or
+pnpm add @meteroid/sdk
+```
+
+Current version: `0.26.0`.
+
+## Quick start
+
+```typescript
+import { Currency, Meteroid } from "@meteroid/sdk";
+
+const meteroid = new Meteroid("your-api-key");
+
+// List customers
+const customers = await meteroid.customers.listCustomers({ page: 0, perPage: 10 });
+
+// Create a customer
+const customer = await meteroid.customers.createCustomer({
+  name: "Acme Inc",
+  alias: "acme-inc",
+  currency: Currency.Eur,
+  billingEmail: "billing@acme.com",
+  invoicingEmails: [],
+  customTaxes: [],
+});
+
+// Fetch by id or alias
+const fetched = await meteroid.customers.getCustomer("acme-inc");
+```
+
+## Configuration
+
+```typescript
+const meteroid = new Meteroid("your-api-key", {
+  // Point at a different environment. Defaults to https://api.meteroid.com
+  serverUrl: "https://your-custom-api.example.com",
+  // Per-request timeout in milliseconds. Unset means no timeout.
+  requestTimeout: 30_000,
+  // Number of retries on 5xx / network failures. Default: 2
+  numRetries: 3,
+  // Or an explicit backoff schedule, in milliseconds (mutually exclusive with numRetries)
+  // retryScheduleInMs: [100, 500, 1000],
+  // A custom fetch, useful for tests, proxies, or Cloudflare Workers
+  // fetch: myFetch,
+});
+```
+
+Requests are authenticated with the bearer token you pass to the constructor. `POST` requests
+get an automatic `idempotency-key` header when you do not supply one.
+
+## Resources
+
+The client exposes one property per API resource:
+
+| Property | Methods |
+| --- | --- |
+| `addOns` | `listAddons`, `createAddon`, `getAddon`, `updateAddon`, `archiveAddon`, `unarchiveAddon`, `listAddOnEntitlements` |
+| `batchJobs` | `listBatchJobs`, `getBatchJob`, `listBatchJobFailures` |
+| `checkoutSessions` | `listCheckoutSessions`, `createCheckoutSession`, `getCheckoutSession`, `cancelCheckoutSession` |
+| `connect` | `listConnectedAccounts`, `createConnectedAccount`, `getConnectedAccount`, `disconnectAccount`, `createOnboardingLink` |
+| `coupons` | `listCoupons`, `createCoupon`, `getCoupon`, `updateCoupon`, `archiveCoupon`, `unarchiveCoupon`, `disableCoupon`, `enableCoupon` |
+| `creditNotes` | `listCreditNotes`, `getCreditNoteById`, `patchCreditNoteCustomProperties`, `downloadCreditNotePdf` |
+| `customProperties` | `listDefinitions`, `createDefinition`, `getDefinition`, `updateDefinition`, `archiveDefinition` |
+| `customers` | `listCustomers`, `createCustomer`, `getCustomer`, `updateCustomer`, `patchCustomer`, `archiveCustomer`, `unarchiveCustomer`, `getEffectiveEntitlements`, `createPortalToken` |
+| `events` | `ingestEvents` |
+| `features` | `listFeatures`, `getFeature` |
+| `invoices` | `listInvoices`, `getInvoiceById`, `patchInvoiceCustomProperties`, `downloadInvoicePdf` |
+| `metrics` | `listMetrics`, `createMetric`, `getMetric`, `updateMetric`, `archiveMetric`, `unarchiveMetric` |
+| `oAuth` | `introspectEndpoint`, `revokeEndpoint`, `tokenEndpoint` |
+| `oAuthApps` | `listOauthApps`, `createOauthApp`, `getOauthApp`, `deleteOauthApp`, `rotateClientSecret` |
+| `plans` | `listPlans`, `createPlan`, `getPlanDetails`, `replacePlan`, `patchPlan`, `publishPlan`, `archivePlan`, `unarchivePlan`, `listPlanVersions`, `listPlanVersionEntitlements`, `setPlanMinimum`, `deletePlanMinimum` |
+| `productFamilies` | `listProductFamilies`, `createProductFamily`, `getProductFamilyByIdOrAlias` |
+| `products` | `listProducts`, `createProduct`, `getProduct`, `updateProduct`, `archiveProduct`, `unarchiveProduct`, `listProductEntitlements` |
+| `subscriptions` | `listSubscriptions`, `createSubscription`, `subscriptionDetails`, `updateSubscription`, `cancelSubscription`, `listSubscriptionEntitlements` |
+| `usage` | `getCustomerUsage`, `getSubscriptionUsage`, `getUsageSummary` |
+
+### Subscriptions
+
+```typescript
+import { SubscriptionActivationConditionEnum } from "@meteroid/sdk";
+
+const subscription = await meteroid.subscriptions.createSubscription({
+  customerIdOrAlias: "acme-inc",
+  planId: "plan_...",
+  startDate: "2026-01-01",
+  activationCondition: SubscriptionActivationConditionEnum.OnStart,
+});
+
+const details = await meteroid.subscriptions.subscriptionDetails(subscription.id);
+
+await meteroid.subscriptions.cancelSubscription(details.id, {
+  reason: "Customer requested cancellation",
+});
+```
+
+### Usage events
+
+```typescript
+await meteroid.events.ingestEvents({
+  events: [
+    {
+      eventId: "evt_123",
+      code: "api_call",
+      customerId: "acme-inc",
+      timestamp: new Date().toISOString(),
+      properties: { endpoint: "/api/v1/users", method: "GET" },
+    },
+  ],
+});
+```
+
+### Invoice and credit-note PDFs
+
+PDF downloads return raw bytes:
+
+```typescript
+const pdf: Uint8Array = await meteroid.invoices.downloadInvoicePdf("inv_...");
+await fs.promises.writeFile("invoice.pdf", pdf);
+```
+
+## Webhook verification
+
+```typescript
+import { Webhook, WebhookVerificationError } from "@meteroid/sdk";
+
+const webhook = new Webhook("whsec_your_webhook_secret");
+
+app.post("/webhooks/meteroid", express.raw({ type: "*/*" }), (req, res) => {
+  try {
+    const event = webhook.verify(req.body, req.headers);
+    console.log("Received event:", event);
+    res.status(200).send("OK");
+  } catch (err) {
+    if (err instanceof WebhookVerificationError) {
+      res.status(400).send("Invalid signature");
+    } else {
+      throw err;
+    }
+  }
+});
+```
+
+`verify` accepts both the Standard Webhooks headers and the legacy Svix aliases. The
+`webhook-*` header wins when both are present:
+
+- `webhook-id` / `svix-id`
+- `webhook-signature` / `svix-signature`
+- `webhook-timestamp` / `svix-timestamp`
+
+The payload must be the **raw** request body — parsing it first breaks the signature.
+
+## Error handling
+
+```typescript
+import { ApiException, ErrorCode } from "@meteroid/sdk";
+
+try {
+  await meteroid.customers.getCustomer("does-not-exist");
+} catch (err) {
+  if (!(err instanceof ApiException)) throw err;
+
+  if (err.restError?.code === ErrorCode.NotFound) {
+    console.error("not found:", err.restError.message);
+  } else if (err.restError) {
+    console.error(`${err.status} ${err.restError.code}: ${err.restError.message}`);
+  } else if (err.oauthError) {
+    // Only the OAuth endpoints return this shape.
+    console.error(`${err.status} ${err.oauthError.error}: ${err.oauthError.errorDescription}`);
+  } else {
+    // Not a documented error body (proxy page, unknown error code, ...).
+    console.error(`${err.status}: ${err.body}`);
+  }
+}
+```
+
+Every non-2xx response throws an `ApiException`. Its body is parsed as a `RestErrorResponse`
+(`restError`: `code` + `message`) or, failing that, an `OAuthErrorResponse` (`oauthError`). The HTTP
+`status`, the response `headers` and the raw `body` string are always set, including when the body
+matches neither shape — which is also the case if the server sends an `ErrorCode` this SDK version
+does not know yet.
+
+5xx responses are retried (see `numRetries` / `retryScheduleInMs`); once retries are exhausted the
+last response is thrown as an `ApiException`.
+
+## Types
+
+Every model and every request/response type is exported from the package root:
+
+```typescript
+import type {
+  Customer,
+  CustomerCreateRequest,
+  Invoice,
+  Plan,
+  Subscription,
+  Fee,
+} from "@meteroid/sdk";
+```
+
+### Conventions
+
+- **Field names** are `lowerCamelCase` in TypeScript and are mapped to the wire's `snake_case`
+  by the generated serializers.
+- **`date-time`** fields are `Date`. **`date`** fields (`start_date`, `invoice_date`, …) are
+  ISO `YYYY-MM-DD` strings.
+- **Decimal** fields (`rate`, `flat_fee`, `unit_price`, …) are `string`, because the API sends
+  them as exact decimal strings and `number` cannot represent them losslessly.
+- **Enums** are TypeScript `enum`s whose values are the wire strings
+  (`InvoiceStatus.Closed === "CLOSED"`). Because they are nominal, pass the enum member
+  (`Currency.Eur`) rather than a bare string literal.
+
+### Discriminated unions
+
+Polymorphic schemas are discriminated unions. Most use `type` as the tag; the config-entitlement
+values use `kind`:
+
+```typescript
+import type { Fee } from "@meteroid/sdk";
+
+function describe(fee: Fee): string {
+  switch (fee.type) {
+    case "RATE":
+      return `rate ${fee.rates.length} tier(s)`;
+    case "USAGE":
+      return `usage on metric ${fee.metricId}`;
+    default:
+      return fee.type;
+  }
+}
+```
+
+Each variant is also exported by name (`FeeRate`, `FeeUsage`, `ConfigValueNumber`, …).
+
+## Environment support
+
+- **Node.js**: 18.0.0 or newer (uses the global `fetch`)
+- **Browsers**: any browser with `fetch`
+- **Cloudflare Workers**: supported (the `credentials` option is omitted where unavailable)
+- **Deno / Bun**: supported via npm compatibility
+
+## Development
+
+```bash
+npm install
+npm run typecheck   # tsc --noEmit
+npm run check       # biome format + lint + assists
+npm run build       # emit dist/
+```
+
+Regenerating the client (from the repository root):
+
+```bash
+./regen_openapi.py
+```
+
+## License
+
+MIT
+
+## Links
+
+- [Meteroid documentation](https://docs.meteroid.com)
+- [GitHub repository](https://github.com/meteroid-oss/meteroid-clients)
+- [Report an issue](https://github.com/meteroid-oss/meteroid-clients/issues)

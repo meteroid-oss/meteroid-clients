@@ -12,7 +12,12 @@ const filesPaths = [
     // Java
     "java/gradle.properties",
     "java/README.md",
-    "java/src/main/java/com/meteroid/Version.java"
+    "java/src/main/java/com/meteroid/Version.java",
+    // TypeScript
+    "typescript/package.json",
+    "typescript/package-lock.json",
+    "typescript/README.md",
+    "typescript/src/request.ts"
 ];
 
 const rootDir = join(__dirname, "..");

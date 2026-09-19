@@ -2,6 +2,7 @@
 
 ## Next
 
+* New TypeScript SDK (`typescript/`, published as `@meteroid/sdk` on npm): typed models and resources, bearer auth, retries and webhook signature verification
 * **Breaking** (Rust) — API errors are now parsed with the models generated from the spec. `Error::Http` carries `HttpErrorContent<RestErrorResponse>` (`code: ErrorCode`, `message`), a new `Error::OAuth` carries `HttpErrorContent<OAuthErrorResponse>`, and `Error::Validation` is removed (the API returns no 422 validation body; any status goes through `Error::Http`/`Error::OAuth`). The hand-written `HttpErrorOut`, `HttpValidationError` and `ValidationError` models are removed. The old `HttpErrorOut` required a `detail` field the API never sends, so `payload` was `None` for every real API error: no working code could have depended on its fields. New `Error::status()`, `code()` and `message()` accessors. Status and raw body remain available on every HTTP error
 * Error response models are now generated from the spec: `RestErrorResponse`, `ErrorCode`, `OAuthErrorResponse`, `OAuthErrorCode`. A body with an error code unknown to the SDK version yields no typed payload; status and raw body are still available
 * Java: `ApiException` gains `getError()` (`Optional<RestErrorResponse>`) and `getOAuthError()` (`Optional<OAuthErrorResponse>`); the existing constructor and getters are unchanged
