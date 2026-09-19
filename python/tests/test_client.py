@@ -9,6 +9,7 @@ import respx
 
 from meteroid import (
     ApiException,
+    InvalidWebhookSecretError,
     Meteroid,
     MeteroidAsync,
     MeteroidError,
@@ -560,6 +561,7 @@ def test_every_sdk_exception_is_a_meteroid_error() -> None:
         ResponseDecodeError,
         ModelParseError,
         WebhookVerificationError,
+        InvalidWebhookSecretError,
     ):
         assert issubclass(exc_type, MeteroidError), exc_type
     # Kept `ValueError`s so existing `except ValueError` handlers still work.

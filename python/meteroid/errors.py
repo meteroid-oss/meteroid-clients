@@ -10,6 +10,8 @@ Every exception this SDK raises derives from :class:`MeteroidError`:
   ``Model.from_json`` could not be mapped onto the model.
 * :class:`meteroid.webhooks.WebhookVerificationError` -- a webhook payload
   failed signature verification.
+* :class:`meteroid.webhooks.InvalidWebhookSecretError` -- a webhook signing
+  secret is not valid base64 or is empty.
 """
 
 from __future__ import annotations

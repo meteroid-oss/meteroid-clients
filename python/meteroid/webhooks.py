@@ -17,6 +17,7 @@ Example
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import hmac
 import math
@@ -25,7 +26,7 @@ import typing as t
 
 from .errors import MeteroidError
 
-__all__ = ["Webhook", "WebhookVerificationError"]
+__all__ = ["InvalidWebhookSecretError", "Webhook", "WebhookVerificationError"]
 
 WEBHOOK_TOLERANCE_IN_SECONDS = 5 * 60
 _SECRET_PREFIX = "whsec_"
@@ -41,6 +42,14 @@ _SVIX_TIMESTAMP = "svix-timestamp"
 
 class WebhookVerificationError(MeteroidError):
     """Raised when a webhook payload fails signature verification."""
+
+
+class InvalidWebhookSecretError(MeteroidError, ValueError):
+    """Raised by :class:`Webhook` when the signing secret is unusable.
+
+    A ``str`` secret must be valid base64, optionally prefixed with
+    ``whsec_``, and the key it decodes to must not be empty.
+    """
 
 
 def _get_header(
@@ -61,12 +70,31 @@ class Webhook:
     _secret: bytes
 
     def __init__(self, secret: t.Union[str, bytes]) -> None:
+        """Build a verifier from a signing secret.
+
+        A ``str`` is the secret as shown in the Meteroid dashboard: base64,
+        with or without the ``whsec_`` prefix. ``bytes`` are the raw key.
+        Raises :class:`InvalidWebhookSecretError` if the secret is not valid
+        base64 or yields an empty key.
+        """
         if isinstance(secret, str):
-            if secret.startswith(_SECRET_PREFIX):
-                secret = secret[len(_SECRET_PREFIX) :]
-            self._secret = base64.b64decode(secret)
+            encoded = secret
+            if encoded.startswith(_SECRET_PREFIX):
+                encoded = encoded[len(_SECRET_PREFIX) :]
+            try:
+                # `validate=True` rejects stray characters instead of silently
+                # dropping them (which turned e.g. `whsec_!` into an empty key).
+                key = base64.b64decode(encoded, validate=True)
+            # `binascii.Error` for bad base64, `ValueError` for non-ASCII input.
+            except (binascii.Error, ValueError) as exc:
+                raise InvalidWebhookSecretError(
+                    "Webhook secret is not valid base64"
+                ) from exc
         else:
-            self._secret = secret
+            key = secret
+        if not key:
+            raise InvalidWebhookSecretError("Webhook secret is empty")
+        self._secret = key
 
     @classmethod
     def from_bytes(cls, secret: bytes) -> "Webhook":

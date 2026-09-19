@@ -24,10 +24,11 @@ from .errors import (
     NetworkException,
     ResponseDecodeError,
 )
-from .webhooks import Webhook, WebhookVerificationError
+from .webhooks import InvalidWebhookSecretError, Webhook, WebhookVerificationError
 
 __all__ = [
     "ApiException",
+    "InvalidWebhookSecretError",
     "Meteroid",
     "MeteroidAsync",
     "MeteroidError",

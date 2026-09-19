@@ -5,7 +5,12 @@ import typing as t
 
 import pytest
 
-from meteroid import Webhook, WebhookVerificationError
+from meteroid import (
+    InvalidWebhookSecretError,
+    MeteroidError,
+    Webhook,
+    WebhookVerificationError,
+)
 
 SECRET = "whsec_C2FVsBQIhrscChlQIMV+b5sSYspob7oD"
 PAYLOAD = b'{"test": "data"}'
@@ -165,3 +170,37 @@ def test_undecodable_str_payload_raises_verification_error() -> None:
 
     with pytest.raises(WebhookVerificationError):
         wh.verify("\udcff", headers_for("webhook", "v1,whatever", timestamp))
+
+
+def _signature_with(wh: Webhook) -> str:
+    return wh.sign(MSG_ID, 1_700_000_000, PAYLOAD)
+
+
+def test_secret_with_and_without_prefix_and_raw_bytes_agree() -> None:
+    import base64
+
+    bare = SECRET[len("whsec_") :]
+    expected = _signature_with(Webhook(SECRET))
+    assert _signature_with(Webhook(bare)) == expected
+    assert _signature_with(Webhook(base64.b64decode(bare))) == expected
+    assert _signature_with(Webhook.from_bytes(base64.b64decode(bare))) == expected
+
+
+@pytest.mark.parametrize(
+    "secret",
+    [
+        "whsec_!",  # non-strict base64 used to decode this to an empty key
+        "whsec_",
+        "",
+        "whsec_C2FVsBQIhrscChlQIMV+b5sSYspob7o",  # bad padding
+        "whsec_C2FVsBQIhrscChlQIMV+b5sSYspob7oD!",  # stray character
+        "whsec_C2FVsBQI hrscChlQIMV+b5sSYspob7oD",  # embedded whitespace
+        "whsec_C2FVsBQIhrscChlQIMV+b5sSYspob7oé",  # non-ASCII
+        b"",
+    ],
+)
+def test_invalid_secret_is_rejected(secret: t.Union[str, bytes]) -> None:
+    with pytest.raises(InvalidWebhookSecretError) as excinfo:
+        Webhook(secret)
+    assert isinstance(excinfo.value, MeteroidError)
+    assert not isinstance(excinfo.value, WebhookVerificationError)
