@@ -1,4 +1,10 @@
 // this file is @generated
-{% for type in api.types -%}
-export { {{ type | to_upper_camel_case }} } from "./{{ type | to_lower_camel_case }}";
+{% for _, type in api.types | items -%}
+{% set type_name = type.name | to_upper_camel_case -%}
+export { {{ type_name }} } from "./{{ type.name | to_lower_camel_case }}";
+{% if type.kind == "struct_enum" -%}
+{% for variant in type.variants -%}
+export { {{ type_name }}{{ variant.name | to_upper_camel_case }} } from "./{{ type.name | to_lower_camel_case }}";
+{% endfor -%}
+{% endif -%}
 {% endfor %}

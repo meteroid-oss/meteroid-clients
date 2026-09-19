@@ -16,16 +16,13 @@ import { HttpMethod, MeteroidRequest, MeteroidRequestContext } from "../request"
             {% if p.description is defined -%}
                 {{ p.description | to_doc_comment(style="js") }}
             {% endif -%}
-            {% set field_ty = p.type.to_js() -%}
-            {% if p.name == "iterator" %}{% set field_ty = "string | null" %}{% endif -%}
-            {{ p.name | to_lower_camel_case }}{% if not p.required %}?{% endif %}: {{ field_ty }};
+            {{ p.name | to_lower_camel_case }}{% if not p.required %}?{% endif %}: {{ p.type.to_js() }};
         {% endfor -%}
         {% for p in op.header_params -%}
             {% if p.description is defined -%}
                 {{ p.description | to_doc_comment(style="js") }}
             {% endif -%}
-            {% set field_ty = "string" -%}
-            {{ p.name | to_lower_camel_case }}{% if not p.required %}?{% endif %}: {{ field_ty }};
+            {{ p.name | to_lower_camel_case }}{% if not p.required %}?{% endif %}: string;
         {% endfor -%}
     }
 
@@ -36,27 +33,34 @@ export class {{ resource_type_name }} {
     public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
     {% for op in resource.operations -%}
-        {% set response_type =
-            op.response_body_schema_name | default("void") | replace("_", "") -%}
-        {{ op.description | with_javadoc_deprecation(op.deprecated) | to_doc_comment(style="js") }}
+        {% if op.response_is_binary | default(false) -%}
+            {% set response_type = "Uint8Array" -%}
+        {% elif op.response_is_text | default(false) -%}
+            {% set response_type = "string" -%}
+        {% elif op.response_body_schema_name is defined -%}
+            {% set response_type = op.response_body_schema_name | to_upper_camel_case -%}
+        {% else -%}
+            {% set response_type = "void" -%}
+        {% endif -%}
+        {{ op.description | default("") | with_javadoc_deprecation(op.deprecated) | to_doc_comment(style="js") }}
         public {{ op.name | to_lower_camel_case }}(
             {# path parameters -#}
             {% for p in op.path_params -%}
                 {{ p | to_lower_camel_case }}: string,
             {% endfor -%}
 
-            {# body parameter interface -#}
+            {# body parameter -#}
             {% if op.request_body_schema_name is defined -%}
-                {% set field_name = op.request_body_schema_name | to_lower_camel_case -%}
-                {{ field_name }}: {{ op.request_body_schema_name }},
+                {% set body_arg = op.request_body_schema_name | to_lower_camel_case -%}
+                {{ body_arg }}: {{ op.request_body_schema_name | to_upper_camel_case }},
             {% endif -%}
 
-            {# query parameters -#}
+            {# query / header parameters -#}
             {% if op | has_query_or_header_params -%}
-                {% set field_ty -%}
+                {% set options_ty -%}
                     {{ resource_type_name }}{{ op.name | to_upper_camel_case }}Options
                 {%- endset -%}
-                options{% if not op | has_required_query_or_header_params %}?{% endif %}: {{ field_ty }},
+                options{% if not op | has_required_query_or_header_params %}?{% endif %}: {{ options_ty }},
             {% endif -%}
         ): Promise<{{ response_type }}> {
             const request = new MeteroidRequest(HttpMethod.{{ op.method | upper }}, "{{ op.path }}");
@@ -68,29 +72,45 @@ export class {{ resource_type_name }} {
 
             {# query parameters -#}
             {% for p in op.query_params -%}
-                request.setQueryParam("{{ p.name }}", options{% if not p.required %}?{% endif %}.{{ p.name | to_lower_camel_case }});
+                {# `explode` defaults to true for OpenAPI `style: form`, and may be missing
+                   entirely when the codegen binary predates the `explode` IR field. -#}
+                {% set explode = p.explode | default(true) -%}
+                {% set accessor %}options{% if not p.required %}?{% endif %}.{{ p.name | to_lower_camel_case }}{% endset -%}
+                {% if (p.type.is_list() or p.type.is_set()) and explode -%}
+                    request.setExplodedQueryParam("{{ p.name }}", {{ accessor }});
+                {% else -%}
+                    request.setQueryParam("{{ p.name }}", {{ accessor }});
+                {% endif -%}
             {% endfor -%}
 
             {# header parameters -#}
             {% for p in op.header_params -%}
-                request.setHeaderParam("{{ p.name }}", options?.{{ p.name | to_lower_camel_case }});
+                request.setHeaderParam("{{ p.name }}", options{% if not p.required %}?{% endif %}.{{ p.name | to_lower_camel_case }});
             {% endfor -%}
 
             {# body parameter -#}
             {% if op.request_body_schema_name is defined -%}
-                request.setBody(
-                    {{ op.request_body_schema_name | to_upper_camel_case }}Serializer._toJsonObject(
-                        {{ op.request_body_schema_name | to_lower_camel_case }},
-                    )
+                {% if op.request_body_is_form | default(false) -%}
+                request.setFormBody(
+                    {{ op.request_body_schema_name | to_upper_camel_case }}Serializer._toJsonObject({{ body_arg }})
                 );
+                {% else -%}
+                request.setBody(
+                    {{ op.request_body_schema_name | to_upper_camel_case }}Serializer._toJsonObject({{ body_arg }})
+                );
+                {% endif -%}
             {% endif -%}
 
-            {% if op.response_body_schema_name is defined %}
+            {% if op.response_is_binary | default(false) -%}
+                return request.sendBinary(this.requestCtx);
+            {% elif op.response_is_text | default(false) -%}
+                return request.sendText(this.requestCtx);
+            {% elif op.response_body_schema_name is defined -%}
                 return request.send(
                     this.requestCtx,
                     {{ op.response_body_schema_name | to_upper_camel_case }}Serializer._fromJsonObject,
                 );
-            {% else %}
+            {% else -%}
                 return request.sendNoResponseBody(this.requestCtx);
             {% endif -%}
         }
