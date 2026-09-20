@@ -30,13 +30,52 @@ output_dir = "java/src/main/java/com/meteroid"
 template = "templates/java/component_type.java.jinja"
 output_dir = "java/src/main/java/com/meteroid/models"
 
-# [typescript]
-# [[typescript.task]]
-# template = "templates/typescript/api_resource.ts.jinja"
-# output_dir = "typescript/src/api"
-# [[typescript.task]]
-# template = "templates/typescript/component_type_summary.ts.jinja"
-# output_dir = "typescript/src/models"
-# [[typescript.task]]
-# template = "templates/typescript/component_type.ts.jinja"
-# output_dir = "typescript/src/models"
+[typescript]
+[[typescript.task]]
+template = "templates/typescript/api_resource.ts.jinja"
+output_dir = "typescript/src/api"
+[[typescript.task]]
+template = "templates/typescript/api_summary.ts.jinja"
+output_dir = "typescript/src"
+[[typescript.task]]
+template = "templates/typescript/component_type_summary.ts.jinja"
+output_dir = "typescript/src/models"
+[[typescript.task]]
+template = "templates/typescript/component_type.ts.jinja"
+output_dir = "typescript/src/models"
+
+[python]
+# The codegen image doesn't ship `ruff`, so formatting happens on the host
+# right after generation (see python/scripts/codegen_format.sh).
+extra_codegen_args = ["--no-postprocess"]
+extra_shell_commands = ["python/scripts/codegen_format.sh"]
+[[python.task]]
+template = "templates/python/api_resource.py.jinja"
+output_dir = "python/meteroid/api"
+[[python.task]]
+template = "templates/python/api_summary.py.jinja"
+output_dir = "python/meteroid/api"
+[[python.task]]
+template = "templates/python/component_type_summary.py.jinja"
+output_dir = "python/meteroid/models"
+[[python.task]]
+template = "templates/python/component_type.py.jinja"
+output_dir = "python/meteroid/models"
+
+# The Go SDK is a single flat package (`meteroid`), so every task writes into
+# `go/`. The codegen image has no Go toolchain, hence --no-postprocess plus an
+# explicit gofmt pass afterwards (local gofmt when available, Docker otherwise).
+[go]
+extra_codegen_args = ["--no-postprocess"]
+extra_shell_commands = [
+    'if command -v gofmt >/dev/null 2>&1; then gofmt -w go; else docker run --rm --user "$(id -u):$(id -g)" -v "$(pwd)/go":/src -w /src golang:1.24-alpine gofmt -w .; fi',
+]
+[[go.task]]
+template = "templates/go/api_resource.go.jinja"
+output_dir = "go"
+[[go.task]]
+template = "templates/go/api_summary.go.jinja"
+output_dir = "go"
+[[go.task]]
+template = "templates/go/component_type.go.jinja"
+output_dir = "go"

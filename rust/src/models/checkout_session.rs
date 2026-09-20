@@ -16,6 +16,9 @@ pub struct CheckoutSession {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_start_date: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cancel_url: Option<String>,
+
     pub checkout_type: CheckoutType,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,6 +56,9 @@ pub struct CheckoutSession {
     pub subscription_id: Option<SubscriptionId>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub success_url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trial_duration_days: Option<i32>,
 }
 
@@ -68,6 +74,7 @@ impl CheckoutSession {
         Self {
             billing_day_anchor: None,
             billing_start_date: None,
+            cancel_url: None,
             checkout_type,
             checkout_url: None,
             completed_at: None,
@@ -81,6 +88,7 @@ impl CheckoutSession {
             plan_version_id,
             status,
             subscription_id: None,
+            success_url: None,
             trial_duration_days: None,
         }
     }

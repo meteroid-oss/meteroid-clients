@@ -2344,6 +2344,87 @@
         ]
       }
     },
+    "/api/v1/credit-notes/{credit_note_id}/xml": {
+      "get": {
+        "tags": [
+          "Credit Notes"
+        ],
+        "summary": "Download credit note e-invoice XML",
+        "description": "Download the structured e-invoice (EN 16931 XML) issued with a credit note. For\nFactur-X the same XML is also embedded in the PDF.",
+        "operationId": "download_credit_note_xml",
+        "parameters": [
+          {
+            "name": "credit_note_id",
+            "in": "path",
+            "description": "Credit Note ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CreditNoteId"
+            },
+            "example": "cn_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit Note e-invoice XML",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Unused dummy struct only used for an OpenAPI definition."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Credit note not found, or not issued as an e-invoice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/custom-property-definitions": {
       "get": {
         "tags": [
@@ -3771,6 +3852,21 @@
             }
           },
           {
+            "name": "einvoicing_status",
+            "in": "query",
+            "description": "Only invoices whose e-invoice was generated, or failed. Invoices from entities that\nhad not opted in carry no status and match neither.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "EInvoicingStatus",
+              "description": "Whether the structured e-invoice was produced with the accounting PDF. Absent when the\ninvoicing entity had not opted in at the time the invoice was issued.",
+              "enum": [
+                "GENERATED",
+                "FAILED"
+              ]
+            }
+          },
+          {
             "name": "order_by",
             "in": "query",
             "description": "Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`, `amount`, `invoice_date`, `status`, `payment_status`. Direction: `asc` or `desc`. Default: `invoice_date.desc`.",
@@ -4075,6 +4171,176 @@
           },
           "404": {
             "description": "Invoice not found or PDF not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices/{invoice_id}/refresh": {
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Refresh invoice",
+        "description": "Recompute a draft invoice against current usage, credits, coupons and tax, and return it.\nDrafts are also refreshed periodically in the background; use this to force it, e.g. after\ningesting late events. Rejected while a payment for the invoice is in progress or when the\ninvoice was merged into a consolidated parent.",
+        "operationId": "refresh_invoice",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "description": "Invoice ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/InvoiceId"
+            },
+            "example": "inv_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Refreshed invoice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invoice cannot be refreshed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices/{invoice_id}/xml": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Download invoice e-invoice XML",
+        "description": "Download the structured e-invoice (EN 16931 XML) issued with an invoice. For\nFactur-X the same XML is also embedded in the PDF.",
+        "operationId": "download_invoice_xml",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "description": "Invoice ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/InvoiceId"
+            },
+            "example": "inv_123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice e-invoice XML",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Unused dummy struct only used for an OpenAPI definition."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found, or not issued as an e-invoice",
             "content": {
               "application/json": {
                 "schema": {
@@ -7145,6 +7411,84 @@
         ]
       }
     },
+    "/api/v1/subscriptions/{subscription_id}/summary": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Get subscription summary",
+        "description": "Retrieve a subscription without its components, add-ons, coupons and entitlements: the same\nshape as list items, for callers that only need status and billing dates.",
+        "operationId": "subscription_summary",
+        "parameters": [
+          {
+            "name": "subscription_id",
+            "in": "path",
+            "description": "Subscription ID",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SubscriptionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/v1/usage/customer/{customer_id}": {
       "get": {
         "tags": [
@@ -8367,6 +8711,12 @@
             ],
             "format": "date"
           },
+          "cancel_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "checkout_type": {
             "$ref": "#/components/schemas/CheckoutType"
           },
@@ -8438,6 +8788,12 @@
               {
                 "type": "null"
               }
+            ]
+          },
+          "success_url": {
+            "type": [
+              "string",
+              "null"
             ]
           },
           "trial_duration_days": {
@@ -9096,6 +9452,13 @@
             ],
             "format": "date"
           },
+          "cancel_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Absolute http(s) URL offered to the customer to leave the checkout without paying."
+          },
           "charge_automatically": {
             "type": [
               "boolean",
@@ -9186,6 +9549,13 @@
               "string",
               "null"
             ]
+          },
+          "success_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Absolute http(s) URL the customer is sent to after a successful checkout.\n`checkout_session_id` is appended as a query parameter. Without it the customer stays on\nthe hosted confirmation page."
           },
           "trial_duration_days": {
             "type": [
@@ -10279,7 +10649,8 @@
           "currency",
           "invoicing_entity_id",
           "custom_taxes",
-          "custom_properties"
+          "custom_properties",
+          "preferred_locales"
         ],
         "properties": {
           "alias": {
@@ -10322,6 +10693,15 @@
               "$ref": "#/components/schemas/CustomTaxRate"
             }
           },
+          "customer_type": {
+            "$ref": "#/components/schemas/CustomerType"
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "$ref": "#/components/schemas/CustomerId"
           },
@@ -10339,7 +10719,21 @@
               "string",
               "null"
             ],
-            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default."
+            "description": "Deprecated: the first entry of `preferred_locales`.",
+            "deprecated": true
+          },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "legal_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB)."
           },
           "name": {
             "type": "string"
@@ -10349,6 +10743,13 @@
               "string",
               "null"
             ]
+          },
+          "preferred_locales": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Preferred document languages, most-preferred first (BCP-47 tags, e.g.\n`[\"fr-FR\", \"en\"]`); overrides the invoicing entity default."
           },
           "shipping_address": {
             "oneOf": [
@@ -10371,7 +10772,6 @@
       "CustomerCreateRequest": {
         "type": "object",
         "required": [
-          "name",
           "invoicing_emails",
           "currency",
           "custom_taxes"
@@ -10417,12 +10817,22 @@
               "$ref": "#/components/schemas/CustomTaxRate"
             }
           },
+          "customer_type": {
+            "$ref": "#/components/schemas/CustomerType",
+            "description": "`INDIVIDUAL` requires `first_name`, `last_name`, and a billing-address country."
+          },
           "exemption_reason": {
             "type": [
               "string",
               "null"
             ],
             "description": "Free-text legal exemption mention surfaced on exempt invoices."
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "invoicing_emails": {
             "type": "array",
@@ -10445,7 +10855,8 @@
               "string",
               "null"
             ],
-            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.\nUnsupported languages fall back to `en-US` when rendering."
+            "description": "Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.",
+            "deprecated": true
           },
           "is_tax_exempt": {
             "type": [
@@ -10453,14 +10864,38 @@
               "null"
             ]
           },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "legal_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB)."
+          },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Required for `COMPANY`. Ignored for `INDIVIDUAL`: derived from `first_name` + `last_name`."
           },
           "phone": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "preferred_locales": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Preferred document languages, most-preferred first (BCP-47 tags, e.g.\n`[\"fr-FR\", \"en\"]`); overrides the invoicing entity default. The first one the\nrenderer has a template for wins, so an unsupported entry alongside a supported\none just falls through; a list of only unsupported ones is rejected."
           },
           "shipping_address": {
             "oneOf": [
@@ -10676,12 +11111,28 @@
               "$ref": "#/components/schemas/CustomTaxRate"
             }
           },
+          "customer_type": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "exemption_reason": {
             "type": [
               "string",
               "null"
             ],
             "description": "Free-text legal exemption mention surfaced on exempt invoices."
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "invoicing_emails": {
             "type": [
@@ -10707,13 +11158,27 @@
               "string",
               "null"
             ],
-            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.\nOmit to leave unchanged, send `\"\"` to reset to the invoicing entity default.\nUnsupported languages fall back to `en-US` when rendering."
+            "description": "Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.",
+            "deprecated": true
           },
           "is_tax_exempt": {
             "type": [
               "boolean",
               "null"
             ]
+          },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "legal_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB)."
           },
           "name": {
             "type": [
@@ -10726,6 +11191,16 @@
               "string",
               "null"
             ]
+          },
+          "preferred_locales": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Preferred document languages, most-preferred first (BCP-47 tags, e.g.\n`[\"fr-FR\", \"en\"]`); overrides the invoicing entity default. Omit to leave\nunchanged, send `[]` to reset to that default."
           },
           "shipping_address": {
             "oneOf": [
@@ -10783,10 +11258,17 @@
           }
         }
       },
+      "CustomerType": {
+        "type": "string",
+        "description": "Company vs. individual (B2C). Defaults to `COMPANY`.",
+        "enum": [
+          "COMPANY",
+          "INDIVIDUAL"
+        ]
+      },
       "CustomerUpdateRequest": {
         "type": "object",
         "required": [
-          "name",
           "invoicing_emails",
           "currency",
           "invoicing_entity_id",
@@ -10827,12 +11309,30 @@
               "$ref": "#/components/schemas/CustomTaxRate"
             }
           },
+          "customer_type": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerType",
+                "description": "`INDIVIDUAL` requires `first_name`, `last_name`, and a billing-address country.\nOmit to keep the stored type — a full replace never silently reclassifies a customer."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "exemption_reason": {
             "type": [
               "string",
               "null"
             ],
             "description": "Free-text legal exemption mention surfaced on exempt invoices."
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Omit to keep the stored value (a full replace does not blank a person's name)."
           },
           "invoicing_emails": {
             "type": "array",
@@ -10848,7 +11348,8 @@
               "string",
               "null"
             ],
-            "description": "Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.\nOmit or send `\"\"` to reset to the invoicing entity default (full-replace update).\nUnsupported languages fall back to `en-US` when rendering."
+            "description": "Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.",
+            "deprecated": true
           },
           "is_tax_exempt": {
             "type": [
@@ -10856,14 +11357,38 @@
               "null"
             ]
           },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "legal_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB)."
+          },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Required for `COMPANY`. Ignored for `INDIVIDUAL`: derived from `first_name` + `last_name`."
           },
           "phone": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "preferred_locales": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Preferred document languages, most-preferred first (BCP-47 tags, e.g.\n`[\"fr-FR\", \"en\"]`); overrides the invoicing entity default. Omit or send `[]` to\nreset to that default (full-replace update)."
           },
           "shipping_address": {
             "oneOf": [
@@ -10897,6 +11422,43 @@
             "$ref": "#/components/schemas/MetricDimension"
           }
         }
+      },
+      "EInvoicingFinding": {
+        "type": "object",
+        "description": "One rule the document did not satisfy, in the standard's own vocabulary.",
+        "required": [
+          "rule",
+          "term",
+          "message"
+        ],
+        "properties": {
+          "hint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "rule": {
+            "type": "string",
+            "description": "The rule identifier — \"BR-11\", \"PEPPOL-EN16931-R003\"."
+          },
+          "term": {
+            "type": "string",
+            "description": "The business term path it is about — \"BG-8/BT-55\"."
+          }
+        }
+      },
+      "EInvoicingStatus": {
+        "type": "string",
+        "title": "EInvoicingStatus",
+        "description": "Whether the structured e-invoice was produced with the accounting PDF. Absent when the\ninvoicing entity had not opted in at the time the invoice was issued.",
+        "enum": [
+          "GENERATED",
+          "FAILED"
+        ]
       },
       "EffectiveEntitlement": {
         "type": "object",
@@ -11101,6 +11663,7 @@
           "invoice.closed",
           "invoice.consolidated",
           "invoice.deleted",
+          "invoice.accounting_pdf_generated",
           "quote.accepted",
           "quote.converted",
           "credit_note.created",
@@ -11626,6 +12189,17 @@
             ],
             "format": "date"
           },
+          "einvoicing_status": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EInvoicingStatus",
+                "description": "Absent when the invoicing entity had not opted in to e-invoicing."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "finalized_at": {
             "type": [
               "string",
@@ -11767,6 +12341,93 @@
         ],
         "properties": {
           "custom_properties": {}
+        }
+      },
+      "InvoiceDocumentsEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InvoiceDocumentsEventData"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "timestamp"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/EventId"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "$ref": "#/components/schemas/EventType"
+              }
+            }
+          }
+        ]
+      },
+      "InvoiceDocumentsEventData": {
+        "type": "object",
+        "description": "Emitted once the accounting PDF is stored. This is also the moment the e-invoicing\noutcome is known: the structured document is produced with the PDF, not at finalization.",
+        "required": [
+          "invoice_id",
+          "customer_id",
+          "pdf_document_id",
+          "einvoicing_findings"
+        ],
+        "properties": {
+          "customer_id": {
+            "$ref": "#/components/schemas/CustomerId"
+          },
+          "einvoicing_error": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Set when generation failed for a reason that is not a business rule."
+          },
+          "einvoicing_findings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EInvoicingFinding"
+            },
+            "description": "Empty unless the status is `failed`."
+          },
+          "einvoicing_profile": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The profile the document was checked against, e.g. \"EN 16931\"."
+          },
+          "einvoicing_status": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EInvoicingStatus",
+                "description": "Absent when the invoicing entity had not opted in."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "invoice_id": {
+            "$ref": "#/components/schemas/InvoiceId"
+          },
+          "pdf_document_id": {
+            "type": "string"
+          },
+          "xml_document_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The structured e-invoice stored beside the PDF, when one was produced."
+          }
         }
       },
       "InvoiceEvent": {
@@ -15633,7 +16294,8 @@
           "REVERSE_CHARGE",
           "TAX_EXEMPT",
           "NOT_REGISTERED",
-          "EXPORT"
+          "EXPORT",
+          "NO_VAT_TERRITORY"
         ]
       },
       "TenantId": {
@@ -16811,6 +17473,48 @@
                 "custom_properties": {
                   "account_tier": "enterprise"
                 },
+                "timestamp": "1970-01-01T00:00:00.000Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully"
+          }
+        }
+      }
+    },
+    "invoice.accounting_pdf_generated": {
+      "post": {
+        "summary": "invoice.accounting_pdf_generated webhook",
+        "description": "The accounting PDF of a finalized invoice was stored, with the e-invoicing outcome when the invoicing entity opted in",
+        "operationId": "webhook_invoice_accounting_pdf_generated",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceDocumentsEvent"
+              },
+              "example": {
+                "id": "evt_7n42DGM5Tflk9n8mt7Fhc7",
+                "type": "invoice.accounting_pdf_generated",
+                "invoice_id": "inv_7n42DGM5Tflk9n8mt7Fhc7",
+                "customer_id": "cus_7n42DGM5Tflk9n8mt7Fhc7",
+                "pdf_document_id": "doc_01HXYZ",
+                "einvoicing_status": "FAILED",
+                "einvoicing_profile": "EN 16931",
+                "einvoicing_findings": [
+                  {
+                    "rule": "BR-11",
+                    "term": "BG-8/BT-55",
+                    "message": "The Buyer postal address shall contain a Buyer country code."
+                  }
+                ],
                 "timestamp": "1970-01-01T00:00:00.000Z"
               }
             }

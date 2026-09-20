@@ -100,4 +100,16 @@ impl<'a> CreditNotes<'a> {
         .execute_binary(self.cfg)
         .await
     }
+
+    /// Download the structured e-invoice (EN 16931 XML) issued with a credit note. For
+    /// Factur-X the same XML is also embedded in the PDF.
+    pub async fn download_credit_note_xml(&self, credit_note_id: String) -> Result<bytes::Bytes> {
+        crate::request::Request::new(
+            http1::Method::GET,
+            "/api/v1/credit-notes/{credit_note_id}/xml",
+        )
+        .with_path_param("credit_note_id", credit_note_id)
+        .execute_binary(self.cfg)
+        .await
+    }
 }

@@ -1,0 +1,122 @@
+// this file is @generated
+{% for resource in api.resources -%}
+{% if resource.subresources | length > 0 -%}
+{{ panic("typescript codegen: subresources are not supported (resource `" ~ resource.name ~ "`)") }}
+{% endif -%}
+{% endfor -%}
+{% for resource in api.resources -%}
+import { {{ resource.name | to_upper_camel_case }} } from "./api/{{ resource.name | to_lower_camel_case }}";
+{% endfor -%}
+import type { MeteroidRequestContext } from "./request";
+import type { XOR } from "./util";
+
+export { ApiException } from "./util";
+export type { XOR } from "./util";
+export * from "./webhook";
+export * from "./models/index";
+export { LIB_VERSION } from "./request";
+
+{% for resource in api.resources -%}
+export { {{ resource.name | to_upper_camel_case }} } from "./api/{{ resource.name | to_lower_camel_case }}";
+{% for op in resource.operations -%}
+{% if op | has_query_or_header_params -%}
+export type { {{ resource.name | to_upper_camel_case }}{{ op.name | to_upper_camel_case }}Options } from "./api/{{ resource.name | to_lower_camel_case }}";
+{% endif -%}
+{% endfor -%}
+{% endfor %}
+
+export type MeteroidOptions = {
+  /** Write a one-line summary of every request and response to stderr. */
+  debug?: boolean;
+  /** Custom API server URL. Defaults to `https://api.meteroid.com`. */
+  serverUrl?: string;
+  /** Time in milliseconds to wait for requests to get a response. */
+  requestTimeout?: number;
+  /**
+   * Custom fetch implementation to use for HTTP requests.
+   * Useful for testing, adding custom middleware, or running in non-standard environments.
+   */
+  fetch?: typeof fetch;
+} & XOR<
+  {
+    /** List of delays (in milliseconds) to wait before each retry attempt. */
+    retryScheduleInMs?: number[];
+  },
+  {
+    /**
+     * The number of times the client will retry if a server-side error
+     * or timeout is received.
+     * Default: 2
+     */
+    numRetries?: number;
+  }
+>;
+
+const DEFAULT_BASE_URL = "https://api.meteroid.com";
+
+/**
+ * Meteroid API client for billing and subscription management.
+ *
+ * @example
+ * ```typescript
+ * const meteroid = new Meteroid("your-api-key");
+ *
+ * // Create a customer
+ * const customer = await meteroid.customers.createCustomer({
+ *   name: "Acme Inc",
+ *   billingEmail: "billing@acme.com",
+ * });
+ * ```
+ */
+export class Meteroid {
+  private readonly requestCtx: MeteroidRequestContext;
+
+  /**
+   * Create a new Meteroid client.
+   *
+   * @param token API token for authentication
+   * @param options Client configuration options
+   */
+  public constructor(token: string, options: MeteroidOptions = {}) {
+    const baseUrl: string = options.serverUrl ?? DEFAULT_BASE_URL;
+
+    if (options.retryScheduleInMs != null) {
+      this.requestCtx = {
+        baseUrl,
+        token,
+        timeout: options.requestTimeout,
+        retryScheduleInMs: options.retryScheduleInMs,
+        debug: options.debug,
+        fetch: options.fetch,
+      };
+      return;
+    }
+
+    if (options.numRetries != null) {
+      this.requestCtx = {
+        baseUrl,
+        token,
+        timeout: options.requestTimeout,
+        numRetries: options.numRetries,
+        debug: options.debug,
+        fetch: options.fetch,
+      };
+      return;
+    }
+
+    this.requestCtx = {
+      baseUrl,
+      token,
+      timeout: options.requestTimeout,
+      debug: options.debug,
+      fetch: options.fetch,
+    };
+  }
+
+  {% for resource in api.resources %}
+  /** Access the {{ resource.name | to_snake_case | replace("_", " ") }} API. */
+  public get {{ resource.name | to_lower_camel_case }}(): {{ resource.name | to_upper_camel_case }} {
+    return new {{ resource.name | to_upper_camel_case }}(this.requestCtx);
+  }
+  {% endfor %}
+}

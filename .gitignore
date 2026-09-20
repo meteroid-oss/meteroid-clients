@@ -18,5 +18,16 @@ target/
 /java/build/
 .gradle/
 
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+/python/build/
+/python/dist/
+*.egg-info/
+
 # Codegen script
 /.codegen-tmp/

@@ -124,4 +124,19 @@ impl<'a> Subscriptions<'a> {
         .execute(self.cfg)
         .await
     }
+
+    /// Retrieve a subscription without its components, add-ons, coupons and entitlements: the same
+    /// shape as list items, for callers that only need status and billing dates.
+    pub async fn subscription_summary(
+        &self,
+        subscription_id: String,
+    ) -> Result<crate::models::Subscription> {
+        crate::request::Request::new(
+            http1::Method::GET,
+            "/api/v1/subscriptions/{subscription_id}/summary",
+        )
+        .with_path_param("subscription_id", subscription_id)
+        .execute(self.cfg)
+        .await
+    }
 }

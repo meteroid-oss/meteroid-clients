@@ -75,6 +75,7 @@ fn test_customer_list_response_with_data() {
                 "name": "Test Customer",
                 "currency": "USD",
                 "custom_properties": {},
+                "preferred_locales": [],
                 "custom_taxes": [],
                 "invoicing_emails": [],
                 "invoicing_entity_id": "inv_entity_1"
@@ -109,12 +110,12 @@ fn test_customer_list_response_with_data() {
 
 #[test]
 fn test_customer_create_request_serialization() {
-    let request = CustomerCreateRequest::new(
+    let mut request = CustomerCreateRequest::new(
         Currency::Usd,
         vec![],
         vec!["billing@example.com".to_string()],
-        "Acme Corp".to_string(),
     );
+    request.name = Some("Acme Corp".to_string());
 
     let json_value = serde_json::to_value(&request).unwrap();
 
@@ -132,8 +133,7 @@ fn test_customer_create_request_serialization() {
 
 #[test]
 fn test_customer_create_request_with_optional_fields() {
-    let mut request =
-        CustomerCreateRequest::new(Currency::Eur, vec![], vec![], "Test Company".to_string());
+    let mut request = CustomerCreateRequest::new(Currency::Eur, vec![], vec![]);
     request.alias = Some("test-alias".to_string());
     request.billing_email = Some("billing@test.com".to_string());
 
@@ -193,6 +193,7 @@ fn test_optional_fields_deserialize_as_none() {
         "name": "Test",
         "currency": "USD",
         "custom_properties": {},
+        "preferred_locales": [],
         "custom_taxes": [],
         "invoicing_emails": [],
         "invoicing_entity_id": "inv_1"
@@ -211,6 +212,7 @@ fn test_optional_fields_deserialize_as_some() {
         "name": "Test",
         "currency": "USD",
         "custom_properties": {},
+        "preferred_locales": [],
         "custom_taxes": [],
         "invoicing_emails": [],
         "invoicing_entity_id": "inv_1",

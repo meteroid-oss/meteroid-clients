@@ -55,6 +55,19 @@ jobs:
         if: steps.codegen.outputs.changed == 'true'
         run: docker build -t ghcr.io/meteroid-oss/openapi-codegen:latest codegen/
 
+      # The Python tasks format their output on the host (python/scripts/codegen_format.sh
+      # runs a pinned `uvx ruff`), since the codegen image ships no `ruff`.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.8.13"
+
+      # The Go codegen tasks format with the host's gofmt; pin it so the output does not
+      # drift with the runner image's default Go.
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
       - name: Regen openapi libs
         run: ./regen_openapi.py
 

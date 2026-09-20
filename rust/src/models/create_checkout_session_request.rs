@@ -22,6 +22,10 @@ pub struct CreateCheckoutSessionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_start_date: Option<String>,
 
+    /// Absolute http(s) URL offered to the customer to leave the checkout without paying.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cancel_url: Option<String>,
+
     /// Automatically try to charge the customer's configured payment method on finalize. Default is true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub charge_automatically: Option<bool>,
@@ -65,6 +69,12 @@ pub struct CreateCheckoutSessionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub purchase_order: Option<String>,
 
+    /// Absolute http(s) URL the customer is sent to after a successful checkout.
+    /// `checkout_session_id` is appended as a query parameter. Without it the customer stays on
+    /// the hosted confirmation page.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub success_url: Option<String>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trial_duration_days: Option<i32>,
 }
@@ -76,6 +86,7 @@ impl CreateCheckoutSessionRequest {
             auto_advance_invoices: None,
             billing_day_anchor: None,
             billing_start_date: None,
+            cancel_url: None,
             charge_automatically: None,
             components: None,
             coupon_code: None,
@@ -90,6 +101,7 @@ impl CreateCheckoutSessionRequest {
             payment_methods_config: None,
             plan_version_id,
             purchase_order: None,
+            success_url: None,
             trial_duration_days: None,
         }
     }

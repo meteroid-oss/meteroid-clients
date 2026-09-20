@@ -1,6 +1,7 @@
 // this file is @generated
 package com.meteroid.api;
 
+import com.meteroid.models.EInvoicingStatus;
 import com.meteroid.models.InvoiceStatus;
 
 import lombok.Data;
@@ -14,6 +15,12 @@ public class InvoicesListInvoicesOptions {
 
     String subscriptionId;
     List<InvoiceStatus> statuses;
+
+    /**
+     * Only invoices whose e-invoice was generated, or failed. Invoices from entities that had not
+     * opted in carry no status and match neither.
+     */
+    EInvoicingStatus einvoicingStatus;
 
     /**
      * Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`,

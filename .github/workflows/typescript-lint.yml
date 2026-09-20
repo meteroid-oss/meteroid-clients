@@ -1,0 +1,55 @@
+name: TypeScript Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'typescript/**'
+      - 'codegen/templates/typescript/**'
+      - 'spec/**'
+      - '.github/workflows/typescript-lint.yml'
+  pull_request:
+    paths:
+      - 'typescript/**'
+      - 'codegen/templates/typescript/**'
+      - 'spec/**'
+      - '.github/workflows/typescript-lint.yml'
+
+# When pushing to a PR, cancel any jobs still running for the previous head commit of the PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: TypeScript Build & Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      - name: Install dependencies
+        working-directory: typescript
+        run: npm ci
+
+      - name: Lint and format check
+        working-directory: typescript
+        run: npm run check
+
+      - name: Typecheck
+        working-directory: typescript
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: typescript
+        run: npm test
+
+      - name: Build
+        working-directory: typescript
+        run: npm run build

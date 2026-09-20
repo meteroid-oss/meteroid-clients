@@ -11,6 +11,10 @@ pub struct InvoicesListInvoicesOptions {
 
     pub statuses: Option<Vec<InvoiceStatus>>,
 
+    /// Only invoices whose e-invoice was generated, or failed. Invoices from entities that
+    /// had not opted in carry no status and match neither.
+    pub einvoicing_status: Option<EInvoicingStatus>,
+
     /// Sort order. Format: `column.direction`. Allowed columns: `invoice_number`, `customer_name`, `amount`, `invoice_date`, `status`, `payment_status`. Direction: `asc` or `desc`. Default: `invoice_date.desc`.
     pub order_by: Option<String>,
 
@@ -39,6 +43,7 @@ impl<'a> Invoices<'a> {
             customer_id,
             subscription_id,
             statuses,
+            einvoicing_status,
             order_by,
             page,
             per_page,
@@ -48,6 +53,7 @@ impl<'a> Invoices<'a> {
             .with_optional_query_param("customer_id", customer_id)
             .with_optional_query_param("subscription_id", subscription_id)
             .with_optional_exploded_query_param("statuses", statuses)
+            .with_optional_query_param("einvoicing_status", einvoicing_status)
             .with_optional_query_param("order_by", order_by)
             .with_optional_query_param("page", page)
             .with_optional_query_param("per_page", per_page)
@@ -85,6 +91,26 @@ impl<'a> Invoices<'a> {
     /// Download the PDF document for an invoice.
     pub async fn download_invoice_pdf(&self, invoice_id: String) -> Result<bytes::Bytes> {
         crate::request::Request::new(http1::Method::GET, "/api/v1/invoices/{invoice_id}/download")
+            .with_path_param("invoice_id", invoice_id)
+            .execute_binary(self.cfg)
+            .await
+    }
+
+    /// Recompute a draft invoice against current usage, credits, coupons and tax, and return it.
+    /// Drafts are also refreshed periodically in the background; use this to force it, e.g. after
+    /// ingesting late events. Rejected while a payment for the invoice is in progress or when the
+    /// invoice was merged into a consolidated parent.
+    pub async fn refresh_invoice(&self, invoice_id: String) -> Result<crate::models::Invoice> {
+        crate::request::Request::new(http1::Method::POST, "/api/v1/invoices/{invoice_id}/refresh")
+            .with_path_param("invoice_id", invoice_id)
+            .execute(self.cfg)
+            .await
+    }
+
+    /// Download the structured e-invoice (EN 16931 XML) issued with an invoice. For
+    /// Factur-X the same XML is also embedded in the PDF.
+    pub async fn download_invoice_xml(&self, invoice_id: String) -> Result<bytes::Bytes> {
+        crate::request::Request::new(http1::Method::GET, "/api/v1/invoices/{invoice_id}/xml")
             .with_path_param("invoice_id", invoice_id)
             .execute_binary(self.cfg)
             .await

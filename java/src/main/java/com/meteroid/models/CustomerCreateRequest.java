@@ -38,8 +38,14 @@ public class CustomerCreateRequest {
     @JsonProperty("custom_taxes")
     private List<CustomTaxRate> customTaxes;
 
+    @JsonProperty("customer_type")
+    private CustomerType customerType;
+
     @JsonProperty("exemption_reason")
     private String exemptionReason;
+
+    @JsonProperty("first_name")
+    private String firstName;
 
     @JsonProperty("invoicing_emails")
     private List<String> invoicingEmails;
@@ -53,8 +59,17 @@ public class CustomerCreateRequest {
     @JsonProperty("is_tax_exempt")
     private Boolean isTaxExempt;
 
+    @JsonProperty("last_name")
+    private String lastName;
+
+    @JsonProperty("legal_number")
+    private String legalNumber;
+
     @JsonProperty private String name;
     @JsonProperty private String phone;
+
+    @JsonProperty("preferred_locales")
+    private List<String> preferredLocales;
 
     @JsonProperty("shipping_address")
     private ShippingAddress shippingAddress;
@@ -207,6 +222,25 @@ public class CustomerCreateRequest {
         this.customTaxes = customTaxes;
     }
 
+    public CustomerCreateRequest customerType(CustomerType customerType) {
+        this.customerType = customerType;
+        return this;
+    }
+
+    /**
+     * `INDIVIDUAL` requires `first_name`, `last_name`, and a billing-address country.
+     *
+     * @return customerType
+     */
+    @javax.annotation.Nullable
+    public CustomerType getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(CustomerType customerType) {
+        this.customerType = customerType;
+    }
+
     public CustomerCreateRequest exemptionReason(String exemptionReason) {
         this.exemptionReason = exemptionReason;
         return this;
@@ -224,6 +258,25 @@ public class CustomerCreateRequest {
 
     public void setExemptionReason(String exemptionReason) {
         this.exemptionReason = exemptionReason;
+    }
+
+    public CustomerCreateRequest firstName(String firstName) {
+        this.firstName = firstName;
+        return this;
+    }
+
+    /**
+     * Get firstName
+     *
+     * @return firstName
+     */
+    @javax.annotation.Nullable
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public CustomerCreateRequest invoicingEmails(List<String> invoicingEmails) {
@@ -273,22 +326,24 @@ public class CustomerCreateRequest {
         this.invoicingEntityId = invoicingEntityId;
     }
 
+    @Deprecated
     public CustomerCreateRequest invoicingLanguage(String invoicingLanguage) {
         this.invoicingLanguage = invoicingLanguage;
         return this;
     }
 
     /**
-     * Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
-     * Unsupported languages fall back to `en-US` when rendering.
+     * Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.
      *
      * @return invoicingLanguage
      */
     @javax.annotation.Nullable
+    @Deprecated
     public String getInvoicingLanguage() {
         return invoicingLanguage;
     }
 
+    @Deprecated
     public void setInvoicingLanguage(String invoicingLanguage) {
         this.invoicingLanguage = invoicingLanguage;
     }
@@ -312,17 +367,55 @@ public class CustomerCreateRequest {
         this.isTaxExempt = isTaxExempt;
     }
 
+    public CustomerCreateRequest lastName(String lastName) {
+        this.lastName = lastName;
+        return this;
+    }
+
+    /**
+     * Get lastName
+     *
+     * @return lastName
+     */
+    @javax.annotation.Nullable
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public CustomerCreateRequest legalNumber(String legalNumber) {
+        this.legalNumber = legalNumber;
+        return this;
+    }
+
+    /**
+     * BT-47 — the buyer&#x27;s national register identifier (SIREN&#x2f;SIRET, HRB).
+     *
+     * @return legalNumber
+     */
+    @javax.annotation.Nullable
+    public String getLegalNumber() {
+        return legalNumber;
+    }
+
+    public void setLegalNumber(String legalNumber) {
+        this.legalNumber = legalNumber;
+    }
+
     public CustomerCreateRequest name(String name) {
         this.name = name;
         return this;
     }
 
     /**
-     * Get name
+     * Required for `COMPANY`. Ignored for `INDIVIDUAL`: derived from `first_name` + `last_name`.
      *
      * @return name
      */
-    @javax.annotation.Nonnull
+    @javax.annotation.Nullable
     public String getName() {
         return name;
     }
@@ -348,6 +441,37 @@ public class CustomerCreateRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public CustomerCreateRequest preferredLocales(List<String> preferredLocales) {
+        this.preferredLocales = preferredLocales;
+        return this;
+    }
+
+    public CustomerCreateRequest addPreferredLocalesItem(String preferredLocalesItem) {
+        if (this.preferredLocales == null) {
+            this.preferredLocales = new ArrayList<>();
+        }
+        this.preferredLocales.add(preferredLocalesItem);
+
+        return this;
+    }
+
+    /**
+     * Preferred document languages, most-preferred first (BCP-47 tags, e.g. `[&quot;fr-FR&quot;,
+     * &quot;en&quot;]`); overrides the invoicing entity default. The first one the renderer has a
+     * template for wins, so an unsupported entry alongside a supported one just falls through; a
+     * list of only unsupported ones is rejected.
+     *
+     * @return preferredLocales
+     */
+    @javax.annotation.Nullable
+    public List<String> getPreferredLocales() {
+        return preferredLocales;
+    }
+
+    public void setPreferredLocales(List<String> preferredLocales) {
+        this.preferredLocales = preferredLocales;
     }
 
     public CustomerCreateRequest shippingAddress(ShippingAddress shippingAddress) {

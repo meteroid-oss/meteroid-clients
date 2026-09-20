@@ -580,8 +580,11 @@ fn response_body_info(resp: ReferenceOr<openapi::Response>) -> (Option<String>, 
             }
 
             // Check for binary response types
+            // Document downloads are returned as raw bytes; e-invoice XML stays byte-exact
+            // (it can be signed or hashed), so it is not decoded as text.
             let binary_types = [
                 "application/pdf",
+                "application/xml",
                 "application/octet-stream",
                 "image/png",
                 "image/jpeg",

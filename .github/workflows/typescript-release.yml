@@ -1,0 +1,56 @@
+name: TypeScript Release
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Mega Releaser
+    types:
+      - completed
+
+# Publishes with npm Trusted Publishing: npm trusts this workflow's GitHub OIDC
+# identity, so no token is stored. Configure it in the package settings on
+# npmjs.com (organization `meteroid-oss`, repository `meteroid-clients`, workflow
+# `typescript-release.yml`, environment `release`). npm only offers that once the
+# package exists, so the first release falls back to an `NPM_TOKEN` secret; delete
+# the secret once Trusted Publishing is configured. npm tries OIDC first either way.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-24.04
+    environment: release
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      # Trusted Publishing needs npm >= 11.5.1, newer than some Node releases bundle.
+      - name: Update npm
+        run: npm install -g npm@^11.5.1
+
+      - name: Install dependencies
+        working-directory: typescript
+        run: npm ci
+
+      - name: Build
+        working-directory: typescript
+        run: npm run build
+
+      - name: Publish
+        working-directory: typescript
+        # Provenance is automatic under Trusted Publishing; `--provenance` keeps it for the
+        # token-authenticated first release.
+        run: npm publish --provenance --access public
+        env:
+          # Only used until Trusted Publishing is configured (see the top of this file).
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
