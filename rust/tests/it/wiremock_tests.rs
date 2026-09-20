@@ -254,6 +254,12 @@ async fn test_user_agent_is_sent() {
         .expect("user-agent should be present");
     assert!(user_agent.to_str().unwrap().starts_with("meteroid-rust/"));
 
+    let api_version = requests[0]
+        .headers
+        .get("meteroid-version")
+        .expect("meteroid-version should be present");
+    assert_eq!(api_version.to_str().unwrap(), meteroid_rs::API_VERSION);
+
     mock_server.verify().await;
 }
 

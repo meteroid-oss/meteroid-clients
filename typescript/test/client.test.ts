@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { API_VERSION } from "../src/apiVersion";
 import {
   ApiException,
   ErrorCode,
@@ -60,6 +61,7 @@ describe("request wiring", () => {
     assert.equal(calls[0].url.pathname, "/api/v1/invoices");
     assert.equal(calls[0].init.headers.authorization, "Bearer test-api-key");
     assert.match(calls[0].init.headers["user-agent"], /^meteroid-typescript\//);
+    assert.strictEqual(calls[0].init.headers["meteroid-version"], API_VERSION);
   });
 
   it("explodes array query parameters into repeated keys", async () => {

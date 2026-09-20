@@ -223,6 +223,7 @@ func (c *Client) attempt(ctx context.Context, req *request, endpoint string, att
 	}
 	httpReq.Header.Set("Accept", "application/json")
 	httpReq.Header.Set("User-Agent", cfg.userAgent)
+	httpReq.Header.Set("Meteroid-Version", APIVersion)
 	if cfg.token != "" {
 		httpReq.Header.Set("Authorization", "Bearer "+cfg.token)
 	}

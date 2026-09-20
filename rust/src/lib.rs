@@ -27,12 +27,14 @@ use hyper::body::Bytes;
 use hyper_util::client::legacy::Client as HyperClient;
 
 pub mod api;
+mod api_version;
 mod connector;
 pub mod error;
 pub mod models;
 mod request;
 pub mod webhooks;
 
+pub use api_version::API_VERSION;
 pub(crate) use connector::{make_connector, Connector};
 
 pub struct Configuration {

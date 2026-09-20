@@ -67,6 +67,9 @@ func TestListCustomers(t *testing.T) {
 	if got := gotRequest.Header.Get("User-Agent"); got != "meteroid-go/"+Version {
 		t.Errorf("user-agent = %q", got)
 	}
+	if got := gotRequest.Header.Get("Meteroid-Version"); got != APIVersion {
+		t.Errorf("meteroid-version = %q", got)
+	}
 
 	if len(response.Data) != 1 {
 		t.Fatalf("len(data) = %d, want 1", len(response.Data))
