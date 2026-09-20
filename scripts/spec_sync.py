@@ -31,6 +31,9 @@ VERSION_FILE = ROOT / ".version"
 CHANGELOG = ROOT / "CHANGELOG.md"
 RUST_API_VERSION = ROOT / "rust" / "src" / "api_version.rs"
 JAVA_API_VERSION = ROOT / "java" / "src" / "main" / "java" / "com" / "meteroid" / "ApiVersion.java"
+TS_API_VERSION = ROOT / "typescript" / "src" / "apiVersion.ts"
+PYTHON_API_VERSION = ROOT / "python" / "meteroid" / "_api_version.py"
+GO_API_VERSION = ROOT / "go" / "api_version.go"
 OASDIFF_IMAGE = os.getenv("OASDIFF_IMAGE", "tufin/oasdiff:latest")
 
 
@@ -119,19 +122,41 @@ def bump_sdk_version(breaking: bool) -> str:
 
 
 def write_api_version(api_version: str) -> None:
+    """The API version every SDK sends as `Meteroid-Version`, one file per language."""
+    note = "Written by scripts/spec_sync.py from the API spec version; do not edit."
+    doc = "API version this SDK was generated against, sent as the `Meteroid-Version` header."
+
     RUST_API_VERSION.write_text(
-        "// Written by scripts/spec_sync.py from the API spec version; do not edit.\n"
-        "/// API version this SDK was generated against, sent as the `Meteroid-Version` header.\n"
+        f"// {note}\n"
+        f"/// {doc}\n"
         f'pub const API_VERSION: &str = "{api_version}";\n'
     )
     JAVA_API_VERSION.write_text(
         "package com.meteroid;\n\n"
-        "// Written by scripts/spec_sync.py from the API spec version; do not edit.\n"
+        f"// {note}\n"
         "/** API version this SDK was generated against, sent as the {@code Meteroid-Version} header. */\n"
         "public final class ApiVersion {\n"
         f'    public static final String API_VERSION = "{api_version}";\n\n'
         "    private ApiVersion() {}\n"
         "}\n"
+    )
+    TS_API_VERSION.write_text(
+        f"// {note}\n"
+        f"/** {doc} */\n"
+        f'export const API_VERSION = "{api_version}";\n'
+    )
+    PYTHON_API_VERSION.write_text(
+        f'"""{doc.replace("`Meteroid-Version`", "``Meteroid-Version``")}\n\n'
+        f'{note}\n"""\n\n'
+        f'API_VERSION = "{api_version}"\n'
+    )
+    GO_API_VERSION.write_text(
+        "package meteroid\n\n"
+        "// APIVersion is the API version this SDK was generated against, sent as the\n"
+        "// Meteroid-Version header.\n"
+        "//\n"
+        f"// {note}\n"
+        f'const APIVersion = "{api_version}"\n'
     )
 
 

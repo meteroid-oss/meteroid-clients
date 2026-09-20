@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { API_VERSION } from "./apiVersion";
 import { ApiException, type XOR } from "./util";
 
 export const LIB_VERSION = "0.26.0";
@@ -224,6 +225,7 @@ export class MeteroidRequest {
           accept: "application/json, */*;q=0.8",
           authorization: `Bearer ${ctx.token}`,
           "user-agent": USER_AGENT,
+          "meteroid-version": API_VERSION,
           "meteroid-req-id": randomId.toString(),
           ...this.headerParams,
         },

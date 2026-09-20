@@ -19,6 +19,7 @@ from meteroid import (
     ResponseDecodeError,
     WebhookVerificationError,
 )
+from meteroid._api_version import API_VERSION
 from meteroid.models import (
     BatchJobStatus,
     Currency,
@@ -70,6 +71,7 @@ def test_list_customers() -> None:
     request = route.calls.last.request
     assert request.headers["authorization"] == "Bearer test-api-key"
     assert request.headers["user-agent"].startswith("meteroid-python/")
+    assert request.headers["meteroid-version"] == API_VERSION
 
     assert len(response.data) == 1
     assert response.data[0].name == "Test Customer"

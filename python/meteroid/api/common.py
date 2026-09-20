@@ -32,6 +32,7 @@ from decimal import Decimal
 
 import httpx
 
+from .._api_version import API_VERSION
 from .._version import __version__
 from ..errors import ApiException, NetworkException, ResponseDecodeError
 from ..serialization import BaseModel, format_datetime, format_decimal
@@ -116,7 +117,11 @@ class Configuration:
     )
 
     def headers(self) -> t.Dict[str, str]:
-        headers = {"user-agent": self.user_agent, "accept": "application/json"}
+        headers = {
+            "user-agent": self.user_agent,
+            "accept": "application/json",
+            "meteroid-version": API_VERSION,
+        }
         if self.bearer_access_token is not None:
             headers["authorization"] = f"Bearer {self.bearer_access_token}"
         return headers
