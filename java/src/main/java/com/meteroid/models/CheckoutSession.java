@@ -24,6 +24,9 @@ public class CheckoutSession {
     @JsonProperty("billing_start_date")
     private String billingStartDate;
 
+    @JsonProperty("cancel_url")
+    private String cancelUrl;
+
     @JsonProperty("checkout_type")
     private CheckoutType checkoutType;
 
@@ -60,6 +63,9 @@ public class CheckoutSession {
 
     @JsonProperty("subscription_id")
     private String subscriptionId;
+
+    @JsonProperty("success_url")
+    private String successUrl;
 
     @JsonProperty("trial_duration_days")
     private Integer trialDurationDays;
@@ -102,6 +108,25 @@ public class CheckoutSession {
 
     public void setBillingStartDate(String billingStartDate) {
         this.billingStartDate = billingStartDate;
+    }
+
+    public CheckoutSession cancelUrl(String cancelUrl) {
+        this.cancelUrl = cancelUrl;
+        return this;
+    }
+
+    /**
+     * Get cancelUrl
+     *
+     * @return cancelUrl
+     */
+    @javax.annotation.Nullable
+    public String getCancelUrl() {
+        return cancelUrl;
+    }
+
+    public void setCancelUrl(String cancelUrl) {
+        this.cancelUrl = cancelUrl;
     }
 
     public CheckoutSession checkoutType(CheckoutType checkoutType) {
@@ -349,6 +374,25 @@ public class CheckoutSession {
 
     public void setSubscriptionId(String subscriptionId) {
         this.subscriptionId = subscriptionId;
+    }
+
+    public CheckoutSession successUrl(String successUrl) {
+        this.successUrl = successUrl;
+        return this;
+    }
+
+    /**
+     * Get successUrl
+     *
+     * @return successUrl
+     */
+    @javax.annotation.Nullable
+    public String getSuccessUrl() {
+        return successUrl;
+    }
+
+    public void setSuccessUrl(String successUrl) {
+        this.successUrl = successUrl;
     }
 
     public CheckoutSession trialDurationDays(Integer trialDurationDays) {

@@ -113,8 +113,11 @@ pub mod customer_patch_request;
 pub mod customer_payment_method_id;
 pub mod customer_portal_token_request;
 pub mod customer_portal_token_response;
+pub mod customer_type;
 pub mod customer_update_request;
 pub mod double_segmentation_matrix;
+pub mod e_invoicing_finding;
+pub mod e_invoicing_status;
 pub mod effective_entitlement;
 pub mod effective_entitlement_list_response;
 pub mod effective_entitlement_value;
@@ -151,6 +154,8 @@ pub mod ingest_failure;
 pub mod introspection_request;
 pub mod invoice;
 pub mod invoice_custom_properties_request;
+pub mod invoice_documents_event;
+pub mod invoice_documents_event_data;
 pub mod invoice_event;
 pub mod invoice_event_data;
 pub mod invoice_id;
@@ -392,10 +397,10 @@ pub use self::{
     customer_list_response::CustomerListResponse, customer_patch_request::CustomerPatchRequest,
     customer_payment_method_id::CustomerPaymentMethodId,
     customer_portal_token_request::CustomerPortalTokenRequest,
-    customer_portal_token_response::CustomerPortalTokenResponse,
+    customer_portal_token_response::CustomerPortalTokenResponse, customer_type::CustomerType,
     customer_update_request::CustomerUpdateRequest,
-    double_segmentation_matrix::DoubleSegmentationMatrix,
-    effective_entitlement::EffectiveEntitlement,
+    double_segmentation_matrix::DoubleSegmentationMatrix, e_invoicing_finding::EInvoicingFinding,
+    e_invoicing_status::EInvoicingStatus, effective_entitlement::EffectiveEntitlement,
     effective_entitlement_list_response::EffectiveEntitlementListResponse,
     effective_entitlement_value::EffectiveEntitlementValue, entitlement::Entitlement,
     entitlement_id::EntitlementId, entitlement_product_ref::EntitlementProductRef,
@@ -413,7 +418,9 @@ pub use self::{
     get_checkout_session_response::GetCheckoutSessionResponse, grouped_usage::GroupedUsage,
     ingest_events_request::IngestEventsRequest, ingest_events_response::IngestEventsResponse,
     ingest_failure::IngestFailure, introspection_request::IntrospectionRequest, invoice::Invoice,
-    invoice_custom_properties_request::InvoiceCustomPropertiesRequest, invoice_event::InvoiceEvent,
+    invoice_custom_properties_request::InvoiceCustomPropertiesRequest,
+    invoice_documents_event::InvoiceDocumentsEvent,
+    invoice_documents_event_data::InvoiceDocumentsEventData, invoice_event::InvoiceEvent,
     invoice_event_data::InvoiceEventData, invoice_id::InvoiceId,
     invoice_line_item::InvoiceLineItem, invoice_list_response::InvoiceListResponse,
     invoice_payment_status::InvoicePaymentStatus, invoice_status::InvoiceStatus,

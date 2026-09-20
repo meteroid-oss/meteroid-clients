@@ -1,0 +1,88 @@
+# Go modules have no registry to upload to: the module proxy serves whatever a
+# VCS tag points at. Releasing therefore means tagging the commit and warming
+# proxy.golang.org so the new version is immediately resolvable.
+#
+# Because the module lives in the `go/` subdirectory of this repository, its
+# path is github.com/meteroid-oss/meteroid-clients/go and the tag must be
+# prefixed accordingly: `go/vX.Y.Z`.
+name: Go Release
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Mega Releaser
+    types:
+      - completed
+
+jobs:
+  publish:
+    name: Tag and publish to the Go module proxy
+    runs-on: ubuntu-24.04
+    environment: release
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache-dependency-path: go/go.mod
+
+      - name: Resolve the version to release
+        id: version
+        run: |
+          version="$(tr -d '[:space:]' < .version)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=go/v$version" >> "$GITHUB_OUTPUT"
+
+      # A published tag is immutable on the module proxy, so make sure the
+      # source is coherent before creating one.
+      - name: Check go/version.go matches .version
+        run: |
+          version='${{ steps.version.outputs.version }}'
+          if ! grep -q "\"$version\"" go/version.go; then
+            echo "go/version.go does not declare version $version"
+            exit 1
+          fi
+
+      - name: Build and test
+        run: |
+          go build ./...
+          go test ./...
+        working-directory: go
+
+      - name: Create the release tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if git rev-parse --verify --quiet "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists, nothing to do."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Meteroid Go SDK $TAG"
+          git push origin "$TAG"
+
+      # Asking the proxy for the version makes it fetch and cache the module, so
+      # `go get` works right away instead of after the first user's request.
+      - name: Warm the module proxy
+        run: |
+          version='${{ steps.version.outputs.version }}'
+          url="https://proxy.golang.org/github.com/meteroid-oss/meteroid-clients/go/@v/v$version.info"
+          for attempt in 1 2 3 4 5; do
+            if curl -fsS "$url"; then
+              echo
+              echo "Module proxy is serving v$version."
+              exit 0
+            fi
+            echo "Proxy has not picked up the tag yet, retrying in 30s..."
+            sleep 30
+          done
+          echo "The module proxy did not serve v$version yet; it usually catches up on its own."
+          exit 1

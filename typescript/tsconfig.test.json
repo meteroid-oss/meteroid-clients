@@ -1,0 +1,14 @@
+{
+  // Tests are compiled to plain CommonJS in `test_build/` and run with the
+  // Node.js built-in test runner (`node --test`), so the SDK needs no test
+  // framework dependency.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./test_build",
+    "rootDir": ".",
+    "declaration": false,
+    "sourceMap": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "test/**/*"]
+}

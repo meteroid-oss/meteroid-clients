@@ -94,4 +94,17 @@ public class CreditNotes {
                                 String.format("/api/v1/credit-notes/%s/download", creditNoteId));
         return this.client.executeBinaryRequest("GET", url.build(), null, null);
     }
+
+    /**
+     * Download the structured e-invoice (EN 16931 XML) issued with a credit note. For Factur-X the
+     * same XML is also embedded in the PDF.
+     */
+    public byte[] downloadCreditNoteXml(final String creditNoteId)
+            throws IOException, ApiException {
+        HttpUrl.Builder url =
+                this.client
+                        .newUrlBuilder()
+                        .encodedPath(String.format("/api/v1/credit-notes/%s/xml", creditNoteId));
+        return this.client.executeBinaryRequest("GET", url.build(), null, null);
+    }
 }

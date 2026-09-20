@@ -54,9 +54,9 @@ use meteroid_rs::models::CustomerCreateRequest;
 let client = Meteroid::new("your-api-key".to_string(), None);
 
 let customer = client.customers().create_customer(CustomerCreateRequest {
-    name: "Acme Corp".to_string(),
+    name: Some("Acme Corp".to_string()),
     alias: Some("acme".to_string()),
-    email: Some("billing@acme.com".to_string()),
+    billing_email: Some("billing@acme.com".to_string()),
     ..Default::default()
 }).await?;
 

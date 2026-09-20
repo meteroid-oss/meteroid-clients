@@ -19,6 +19,9 @@ pub enum TaxExemptionType {
 
     #[serde(rename = "EXPORT")]
     Export,
+
+    #[serde(rename = "NO_VAT_TERRITORY")]
+    NoVatTerritory,
 }
 
 impl fmt::Display for TaxExemptionType {
@@ -28,6 +31,7 @@ impl fmt::Display for TaxExemptionType {
             Self::TaxExempt => "TAX_EXEMPT",
             Self::NotRegistered => "NOT_REGISTERED",
             Self::Export => "EXPORT",
+            Self::NoVatTerritory => "NO_VAT_TERRITORY",
         };
         f.write_str(value)
     }

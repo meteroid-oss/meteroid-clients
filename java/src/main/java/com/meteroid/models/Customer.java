@@ -38,6 +38,12 @@ public class Customer {
     @JsonProperty("custom_taxes")
     private List<CustomTaxRate> customTaxes;
 
+    @JsonProperty("customer_type")
+    private CustomerType customerType;
+
+    @JsonProperty("first_name")
+    private String firstName;
+
     @JsonProperty private String id;
 
     @JsonProperty("invoicing_emails")
@@ -49,8 +55,17 @@ public class Customer {
     @JsonProperty("invoicing_language")
     private String invoicingLanguage;
 
+    @JsonProperty("last_name")
+    private String lastName;
+
+    @JsonProperty("legal_number")
+    private String legalNumber;
+
     @JsonProperty private String name;
     @JsonProperty private String phone;
+
+    @JsonProperty("preferred_locales")
+    private List<String> preferredLocales;
 
     @JsonProperty("shipping_address")
     private ShippingAddress shippingAddress;
@@ -202,6 +217,44 @@ public class Customer {
         this.customTaxes = customTaxes;
     }
 
+    public Customer customerType(CustomerType customerType) {
+        this.customerType = customerType;
+        return this;
+    }
+
+    /**
+     * Get customerType
+     *
+     * @return customerType
+     */
+    @javax.annotation.Nullable
+    public CustomerType getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(CustomerType customerType) {
+        this.customerType = customerType;
+    }
+
+    public Customer firstName(String firstName) {
+        this.firstName = firstName;
+        return this;
+    }
+
+    /**
+     * Get firstName
+     *
+     * @return firstName
+     */
+    @javax.annotation.Nullable
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public Customer id(String id) {
         this.id = id;
         return this;
@@ -268,23 +321,64 @@ public class Customer {
         this.invoicingEntityId = invoicingEntityId;
     }
 
+    @Deprecated
     public Customer invoicingLanguage(String invoicingLanguage) {
         this.invoicingLanguage = invoicingLanguage;
         return this;
     }
 
     /**
-     * Preferred document language (e.g. `en-US`, `fr-FR`); overrides the invoicing entity default.
+     * Deprecated: the first entry of `preferred_locales`.
      *
      * @return invoicingLanguage
      */
     @javax.annotation.Nullable
+    @Deprecated
     public String getInvoicingLanguage() {
         return invoicingLanguage;
     }
 
+    @Deprecated
     public void setInvoicingLanguage(String invoicingLanguage) {
         this.invoicingLanguage = invoicingLanguage;
+    }
+
+    public Customer lastName(String lastName) {
+        this.lastName = lastName;
+        return this;
+    }
+
+    /**
+     * Get lastName
+     *
+     * @return lastName
+     */
+    @javax.annotation.Nullable
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Customer legalNumber(String legalNumber) {
+        this.legalNumber = legalNumber;
+        return this;
+    }
+
+    /**
+     * BT-47 — the buyer&#x27;s national register identifier (SIREN&#x2f;SIRET, HRB).
+     *
+     * @return legalNumber
+     */
+    @javax.annotation.Nullable
+    public String getLegalNumber() {
+        return legalNumber;
+    }
+
+    public void setLegalNumber(String legalNumber) {
+        this.legalNumber = legalNumber;
     }
 
     public Customer name(String name) {
@@ -323,6 +417,35 @@ public class Customer {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Customer preferredLocales(List<String> preferredLocales) {
+        this.preferredLocales = preferredLocales;
+        return this;
+    }
+
+    public Customer addPreferredLocalesItem(String preferredLocalesItem) {
+        if (this.preferredLocales == null) {
+            this.preferredLocales = new ArrayList<>();
+        }
+        this.preferredLocales.add(preferredLocalesItem);
+
+        return this;
+    }
+
+    /**
+     * Preferred document languages, most-preferred first (BCP-47 tags, e.g. `[&quot;fr-FR&quot;,
+     * &quot;en&quot;]`); overrides the invoicing entity default.
+     *
+     * @return preferredLocales
+     */
+    @javax.annotation.Nonnull
+    public List<String> getPreferredLocales() {
+        return preferredLocales;
+    }
+
+    public void setPreferredLocales(List<String> preferredLocales) {
+        this.preferredLocales = preferredLocales;
     }
 
     public Customer shippingAddress(ShippingAddress shippingAddress) {

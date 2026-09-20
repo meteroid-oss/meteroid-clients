@@ -2,14 +2,24 @@
 
 ## Next
 
+* New TypeScript SDK (`typescript/`, published as `@meteroid/sdk` on npm): typed models and resources, bearer auth, retries and webhook signature verification
+* New Python SDK (`python/`, published as `meteroid` on PyPI): sync + asyncio clients, dataclass models, bearer auth, retries and webhook signature verification
+* New Go SDK (`go/`, module `github.com/meteroid-oss/meteroid-clients/go`, package `meteroid`): standard-library only, context-aware methods, bearer auth, retries and webhook signature verification
 * **Breaking** (Rust) — API errors are now parsed with the models generated from the spec. `Error::Http` carries `HttpErrorContent<RestErrorResponse>` (`code: ErrorCode`, `message`), a new `Error::OAuth` carries `HttpErrorContent<OAuthErrorResponse>`, and `Error::Validation` is removed (the API returns no 422 validation body; any status goes through `Error::Http`/`Error::OAuth`). The hand-written `HttpErrorOut`, `HttpValidationError` and `ValidationError` models are removed. The old `HttpErrorOut` required a `detail` field the API never sends, so `payload` was `None` for every real API error: no working code could have depended on its fields. New `Error::status()`, `code()` and `message()` accessors. Status and raw body remain available on every HTTP error
-* Error response models are now generated from the spec: `RestErrorResponse`, `ErrorCode`, `OAuthErrorResponse`, `OAuthErrorCode`. A body with an error code unknown to the SDK version yields no typed payload; status and raw body are still available
+* Error response models are now generated from the spec: `RestErrorResponse`, `ErrorCode`, `OAuthErrorResponse`, `OAuthErrorCode`. A body with an error code unknown to the SDK version yields no typed payload (except in Go, whose string enums accept unknown values and report them through `IsKnown()`); status and raw body are always available
 * Java: `ApiException` gains `getError()` (`Optional<RestErrorResponse>`) and `getOAuthError()` (`Optional<OAuthErrorResponse>`); the existing constructor and getters are unchanged
 * Java: webhook verification now gives `webhook-*` headers precedence, using `svix-*` only when the matching `webhook-*` header is absent, like the other SDKs. Previously `svix-*` headers overwrote `webhook-*` ones
 * Java: the published POM's project and SCM URLs, and the Rust crate's `repository`, now point at `meteroid-oss/meteroid-clients`
 * Codegen: generation fails loudly on unsupported operations or components instead of silently dropping them
 * Java: `jackson-core`, `jackson-databind`, `jackson-annotations` and `standardwebhooks` are now `compile`-scope dependencies (Gradle `api`). `Webhook.verify`/`sign` throw standard-webhooks exceptions and every model's `fromJson`/`toJson` throws `JsonProcessingException`, so code catching them did not compile against the published artifact
 * Java: the `Meteroid` Javadoc example called `getCustomer()`; the getter is `getCustomers()`
+* Invoices: new `refresh_invoice` (`POST /invoices/{invoice_id}/refresh`) to recompute a draft invoice, new `download_invoice_xml` for the e-invoice XML, and new `einvoicing_status` on `Invoice` (`EInvoicingStatus`, plus the `EInvoicingFinding` model)
+* Credit notes: new `download_credit_note_xml`. XML downloads return raw bytes in every SDK, like the PDF downloads
+* Subscriptions: new `subscription_summary` (`GET /subscriptions/{subscription_id}/summary`), a lightweight read returning the list-item shape
+* Checkout sessions: `success_url` and `cancel_url` on `CreateCheckoutSessionRequest` and `CheckoutSession`
+* Customers: `customer_type` (`CustomerType`: `COMPANY` / `INDIVIDUAL`), `first_name`, `last_name`, `legal_number` and `preferred_locales` on `Customer` and on the create, update and patch requests
+* New `invoice.accounting_pdf_generated` event type and `InvoiceDocumentsEvent` payload; `NO_VAT_TERRITORY` added to `TaxExemptionType`
+* **Breaking** (Rust) — `Customer::new` takes `preferred_locales`, and `CustomerCreateRequest::new` / `CustomerUpdateRequest::new` no longer take `name`, which is now optional (in Go, `Name` is a `*string`)
 
 ## Version 0.26.0
 

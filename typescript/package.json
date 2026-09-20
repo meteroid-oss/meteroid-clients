@@ -1,0 +1,58 @@
+{
+  "name": "@meteroid/sdk",
+  "version": "0.26.0",
+  "description": "Meteroid TypeScript SDK for billing and subscription management",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist test_build",
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "fmt": "biome format --write",
+    "lint": "biome lint",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test test_build/test/*.test.js && npm run build && node --test test/*.test.mjs",
+    "prepublishOnly": "npm run check && npm run build"
+  },
+  "dependencies": {
+    "standardwebhooks": "^1.1.0",
+    "uuid": "^11.1.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.4",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "meteroid",
+    "billing",
+    "subscription",
+    "api",
+    "sdk"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meteroid-oss/meteroid-clients",
+    "directory": "typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/meteroid-oss/meteroid-clients/issues"
+  },
+  "homepage": "https://github.com/meteroid-oss/meteroid-clients/tree/main/typescript"
+}

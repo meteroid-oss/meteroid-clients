@@ -32,6 +32,9 @@ public class CreateCheckoutSessionRequest {
     @JsonProperty("billing_start_date")
     private String billingStartDate;
 
+    @JsonProperty("cancel_url")
+    private String cancelUrl;
+
     @JsonProperty("charge_automatically")
     private Boolean chargeAutomatically;
 
@@ -71,6 +74,9 @@ public class CreateCheckoutSessionRequest {
 
     @JsonProperty("purchase_order")
     private String purchaseOrder;
+
+    @JsonProperty("success_url")
+    private String successUrl;
 
     @JsonProperty("trial_duration_days")
     private Integer trialDurationDays;
@@ -160,6 +166,25 @@ public class CreateCheckoutSessionRequest {
 
     public void setBillingStartDate(String billingStartDate) {
         this.billingStartDate = billingStartDate;
+    }
+
+    public CreateCheckoutSessionRequest cancelUrl(String cancelUrl) {
+        this.cancelUrl = cancelUrl;
+        return this;
+    }
+
+    /**
+     * Absolute http(s) URL offered to the customer to leave the checkout without paying.
+     *
+     * @return cancelUrl
+     */
+    @javax.annotation.Nullable
+    public String getCancelUrl() {
+        return cancelUrl;
+    }
+
+    public void setCancelUrl(String cancelUrl) {
+        this.cancelUrl = cancelUrl;
     }
 
     public CreateCheckoutSessionRequest chargeAutomatically(Boolean chargeAutomatically) {
@@ -437,6 +462,27 @@ public class CreateCheckoutSessionRequest {
 
     public void setPurchaseOrder(String purchaseOrder) {
         this.purchaseOrder = purchaseOrder;
+    }
+
+    public CreateCheckoutSessionRequest successUrl(String successUrl) {
+        this.successUrl = successUrl;
+        return this;
+    }
+
+    /**
+     * Absolute http(s) URL the customer is sent to after a successful checkout.
+     * `checkout_session_id` is appended as a query parameter. Without it the customer stays on the
+     * hosted confirmation page.
+     *
+     * @return successUrl
+     */
+    @javax.annotation.Nullable
+    public String getSuccessUrl() {
+        return successUrl;
+    }
+
+    public void setSuccessUrl(String successUrl) {
+        this.successUrl = successUrl;
     }
 
     public CreateCheckoutSessionRequest trialDurationDays(Integer trialDurationDays) {
