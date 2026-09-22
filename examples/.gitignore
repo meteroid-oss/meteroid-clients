@@ -4,6 +4,11 @@
 .env.*
 !.env.example
 
+# Written by `make seed`: the alias of the workspace it subscribed. Derived state, and
+# different in every tenant, so it is regenerated rather than committed. (`.env.*` above
+# already covers it; it is spelled out because deleting this line is the obvious mistake.)
+.env.seed
+
 # Rust backend.
 backends/rust/target/
 
@@ -13,7 +18,7 @@ backends/java/build/
 backends/java/.gradle/
 backends/java/bin/
 
-# Node — the SPA and both test suites. Lockfiles are committed; installs are not.
+# Node — the SPA, the seed and both test suites. Lockfiles are committed; installs are not.
 node_modules/
 dist/
 .vite/

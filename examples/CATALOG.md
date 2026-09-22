@@ -5,8 +5,24 @@ this page, every time it starts and on every request that needs them. If somethi
 every affected endpoint fails loudly with `503 CATALOG_NOT_SEEDED` and a message naming the
 identifier it looked up.
 
-Seed this **once** per tenant, by hand. The only thing the demo creates at runtime is a **customer**,
-one per demo session — that is expected, and the same API key is reused indefinitely.
+Seed this **once** per tenant, with one command:
+
+```bash
+make up      # a local Meteroid on http://localhost:8084 (docker compose)
+make seed    # applies everything on this page, idempotently
+```
+
+`make seed` reads [`seed/scribe.catalog.yaml`](seed/), which mirrors this page one-to-one, and
+applies it over the REST API. It resolves every object by its natural key before creating it, so
+re-running converges rather than duplicating, and it ends by running [section 7](#7-verification-checklist)
+against itself and printing a PASS/FAIL table. Point it at a hosted tenant instead by setting
+`METEROID_BASE_URL` and `METEROID_API_KEY` in `.env`.
+
+Everything on this page is seeded that way **except the webhook endpoint** (section 6), which
+Meteroid exposes no REST API for at all.
+
+The only thing the demo creates at runtime is a **customer**, one per demo session — that is
+expected, and the same API key is reused indefinitely.
 
 > **One currency, everywhere.** Meteroid will not check a customer out against a plan version in a
 > different currency. Whatever you seed the plans in must equal `SCRIBE_DEFAULT_CURRENCY` in `.env`
@@ -17,25 +33,30 @@ one per demo session — that is expected, and the same API key is reused indefi
 
 ## 1. What can and cannot be created over the REST API
 
-This is the constraint that shapes the whole demo. Meteroid's REST API is *read-only* for features
-and entitlements — they exist, but there is no `POST`.
+Features and plan-version entitlements used to be read-only over REST, which is why older versions
+of this page said to create them in the dashboard. They are writable now, and `make seed` writes
+them. One row is still dashboard-only: webhook endpoints.
 
 | Object | REST | Endpoint | Where you seed it |
 | --- | --- | --- | --- |
-| Product family | writable | `POST /api/v1/product_families` | Dashboard or API |
-| Billable metric | writable | `POST /api/v1/metrics` | Dashboard or API |
-| Plan + version | writable | `POST /api/v1/plans`, `POST /api/v1/plans/{id}/publish` | Dashboard or API |
-| Product | writable | `POST /api/v1/products` | Dashboard or API |
-| Customer | writable | `POST /api/v1/customers` | **Created by the demo at runtime** |
-| Subscription | writable | `POST /api/v1/subscriptions` | Created by Meteroid on checkout completion |
-| **Feature** | **read-only** | `GET /api/v1/features`, `GET /api/v1/features/{id_or_code}` | **Dashboard only** |
-| **Plan-version entitlement** | **read-only** | `GET /api/v1/plan-versions/{id}/entitlements` | **Dashboard only** |
-| **Product entitlement** | **read-only** | `GET /api/v1/products/{id}/entitlements` | **Dashboard only** |
-| **Add-on entitlement** | **read-only** | `GET /api/v1/addons/{id}/entitlements` | **Dashboard only** |
+| Product family | writable | `POST /api/v1/product_families` | `make seed` |
+| Billable metric | writable | `POST /api/v1/metrics` | `make seed` |
+| Plan + version | writable | `POST /api/v1/plans`, `POST /api/v1/plans/{id}/publish` | `make seed` |
+| Product | writable | `POST /api/v1/products` | unused by the demo |
+| Customer | writable | `POST /api/v1/customers` | `make seed` (the test fixture) + **the demo at runtime** |
+| Subscription | writable | `POST /api/v1/subscriptions` | `make seed` (the test fixture) + Meteroid on checkout |
+| **Feature** | **writable** | `POST /api/v1/features`, `GET /api/v1/features/{id_or_code}` | `make seed` |
+| **Plan-version entitlement** | **writable** | `POST /api/v1/plan-versions/{id}/entitlements`, and an `entitlements` array on `POST`/`PUT /api/v1/plans` | `make seed` |
+| Product entitlement | writable | `POST`/`GET /api/v1/products/{id}/entitlements` | unused by the demo |
+| Add-on entitlement | writable | `POST`/`GET /api/v1/addons/{id}/entitlements` | unused by the demo |
 | **Webhook endpoint + secret** | **not in the REST API** | — | **Dashboard only** |
 
-> **The four features and every entitlement value below must be created in the Meteroid dashboard.**
-> There is no API call that will do it, and no amount of retrying will change that.
+> **Check your Meteroid before blaming the seed.** The catalog writes are new and are not in a
+> published image yet, so today every `ghcr.io/meteroid-oss/meteroid-api` tag answers `405` to
+> `POST /api/v1/features`. The seed names the endpoint when that happens. `GET
+> /api-docs/openapi.json` on the instance is the authority on what it actually supports, and
+> once an image carries these writes the only change needed here is the tag in
+> `docker-compose.yml`.
 
 ---
 
@@ -113,10 +134,11 @@ curl -sX POST -H "Authorization: Bearer $METEROID_API_KEY" -H 'Content-Type: app
 
 ---
 
-## 4. Features — **dashboard only**
+## 4. Features
 
-Four features. The **code** is the contract: it is what the backends gate on and what
-`GET /api/entitlements` returns as `feature_code`. Names are cosmetic; codes are not.
+Four features, seeded from the `features:` block of `seed/scribe.catalog.yaml`. The **code** is
+the contract: it is what the backends gate on and what `GET /api/entitlements` returns as
+`feature_code`. Names are cosmetic; codes are not.
 
 | Code | Type | Value type | Bound to | Used by |
 | --- | --- | --- | --- | --- |
@@ -203,10 +225,12 @@ Two flattening details worth knowing before you seed something fancier:
   Seed `TIERED`, `VOLUME`, `PACKAGE` or `MATRIX` and the table shows the model name with no number —
   by design, not a bug.
 
-### Entitlements per plan version — **dashboard only**
+### Entitlements per plan version
 
-Attach these to each plan's **published version**. This table is the demo's entire feature-gating
-story, and it is the thing most likely to be half-seeded, so check it twice.
+Attached to each plan's version by the seed, before it publishes it — `entitlements:` under each
+plan in `seed/scribe.catalog.yaml`. This table is the demo's entire feature-gating story, and it is
+the thing most likely to be half-seeded, which is why section 7 checks it and `make seed` exits
+non-zero when a row is missing.
 
 | Feature | `Scribe Free` | `Scribe Pro` | `Scribe Scale` |
 | --- | --- | --- | --- |
@@ -263,12 +287,14 @@ instance on the same host).
 
 ## 7. Verification checklist
 
-Run these against the seeded tenant before starting a demo. Every one must return the expected
-object; each maps directly onto a `CATALOG_NOT_SEEDED` message a backend would otherwise produce.
+**`make seed` runs this checklist itself** and prints it as a PASS/FAIL table, exiting non-zero on
+any failure — so in the normal case there is nothing to do here. The curls below are the same checks
+by hand, for a tenant somebody else seeded. Every one must return the expected object; each maps
+directly onto a `CATALOG_NOT_SEEDED` message a backend would otherwise produce.
 
 ```bash
-export METEROID_BASE_URL=https://api.meteroid.com
-export METEROID_API_KEY=...    # never commit this
+export METEROID_BASE_URL=http://localhost:8084     # or https://api.meteroid.com
+export METEROID_API_KEY=...                        # never commit a real one
 
 auth=(-sH "Authorization: Bearer $METEROID_API_KEY")
 
@@ -276,7 +302,7 @@ auth=(-sH "Authorization: Bearer $METEROID_API_KEY")
 #    Note its `id` too — that is the key the metric_id -> metric_code map is built on.
 curl "${auth[@]}" "$METEROID_BASE_URL/api/v1/metrics?search=transcription_minutes"
 
-# 2. the four features exist, by code (GET-only endpoint — seeded in the dashboard).
+# 2. the four features exist, by code, with the right feature_type.
 #    This is exactly the startup check each backend performs.
 for f in transcription_minutes sso retention_days seats; do
   curl "${auth[@]}" "$METEROID_BASE_URL/api/v1/features/$f"

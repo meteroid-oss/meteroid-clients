@@ -1,0 +1,182 @@
+# The Scribe catalog, declaratively. This file mirrors CATALOG.md one-to-one and is the
+# only place the demo's catalog values live — `src/` holds no product name, code, price
+# or limit of its own.
+#
+# Applied with:  make seed   (or: npm --prefix seed start)
+#
+# Every object is resolved by its natural key before it is created, so re-running
+# converges instead of duplicating. The natural keys are:
+#
+#   product family  id_or_alias        metric   code
+#   feature         code               plan     EXACT name
+#   customer        alias
+#
+# CATALOG.md section 5 explains why plans resolve by name: Meteroid plans carry no
+# user-supplied code, and `search` is fuzzy, so the name IS the lookup key.
+
+currency: USD
+
+product_family:
+  name: Scribe
+
+# CATALOG.md section 3. The code is what every backend ingests events against.
+metrics:
+  - code: transcription_minutes
+    name: Transcription minutes
+    aggregation_type: SUM
+    aggregation_key: minutes
+
+# CATALOG.md section 4. The code is the contract; the name is cosmetic. The TYPE is as
+# load-bearing as the code — `transcription_minutes` seeded as anything but METERED makes
+# the quota path unenforceable, and the backends say so with 503 CATALOG_NOT_SEEDED.
+features:
+  - code: transcription_minutes
+    name: Transcription minutes
+    description: Minutes of audio transcribed, metered against the subscription's quota.
+    type:
+      type: METERED
+      metric: transcription_minutes
+
+  - code: sso
+    name: Single sign-on
+    description: SAML / OIDC single sign-on.
+    type:
+      type: BOOLEAN
+
+  - code: retention_days
+    name: Transcript retention
+    description: How many days transcripts are kept.
+    type:
+      type: CONFIG
+      value_type: NUMBER
+
+  - code: seats
+    name: Seats
+    description: Seats included in the workspace.
+    type:
+      type: CONFIG
+      value_type: NUMBER
+
+# CATALOG.md section 5. `plan_code` is the demo's stable identifier; Meteroid only knows
+# the name, so the name must match exactly, including case.
+plans:
+  - plan_code: free
+    name: Scribe Free
+    plan_type: FREE
+    description: Try Scribe with 30 minutes a month.
+    components:
+      - name: Free monthly
+        fee:
+          type: RATE
+          rates:
+            - term: MONTHLY
+              price: "0"
+    entitlements:
+      transcription_minutes:
+        type: METERED
+        enabled: true
+        limit: "30"
+        reset_period:
+          type: BILLING_CYCLE
+      sso:
+        type: BOOLEAN
+        enabled: false
+      retention_days:
+        type: CONFIG
+        value:
+          kind: NUMBER
+          value: "7"
+      seats:
+        type: CONFIG
+        value:
+          kind: NUMBER
+          value: "1"
+
+  - plan_code: pro
+    name: Scribe Pro
+    plan_type: STANDARD
+    description: For teams that transcribe every day.
+    components:
+      - name: Pro monthly
+        fee:
+          type: RATE
+          rates:
+            - term: MONTHLY
+              price: "29"
+    entitlements:
+      transcription_minutes:
+        type: METERED
+        enabled: true
+        limit: "600"
+        reset_period:
+          type: BILLING_CYCLE
+      sso:
+        type: BOOLEAN
+        enabled: false
+      retention_days:
+        type: CONFIG
+        value:
+          kind: NUMBER
+          value: "90"
+      seats:
+        type: CONFIG
+        value:
+          kind: NUMBER
+          value: "5"
+
+  - plan_code: scale
+    name: Scribe Scale
+    plan_type: STANDARD
+    description: Unlimited transcription, billed per minute.
+    components:
+      - name: Scale monthly
+        fee:
+          type: RATE
+          rates:
+            - term: MONTHLY
+              price: "99"
+      - name: Transcription minutes
+        fee:
+          type: USAGE
+          metric: transcription_minutes
+          cadence: MONTHLY
+          pricing:
+            type: PER_UNIT
+            rate: "0.01"
+    entitlements:
+      # No `limit` — unlimited. That is what makes QuotaSnapshot.unlimited true and sends
+      # every minute through the USAGE component onto the invoice instead of a quota wall.
+      transcription_minutes:
+        type: METERED
+        enabled: true
+        reset_period:
+          type: BILLING_CYCLE
+      sso:
+        type: BOOLEAN
+        enabled: true
+      retention_days:
+        type: CONFIG
+        value:
+          kind: NUMBER
+          value: "365"
+      seats:
+        type: CONFIG
+        value:
+          kind: NUMBER
+          value: "25"
+
+# One workspace that is already subscribed. Both test suites need one and neither can
+# create it — reaching a subscribed state through the product means completing a hosted
+# checkout in a browser. `ON_START` activates without one.
+#
+# Free, not Pro: its limit is finite, which is the only way the quota tests are reachable.
+fixtures:
+  subscribed_workspace:
+    customer:
+      name: Scribe demo workspace
+      alias: scribe-seeded-workspace
+      invoicing_emails:
+        - demo@scribe.test
+    subscription:
+      plan: Scribe Free
+      activation_condition: ON_START

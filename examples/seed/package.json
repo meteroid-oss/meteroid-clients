@@ -1,0 +1,21 @@
+{
+  "name": "scribe-seed",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Applies examples/seed/scribe.catalog.yaml to a Meteroid tenant over the REST API, idempotently.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3",
+    "yaml": "2.6.1"
+  }
+}

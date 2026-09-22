@@ -18,14 +18,29 @@ one SPA ──► BASE_URL ├──────────────► back
 
 ## Quickstart
 
-You need a Meteroid tenant with the catalog from **[CATALOG.md](CATALOG.md)** seeded, and an API key.
-**Read CATALOG.md first — nothing works without it.** The demo never creates catalog objects; it
-resolves them and fails loudly if they are missing.
+You need Docker and Node. Everything else — a Meteroid instance, a tenant, an API key, the catalog
+from **[CATALOG.md](CATALOG.md)** — is what these two commands produce.
 
 ```bash
 cd examples
-cp .env.example .env          # fill in METEROID_API_KEY, METEROID_WEBHOOK_SECRET,
-                              # and SCRIBE_SESSION_SECRET (openssl rand -hex 32)
+cp .env.example .env          # then fill in SCRIBE_SESSION_SECRET (openssl rand -hex 32)
+
+make up                       # a pinned Meteroid on :8084, dashboard on :3000
+make seed                     # applies CATALOG.md over the REST API, then verifies it
+```
+
+`make up` brings up Meteroid with `INSTANCE_BOOTSTRAP_*` set, so it comes up with an organization,
+a `Development` tenant in USD, a simulated payment gateway, and **the API key already in
+`.env.example`** — nothing to copy out of a dashboard. That key is a committed development
+credential; the file says so, at length. `make down` deletes the whole thing, volumes included.
+
+`make seed` applies [`seed/scribe.catalog.yaml`](seed/) — the catalog, declaratively — resolving
+every object by its natural key first, so it is safe to re-run. It finishes by running CATALOG.md's
+own verification checklist against the tenant and printing a PASS/FAIL table, and it writes
+`.env.seed` with the alias of a workspace it subscribed to Scribe Free, which is the fixture both
+test suites need and cannot create for themselves.
+
+```bash
 make help                     # every target, and which port each backend uses
 ```
 
@@ -34,6 +49,8 @@ Then, in three terminals:
 ```bash
 make run-rust                 # or: make run-java / make run-typescript — the backend
 make run-frontend             # the SPA on :5173, pointed at the Rust backend
+
+set -a; . ./.env.seed; set +a # the subscribed workspace `make seed` created
 make test-contract            # the contract suite, against the same backend
 ```
 
@@ -58,7 +75,7 @@ CATALOG.md.
 Everything that can be checked without a live tenant:
 
 ```bash
-make check      # contract lint + 4 typechecks + clippy -D warnings + fmt + gradle build
+make check      # contract lint + 5 typechecks + clippy -D warnings + fmt + gradle build
 ```
 
 ---
@@ -135,9 +152,12 @@ quota reports `402` and sends no event at all.
 examples/
   openapi.yaml            the demo backend's contract — the single source of truth
   lint_contract.py        enforces the contract's modelling rules (run after editing the YAML)
-  CATALOG.md              what the operator seeds in Meteroid, once, by hand
-  .env.example            every environment variable, documented, with no secrets
-  Makefile                run any backend, the SPA, or either suite
+  CATALOG.md              what lives in Meteroid, and what the seed puts there
+  docker-compose.yml      a pinned local Meteroid — `make up`
+  volume/clickhouse/      ClickHouse's cluster + embedded-Keeper config, mounted by the above
+  seed/                   scribe.catalog.yaml + the CLI that applies it — `make seed`
+  .env.example            every environment variable, documented
+  Makefile                bring Meteroid up, seed it, run any backend, the SPA, or either suite
   frontend/               one SPA, targets a configurable BASE_URL
   backends/
     rust/                 hand-written, uses meteroid-rs            (port 8080)
@@ -180,21 +200,46 @@ must be accepted and payloads that must be rejected, so the union rules are test
 
 ---
 
-## The catalog is seeded once, out of band
+## The catalog is seeded once, from a manifest
 
-Meteroid's REST API has **no** `POST /api/v1/features`, and entitlements are GET-only on plan
-versions, products and add-ons. Features and entitlements are therefore created in the Meteroid
-dashboard, once per tenant.
+`seed/scribe.catalog.yaml` is the catalog as data — product family, metric, four features, three
+plans with their price components, and the twelve per-plan-version entitlement values. It mirrors
+CATALOG.md one-to-one, and `seed/src/` contains no catalog value of its own: adding a feature is a
+manifest edit.
 
-The demo resolves them by stable identifier on every run — features by `code`, the metric by `code`,
-plans by **exact `name`** (Meteroid plans have no code) — and fails with `503 CATALOG_NOT_SEEDED`
-naming the missing object rather than degrading silently.
+`make seed` applies it over the REST API and is **idempotent by resolution, not by bookkeeping** —
+it keeps no state file. Before creating anything it looks the object up by its natural key: a
+feature by `code` (`GET /features/{code}`, exact), a metric by `code`, a plan by **exact `name`**
+(Meteroid plans carry no code and `search` is fuzzy, so the list is narrowed client-side), a
+customer by `alias`. A second run reports everything as `exists` and changes nothing.
+
+It also creates one **subscribed workspace**: a customer plus a subscription to Scribe Free with
+`activation_condition: ON_START`, which activates without a hosted checkout. That fixture is what
+unblocks the metered, usage, invoice and quota tests, which otherwise skip for want of a workspace
+that has a subscription. Its alias lands in `.env.seed`.
+
+The backends still never create catalog objects. They resolve them by the same stable identifiers on
+every run and fail with `503 CATALOG_NOT_SEEDED` naming the missing object rather than degrading
+silently.
+
+One thing is still manual by design: the **webhook endpoint** (CATALOG.md section 6). Meteroid
+exposes no REST API for webhook endpoints or their signing secrets, so that one is created in the
+dashboard — on `http://localhost:3000` with the local stack — and its `whsec_…` copied into
+`METEROID_WEBHOOK_SECRET`. The contract suite does not need it to exercise the receiver: it signs its
+own payloads.
+
+One more is manual by accident of timing: **features and plan-version entitlements are newer than the
+Meteroid images on ghcr**. `POST /api/v1/features` answers `405` on `meteroid-api:main` as of
+2026-09-18. The seed names the endpoint when that happens; until an image with those writes is
+published, seed the four features and the twelve entitlement values in the dashboard and let the seed
+do the rest. `GET /api-docs/openapi.json` on your instance says which of the two situations you are
+in.
 
 Each demo *session* creates one new Meteroid **customer**, which is expected and cheap. There is no
 user auth to build: `POST /api/session` mints a session token bound to that customer's alias, and
 every other endpoint takes it as a bearer token. The token is a stateless HMAC over the alias, so
-all backends mint tokens the others accept — which is also how the test suites get a handle on a
-workspace an operator subscribed by hand.
+all backends mint tokens the others accept — which is also how the test suites get a handle on the
+seeded subscribed workspace.
 
 ---
 
@@ -325,8 +370,8 @@ including the test-only ones.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `METEROID_API_KEY` | yes | Server-side Meteroid credential. Never reaches the browser. |
-| `METEROID_BASE_URL` | no | Defaults to `https://api.meteroid.com`. |
+| `METEROID_API_KEY` | yes | Server-side Meteroid credential. Never reaches the browser. `.env.example` ships the development key `make up` installs — public, and for this demo only. |
+| `METEROID_BASE_URL` | no | `http://localhost:8084`, the stack `make up` starts. Point it at `https://api.meteroid.com` for the hosted API. |
 | `METEROID_WEBHOOK_SECRET` | yes | `whsec_…` from the dashboard endpoint. Verifies inbound webhooks; the contract suite signs with it. |
 | `SCRIBE_SESSION_SECRET` | yes | HMAC key for session tokens. No default — every backend refuses to start without it. |
 | `SCRIBE_DEFAULT_CURRENCY` | no | Currency for created customers. Must match the seeded plans (`USD`). |
@@ -349,9 +394,23 @@ No secret is committed, and nothing reads a credential from anywhere but the env
 | `backends/typescript` | done — all 12 operations, `tsc --strict` clean, 57 offline tests (incl. the metered path against a stubbed Meteroid) |
 | `frontend` | done — all 12 operations consumed, types generated from `openapi.yaml` and committed |
 | `tests/contract` | done — 110 tests over all 12 operations, every response validated against `openapi.yaml` |
-| `tests/e2e` | done — 3 specs; needs a browser (`npm --prefix tests/e2e run browsers`) and a hand-provisioned subscribed workspace |
+| `tests/e2e` | done — 3 specs; needs a browser (`npm --prefix tests/e2e run browsers`) and the subscribed workspace `make seed` creates |
+| `docker-compose.yml` | done — brought up in full, every service healthy; trimmed and pinned from the upstream deploy compose |
+| `seed/` | written and run against a live instance — see the caveat below |
 
-**Nothing here has been exercised against a live Meteroid tenant** — there is none in the development
-environment. Every Meteroid-backed path is verified only insofar as it compiles, typechecks, lints,
-and returns a contract-shaped error when Meteroid is unreachable. The first run against a real tenant
-should be treated as the real test.
+**Partly exercised against a live Meteroid.** `make up` brings the stack up and it works: Postgres,
+Redpanda, ClickHouse, `metering-api`, `meteroid-api` and the scheduler all reach a healthy state, and
+the REST API answers. Against that instance the seed creates the product family, the metric, all
+three plans with their price components, publishes them, and creates the subscribed-workspace fixture
+(`ACTIVE`, no checkout) — and a second run reports every one of them as already existing, which is
+the idempotency claim actually tested rather than asserted.
+
+**The feature and entitlement half is not yet reachable on any published image.** `POST
+/api/v1/features` and `POST /api/v1/plan-versions/{id}/entitlements` do not exist in
+`ghcr.io/meteroid-oss/meteroid-api:main` as of 2026-09-18 — the API answers `405`, `CreatePlanRequest`
+has no `entitlements` field, and the image's own `FeatureType` union has no `CONFIG` variant. The seed
+is written against the documented endpoints and says so by name when it gets a `405`. Until an image
+carrying them ships, `make seed` stops at the features step and the four features plus twelve
+entitlement values still have to be created in the dashboard.
+
+The backends themselves have still not been run against a live tenant.

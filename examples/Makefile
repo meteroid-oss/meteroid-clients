@@ -55,6 +55,36 @@ help: ## Show this help
 	@echo '  Backends listen on: rust $(RUST_PORT) · java $(JAVA_PORT) · typescript $(TS_PORT)'
 	@echo '  Targets marked [BACKEND] take BACKEND=rust|java|typescript, e.g. make test-contract BACKEND=java'
 	@echo ''
+	@echo '  From nothing to a working demo:  make up && make seed'
+	@echo ''
+
+# ------------------------------------------------------------------ meteroid
+
+# Where `make up` puts Meteroid. `-include .env` means a .env pointing somewhere else
+# wins, which is what you want when seeding a hosted tenant instead of the local one.
+METEROID_BASE_URL ?= http://localhost:8084
+
+.PHONY: up
+up: ## Start a local Meteroid (docker compose) and wait for it
+	docker compose up -d --wait
+	@echo "==> waiting for the REST API on $(METEROID_BASE_URL)"
+	@for i in $$(seq 1 60); do \
+		curl -fsS -o /dev/null "$(METEROID_BASE_URL)/api-docs/openapi.json" && break; \
+		sleep 2; \
+	done
+	@curl -fsS -o /dev/null "$(METEROID_BASE_URL)/api-docs/openapi.json" \
+		|| { echo "Meteroid did not answer on $(METEROID_BASE_URL). Try: docker compose logs meteroid-api"; exit 1; }
+	@echo "Meteroid is up:  REST $(METEROID_BASE_URL)  ·  dashboard http://localhost:3000"
+	@echo "Next:  make seed"
+
+.PHONY: seed
+seed: seed/node_modules ## Apply seed/scribe.catalog.yaml to METEROID_BASE_URL
+	npm --prefix seed start
+
+.PHONY: down
+down: ## Stop Meteroid and delete its data
+	docker compose down -v
+	@rm -f .env.seed
 
 # ------------------------------------------------------------------ run
 
@@ -111,11 +141,12 @@ lint-contract: ## Validate openapi.yaml as OpenAPI and against the demo's modell
 	python3 lint_contract.py
 
 .PHONY: typecheck
-typecheck: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules ## Typecheck the SPA, both suites and the TypeScript backend
+typecheck: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules seed/node_modules ## Typecheck the SPA, both suites, the TypeScript backend and the seed
 	npm --prefix frontend run typecheck
 	npm --prefix tests/contract run typecheck
 	npm --prefix tests/e2e run typecheck
 	npm --prefix $(TS_BACKEND) run typecheck
+	npm --prefix seed run typecheck
 
 .PHONY: generate-api
 generate-api: frontend/node_modules ## Regenerate the SPA's types from openapi.yaml
@@ -125,7 +156,7 @@ generate-api: frontend/node_modules ## Regenerate the SPA's types from openapi.y
 # ------------------------------------------------------------------ misc
 
 .PHONY: install
-install: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules ## Install every npm dependency
+install: frontend/node_modules tests/contract/node_modules tests/e2e/node_modules $(TS_BACKEND)/node_modules seed/node_modules ## Install every npm dependency
 
 frontend/node_modules: frontend/package-lock.json
 	npm --prefix frontend ci
@@ -137,6 +168,10 @@ tests/contract/node_modules: tests/contract/package-lock.json
 
 tests/e2e/node_modules: tests/e2e/package-lock.json
 	npm --prefix tests/e2e ci
+	@touch $@
+
+seed/node_modules: seed/package-lock.json
+	npm --prefix seed ci
 	@touch $@
 
 # The backend's node_modules holds a symlink to the SDK, so the SDK has to be built
@@ -160,6 +195,6 @@ health: ## Curl /api/health on BACKEND
 clean: ## Remove build output (keeps .env)
 	rm -rf frontend/dist frontend/node_modules
 	rm -rf tests/contract/node_modules tests/e2e/node_modules tests/e2e/test-results
-	rm -rf $(TS_BACKEND)/node_modules
+	rm -rf $(TS_BACKEND)/node_modules seed/node_modules
 	cargo clean --manifest-path backends/rust/Cargo.toml
 	$(GRADLE) clean

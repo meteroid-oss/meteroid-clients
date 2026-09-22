@@ -1,0 +1,252 @@
+# A local Meteroid for the Scribe demo.
+#
+#     make up      # bring it up, wait for health
+#     make seed    # apply examples/seed/scribe.catalog.yaml over the REST API
+#     make down    # stop it and delete every volume
+#
+# Trimmed from meteroid/docker/deploy/docker-compose.yml upstream: analytics-api is
+# dropped, everything else is kept because the demo's metered quota path needs it —
+# metering-api owns the usage counters, and it needs redpanda to read events from and
+# clickhouse to aggregate them in.
+#
+# Every image is pinned. `latest` would make "the demo works" a statement about
+# whatever was pushed this morning.
+#
+# The credentials here are development-only and deliberately committed. See
+# .env.example; nothing in this file is safe to reuse anywhere real.
+
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+    tag: "{{.Name}}"
+
+x-meteroid-env: &meteroid-env
+  JWT_SECRET: ${JWT_SECRET:-scribe-demo-jwt-secret-do-not-reuse}
+  INTERNAL_API_SECRET: ${INTERNAL_API_SECRET:-scribe-demo-internal-secret-do-not-reuse}
+  SECRETS_CRYPT_KEY: ${SECRETS_CRYPT_KEY:-00000000000000000000000000000000}
+  DATABASE_URL: postgres://meteroid:meteroid@meteroid-postgres:5432/meteroid?sslmode=disable
+  METEROID_API_LISTEN_ADDRESS: 0.0.0.0:50061
+  METEROID_REST_API_LISTEN_ADDRESS: 0.0.0.0:8084
+  METERING_API_EXTERNAL_URL: http://metering-api:50062
+  ENABLE_MULTI_ORGANIZATION: "false"
+  METEROID_PUBLIC_URL: http://localhost:3000
+  OBJECT_STORE_URI: file:///data/object-store
+
+volumes:
+  pg_data:
+  clickhouse_data:
+  clickhouse_coordination:
+  redpanda_data:
+  object_store_data:
+
+networks:
+  meteroid_net:
+
+name: scribe-demo
+
+services:
+
+  # ------------------------------------------------------------------ infrastructure
+
+  meteroid-postgres:
+    image: ghcr.io/meteroid-oss/meteroid-postgres:18.3-standard
+    ports:
+      - "5432:5432"
+    user: postgres
+    environment:
+      POSTGRES_USER: meteroid
+      POSTGRES_PASSWORD: meteroid
+      POSTGRES_DB: meteroid
+    volumes:
+      - pg_data:/var/lib/postgresql
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - meteroid_net
+    logging: *logging
+
+  # clickhouse-server runs as 101:101 and a fresh named volume is owned by root, so the
+  # coordination directories have to exist with the right owner before it starts.
+  clickhouse-volume-init:
+    image: alpine:3.21
+    user: root
+    command:
+      - sh
+      - -c
+      - mkdir -p /coordination/log /coordination/snapshots && chown -R 101:101 /coordination
+    volumes:
+      - clickhouse_coordination:/coordination
+    restart: "no"
+    logging: *logging
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.6.2-alpine
+    depends_on:
+      clickhouse-volume-init:
+        condition: service_completed_successfully
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: default
+      CLICKHOUSE_DB: meteroid
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    # Upstream raises nofile to 262144. Dropped on purpose: a single-node ClickHouse at
+    # demo load does not need it, and a host whose hard limit is lower cannot grant it —
+    # the container then refuses to start at all.
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_coordination:/var/lib/clickhouse/coordination
+      - ./volume/clickhouse/config.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://clickhouse:8123/ping || exit 1
+      interval: 5s
+      timeout: 3s
+      retries: 100
+    networks:
+      - meteroid_net
+    logging: *logging
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.1
+    hostname: redpanda
+    command:
+      - redpanda start
+      - --smp 1
+      - --memory 1G
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+      - --advertise-kafka-addr INTERNAL://redpanda:29092,EXTERNAL://localhost:9092
+    ports:
+      - "9092:9092"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - meteroid_net
+    logging: *logging
+
+  redpanda-topic-create:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.1
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    entrypoint:
+      - bash
+      - -c
+      - |
+        for topic in meteroid-events-raw; do \
+          echo "Creating topic: $$topic" && \
+          rpk topic create "$$topic" --brokers redpanda:29092 || true; \
+        done
+    restart: "no"
+    networks:
+      - meteroid_net
+    logging: *logging
+
+  # ------------------------------------------------------------------ meteroid
+
+  meteroid-api:
+    image: ghcr.io/meteroid-oss/meteroid-api:sha-c72f3f0
+    depends_on:
+      meteroid-postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    ports:
+      - "8084:8084"
+      - "50061:50061"
+    environment:
+      <<: *meteroid-env
+      # Instance bootstrap — this is what makes `make up && make seed` possible with
+      # nothing to click and nothing to copy out of a dashboard. The API key below is
+      # installed verbatim, so it is the same value .env.example hands every backend.
+      INSTANCE_BOOTSTRAP_ENABLED: "true"
+      INSTANCE_BOOTSTRAP_EMAIL: ${INSTANCE_BOOTSTRAP_EMAIL:-demo@scribe.test}
+      INSTANCE_BOOTSTRAP_PASSWORD: ${INSTANCE_BOOTSTRAP_PASSWORD:-scribe-demo-password}
+      INSTANCE_BOOTSTRAP_ORGANIZATION: Scribe demo
+      INSTANCE_BOOTSTRAP_TENANT: Development
+      INSTANCE_BOOTSTRAP_CURRENCY: USD
+      INSTANCE_BOOTSTRAP_API_KEY: ${METEROID_API_KEY:?set METEROID_API_KEY in examples/.env (copy it from .env.example)}
+      # Connects a simulated payment provider and points the card and direct-debit rails
+      # at it, which is what makes a paid checkout completable without a Stripe account.
+      INSTANCE_BOOTSTRAP_TEST_GATEWAY: "true"
+    volumes:
+      - object_store_data:/data/object-store
+    healthcheck:
+      test: ["CMD", "/bin/grpc_health_probe", "-addr=:50061"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - meteroid_net
+    logging: *logging
+
+  meteroid-scheduler:
+    image: ghcr.io/meteroid-oss/meteroid-scheduler:sha-c72f3f0
+    depends_on:
+      meteroid-postgres:
+        condition: service_healthy
+      meteroid-api:
+        condition: service_healthy
+    environment:
+      <<: *meteroid-env
+    networks:
+      - meteroid_net
+    logging: *logging
+
+  metering-api:
+    image: ghcr.io/meteroid-oss/metering-api:sha-c72f3f0
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    ports:
+      - "50062:50062"
+    environment:
+      INTERNAL_API_SECRET: ${INTERNAL_API_SECRET:-scribe-demo-internal-secret-do-not-reuse}
+      METERING_API_LISTEN_ADDRESS: 0.0.0.0:50062
+      METEROID_API_EXTERNAL_URL: http://meteroid-api:50061
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:29092
+      KAFKA_RAW_TOPIC: meteroid-events-raw
+      CLICKHOUSE_DATABASE: meteroid
+      CLICKHOUSE_HTTP_ADDRESS: http://clickhouse:8123
+      CLICKHOUSE_TCP_ADDRESS: clickhouse:9000
+      CLICKHOUSE_USERNAME: default
+      CLICKHOUSE_PASSWORD: default
+      CLICKHOUSE_CLUSTER_NAME: meteroid
+    networks:
+      - meteroid_net
+    logging: *logging
+
+  meteroid-web:
+    image: ghcr.io/meteroid-oss/meteroid-web:sha-c72f3f0
+    depends_on:
+      meteroid-api:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    environment:
+      VITE_METEROID_API_EXTERNAL_URL: http://localhost:50061
+      VITE_METEROID_REST_API_EXTERNAL_URL: http://localhost:8084
+    networks:
+      - meteroid_net
+    logging: *logging
