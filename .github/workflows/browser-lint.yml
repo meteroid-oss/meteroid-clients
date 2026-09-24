@@ -6,12 +6,16 @@ on:
       - main
     paths:
       - 'browser/**'
+      - 'codegen/templates/typescript/**'
+      - 'spec/client/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/browser-lint.yml'
   pull_request:
     paths:
       - 'browser/**'
+      - 'codegen/templates/typescript/**'
+      - 'spec/client/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/browser-lint.yml'
