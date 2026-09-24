@@ -1,3 +1,4 @@
+// this file is @generated
 import { type ProductId, ProductIdSerializer } from "./productId";
 /** Minimal reference to the product a feature belongs to. */
 export interface EntitlementProductRef {

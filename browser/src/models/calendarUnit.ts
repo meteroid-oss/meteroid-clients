@@ -1,3 +1,5 @@
+// this file is @generated
+
 export enum CalendarUnit {
   Hour = "HOUR",
   Day = "DAY",

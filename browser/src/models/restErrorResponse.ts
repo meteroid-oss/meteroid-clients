@@ -1,3 +1,4 @@
+// this file is @generated
 import { type ErrorCode, ErrorCodeSerializer } from "./errorCode";
 
 export interface RestErrorResponse {

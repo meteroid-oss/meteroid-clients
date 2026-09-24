@@ -1,3 +1,4 @@
+// this file is @generated
 /** Never resets — counts all usage since the subscription was activated. */
 export interface NeverResetPeriod {}
 

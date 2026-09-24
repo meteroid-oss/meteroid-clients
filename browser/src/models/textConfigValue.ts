@@ -1,3 +1,4 @@
+// this file is @generated
 /** A text config value. */
 export interface TextConfigValue {
   value: string;

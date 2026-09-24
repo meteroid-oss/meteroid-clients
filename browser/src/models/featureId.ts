@@ -1,3 +1,5 @@
+// this file is @generated
+
 export type FeatureId = string;
 
 export const FeatureIdSerializer = {

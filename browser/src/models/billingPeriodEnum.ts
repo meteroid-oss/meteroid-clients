@@ -1,3 +1,5 @@
+// this file is @generated
+
 export enum BillingPeriodEnum {
   Monthly = "MONTHLY",
   Quarterly = "QUARTERLY",

@@ -1,5 +1,4 @@
-// Hand-written until spec/client/v1/openapi.json exists; the `[typescript-client]`
-// codegen section will then generate this directory with the same files and exports.
+// this file is @generated
 export { BillableMetricId } from "./billableMetricId";
 export { BillingCycleResetPeriod } from "./billingCycleResetPeriod";
 export { BillingPeriodEnum } from "./billingPeriodEnum";
@@ -16,7 +15,6 @@ export { ConfigValueNumber } from "./configValue";
 export { ConfigValueBoolean } from "./configValue";
 export { ConfigValueText } from "./configValue";
 export { ConfigValueJson } from "./configValue";
-export { Currency } from "./currency";
 export { CustomerId } from "./customerId";
 export { EffectiveEntitlement } from "./effectiveEntitlement";
 export { EffectiveEntitlementListResponse } from "./effectiveEntitlementListResponse";

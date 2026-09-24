@@ -1,3 +1,4 @@
+// this file is @generated
 /** Resets each time your subscription renews — anchored to your billing cycle. */
 export interface BillingCycleResetPeriod {}
 

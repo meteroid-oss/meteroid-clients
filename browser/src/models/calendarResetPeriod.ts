@@ -1,3 +1,4 @@
+// this file is @generated
 import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit";
 /** Resets on calendar boundaries (e.g. the 1st of every month) — not tied to subscription start date. */
 export interface CalendarResetPeriod {

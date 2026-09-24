@@ -1,21 +1,24 @@
+// this file is @generated
 import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
-import { type Currency, CurrencySerializer } from "./currency";
 import { type PlanId, PlanIdSerializer } from "./planId";
 import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
 import {
   type SubscriptionStatusEnum,
   SubscriptionStatusEnumSerializer,
 } from "./subscriptionStatusEnum";
-/** A subscription of the signed-in customer, without pricing internals. */
+
 export interface ClientSubscription {
   billingPeriod?: BillingPeriodEnum | null;
 
-  currency: Currency;
+  currency: string;
 
+  /** Current billing period end date */
   currentPeriodEnd?: string | null;
 
+  /** Current billing period start date */
   currentPeriodStart: string;
 
+  /** When the subscription ends (if set) */
   endDate?: string | null;
 
   id: SubscriptionId;
@@ -26,6 +29,7 @@ export interface ClientSubscription {
 
   planVersion: number;
 
+  /** When the subscription contract starts (benefits apply from this date) */
   startDate: string;
 
   status: SubscriptionStatusEnum;
@@ -38,7 +42,7 @@ export const ClientSubscriptionSerializer = {
         object["billing_period"] != null
           ? BillingPeriodEnumSerializer._fromJsonObject(object["billing_period"])
           : undefined,
-      currency: CurrencySerializer._fromJsonObject(object["currency"]),
+      currency: object["currency"],
       currentPeriodEnd: object["current_period_end"],
       currentPeriodStart: object["current_period_start"],
       endDate: object["end_date"],
@@ -57,7 +61,7 @@ export const ClientSubscriptionSerializer = {
         self.billingPeriod != null
           ? BillingPeriodEnumSerializer._toJsonObject(self.billingPeriod)
           : undefined,
-      currency: CurrencySerializer._toJsonObject(self.currency),
+      currency: self.currency,
       current_period_end: self.currentPeriodEnd,
       current_period_start: self.currentPeriodStart,
       end_date: self.endDate,

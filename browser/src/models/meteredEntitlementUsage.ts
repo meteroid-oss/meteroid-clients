@@ -1,3 +1,4 @@
+// this file is @generated
 import { parseDateTime } from "../datetime";
 
 export interface MeteredEntitlementUsage {

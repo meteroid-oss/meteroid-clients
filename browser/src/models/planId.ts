@@ -1,3 +1,5 @@
+// this file is @generated
+
 export type PlanId = string;
 
 export const PlanIdSerializer = {

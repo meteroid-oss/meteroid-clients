@@ -334,9 +334,11 @@ in `@meteroid/sdk`) makes the entitlements available from the first render, and
 
 ## Types
 
-The models (`ClientCustomer`, `ClientSubscription`, `EffectiveEntitlement`, …) mirror
-`spec/client/v1/openapi.json` and are exported from the package root, like the rest of
-the API (`EntitlementCheck`, `EmbedEvents`, `TokenResponse`, …).
+The models (`ClientCustomer`, `ClientSubscription`, `EffectiveEntitlement`, …) are
+generated from `spec/client/v1/openapi.json` into `src/models` (`./regen_openapi.py` at
+the repository root; edit the templates in `codegen/templates/typescript`, not the
+generated files). They are exported from the package root, like the rest of the API
+(`EntitlementCheck`, `EmbedEvents`, `TokenResponse`, …).
 
 ## Development
 

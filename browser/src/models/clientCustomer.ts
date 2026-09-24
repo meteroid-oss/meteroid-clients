@@ -1,12 +1,12 @@
-import { type Currency, CurrencySerializer } from "./currency";
+// this file is @generated
 import { type CustomerId, CustomerIdSerializer } from "./customerId";
-/** The signed-in customer, as seen by the customer themselves. */
+/** The customer the token was minted for. */
 export interface ClientCustomer {
   alias?: string | null;
 
   billingEmail?: string | null;
 
-  currency: Currency;
+  currency: string;
 
   id: CustomerId;
 
@@ -18,7 +18,7 @@ export const ClientCustomerSerializer = {
     return {
       alias: object["alias"],
       billingEmail: object["billing_email"],
-      currency: CurrencySerializer._fromJsonObject(object["currency"]),
+      currency: object["currency"],
       id: CustomerIdSerializer._fromJsonObject(object["id"]),
       name: object["name"],
     };
@@ -28,7 +28,7 @@ export const ClientCustomerSerializer = {
     return {
       alias: self.alias,
       billing_email: self.billingEmail,
-      currency: CurrencySerializer._toJsonObject(self.currency),
+      currency: self.currency,
       id: CustomerIdSerializer._toJsonObject(self.id),
       name: self.name,
     };

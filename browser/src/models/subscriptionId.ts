@@ -1,3 +1,5 @@
+// this file is @generated
+
 export type SubscriptionId = string;
 
 export const SubscriptionIdSerializer = {

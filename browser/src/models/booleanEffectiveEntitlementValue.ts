@@ -1,3 +1,5 @@
+// this file is @generated
+
 export interface BooleanEffectiveEntitlementValue {
   enabled: boolean;
 }

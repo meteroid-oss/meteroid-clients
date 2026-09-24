@@ -1,3 +1,4 @@
+// this file is @generated
 import {
   type ClientSubscription,
   ClientSubscriptionSerializer,

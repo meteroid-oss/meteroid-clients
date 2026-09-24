@@ -1,3 +1,4 @@
+// this file is @generated
 /** A boolean config value. */
 export interface BooleanConfigValue {
   value: boolean;

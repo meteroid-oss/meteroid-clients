@@ -1,3 +1,5 @@
+// this file is @generated
+
 export type CustomerId = string;
 
 export const CustomerIdSerializer = {

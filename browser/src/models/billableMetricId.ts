@@ -1,3 +1,5 @@
+// this file is @generated
+
 export type BillableMetricId = string;
 
 export const BillableMetricIdSerializer = {

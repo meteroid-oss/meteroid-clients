@@ -1,3 +1,4 @@
+// this file is @generated
 /** A number config value (decimal, encoded as a string). */
 export interface NumberConfigValue {
   value: string;

@@ -1,3 +1,4 @@
+// this file is @generated
 import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit";
 /** Always ends at now — e.g. 30 days means the last 30 days, old usage drops off automatically. */
 export interface SlidingWindowResetPeriod {

@@ -1,3 +1,4 @@
+// this file is @generated
 import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit";
 /** Resets at regular intervals — anchored to your subscription's exact activation time. */
 export interface FixedWindowResetPeriod {

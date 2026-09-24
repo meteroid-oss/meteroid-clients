@@ -1,3 +1,4 @@
+// this file is @generated
 /** A structured (JSON) config value — the "metadata" case, several fields in one entitlement. */
 export interface JsonConfigValue {
   value: unknown;

@@ -1,3 +1,5 @@
+// this file is @generated
+
 export enum SubscriptionStatusEnum {
   PendingActivation = "PENDING_ACTIVATION",
   PendingCharge = "PENDING_CHARGE",

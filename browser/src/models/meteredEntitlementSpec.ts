@@ -1,3 +1,4 @@
+// this file is @generated
 import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
 import { type ResetPeriod, ResetPeriodSerializer } from "./resetPeriod";
 

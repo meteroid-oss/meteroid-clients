@@ -1,3 +1,4 @@
+// this file is @generated
 import { type ConfigValue, ConfigValueSerializer } from "./configValue";
 
 export interface ConfigEffectiveEntitlementValue {
