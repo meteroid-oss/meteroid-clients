@@ -1,0 +1,55 @@
+name: Browser Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'browser/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/browser-lint.yml'
+  pull_request:
+    paths:
+      - 'browser/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/browser-lint.yml'
+
+# When pushing to a PR, cancel any jobs still running for the previous head commit of the PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Browser Build & Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # browser/ and react/ share the npm workspace at the repository root.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint and format check
+        working-directory: browser
+        run: npm run check
+
+      - name: Typecheck
+        working-directory: browser
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: browser
+        run: npm test
+
+      - name: Build
+        working-directory: browser
+        run: npm run build
