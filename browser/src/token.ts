@@ -29,7 +29,7 @@ export interface ClientToken {
 export interface TokenSource {
   /** A token that is not about to expire, fetched when needed (single-flight). */
   get(): Promise<ClientToken>;
-  /** A new token, unless the current one already differs from `stale`. */
+  /** A new token, unless the current one already differs from `stale` and is still fresh. */
   refresh(stale?: string): Promise<ClientToken>;
   /** While enabled, a new token is fetched ahead of the current one's expiry. */
   keepFresh(enabled: boolean): void;
@@ -117,23 +117,25 @@ export function createTokenSource(getToken: GetToken, now = Date.now): TokenSour
     return inflight;
   };
 
-  return {
-    async get() {
-      if (current !== undefined && now() < staleAt) {
+  const get = async (): Promise<ClientToken> => {
+    if (current !== undefined && now() < staleAt) {
+      return current;
+    }
+    try {
+      return await load();
+    } catch (error) {
+      if (current?.expiresAt !== undefined && now() < current.expiresAt) {
         return current;
       }
-      try {
-        return await load();
-      } catch (error) {
-        if (current?.expiresAt !== undefined && now() < current.expiresAt) {
-          return current;
-        }
-        throw error;
-      }
-    },
+      throw error;
+    }
+  };
+
+  return {
+    get,
     refresh(stale) {
       return current !== undefined && stale !== undefined && current.token !== stale
-        ? Promise.resolve(current)
+        ? get()
         : load();
     },
     keepFresh(enabled) {

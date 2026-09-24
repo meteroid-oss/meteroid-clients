@@ -174,6 +174,16 @@ describe("token lifecycle", () => {
     assert.equal(calls(), 2);
   });
 
+  it("refresh() does not hand out a newer token that is itself expired", async () => {
+    const { tokens, advance } = source(() => 3_600_000);
+    const first = await tokens.get();
+    advance(3_600_000);
+    await tokens.get();
+    // An embed still on the first token reports it expired hours later.
+    advance(4 * 3_600_000);
+    assert.equal((await tokens.refresh(first.token)).token, "tok_3");
+  });
+
   it("keepFresh() fetches ahead of expiry, only while enabled", async () => {
     mock.timers.enable({ apis: ["setTimeout"] });
     const { tokens, calls, advance } = source(() => 600_000);
