@@ -319,7 +319,8 @@ Without a bundler, load the IIFE build: it sets `window.Meteroid` (`createMetero
 ```
 
 It also mounts embeds declared in the markup, and keeps the API of the portal's
-`/embed.js` (`mountBillingPortal(target, { token, baseUrl, … })`):
+`/embed.js`: `mountBillingPortal(target, { token, baseUrl, getToken, onPlanChanged, … })`,
+whose callbacks get the raw `snake_case` message and whose handle has `setToken(token)`:
 
 ```html
 <div data-meteroid-portal data-token="…" data-view="plan" data-portal-url="https://app.meteroid.com"></div>

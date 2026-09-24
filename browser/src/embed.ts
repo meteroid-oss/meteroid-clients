@@ -86,6 +86,11 @@ export interface EmbedHandle {
   destroy(): void;
 }
 
+/** @internal `setToken` serves the `/embed.js` API of the `<script>` build. */
+export interface MountedEmbed extends EmbedHandle {
+  setToken(token: string): void;
+}
+
 /** @internal */
 export interface EmbedTokens {
   get(): Promise<ClientToken>;
@@ -179,7 +184,8 @@ export function parseEmbedMessage(data: unknown): [EmbedEventType, object] | und
   }
 }
 
-const hostOrigin = (): string | undefined => {
+/** @internal */
+export const hostOrigin = (): string | undefined => {
   const origin = window.location.origin;
   return origin && origin !== "null" ? origin : undefined;
 };
@@ -190,7 +196,7 @@ export function mount(
   options: EmbedOptions,
   tokens: EmbedTokens,
   portalUrl: string | undefined
-): EmbedHandle {
+): MountedEmbed {
   const container =
     typeof target === "string" ? document.querySelector<HTMLElement>(target) : target;
   if (!container) {
@@ -212,11 +218,11 @@ export function mount(
   const emit = (type: EmbedEventType, event: object) =>
     listeners.get(type)?.forEach((listener) => listener(event));
 
-  const setToken = (next: ClientToken) => {
-    token = next.token;
+  const setToken = (next: string) => {
+    token = next;
     if (!destroyed && origin) {
       iframe.contentWindow?.postMessage(
-        { source: "meteroid", v: 1, type: "meteroid:set_token", token: next.token },
+        { source: "meteroid", v: 1, type: "meteroid:set_token", token: next },
         origin
       );
     }
@@ -237,7 +243,10 @@ export function mount(
     } else if (type === "navigate") {
       options.onNavigate?.(event as EmbedEvents["navigate"]);
     } else if (type === "token_expired" && tokens.refresh) {
-      tokens.refresh(token).then(setToken, (error) => emit("error", { error }));
+      tokens.refresh(token).then(
+        (next) => setToken(next.token),
+        (error) => emit("error", { error })
+      );
     }
     emit(type, event);
   };
@@ -284,6 +293,7 @@ export function mount(
       iframe.remove();
       listeners.clear();
     },
+    setToken,
   };
 }
 

@@ -90,8 +90,56 @@ describe("<script> build", () => {
     assert.equal(Meteroid.DEFAULT_BASE_URL, "https://app.meteroid.com");
     assert.equal(
       Meteroid.buildEmbedUrl({ token: "t", baseUrl: "https://portal.example" }),
-      "https://portal.example/portal/customer?token=t&embed=portal"
+      "https://portal.example/portal/customer?token=t&embed=portal&origin=https%3A%2F%2Fmerchant.example"
     );
+  });
+
+  it("keeps the callbacks, getToken and setToken of mountBillingPortal", async () => {
+    const window = load('<div id="billing"></div>');
+    const events = [];
+    let calls = 0;
+    const handle = window.Meteroid.mountBillingPortal("#billing", {
+      token: "tok_0",
+      baseUrl: "https://portal.example",
+      getToken: async () => `tok_${++calls}`,
+      // Copied out of the jsdom realm, whose Object.prototype differs.
+      onPlanChanged: (event) => events.push({ ...event }),
+      onNavigate: (target, event) => events.push([target, event.url]),
+    });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const frame = handle.iframe.contentWindow;
+    assert.equal(new URL(handle.iframe.src).searchParams.get("token"), "tok_0");
+    const posted = [];
+    frame.postMessage = (message, origin) => posted.push([message.token, origin]);
+    const post = (type, payload) =>
+      window.dispatchEvent(
+        new window.MessageEvent("message", {
+          data: { source: "meteroid", v: 1, type: `meteroid:${type}`, ...payload },
+          origin: "https://portal.example",
+          source: frame,
+        })
+      );
+
+    post("plan_changed", { subscription_id: "sub_1" });
+    post("navigate", { target: "checkout", url: "https://portal.example/checkout" });
+    post("token_expired", {});
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    handle.setToken("tok_manual");
+
+    assert.deepEqual(events, [
+      {
+        source: "meteroid",
+        v: 1,
+        type: "meteroid:plan_changed",
+        subscription_id: "sub_1",
+      },
+      ["checkout", "https://portal.example/checkout"],
+    ]);
+    assert.deepEqual(posted, [
+      ["tok_1", "https://portal.example"],
+      ["tok_manual", "https://portal.example"],
+    ]);
+    handle.destroy();
   });
 
   it("mounts embeds declared with data attributes", async () => {

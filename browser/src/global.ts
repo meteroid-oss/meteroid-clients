@@ -1,34 +1,88 @@
 // Entry of the `<script>` build (`dist/meteroid.global.js`): sets `window.Meteroid`
 // and mounts the embeds declared with data attributes. It keeps the API of the
-// `/embed.js` it replaces (`mountBillingPortal`, `baseUrl`, `onNavigate(target)`).
+// `/embed.js` it replaces (`mountBillingPortal`, `baseUrl`, `on*` callbacks, `setToken`).
 import { createMeteroid } from "./client";
 import {
   buildEmbedUrl,
   DEFAULT_PORTAL_URL,
-  type EmbedHandle,
+  type EmbedEventType,
   type EmbedOptions,
+  hostOrigin,
+  type MountedEmbed,
+  mount,
   mountEmbed,
 } from "./embed";
 import { ApiException } from "./errors";
 import { DEFAULT_API_URL } from "./http";
+import { createTokenSource, type GetToken } from "./token";
 
-interface LegacyEmbedOptions extends Omit<EmbedOptions, "onNavigate"> {
+const LEGACY_CALLBACKS = {
+  ready: "onReady",
+  plan_changed: "onPlanChanged",
+  subscription_canceled: "onSubscriptionCanceled",
+  payment_method_added: "onPaymentMethodAdded",
+  checkout_opened: "onCheckoutOpened",
+  checkout_completed: "onCheckoutCompleted",
+  token_expired: "onTokenExpired",
+} as const;
+
+type LegacyEvent = Record<string, unknown>;
+
+type LegacyCallbacks = {
+  [K in (typeof LEGACY_CALLBACKS)[keyof typeof LEGACY_CALLBACKS]]?: (
+    event: LegacyEvent
+  ) => void;
+};
+
+interface LegacyEmbedOptions extends Omit<EmbedOptions, "onNavigate">, LegacyCallbacks {
   token: string;
   portalUrl?: string;
   baseUrl?: string;
-  onNavigate?: (target: string) => void;
+  /** Only called on `token_expired`: the iframe starts with `token`. */
+  getToken?: GetToken;
+  onNavigate?: (target: string, event: LegacyEvent) => void;
 }
+
+// `/embed.js` passed its callbacks the message itself, with snake_case ids.
+const legacyEvent = (
+  type: string,
+  { subscriptionId, ...payload }: LegacyEvent
+): LegacyEvent => ({
+  source: "meteroid",
+  v: 1,
+  type: `meteroid:${type}`,
+  ...payload,
+  ...(subscriptionId === undefined ? {} : { subscription_id: subscriptionId }),
+});
 
 const fromLegacy = ({ baseUrl, onNavigate, ...options }: LegacyEmbedOptions) => ({
   ...options,
   portalUrl: options.portalUrl ?? baseUrl,
-  onNavigate: onNavigate && ((event: { target: string }) => onNavigate(event.target)),
+  onNavigate:
+    onNavigate &&
+    ((event: { target: string; url?: string }) =>
+      onNavigate(event.target, legacyEvent("navigate", event))),
 });
 
-const mountBillingPortal = (
+function mountBillingPortal(
   target: string | HTMLElement,
-  options: LegacyEmbedOptions
-): EmbedHandle => mountEmbed(target, fromLegacy(options));
+  legacy: LegacyEmbedOptions
+): MountedEmbed {
+  const { token, getToken, portalUrl, ...options } = fromLegacy(legacy);
+  const renew = getToken && createTokenSource(getToken);
+  const handle = mount(
+    target,
+    options,
+    { get: async () => ({ token }), refresh: renew?.refresh },
+    portalUrl
+  );
+  for (const [type, name] of Object.entries(LEGACY_CALLBACKS)) {
+    handle.on(type as EmbedEventType, (event) =>
+      legacy[name]?.(legacyEvent(type, event as LegacyEvent))
+    );
+  }
+  return handle;
+}
 
 const DATA_ATTRIBUTES: Record<string, string> = {
   view: "view",
@@ -91,7 +145,8 @@ if (typeof window !== "undefined") {
   (window as unknown as { Meteroid: object }).Meteroid = {
     createMeteroid,
     mountEmbed,
-    buildEmbedUrl: (options: LegacyEmbedOptions) => buildEmbedUrl(fromLegacy(options)),
+    buildEmbedUrl: (options: LegacyEmbedOptions) =>
+      buildEmbedUrl({ origin: hostOrigin(), ...fromLegacy(options) }),
     mountBillingPortal,
     ApiException,
     DEFAULT_API_URL,
