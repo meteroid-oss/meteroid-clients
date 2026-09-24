@@ -60,6 +60,20 @@ describe("built package", () => {
     const size = gzipSync(result.outputFiles[0].contents).length;
     assert.ok(size < 10_000, `${size} bytes`);
   });
+
+  it("keeps the side effects of the <script> build when a bundler imports it", async () => {
+    const result = await build({
+      stdin: {
+        contents: 'import "@meteroid/browser/meteroid.global.js";',
+        resolveDir: fileURLToPath(new URL(".", import.meta.url)),
+      },
+      bundle: true,
+      format: "esm",
+      write: false,
+      logLevel: "silent",
+    });
+    assert.match(result.outputFiles[0].text, /mountBillingPortal/);
+  });
 });
 
 describe("<script> build", () => {

@@ -2,7 +2,9 @@
   "name": "@meteroid/browser",
   "version": "0.26.0",
   "description": "Meteroid in the browser: entitlements, usage, subscriptions and billing embeds for the signed-in customer",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/meteroid.global.js"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/types/index.d.ts",
