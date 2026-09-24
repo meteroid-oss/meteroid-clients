@@ -29,7 +29,8 @@ export interface MeteroidProviderProps {
   customerKey?: string | number;
   /**
    * Entitlements loaded on the server (with `@meteroid/sdk` or the REST API), so that
-   * the first render, and the server render, already know them.
+   * the first render, and the server render, already know them. When `customerKey`
+   * changes, they are only used if they changed too.
    */
   initialEntitlements?: EffectiveEntitlementListResponse;
   /** Base URL of the REST API. Defaults to the token's `api_url`. */
@@ -39,7 +40,11 @@ export interface MeteroidProviderProps {
   children?: ReactNode;
 }
 
-type ClientState = { key: unknown[]; client: Meteroid };
+type ClientState = {
+  key: unknown[];
+  initial: EffectiveEntitlementListResponse | undefined;
+  client: Meteroid;
+};
 
 /** Provides the billing state of the signed-in customer to the hooks and components. */
 export function MeteroidProvider({
@@ -56,21 +61,25 @@ export function MeteroidProvider({
   });
 
   const key = [customerKey, apiUrl, portalUrl];
-  const create = (): ClientState => ({
+  const create = (seed: EffectiveEntitlementListResponse | undefined): ClientState => ({
     key,
+    initial: initialEntitlements,
     client: createMeteroid({
       getToken: () => getTokenRef.current(),
       apiUrl,
       portalUrl,
-      initialEntitlements,
+      initialEntitlements: seed,
     }),
   });
-  const [state, setState] = useState(create);
+  const [state, setState] = useState(() => create(initialEntitlements));
   let client = state.client;
   if (key.some((value, index) => value !== state.key[index])) {
     // The client starts on its first subscriber and stops with its last one, so a
-    // replaced client needs no teardown.
-    const next = create();
+    // replaced client needs no teardown. Unchanged `initialEntitlements` belong to the
+    // previous customer.
+    const next = create(
+      initialEntitlements === state.initial ? undefined : initialEntitlements
+    );
     client = next.client;
     setState(next);
   }

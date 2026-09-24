@@ -162,6 +162,32 @@ describe("MeteroidProvider", () => {
     assert.ok(calls.slice(3).every((c) => c.authorization === "Bearer tok_b"));
   });
 
+  it("keeps the previous customer's initialEntitlements out of the next one", async () => {
+    mockApi();
+    const seen: string[] = [];
+    function Probe() {
+      const { status, hasAccess } = useEntitlement("sso");
+      seen.push(`${status}:${hasAccess}`);
+      return null;
+    }
+    const initial = parsedEntitlements();
+    const app = (who: string, initialEntitlements = initial) => (
+      <MeteroidProvider
+        getToken={() => new Promise<string>(() => {})}
+        customerKey={who}
+        initialEntitlements={initialEntitlements}
+      >
+        <Probe />
+      </MeteroidProvider>
+    );
+    await render(app("a"));
+    assert.equal(seen[seen.length - 1], "ready:true");
+    await render(app("b"));
+    assert.equal(seen[seen.length - 1], "loading:false");
+    await render(app("c", parsedEntitlements()));
+    assert.equal(seen[seen.length - 1], "ready:true");
+  });
+
   it("hydrates server-rendered markup without a mismatch", async () => {
     mockApi();
     const initialEntitlements = parsedEntitlements();
