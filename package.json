@@ -1,0 +1,15 @@
+{
+  "name": "meteroid-frontend",
+  "private": true,
+  "description": "npm workspace for the browser packages (@meteroid/browser, @meteroid/react). The server SDK in typescript/ is a separate, standalone package.",
+  "workspaces": [
+    "browser",
+    "react"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "check": "npm run check --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm run test --workspaces"
+  }
+}

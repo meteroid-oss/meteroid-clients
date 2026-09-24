@@ -1,0 +1,112 @@
+// Runs against the built package (`dist/`), resolved through its own name so that
+// the `exports` map is what gets tested.
+
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
+import {
+  ApiException,
+  buildEmbedUrl,
+  checkEntitlement,
+  compareDecimal,
+  createMeteroid,
+  ErrorCode,
+  mountEmbed,
+} from "@meteroid/browser";
+import { build } from "esbuild";
+import { JSDOM } from "jsdom";
+
+const require = createRequire(import.meta.url);
+
+describe("built package", () => {
+  it("exposes the same API to import and require", () => {
+    const cjs = require("@meteroid/browser");
+    const functions = {
+      createMeteroid,
+      mountEmbed,
+      buildEmbedUrl,
+      checkEntitlement,
+      compareDecimal,
+      ApiException,
+    };
+    for (const [name, value] of Object.entries(functions)) {
+      assert.equal(typeof value, "function", name);
+      assert.equal(typeof cjs[name], "function", name);
+    }
+    assert.equal(ErrorCode.TokenExpired, "TOKEN_EXPIRED");
+    assert.equal(cjs.DEFAULT_API_URL, "https://api.meteroid.com");
+  });
+
+  it("does not touch the DOM when imported", () => {
+    assert.equal(typeof globalThis.window, "undefined");
+    const client = createMeteroid({ getToken: async () => "tok" });
+    assert.equal(client.getSnapshot().entitlements.status, "loading");
+  });
+
+  it("stays under 10 KB gzipped for createMeteroid + mountEmbed", async () => {
+    const result = await build({
+      stdin: {
+        contents: 'export { createMeteroid, mountEmbed } from "@meteroid/browser";',
+        resolveDir: fileURLToPath(new URL(".", import.meta.url)),
+      },
+      bundle: true,
+      minify: true,
+      format: "esm",
+      write: false,
+    });
+    const size = gzipSync(result.outputFiles[0].contents).length;
+    assert.ok(size < 10_000, `${size} bytes`);
+  });
+});
+
+describe("<script> build", () => {
+  const script = readFileSync(
+    require.resolve("@meteroid/browser/meteroid.global.js"),
+    "utf8"
+  );
+
+  function load(body) {
+    const dom = new JSDOM(`<!doctype html><html><body>${body}</body></html>`, {
+      url: "https://merchant.example/",
+      runScripts: "outside-only",
+    });
+    dom.window.eval(script);
+    return dom.window;
+  }
+
+  it("sets window.Meteroid, including the API of the previous /embed.js", () => {
+    const { Meteroid } = load("");
+    for (const name of [
+      "createMeteroid",
+      "mountEmbed",
+      "mountBillingPortal",
+      "buildEmbedUrl",
+    ]) {
+      assert.equal(typeof Meteroid[name], "function", name);
+    }
+    assert.equal(Meteroid.DEFAULT_BASE_URL, "https://app.meteroid.com");
+    assert.equal(
+      Meteroid.buildEmbedUrl({ token: "t", baseUrl: "https://portal.example" }),
+      "https://portal.example/portal/customer?token=t&embed=portal"
+    );
+  });
+
+  it("mounts embeds declared with data attributes", async () => {
+    const window = load(
+      '<div id="a" data-meteroid-portal data-token="tok" data-view="plan" ' +
+        'data-base-url="https://portal.example" data-count="3" data-branding="false"></div>'
+    );
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const iframe = window.document.querySelector("#a iframe");
+    assert.ok(iframe);
+    const src = new URL(iframe.src);
+    assert.equal(src.origin, "https://portal.example");
+    assert.equal(src.searchParams.get("embed"), "plan");
+    assert.equal(src.searchParams.get("count"), "3");
+    assert.equal(src.searchParams.get("branding"), "false");
+    assert.equal(src.searchParams.get("origin"), "https://merchant.example");
+  });
+});
