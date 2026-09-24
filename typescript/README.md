@@ -7,6 +7,14 @@ Everything under `src/api` and `src/models` is generated from `spec/openapi.json
 `./regen_openapi.py` at the root of this repository — edit the templates in
 `codegen/templates/typescript`, not the generated files.
 
+> [!WARNING]
+> **Server-side only.** This SDK authenticates with your secret API key, which has full
+> access to your Meteroid account. Never ship the key to a browser or a mobile app, and do
+> not bundle this SDK into frontend code. To show billing state in your frontend, add a
+> [browser token endpoint](#browser-token-endpoint) and use
+> [`@meteroid/browser`](https://github.com/meteroid-oss/meteroid-clients/tree/main/browser)
+> or [`@meteroid/react`](https://github.com/meteroid-oss/meteroid-clients/tree/main/react).
+
 ## Installation
 
 ```bash
@@ -132,6 +140,32 @@ PDF downloads return raw bytes:
 const pdf: Uint8Array = await meteroid.invoices.downloadInvoicePdf("inv_...");
 await fs.promises.writeFile("invoice.pdf", pdf);
 ```
+
+## Browser token endpoint
+
+Frontends read the signed-in customer's billing state (entitlements, usage,
+subscriptions) and embed the billing portal with a short-lived token scoped to that
+customer, never with your API key. Mint it on your backend, in a route protected by your
+own authentication, and return the response as it is:
+
+```typescript
+app.get("/billing-token", requireUser, async (req, res) => {
+  const token = await meteroid.customers.createPortalToken(req.user.meteroidCustomerId, {
+    expiresInSeconds: 3600,
+  });
+  res.set("Cache-Control", "no-store").json(token);
+});
+```
+
+[`@meteroid/browser`](https://github.com/meteroid-oss/meteroid-clients/tree/main/browser)
+and [`@meteroid/react`](https://github.com/meteroid-oss/meteroid-clients/tree/main/react)
+call this route through their `getToken` option and fetch a new token before the current
+one expires.
+
+- Only mint a token for the customer the authenticated user belongs to.
+- Keep lifetimes short (an hour is plenty), and mint read-only tokens
+  (`"scopes": ["read"]`) for pages that only gate features or show usage. Embeds that
+  change the plan or the payment methods need the `manage` scope, the default.
 
 ## Webhook verification
 
@@ -305,7 +339,9 @@ Each variant is also exported by name (`FeeRate`, `FeeUsage`, `ConfigValueNumber
 ## Environment support
 
 - **Node.js**: 18.0.0 or newer (uses the global `fetch`)
-- **Browsers**: any browser with `fetch`
+- **Browsers**: not for browsers, since it needs your secret API key. Use
+  [`@meteroid/browser`](https://github.com/meteroid-oss/meteroid-clients/tree/main/browser)
+  with a [browser token endpoint](#browser-token-endpoint) instead
 - **Cloudflare Workers**: supported (the `credentials` option is omitted where unavailable)
 - **Deno / Bun**: supported via npm compatibility
 
