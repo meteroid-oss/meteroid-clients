@@ -1,0 +1,66 @@
+name: React Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'react/**'
+      - 'browser/**'
+      # test/types checks that server-side entitlements fit initialEntitlements.
+      - 'typescript/src/models/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/react-lint.yml'
+  pull_request:
+    paths:
+      - 'react/**'
+      - 'browser/**'
+      # test/types checks that server-side entitlements fit initialEntitlements.
+      - 'typescript/src/models/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/react-lint.yml'
+
+# When pushing to a PR, cancel any jobs still running for the previous head commit of the PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: React Build & Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # browser/ and react/ share the npm workspace at the repository root.
+      - name: Install dependencies
+        run: npm ci
+
+      # @meteroid/react resolves @meteroid/browser to its build.
+      - name: Build @meteroid/browser
+        working-directory: browser
+        run: npm run build
+
+      - name: Lint and format check
+        working-directory: react
+        run: npm run check
+
+      - name: Typecheck
+        working-directory: react
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: react
+        run: npm test
+
+      - name: Build
+        working-directory: react
+        run: npm run build

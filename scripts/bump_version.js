@@ -18,6 +18,10 @@ const filesPaths = [
     "typescript/package-lock.json",
     "typescript/README.md",
     "typescript/src/request.ts",
+    // Browser packages (npm workspace: react depends on browser at the same version)
+    "package-lock.json",
+    "browser/package.json",
+    "react/package.json",
     // Python
     "python/pyproject.toml",
     "python/meteroid/_version.py",

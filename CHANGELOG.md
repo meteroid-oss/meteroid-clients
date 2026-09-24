@@ -2,6 +2,9 @@
 
 ## Next
 
+* New `@meteroid/browser` package (`browser/`, npm): the signed-in customer's entitlements, usage and subscriptions from the browser, with a customer token minted by your backend (`getToken`: renewed before expiry and on `401 TOKEN_EXPIRED`, single-flight), a snapshot store with synchronous `check(featureCode)`, and billing embeds speaking the typed event protocol v1 (`mountEmbed`). ESM, CommonJS and a `<script>` build that keeps the API of the portal's `/embed.js`. Its models are generated from the new client API spec (`spec/client/v1/openapi.json`)
+* New `@meteroid/react` package (`react/`, npm): `MeteroidProvider`, `useEntitlement` and the other hooks on `useSyncExternalStore`, `<Gate>`, `<UsageMeter>`, `<BillingEmbed>` / `<BillingPortal>` with typed callbacks, server rendering with `initialEntitlements`, and typed feature codes through the `Register` interface
+* TypeScript: the README warns never to ship the API key to a browser, and documents the browser token endpoint
 * New TypeScript SDK (`typescript/`, published as `@meteroid/sdk` on npm): typed models and resources, bearer auth, retries and webhook signature verification
 * New Python SDK (`python/`, published as `meteroid` on PyPI): sync + asyncio clients, dataclass models, bearer auth, retries and webhook signature verification
 * New Go SDK (`go/`, module `github.com/meteroid-oss/meteroid-clients/go`, package `meteroid`): standard-library only, context-aware methods, bearer auth, retries and webhook signature verification

@@ -1,0 +1,11 @@
+{
+  // Declarations only: esbuild bundles the JavaScript (see build.mjs).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "rootDir": "./src",
+    "outDir": "./dist/types"
+  },
+  "include": [],
+  "files": ["src/index.ts"]
+}

@@ -44,6 +44,18 @@ output_dir = "typescript/src/models"
 template = "templates/typescript/component_type.ts.jinja"
 output_dir = "typescript/src/models"
 
+# @meteroid/browser: models only. The resource templates hardcode the server
+# client (`Meteroid(token)`, `./request`), so its calls are hand-written.
+[typescript-client]
+[[typescript-client.task]]
+template = "templates/typescript/component_type_summary.ts.jinja"
+input_files = ["client/v1/openapi.json"]
+output_dir = "browser/src/models"
+[[typescript-client.task]]
+template = "templates/typescript/component_type.ts.jinja"
+input_files = ["client/v1/openapi.json"]
+output_dir = "browser/src/models"
+
 [python]
 # The codegen image doesn't ship `ruff`, so formatting happens on the host
 # right after generation (see python/scripts/codegen_format.sh).

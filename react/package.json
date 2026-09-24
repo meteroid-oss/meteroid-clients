@@ -1,0 +1,74 @@
+{
+  "name": "@meteroid/react",
+  "version": "0.26.0",
+  "description": "React bindings for Meteroid: feature gates, usage meters and billing embeds on top of @meteroid/browser",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "clean": "rm -rf dist test_build",
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "fmt": "biome format --write",
+    "lint": "biome lint",
+    "typecheck": "tsc --noEmit && tsc -p test/types/tsconfig.json",
+    "test": "tsc -p tsconfig.test.json && node --test test_build/test/*.test.js && npm run build && node --test test/*.test.mjs",
+    "prepublishOnly": "npm run check && npm run build"
+  },
+  "dependencies": {
+    "@meteroid/browser": "0.26.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.4",
+    "@types/jsdom": "^28.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "esbuild": "^0.25.0",
+    "jsdom": "^28.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.5.0"
+  },
+  "keywords": [
+    "meteroid",
+    "billing",
+    "entitlements",
+    "feature-flags",
+    "usage",
+    "subscription",
+    "react"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meteroid-oss/meteroid-clients",
+    "directory": "react"
+  },
+  "bugs": {
+    "url": "https://github.com/meteroid-oss/meteroid-clients/issues"
+  },
+  "homepage": "https://github.com/meteroid-oss/meteroid-clients/tree/main/react"
+}
