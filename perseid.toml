@@ -1,0 +1,41 @@
+spec = "spec/openapi.json"
+name = "Meteroid"
+base_url = "https://api.meteroid.com"
+
+[rust]
+package = "meteroid-rs"
+
+[rust.context]
+example = "let customers = client.customers().list_customers(None).await?;"
+send_sync_probe = """
+let meteroid = Meteroid::new(String::new(), None);
+let customer_api = meteroid.customers();
+let fut = customer_api.list_customers(None);
+"""
+
+[typescript]
+package = "@meteroid/sdk"
+exports = ["webhook"]
+
+[typescript.context]
+tagline = "billing and subscription management"
+example = """
+// Create a customer
+const customer = await meteroid.customers.createCustomer({
+  name: "Acme Inc",
+  billingEmail: "billing@acme.com",
+});
+"""
+
+[python.context]
+example = "customers = client.customers.list_customers()"
+async_example = "customers = await client.customers.list_customers()"
+
+[go]
+module = "github.com/meteroid-oss/meteroid-clients/go"
+
+[java]
+package = "com.meteroid"
+
+[java.context]
+example = "CustomerListResponse customers = meteroid.getCustomers().listCustomers();"

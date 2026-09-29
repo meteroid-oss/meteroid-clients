@@ -6,13 +6,13 @@ on:
       - main
     paths:
       - 'python/**'
-      - 'codegen/templates/python/**'
+      - 'perseid.toml'
       - '.github/workflows/python-lint.yml'
       - 'spec/**'
   pull_request:
     paths:
       - 'python/**'
-      - 'codegen/templates/python/**'
+      - 'perseid.toml'
       - '.github/workflows/python-lint.yml'
       - 'spec/**'
 

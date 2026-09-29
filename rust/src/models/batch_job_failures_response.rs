@@ -7,11 +7,11 @@ use super::batch_job_item_failure_response::BatchJobItemFailureResponse;
 pub struct BatchJobFailuresResponse {
     pub data: Vec<BatchJobItemFailureResponse>,
 
-    pub total_count: i32,
+    pub total_count: i64,
 }
 
 impl BatchJobFailuresResponse {
-    pub fn new(data: Vec<BatchJobItemFailureResponse>, total_count: i32) -> Self {
+    pub fn new(data: Vec<BatchJobItemFailureResponse>, total_count: i64) -> Self {
         Self { data, total_count }
     }
 }

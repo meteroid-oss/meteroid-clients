@@ -7,11 +7,11 @@ pub struct CouponLineItem {
 
     pub name: String,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 impl CouponLineItem {
-    pub fn new(coupon_id: String, name: String, total: i32) -> Self {
+    pub fn new(coupon_id: String, name: String, total: i64) -> Self {
         Self {
             coupon_id,
             name,

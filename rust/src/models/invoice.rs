@@ -11,9 +11,9 @@ use super::{
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Invoice {
-    pub amount_due: i32,
+    pub amount_due: i64,
 
-    pub applied_credits: i32,
+    pub applied_credits: i64,
 
     /// The period/moment this invoice is about — the subscription period start, or the invoice's
     /// own date for manual/one-off. Stable and always present, distinct from `invoice_date` (the
@@ -83,15 +83,15 @@ pub struct Invoice {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<SubscriptionId>,
 
-    pub subtotal: i32,
+    pub subtotal: i64,
 
-    pub subtotal_recurring: i32,
+    pub subtotal_recurring: i64,
 
-    pub tax_amount: i32,
+    pub tax_amount: i64,
 
     pub tax_breakdown: Vec<TaxBreakdownItem>,
 
-    pub total: i32,
+    pub total: i64,
 
     pub transactions: Vec<Transaction>,
 
@@ -104,8 +104,8 @@ pub struct Invoice {
 
 impl Invoice {
     pub fn new(
-        amount_due: i32,
-        applied_credits: i32,
+        amount_due: i64,
+        applied_credits: i64,
         coupons: Vec<CouponLineItem>,
         created_at: String,
         currency: Currency,
@@ -120,11 +120,11 @@ impl Invoice {
         net_terms: i32,
         payment_status: InvoicePaymentStatus,
         status: InvoiceStatus,
-        subtotal: i32,
-        subtotal_recurring: i32,
-        tax_amount: i32,
+        subtotal: i64,
+        subtotal_recurring: i64,
+        tax_amount: i64,
         tax_breakdown: Vec<TaxBreakdownItem>,
-        total: i32,
+        total: i64,
         transactions: Vec<Transaction>,
     ) -> Self {
         Self {

@@ -7,13 +7,13 @@ pub struct PaginationResponse {
 
     pub per_page: i32,
 
-    pub total_items: i32,
+    pub total_items: i64,
 
     pub total_pages: i32,
 }
 
 impl PaginationResponse {
-    pub fn new(page: i32, per_page: i32, total_items: i32, total_pages: i32) -> Self {
+    pub fn new(page: i32, per_page: i32, total_items: i64, total_pages: i32) -> Self {
         Self {
             page,
             per_page,

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct CapacityPricing {
-    pub included: i32,
+    pub included: i64,
 
     pub overage_rate: rust_decimal::Decimal,
 
@@ -12,7 +12,7 @@ pub struct CapacityPricing {
 
 impl CapacityPricing {
     pub fn new(
-        included: i32,
+        included: i64,
         overage_rate: rust_decimal::Decimal,
         rate: rust_decimal::Decimal,
     ) -> Self {

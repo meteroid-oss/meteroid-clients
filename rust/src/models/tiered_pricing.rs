@@ -6,7 +6,7 @@ use super::tier_row::TierRow;
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct TieredPricing {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub block_size: Option<i32>,
+    pub block_size: Option<i64>,
 
     pub tiers: Vec<TierRow>,
 }

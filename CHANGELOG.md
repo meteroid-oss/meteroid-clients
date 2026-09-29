@@ -2,6 +2,9 @@
 
 ## Next
 
+* **Breaking** (Rust) — `int64`/`uint64` fields are now `i64`/`u64` instead of `i32` (e.g. `Invoice.amount_due`, `CreditNote.total`), so amounts above 2³¹ no longer fail to deserialize
+* Rust: the HTTP runtime now supports multipart and streaming uploads and server-sent events (unused by the current API), and `Configuration` moved to its own module (still exported at the crate root)
+* Codegen: the embedded generator is replaced by [perseid](https://github.com/meteroid-oss/perseid), configured in `perseid.toml`; regenerate with `perseid generate`
 * New TypeScript SDK (`typescript/`, published as `@meteroid/sdk` on npm): typed models and resources, bearer auth, retries and webhook signature verification
 * New Python SDK (`python/`, published as `meteroid` on PyPI): sync + asyncio clients, dataclass models, bearer auth, retries and webhook signature verification
 * New Go SDK (`go/`, module `github.com/meteroid-oss/meteroid-clients/go`, package `meteroid`): standard-library only, context-aware methods, bearer auth, retries and webhook signature verification

@@ -6,13 +6,13 @@ on:
       - main
     paths:
       - 'typescript/**'
-      - 'codegen/templates/typescript/**'
+      - 'perseid.toml'
       - 'spec/**'
       - '.github/workflows/typescript-lint.yml'
   pull_request:
     paths:
       - 'typescript/**'
-      - 'codegen/templates/typescript/**'
+      - 'perseid.toml'
       - 'spec/**'
       - '.github/workflows/typescript-lint.yml'
 

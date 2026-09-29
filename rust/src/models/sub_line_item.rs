@@ -9,7 +9,7 @@ pub struct SubLineItem {
 
     pub quantity: rust_decimal::Decimal,
 
-    pub total: i32,
+    pub total: i64,
 
     pub unit_price: rust_decimal::Decimal,
 }
@@ -19,7 +19,7 @@ impl SubLineItem {
         id: String,
         name: String,
         quantity: rust_decimal::Decimal,
-        total: i32,
+        total: i64,
         unit_price: rust_decimal::Decimal,
     ) -> Self {
         Self {

@@ -62,7 +62,7 @@ pub struct Subscription {
     pub invoice_memo: Option<String>,
 
     /// Monthly recurring revenue in cents
-    pub mrr_cents: i32,
+    pub mrr_cents: i64,
 
     /// Payment terms in days (0 = due on issue)
     pub net_terms: i32,
@@ -109,7 +109,7 @@ impl Subscription {
         customer_id: CustomerId,
         customer_name: String,
         id: SubscriptionId,
-        mrr_cents: i32,
+        mrr_cents: i64,
         net_terms: i32,
         period: BillingPeriodEnum,
         plan_id: PlanId,

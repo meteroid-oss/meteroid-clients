@@ -287,11 +287,8 @@ The SDK automatically retries requests on 5xx server errors with delays of 50ms,
 The API client code is generated from the OpenAPI specification. To regenerate:
 
 ```bash
-# Build the codegen Docker image (from repo root)
-cd codegen && docker build -t meteroid-codegen:latest .
-
-# Run code generation (from repo root)
-./regen_openapi.py
+# From the repository root, with perseid installed (https://github.com/meteroid-oss/perseid)
+perseid generate java
 ```
 
 ## License

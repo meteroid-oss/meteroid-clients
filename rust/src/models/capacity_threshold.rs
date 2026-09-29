@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct CapacityThreshold {
-    pub included_amount: i32,
+    pub included_amount: i64,
 
     pub per_unit_overage: rust_decimal::Decimal,
 
@@ -12,7 +12,7 @@ pub struct CapacityThreshold {
 
 impl CapacityThreshold {
     pub fn new(
-        included_amount: i32,
+        included_amount: i64,
         per_unit_overage: rust_decimal::Decimal,
         price: rust_decimal::Decimal,
     ) -> Self {

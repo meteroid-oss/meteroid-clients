@@ -51,7 +51,7 @@ pub struct SubscriptionEventData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invoice_threshold: Option<String>,
 
-    pub mrr_cents: i32,
+    pub mrr_cents: i64,
 
     pub net_terms: i32,
 
@@ -84,7 +84,7 @@ impl SubscriptionEventData {
         custom_properties: serde_json::Value,
         customer_id: CustomerId,
         customer_name: String,
-        mrr_cents: i32,
+        mrr_cents: i64,
         net_terms: i32,
         period: BillingPeriodEnum,
         plan_name: String,

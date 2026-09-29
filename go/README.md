@@ -343,11 +343,11 @@ Verification enforces a five minute timestamp tolerance.
 ## Development
 
 The models and resource methods under `go/` are generated from
-[`spec/openapi.json`](../spec/openapi.json) by the templates in
-`codegen/templates/go/`. Regenerate them from the repository root:
+[`spec/openapi.json`](../spec/openapi.json) by [perseid](https://github.com/meteroid-oss/perseid).
+Regenerate them from the repository root:
 
 ```sh
-./regen_openapi.py
+perseid generate go
 ```
 
 Do not edit files carrying the generated-file marker comment on their first
