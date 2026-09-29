@@ -12,7 +12,7 @@ concurrency:
 
 env:
   # Switch to `uses: meteroid-oss/perseid@v0.2.0` with `command: generate --check` once released.
-  PERSEID_REV: 1b0f8562162ba1f345b679ae20aab1b63217298a
+  PERSEID_REV: b85948127d110c707038fa2e6b0597663ae628d7
 
 jobs:
   check-generated:
