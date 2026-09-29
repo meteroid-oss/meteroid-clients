@@ -16,7 +16,7 @@ pub struct CreditNote {
 
     pub credit_type: CreditType,
 
-    pub credited_amount_cents: i32,
+    pub credited_amount_cents: i64,
 
     pub currency: Currency,
 
@@ -45,20 +45,20 @@ pub struct CreditNote {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 
-    pub refunded_amount_cents: i32,
+    pub refunded_amount_cents: i64,
 
     pub status: CreditNoteStatus,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<SubscriptionId>,
 
-    pub subtotal: i32,
+    pub subtotal: i64,
 
-    pub tax_amount: i32,
+    pub tax_amount: i64,
 
     pub tax_breakdown: Vec<TaxBreakdownItem>,
 
-    pub total: i32,
+    pub total: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
@@ -72,7 +72,7 @@ impl CreditNote {
         created_at: String,
         credit_note_number: String,
         credit_type: CreditType,
-        credited_amount_cents: i32,
+        credited_amount_cents: i64,
         currency: Currency,
         custom_properties: serde_json::Value,
         customer_id: CustomerId,
@@ -80,12 +80,12 @@ impl CreditNote {
         invoice_id: InvoiceId,
         invoice_number: String,
         line_items: Vec<InvoiceLineItem>,
-        refunded_amount_cents: i32,
+        refunded_amount_cents: i64,
         status: CreditNoteStatus,
-        subtotal: i32,
-        tax_amount: i32,
+        subtotal: i64,
+        tax_amount: i64,
         tax_breakdown: Vec<TaxBreakdownItem>,
-        total: i32,
+        total: i64,
     ) -> Self {
         Self {
             created_at,

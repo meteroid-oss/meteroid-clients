@@ -14,7 +14,7 @@ pub struct TaxBreakdownItem {
 
     pub name: String,
 
-    pub tax_amount: i32,
+    pub tax_amount: i64,
 
     pub tax_rate: rust_decimal::Decimal,
 
@@ -22,15 +22,15 @@ pub struct TaxBreakdownItem {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tax_reference: Option<String>,
 
-    pub taxable_amount: i32,
+    pub taxable_amount: i64,
 }
 
 impl TaxBreakdownItem {
     pub fn new(
         name: String,
-        tax_amount: i32,
+        tax_amount: i64,
         tax_rate: rust_decimal::Decimal,
-        taxable_amount: i32,
+        taxable_amount: i64,
     ) -> Self {
         Self {
             exemption_reason: None,

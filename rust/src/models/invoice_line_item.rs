@@ -5,7 +5,7 @@ use super::sub_line_item::SubLineItem;
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct InvoiceLineItem {
-    pub amount_total: i32,
+    pub amount_total: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -29,7 +29,7 @@ pub struct InvoiceLineItem {
 
 impl InvoiceLineItem {
     pub fn new(
-        amount_total: i32,
+        amount_total: i64,
         end_date: String,
         name: String,
         start_date: String,

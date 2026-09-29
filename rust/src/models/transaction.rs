@@ -9,7 +9,7 @@ use super::{
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Transaction {
-    pub amount: i32,
+    pub amount: i64,
 
     pub currency: String,
 
@@ -37,7 +37,7 @@ pub struct Transaction {
 
 impl Transaction {
     pub fn new(
-        amount: i32,
+        amount: i64,
         currency: String,
         id: PaymentTransactionId,
         payment_type: PaymentTypeEnum,

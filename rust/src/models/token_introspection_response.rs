@@ -10,10 +10,10 @@ pub struct TokenIntrospectionResponse {
     pub client_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exp: Option<i32>,
+    pub exp: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub iat: Option<i32>,
+    pub iat: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<String>,

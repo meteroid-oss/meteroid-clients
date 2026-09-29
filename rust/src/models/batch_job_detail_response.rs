@@ -19,7 +19,7 @@ pub struct BatchJobDetailResponse {
 
     pub failed_items: i32,
 
-    pub failure_count: i32,
+    pub failure_count: i64,
 
     pub has_error_csv: bool,
 
@@ -51,7 +51,7 @@ impl BatchJobDetailResponse {
         created_at: String,
         created_by: String,
         failed_items: i32,
-        failure_count: i32,
+        failure_count: i64,
         has_error_csv: bool,
         has_output: bool,
         id: BatchJobId,

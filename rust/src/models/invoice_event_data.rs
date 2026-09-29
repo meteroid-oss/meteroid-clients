@@ -28,9 +28,9 @@ pub struct InvoiceEventData {
 
     pub status: InvoiceStatus,
 
-    pub tax_amount: i32,
+    pub tax_amount: i64,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 impl InvoiceEventData {
@@ -41,8 +41,8 @@ impl InvoiceEventData {
         customer_id: CustomerId,
         invoice_id: InvoiceId,
         status: InvoiceStatus,
-        tax_amount: i32,
-        total: i32,
+        tax_amount: i64,
+        total: i64,
     ) -> Self {
         Self {
             consolidated_into_invoice_id: None,

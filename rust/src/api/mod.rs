@@ -1,5 +1,11 @@
 // this file is @generated
 pub mod client;
+#[path = "../event_stream.rs"]
+mod event_stream;
+#[path = "../upload.rs"]
+pub mod upload;
+pub use event_stream::{EventStream, SseEvent};
+pub use upload::Upload;
 
 mod add_ons;
 mod batch_jobs;

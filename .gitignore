@@ -29,5 +29,3 @@ __pycache__/
 /python/dist/
 *.egg-info/
 
-# Codegen script
-/.codegen-tmp/

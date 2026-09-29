@@ -5,7 +5,7 @@ use super::billable_metric_id::BillableMetricId;
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct CapacityFee {
-    pub included: i32,
+    pub included: i64,
 
     pub metric_id: BillableMetricId,
 
@@ -16,7 +16,7 @@ pub struct CapacityFee {
 
 impl CapacityFee {
     pub fn new(
-        included: i32,
+        included: i64,
         metric_id: BillableMetricId,
         overage_rate: rust_decimal::Decimal,
         rate: rust_decimal::Decimal,

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct TokenResponse {
     pub access_token: String,
 
-    pub expires_in: i32,
+    pub expires_in: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub refresh_token: Option<String>,
@@ -18,7 +18,7 @@ pub struct TokenResponse {
 }
 
 impl TokenResponse {
-    pub fn new(access_token: String, expires_in: i32, token_type: String) -> Self {
+    pub fn new(access_token: String, expires_in: i64, token_type: String) -> Self {
         Self {
             access_token,
             expires_in,

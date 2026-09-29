@@ -4,8 +4,8 @@ The official TypeScript/JavaScript SDK for the [Meteroid](https://meteroid.com) 
 subscription management API.
 
 Everything under `src/api` and `src/models` is generated from `spec/openapi.json` by
-`./regen_openapi.py` at the root of this repository — edit the templates in
-`codegen/templates/typescript`, not the generated files.
+[perseid](https://github.com/meteroid-oss/perseid) (`perseid generate typescript` at the root
+of this repository) — do not edit the generated files.
 
 ## Installation
 
@@ -322,7 +322,7 @@ npm test            # unit tests, then the built package from an ES module
 Regenerating the client (from the repository root):
 
 ```bash
-./regen_openapi.py
+perseid generate typescript
 ```
 
 ## License

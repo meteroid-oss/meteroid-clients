@@ -9,7 +9,7 @@ pub struct ComponentParameters {
     pub billing_period: Option<BillingPeriodEnum>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub committed_capacity: Option<i32>,
+    pub committed_capacity: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub initial_slot_count: Option<i32>,

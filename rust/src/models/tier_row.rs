@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct TierRow {
-    pub first_unit: i32,
+    pub first_unit: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flat_cap: Option<rust_decimal::Decimal>,
@@ -15,7 +15,7 @@ pub struct TierRow {
 }
 
 impl TierRow {
-    pub fn new(first_unit: i32, rate: rust_decimal::Decimal) -> Self {
+    pub fn new(first_unit: i64, rate: rust_decimal::Decimal) -> Self {
         Self {
             first_unit,
             flat_cap: None,

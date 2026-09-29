@@ -349,8 +349,8 @@ uv run pytest
 ```
 
 The `meteroid/api/*.py` and `meteroid/models/*.py` modules (except the
-hand-written `api/common.py`) are generated from
-`spec/openapi.json` by `./regen_openapi.py` at the repository root.
+shared runtime) are generated from `spec/openapi.json` by
+[perseid](https://github.com/meteroid-oss/perseid): `perseid generate python` at the repository root.
 
 ## License
 

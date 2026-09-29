@@ -11,7 +11,7 @@ pub struct AvailableParameters {
 
     /// Map of component_id -> available capacity values
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub capacity_thresholds: Option<std::collections::HashMap<String, Vec<i32>>>,
+    pub capacity_thresholds: Option<std::collections::HashMap<String, Vec<i64>>>,
 
     /// List of component_ids that support slot parametrization (initial slot count)
     #[serde(skip_serializing_if = "Option::is_none")]
