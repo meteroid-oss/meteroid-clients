@@ -86,4 +86,4 @@ await client.addOns.retrieve("addon_id", { maxRetries: 0, timeout: 5_000 });
 the `fetch` implementation.
 
 - Source: https://github.com/meteroid-oss/meteroid-clients
-- License: MIT
+- License: Apache-2.0

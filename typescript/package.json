@@ -2,7 +2,7 @@
   "name": "@meteroid/sdk",
   "version": "0.26.0",
   "description": "Meteroid billing API client",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": { "type": "git", "url": "git+https://github.com/meteroid-oss/meteroid-clients.git" },
   "homepage": "https://meteroid.com",
   "author": "Meteroid <support@meteroid.com>",

@@ -134,4 +134,4 @@ honoring `Retry-After` and `retry-after-ms` up to a minute (the backoff otherwis
 is idempotent or the request carries an `Idempotency-Key` (POST requests get one automatically).
 
 - Source: https://github.com/meteroid-oss/meteroid-clients
-- License: MIT
+- License: Apache-2.0

@@ -26,7 +26,7 @@ var defaultSecurity = [][]string{{"bearer_auth"}}
 //
 // Homepage: https://meteroid.com
 // Source: https://github.com/meteroid-oss/meteroid-clients
-// License: MIT
+// License: Apache-2.0
 type Client struct {
 	cfg *config
 }

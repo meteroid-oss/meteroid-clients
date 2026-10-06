@@ -7,7 +7,7 @@ webhooks = true
 
 [metadata]
 description = "Meteroid billing API client"
-license = "MIT"
+license = "Apache-2.0"
 homepage = "https://meteroid.com"
 authors = ["Meteroid <support@meteroid.com>"]
 

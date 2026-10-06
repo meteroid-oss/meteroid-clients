@@ -104,4 +104,4 @@ client.add_ons().with_options(options).retrieve("addon_id").await?;
 `rustls-tls` (default) or `native-tls`, `http2`, and `webhooks` for the webhook verifier.
 
 - Source: https://github.com/meteroid-oss/meteroid-clients
-- License: MIT
+- License: Apache-2.0

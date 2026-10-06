@@ -86,4 +86,4 @@ addOn, err := client.AddOns().Retrieve(ctx, "addon_id", meteroid.WithMaxRetries(
 ```
 
 - Source: https://github.com/meteroid-oss/meteroid-clients
-- License: MIT
+- License: Apache-2.0
