@@ -1,39 +1,63 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum CheckoutSessionStatus {
-    #[default]
-    #[serde(rename = "CREATED")]
     Created,
-
-    #[serde(rename = "AWAITING_PAYMENT")]
     AwaitingPayment,
-
-    #[serde(rename = "COMPLETED")]
     Completed,
-
-    #[serde(rename = "EXPIRED")]
     Expired,
-
-    #[serde(rename = "CANCELLED")]
     Cancelled,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for CheckoutSessionStatus {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl CheckoutSessionStatus {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Created => "CREATED",
             Self::AwaitingPayment => "AWAITING_PAYMENT",
             Self::Completed => "COMPLETED",
             Self::Expired => "EXPIRED",
             Self::Cancelled => "CANCELLED",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for CheckoutSessionStatus {
+    fn from(value: &str) -> Self {
+        match value {
+            "CREATED" => Self::Created,
+            "AWAITING_PAYMENT" => Self::AwaitingPayment,
+            "COMPLETED" => Self::Completed,
+            "EXPIRED" => Self::Expired,
+            "CANCELLED" => Self::Cancelled,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for CheckoutSessionStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for CheckoutSessionStatus {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for CheckoutSessionStatus {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

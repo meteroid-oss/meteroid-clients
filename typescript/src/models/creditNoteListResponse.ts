@@ -1,30 +1,31 @@
 // this file is @generated
-import { type CreditNote, CreditNoteSerializer } from "./creditNote";
+import { extraProperties } from "../json.js";
+import { type CreditNote, CreditNoteSerializer } from "./creditNote.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface CreditNoteListResponse {
   data: CreditNote[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `CreditNoteListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreditNoteListResponseSerializer = {
-  _fromJsonObject(object: any): CreditNoteListResponse {
+  parse(json: any): CreditNoteListResponse {
     return {
-      data: object["data"].map((item: any) => CreditNoteSerializer._fromJsonObject(item)),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => CreditNoteSerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: CreditNoteListResponse): any {
+  serialize(value: CreditNoteListResponse): any {
     return {
-      data: self.data.map((item: any) => CreditNoteSerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => CreditNoteSerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

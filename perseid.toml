@@ -1,0 +1,27 @@
+#:schema https://raw.githubusercontent.com/meteroid-oss/perseid/main/perseid.schema.json
+spec = "spec/openapi.json"
+name = "Meteroid"
+sdks = ["rust", "typescript", "python", "go", "java"]
+base_url = "https://api.meteroid.com"
+webhooks = true
+
+[metadata]
+description = "Meteroid billing API client"
+license = "MIT"
+homepage = "https://meteroid.com"
+authors = ["Meteroid <support@meteroid.com>"]
+
+[rust]
+package = "meteroid-rs"
+
+[typescript]
+package = "@meteroid/sdk"
+
+[python]
+package = "meteroid"
+
+[go]
+package = "meteroid"
+
+[java]
+package = "com.meteroid"

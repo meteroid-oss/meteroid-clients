@@ -1,118 +1,139 @@
 // this file is @generated
+
 import {
   type CreateProductRequest,
   CreateProductRequestSerializer,
-} from "../models/createProductRequest";
-import { type Product, ProductSerializer } from "../models/product";
-import type { ProductFamilyId } from "../models/productFamilyId";
+} from "../models/createProductRequest.js";
+import { type Product, ProductSerializer } from "../models/product.js";
+import type { ProductFamilyId } from "../models/productFamilyId.js";
 import {
   type ProductListResponse,
   ProductListResponseSerializer,
-} from "../models/productListResponse";
+} from "../models/productListResponse.js";
 import {
   type ResolvedEntitlementListResponse,
   ResolvedEntitlementListResponseSerializer,
-} from "../models/resolvedEntitlementListResponse";
+} from "../models/resolvedEntitlementListResponse.js";
 import {
   type UpdateProductRequest,
   UpdateProductRequestSerializer,
-} from "../models/updateProductRequest";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/updateProductRequest.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface ProductsListProductsOptions {
-  productFamilyId?: ProductFamilyId;
-  search?: string;
+/** The query and header parameters of `list`. */
+export interface ProductsListOptions {
+  productFamilyId?: ProductFamilyId | undefined;
+  search?: string | undefined;
   /** Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`. */
-  orderBy?: string;
+  orderBy?: string | undefined;
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
+  perPage?: number | undefined;
 }
 
+/** The products operations, reached through the client's `products`. */
 export class Products {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /**  */
-  public listProducts(
-    options?: ProductsListProductsOptions
-  ): Promise<ProductListResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/products");
+  /** List products */
+  public list(
+    options?: ProductsListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<ProductListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/products");
 
     request.setQueryParam("product_family_id", options?.productFamilyId);
     request.setQueryParam("search", options?.search);
     request.setQueryParam("order_by", options?.orderBy);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
-    return request.send(this.requestCtx, ProductListResponseSerializer._fromJsonObject);
+    return request.send(
+      this.requestCtx,
+      ProductListResponseSerializer.parse,
+      requestOptions
+    );
   }
 
-  /**  */
-  public createProduct(createProductRequest: CreateProductRequest): Promise<Product> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/products");
+  /** Create a product */
+  public create(
+    createProductRequest: CreateProductRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Product> {
+    const request = new MeteroidRequest("POST", "/api/v1/products");
 
-    request.setBody(CreateProductRequestSerializer._toJsonObject(createProductRequest));
-    return request.send(this.requestCtx, ProductSerializer._fromJsonObject);
+    request.setBody(CreateProductRequestSerializer.serialize(createProductRequest));
+    return request.send(this.requestCtx, ProductSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public getProduct(productId: string): Promise<Product> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/products/{product_id}");
-
-    request.setPathParam("product_id", productId);
-    return request.send(this.requestCtx, ProductSerializer._fromJsonObject);
-  }
-
-  /** Partially update product fields. The fee_type is immutable and cannot be changed. */
-  public updateProduct(
+  /** Get product details */
+  public retrieve(
     productId: string,
-    updateProductRequest: UpdateProductRequest
-  ): Promise<Product> {
-    const request = new MeteroidRequest(
-      HttpMethod.PATCH,
-      "/api/v1/products/{product_id}"
-    );
+    requestOptions?: RequestOptions
+  ): APIPromise<Product> {
+    const request = new MeteroidRequest("GET", "/api/v1/products/{product_id}");
 
     request.setPathParam("product_id", productId);
-    request.setBody(UpdateProductRequestSerializer._toJsonObject(updateProductRequest));
-    return request.send(this.requestCtx, ProductSerializer._fromJsonObject);
+    return request.send(this.requestCtx, ProductSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public archiveProduct(productId: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/products/{product_id}/archive"
-    );
+  /**
+   * Update a product
+   *
+   * Partially update product fields. The fee_type is immutable and cannot be changed.
+   */
+  public update(
+    productId: string,
+    updateProductRequest: UpdateProductRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Product> {
+    const request = new MeteroidRequest("PATCH", "/api/v1/products/{product_id}");
 
     request.setPathParam("product_id", productId);
-    return request.sendNoResponseBody(this.requestCtx);
+    request.setBody(UpdateProductRequestSerializer.serialize(updateProductRequest));
+    return request.send(this.requestCtx, ProductSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public listProductEntitlements(
-    productId: string
-  ): Promise<ResolvedEntitlementListResponse> {
+  /** Archive a product */
+  public archive(productId: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("POST", "/api/v1/products/{product_id}/archive");
+
+    request.setPathParam("product_id", productId);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
+  }
+
+  /** List product entitlements */
+  public listEntitlements(
+    productId: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<ResolvedEntitlementListResponse> {
     const request = new MeteroidRequest(
-      HttpMethod.GET,
+      "GET",
       "/api/v1/products/{product_id}/entitlements"
     );
 
     request.setPathParam("product_id", productId);
     return request.send(
       this.requestCtx,
-      ResolvedEntitlementListResponseSerializer._fromJsonObject
+      ResolvedEntitlementListResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public unarchiveProduct(productId: string): Promise<void> {
+  /** Unarchive a product */
+  public unarchive(productId: string, requestOptions?: RequestOptions): APIPromise<void> {
     const request = new MeteroidRequest(
-      HttpMethod.POST,
+      "POST",
       "/api/v1/products/{product_id}/unarchive"
     );
 
     request.setPathParam("product_id", productId);
-    return request.sendNoResponseBody(this.requestCtx);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
   }
 }

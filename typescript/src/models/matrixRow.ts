@@ -1,34 +1,36 @@
 // this file is @generated
-import { type MatrixDimension, MatrixDimensionSerializer } from "./matrixDimension";
+import { extraProperties } from "../json.js";
+import { type MatrixDimension, MatrixDimensionSerializer } from "./matrixDimension.js";
 
 export interface MatrixRow {
   dimension1: MatrixDimension;
-
-  dimension2?: MatrixDimension | null;
-
+  dimension2?: MatrixDimension | null | undefined;
   perUnitPrice: string;
 }
 
+/** Converts `MatrixRow` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MatrixRowSerializer = {
-  _fromJsonObject(object: any): MatrixRow {
+  parse(json: any): MatrixRow {
     return {
-      dimension1: MatrixDimensionSerializer._fromJsonObject(object["dimension1"]),
+      ...extraProperties(json, ["dimension1", "dimension2", "per_unit_price"]),
+      dimension1: MatrixDimensionSerializer.parse(json["dimension1"]),
       dimension2:
-        object["dimension2"] != null
-          ? MatrixDimensionSerializer._fromJsonObject(object["dimension2"])
-          : undefined,
-      perUnitPrice: object["per_unit_price"],
+        json["dimension2"] != null
+          ? MatrixDimensionSerializer.parse(json["dimension2"])
+          : json["dimension2"],
+      perUnitPrice: json["per_unit_price"],
     };
   },
 
-  _toJsonObject(self: MatrixRow): any {
+  serialize(value: MatrixRow): any {
     return {
-      dimension1: MatrixDimensionSerializer._toJsonObject(self.dimension1),
+      ...extraProperties(value, ["dimension1", "dimension2", "perUnitPrice"]),
+      dimension1: MatrixDimensionSerializer.serialize(value.dimension1),
       dimension2:
-        self.dimension2 != null
-          ? MatrixDimensionSerializer._toJsonObject(self.dimension2)
-          : undefined,
-      per_unit_price: self.perUnitPrice,
+        value.dimension2 != null
+          ? MatrixDimensionSerializer.serialize(value.dimension2)
+          : value.dimension2,
+      per_unit_price: value.perUnitPrice,
     };
   },
 };

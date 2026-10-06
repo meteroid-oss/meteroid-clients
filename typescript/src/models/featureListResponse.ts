@@ -1,30 +1,31 @@
 // this file is @generated
-import { type Feature, FeatureSerializer } from "./feature";
+import { extraProperties } from "../json.js";
+import { type Feature, FeatureSerializer } from "./feature.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface FeatureListResponse {
   data: Feature[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `FeatureListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FeatureListResponseSerializer = {
-  _fromJsonObject(object: any): FeatureListResponse {
+  parse(json: any): FeatureListResponse {
     return {
-      data: object["data"].map((item: any) => FeatureSerializer._fromJsonObject(item)),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => FeatureSerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: FeatureListResponse): any {
+  serialize(value: FeatureListResponse): any {
     return {
-      data: self.data.map((item: any) => FeatureSerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => FeatureSerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

@@ -1,24 +1,27 @@
 // this file is @generated
-import { type TierRow, TierRowSerializer } from "./tierRow";
+import { extraProperties } from "../json.js";
+import { type TierRow, TierRowSerializer } from "./tierRow.js";
 
 export interface VolumePlanPricing {
-  blockSize?: number | null;
-
+  blockSize?: number | null | undefined;
   tiers: TierRow[];
 }
 
+/** Converts `VolumePlanPricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const VolumePlanPricingSerializer = {
-  _fromJsonObject(object: any): VolumePlanPricing {
+  parse(json: any): VolumePlanPricing {
     return {
-      blockSize: object["block_size"],
-      tiers: object["tiers"].map((item: any) => TierRowSerializer._fromJsonObject(item)),
+      ...extraProperties(json, ["block_size", "tiers"]),
+      blockSize: json["block_size"],
+      tiers: json["tiers"].map((item: any) => TierRowSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: VolumePlanPricing): any {
+  serialize(value: VolumePlanPricing): any {
     return {
-      block_size: self.blockSize,
-      tiers: self.tiers.map((item: any) => TierRowSerializer._toJsonObject(item)),
+      ...extraProperties(value, ["blockSize", "tiers"]),
+      block_size: value.blockSize,
+      tiers: value.tiers.map((item: any) => TierRowSerializer.serialize(item)),
     };
   },
 };

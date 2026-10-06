@@ -1,48 +1,59 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId.js";
 import {
   type ProductFeeTypeEnum,
   ProductFeeTypeEnumSerializer,
-} from "./productFeeTypeEnum";
-import { type ProductId, ProductIdSerializer } from "./productId";
+} from "./productFeeTypeEnum.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
 
 export interface ProductEventData {
   createdAt: Date;
-
-  description?: string | null;
-
+  description?: string | null | undefined;
   feeType: ProductFeeTypeEnum;
-
   name: string;
-
   productFamilyId: ProductFamilyId;
-
   productId: ProductId;
 }
 
+/** Converts `ProductEventData` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductEventDataSerializer = {
-  _fromJsonObject(object: any): ProductEventData {
+  parse(json: any): ProductEventData {
     return {
-      createdAt: parseDateTime(object["created_at"]),
-      description: object["description"],
-      feeType: ProductFeeTypeEnumSerializer._fromJsonObject(object["fee_type"]),
-      name: object["name"],
-      productFamilyId: ProductFamilyIdSerializer._fromJsonObject(
-        object["product_family_id"]
-      ),
-      productId: ProductIdSerializer._fromJsonObject(object["product_id"]),
+      ...extraProperties(json, [
+        "created_at",
+        "description",
+        "fee_type",
+        "name",
+        "product_family_id",
+        "product_id",
+      ]),
+      createdAt: parseDateTime(json["created_at"]),
+      description: json["description"],
+      feeType: ProductFeeTypeEnumSerializer.parse(json["fee_type"]),
+      name: json["name"],
+      productFamilyId: ProductFamilyIdSerializer.parse(json["product_family_id"]),
+      productId: ProductIdSerializer.parse(json["product_id"]),
     };
   },
 
-  _toJsonObject(self: ProductEventData): any {
+  serialize(value: ProductEventData): any {
     return {
-      created_at: self.createdAt,
-      description: self.description,
-      fee_type: ProductFeeTypeEnumSerializer._toJsonObject(self.feeType),
-      name: self.name,
-      product_family_id: ProductFamilyIdSerializer._toJsonObject(self.productFamilyId),
-      product_id: ProductIdSerializer._toJsonObject(self.productId),
+      ...extraProperties(value, [
+        "createdAt",
+        "description",
+        "feeType",
+        "name",
+        "productFamilyId",
+        "productId",
+      ]),
+      created_at: value.createdAt,
+      description: value.description,
+      fee_type: ProductFeeTypeEnumSerializer.serialize(value.feeType),
+      name: value.name,
+      product_family_id: ProductFamilyIdSerializer.serialize(value.productFamilyId),
+      product_id: ProductIdSerializer.serialize(value.productId),
     };
   },
 };

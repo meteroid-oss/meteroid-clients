@@ -1,42 +1,152 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type EventId, EventIdSerializer } from "./eventId";
-import { type EventType, EventTypeSerializer } from "./eventType";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties, pickProperties } from "../json.js";
+import { type EventId, EventIdSerializer } from "./eventId.js";
+import { type EventType, EventTypeSerializer } from "./eventType.js";
 import {
   type SubscriptionEventData,
   SubscriptionEventDataSerializer,
-} from "./subscriptionEventData";
+} from "./subscriptionEventData.js";
 
-export interface SubscriptionEvent {
-  flattenSubscriptioneventdata: SubscriptionEventData;
-
+export interface SubscriptionEvent extends SubscriptionEventData {
   id: EventId;
-
   timestamp: Date;
-
   type: EventType;
 }
 
+/** Converts `SubscriptionEvent` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionEventSerializer = {
-  _fromJsonObject(object: any): SubscriptionEvent {
+  parse(json: any): SubscriptionEvent {
     return {
-      flattenSubscriptioneventdata: SubscriptionEventDataSerializer._fromJsonObject(
-        object["__flatten_subscriptioneventdata"]
-      ),
-      id: EventIdSerializer._fromJsonObject(object["id"]),
-      timestamp: parseDateTime(object["timestamp"]),
-      type: EventTypeSerializer._fromJsonObject(object["type"]),
+      ...extraProperties(json, [
+        "id",
+        "timestamp",
+        "type",
+        "activated_at",
+        "auto_advance_invoices",
+        "billing_day_anchor",
+        "billing_start_date",
+        "cancellation_reason",
+        "change_type",
+        "charge_automatically",
+        "created_at",
+        "currency",
+        "custom_properties",
+        "customer_alias",
+        "customer_id",
+        "customer_name",
+        "end_date",
+        "invoice_memo",
+        "invoice_threshold",
+        "mrr_cents",
+        "net_terms",
+        "period",
+        "plan_name",
+        "purchase_order",
+        "start_date",
+        "status",
+        "subscription_id",
+        "trial_duration",
+        "version",
+      ]),
+      ...pickProperties(SubscriptionEventDataSerializer.parse(json), [
+        "activatedAt",
+        "autoAdvanceInvoices",
+        "billingDayAnchor",
+        "billingStartDate",
+        "cancellationReason",
+        "changeType",
+        "chargeAutomatically",
+        "createdAt",
+        "currency",
+        "customProperties",
+        "customerAlias",
+        "customerId",
+        "customerName",
+        "endDate",
+        "invoiceMemo",
+        "invoiceThreshold",
+        "mrrCents",
+        "netTerms",
+        "period",
+        "planName",
+        "purchaseOrder",
+        "startDate",
+        "status",
+        "subscriptionId",
+        "trialDuration",
+        "version",
+      ]),
+      id: EventIdSerializer.parse(json["id"]),
+      timestamp: parseDateTime(json["timestamp"]),
+      type: EventTypeSerializer.parse(json["type"]),
     };
   },
 
-  _toJsonObject(self: SubscriptionEvent): any {
+  serialize(value: SubscriptionEvent): any {
     return {
-      __flatten_subscriptioneventdata: SubscriptionEventDataSerializer._toJsonObject(
-        self.flattenSubscriptioneventdata
-      ),
-      id: EventIdSerializer._toJsonObject(self.id),
-      timestamp: self.timestamp,
-      type: EventTypeSerializer._toJsonObject(self.type),
+      ...extraProperties(value, [
+        "id",
+        "timestamp",
+        "type",
+        "activatedAt",
+        "autoAdvanceInvoices",
+        "billingDayAnchor",
+        "billingStartDate",
+        "cancellationReason",
+        "changeType",
+        "chargeAutomatically",
+        "createdAt",
+        "currency",
+        "customProperties",
+        "customerAlias",
+        "customerId",
+        "customerName",
+        "endDate",
+        "invoiceMemo",
+        "invoiceThreshold",
+        "mrrCents",
+        "netTerms",
+        "period",
+        "planName",
+        "purchaseOrder",
+        "startDate",
+        "status",
+        "subscriptionId",
+        "trialDuration",
+        "version",
+      ]),
+      ...pickProperties(SubscriptionEventDataSerializer.serialize(value), [
+        "activated_at",
+        "auto_advance_invoices",
+        "billing_day_anchor",
+        "billing_start_date",
+        "cancellation_reason",
+        "change_type",
+        "charge_automatically",
+        "created_at",
+        "currency",
+        "custom_properties",
+        "customer_alias",
+        "customer_id",
+        "customer_name",
+        "end_date",
+        "invoice_memo",
+        "invoice_threshold",
+        "mrr_cents",
+        "net_terms",
+        "period",
+        "plan_name",
+        "purchase_order",
+        "start_date",
+        "status",
+        "subscription_id",
+        "trial_duration",
+        "version",
+      ]),
+      id: EventIdSerializer.serialize(value.id),
+      timestamp: value.timestamp,
+      type: EventTypeSerializer.serialize(value.type),
     };
   },
 };

@@ -1,20 +1,26 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .component_override import ComponentOverride
-from .component_parameterization import ComponentParameterization
-from .extra_component import ExtraComponent
-from .price_component_id import PriceComponentId
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .component_override import ComponentOverride
+    from .component_parameterization import ComponentParameterization
+    from .extra_component import ExtraComponent
+    from .price_component_id import PriceComponentId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CreateSubscriptionComponents(BaseModel):
-    extra_components: t.Optional[t.List[ExtraComponent]] = None
+    """The `CreateSubscriptionComponents` object."""
 
-    overridden_components: t.Optional[t.List[ComponentOverride]] = None
+    extra_components: list[ExtraComponent] | None | Unset = UNSET
 
-    parameterized_components: t.Optional[t.List[ComponentParameterization]] = None
+    overridden_components: list[ComponentOverride] | None | Unset = UNSET
 
-    remove_components: t.Optional[t.List[PriceComponentId]] = None
+    parameterized_components: list[ComponentParameterization] | None | Unset = UNSET
+
+    remove_components: list[PriceComponentId] | None | Unset = UNSET

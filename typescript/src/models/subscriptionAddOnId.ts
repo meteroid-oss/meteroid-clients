@@ -2,12 +2,13 @@
 
 export type SubscriptionAddOnId = string;
 
+/** Converts `SubscriptionAddOnId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionAddOnIdSerializer = {
-  _fromJsonObject(object: any): SubscriptionAddOnId {
-    return object;
+  parse(json: any): SubscriptionAddOnId {
+    return json;
   },
 
-  _toJsonObject(self: SubscriptionAddOnId): any {
-    return self;
+  serialize(value: SubscriptionAddOnId): any {
+    return value;
   },
 };

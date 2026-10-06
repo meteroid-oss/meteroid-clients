@@ -1,75 +1,215 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class ListCheckoutSessionsResponse {
-    @JsonProperty private List<CheckoutSession> sessions;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class ListCheckoutSessionsResponse {
+    @JsonProperty("sessions")
+    private List<CheckoutSession> sessions;
 
-    public ListCheckoutSessionsResponse() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public ListCheckoutSessionsResponse sessions(List<CheckoutSession> sessions) {
-        this.sessions = sessions;
-        return this;
+    private ListCheckoutSessionsResponse() {}
+
+    private ListCheckoutSessionsResponse(Builder builder) {
+        this.sessions = Utils.copyList(builder.sessions);
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
-    public ListCheckoutSessionsResponse addSessionsItem(CheckoutSession sessionsItem) {
-        if (this.sessions == null) {
-            this.sessions = new ArrayList<>();
+    /**
+     * A builder of {@code ListCheckoutSessionsResponse}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * A builder starting from this value.
+     *
+     * @return a new builder
+     */
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.sessions = Utils.mutableList(sessions);
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
+    }
+
+    /**
+     * The {@code sessions} property.
+     *
+     * @return the value, never null
+     */
+    public List<CheckoutSession> sessions() {
+        return Utils.required(sessions, "sessions");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.sessions.add(sessionsItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ListCheckoutSessionsResponse that = (ListCheckoutSessionsResponse) o;
+        return Objects.equals(sessions, that.sessions)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(sessions, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "ListCheckoutSessionsResponse{"
+                + "sessions="
+                + sessions
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link ListCheckoutSessionsResponse}. */
+    public static final class Builder {
+        private List<CheckoutSession> sessions;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code sessions} property.
+         *
+         * @param sessions the value
+         * @return this builder
+         */
+        public Builder sessions(List<CheckoutSession> sessions) {
+            this.sessions = Utils.mutableList(sessions);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code sessions}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addSessionsItem(CheckoutSession item) {
+            if (this.sessions == null) {
+                this.sessions = new ArrayList<>();
+            }
+            this.sessions.add(item);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code ListCheckoutSessionsResponse}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public ListCheckoutSessionsResponse build() {
+            Utils.checkRequired(sessions, "sessions");
+            return new ListCheckoutSessionsResponse(this);
+        }
     }
 
     /**
-     * Get sessions
+     * Parse {@code json} as {@code ListCheckoutSessionsResponse}.
      *
-     * @return sessions
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<CheckoutSession> getSessions() {
-        return sessions;
-    }
-
-    public void setSessions(List<CheckoutSession> sessions) {
-        this.sessions = sessions;
+    public static ListCheckoutSessionsResponse fromJson(String json) {
+        return Utils.parse(json, ListCheckoutSessionsResponse.class);
     }
 
     /**
-     * Create an instance of ListCheckoutSessionsResponse given an JSON string
+     * This value as JSON.
      *
-     * @param jsonString JSON string
-     * @return An instance of ListCheckoutSessionsResponse
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     ListCheckoutSessionsResponse
+     * @return the JSON text
      */
-    public static ListCheckoutSessionsResponse fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, ListCheckoutSessionsResponse.class);
-    }
-
-    /**
-     * Convert an instance of ListCheckoutSessionsResponse to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

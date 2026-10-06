@@ -1,37 +1,37 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId.js";
 
 export interface PlanVersionSummary {
   createdAt: Date;
-
   currency: string;
-
   id: PlanVersionId;
-
   isDraft: boolean;
-
   version: number;
 }
 
+/** Converts `PlanVersionSummary` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PlanVersionSummarySerializer = {
-  _fromJsonObject(object: any): PlanVersionSummary {
+  parse(json: any): PlanVersionSummary {
     return {
-      createdAt: parseDateTime(object["created_at"]),
-      currency: object["currency"],
-      id: PlanVersionIdSerializer._fromJsonObject(object["id"]),
-      isDraft: object["is_draft"],
-      version: object["version"],
+      ...extraProperties(json, ["created_at", "currency", "id", "is_draft", "version"]),
+      createdAt: parseDateTime(json["created_at"]),
+      currency: json["currency"],
+      id: PlanVersionIdSerializer.parse(json["id"]),
+      isDraft: json["is_draft"],
+      version: json["version"],
     };
   },
 
-  _toJsonObject(self: PlanVersionSummary): any {
+  serialize(value: PlanVersionSummary): any {
     return {
-      created_at: self.createdAt,
-      currency: self.currency,
-      id: PlanVersionIdSerializer._toJsonObject(self.id),
-      is_draft: self.isDraft,
-      version: self.version,
+      ...extraProperties(value, ["createdAt", "currency", "id", "isDraft", "version"]),
+      created_at: value.createdAt,
+      currency: value.currency,
+      id: PlanVersionIdSerializer.serialize(value.id),
+      is_draft: value.isDraft,
+      version: value.version,
     };
   },
 };

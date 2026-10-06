@@ -5,21 +5,22 @@ use super::{
     batch_job_id::BatchJobId, batch_job_status::BatchJobStatus, batch_job_type::BatchJobType,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct BatchJobDetailResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<String>,
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
-    pub created_by: String,
+    pub created_by: uuid::Uuid,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_csv_url: Option<String>,
 
     pub failed_items: i32,
 
-    pub failure_count: i32,
+    pub failure_count: i64,
 
     pub has_error_csv: bool,
 
@@ -44,14 +45,20 @@ pub struct BatchJobDetailResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_items: Option<i32>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl BatchJobDetailResponse {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
-        created_at: String,
-        created_by: String,
+        created_at: chrono::DateTime<chrono::Utc>,
+        created_by: uuid::Uuid,
         failed_items: i32,
-        failure_count: i32,
+        failure_count: i64,
         has_error_csv: bool,
         has_output: bool,
         id: BatchJobId,
@@ -76,6 +83,7 @@ impl BatchJobDetailResponse {
             processed_items,
             status,
             total_items: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

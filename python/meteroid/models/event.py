@@ -1,12 +1,15 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
 from ..serialization import BaseModel
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Event(BaseModel):
+    """The `Event` object."""
+
     code: str
     """Billable metric code. Max 512 characters."""
 
@@ -20,5 +23,5 @@ class Event(BaseModel):
     """RFC 3339 timestamp. Defaults to ingestion time if omitted.
     Must be between 24 hours ago and 1 hour from now. Set `allow_backfilling` to remove the past limit."""
 
-    properties: t.Optional[t.Dict[str, str]] = None
+    properties: dict[str, str] | None = None
     """Arbitrary string key-value pairs used by billable metrics for filtering and aggregation."""

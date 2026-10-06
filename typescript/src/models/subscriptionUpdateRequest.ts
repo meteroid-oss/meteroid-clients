@@ -1,64 +1,76 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type PaymentMethodsConfig,
   PaymentMethodsConfigSerializer,
-} from "./paymentMethodsConfig";
+} from "./paymentMethodsConfig.js";
 
 export interface SubscriptionUpdateRequest {
   /** If false, invoices will stay in Draft until manually reviewed and finalized. */
-  autoAdvanceInvoices?: boolean | null;
-
+  autoAdvanceInvoices?: boolean | null | undefined;
   /** Automatically try to charge the customer's configured payment method on finalize. */
-  chargeAutomatically?: boolean | null;
-
+  chargeAutomatically?: boolean | null | undefined;
   /**
    * Partial update of custom property values (merge; send a key with `null` to remove it).
    * Validated against the tenant's `SUBSCRIPTION` property definitions. Omit to leave unchanged.
    */
-  customProperties?: unknown;
-
+  customProperties?: unknown | undefined;
   /** Default memo for invoices */
-  invoiceMemo?: string | null;
-
+  invoiceMemo?: string | null | undefined;
   /** Payment terms in days (0 = due on issue) */
-  netTerms?: number | null;
-
-  paymentMethodsConfig?: PaymentMethodsConfig | null;
-
+  netTerms?: number | null | undefined;
+  paymentMethodsConfig?: PaymentMethodsConfig | null | undefined;
   /** Purchase order number */
-  purchaseOrder?: string | null;
+  purchaseOrder?: string | null | undefined;
 }
 
+/** Converts `SubscriptionUpdateRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionUpdateRequestSerializer = {
-  _fromJsonObject(object: any): SubscriptionUpdateRequest {
+  parse(json: any): SubscriptionUpdateRequest {
     return {
-      autoAdvanceInvoices: object["auto_advance_invoices"],
-      chargeAutomatically: object["charge_automatically"],
-      customProperties: object["custom_properties"],
-      invoiceMemo: object["invoice_memo"],
-      netTerms: object["net_terms"],
+      ...extraProperties(json, [
+        "auto_advance_invoices",
+        "charge_automatically",
+        "custom_properties",
+        "invoice_memo",
+        "net_terms",
+        "payment_methods_config",
+        "purchase_order",
+      ]),
+      autoAdvanceInvoices: json["auto_advance_invoices"],
+      chargeAutomatically: json["charge_automatically"],
+      customProperties: json["custom_properties"],
+      invoiceMemo: json["invoice_memo"],
+      netTerms: json["net_terms"],
       paymentMethodsConfig:
-        object["payment_methods_config"] != null
-          ? PaymentMethodsConfigSerializer._fromJsonObject(
-              object["payment_methods_config"]
-            )
-          : undefined,
-      purchaseOrder: object["purchase_order"],
+        json["payment_methods_config"] != null
+          ? PaymentMethodsConfigSerializer.parse(json["payment_methods_config"])
+          : json["payment_methods_config"],
+      purchaseOrder: json["purchase_order"],
     };
   },
 
-  _toJsonObject(self: SubscriptionUpdateRequest): any {
+  serialize(value: SubscriptionUpdateRequest): any {
     return {
-      auto_advance_invoices: self.autoAdvanceInvoices,
-      charge_automatically: self.chargeAutomatically,
-      custom_properties: self.customProperties,
-      invoice_memo: self.invoiceMemo,
-      net_terms: self.netTerms,
+      ...extraProperties(value, [
+        "autoAdvanceInvoices",
+        "chargeAutomatically",
+        "customProperties",
+        "invoiceMemo",
+        "netTerms",
+        "paymentMethodsConfig",
+        "purchaseOrder",
+      ]),
+      auto_advance_invoices: value.autoAdvanceInvoices,
+      charge_automatically: value.chargeAutomatically,
+      custom_properties: value.customProperties,
+      invoice_memo: value.invoiceMemo,
+      net_terms: value.netTerms,
       payment_methods_config:
-        self.paymentMethodsConfig != null
-          ? PaymentMethodsConfigSerializer._toJsonObject(self.paymentMethodsConfig)
-          : undefined,
-      purchase_order: self.purchaseOrder,
+        value.paymentMethodsConfig != null
+          ? PaymentMethodsConfigSerializer.serialize(value.paymentMethodsConfig)
+          : value.paymentMethodsConfig,
+      purchase_order: value.purchaseOrder,
     };
   },
 };

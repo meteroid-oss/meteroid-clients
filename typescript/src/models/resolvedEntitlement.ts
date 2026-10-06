@@ -1,28 +1,31 @@
 // this file is @generated
-import { type FeatureRef, FeatureRefSerializer } from "./featureRef";
+import { extraProperties } from "../json.js";
+import { type FeatureRef, FeatureRefSerializer } from "./featureRef.js";
 import {
   type ResolvedEntitlementValue,
   ResolvedEntitlementValueSerializer,
-} from "./resolvedEntitlementValue";
+} from "./resolvedEntitlementValue.js";
 /** Merged entitlement value for a feature across the priority hierarchy, without usage data. */
 export interface ResolvedEntitlement {
   feature: FeatureRef;
-
   value: ResolvedEntitlementValue;
 }
 
+/** Converts `ResolvedEntitlement` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ResolvedEntitlementSerializer = {
-  _fromJsonObject(object: any): ResolvedEntitlement {
+  parse(json: any): ResolvedEntitlement {
     return {
-      feature: FeatureRefSerializer._fromJsonObject(object["feature"]),
-      value: ResolvedEntitlementValueSerializer._fromJsonObject(object["value"]),
+      ...extraProperties(json, ["feature", "value"]),
+      feature: FeatureRefSerializer.parse(json["feature"]),
+      value: ResolvedEntitlementValueSerializer.parse(json["value"]),
     };
   },
 
-  _toJsonObject(self: ResolvedEntitlement): any {
+  serialize(value: ResolvedEntitlement): any {
     return {
-      feature: FeatureRefSerializer._toJsonObject(self.feature),
-      value: ResolvedEntitlementValueSerializer._toJsonObject(self.value),
+      ...extraProperties(value, ["feature", "value"]),
+      feature: FeatureRefSerializer.serialize(value.feature),
+      value: ResolvedEntitlementValueSerializer.serialize(value.value),
     };
   },
 };

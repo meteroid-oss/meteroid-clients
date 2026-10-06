@@ -2,12 +2,13 @@
 
 export type CreditNoteId = string;
 
+/** Converts `CreditNoteId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreditNoteIdSerializer = {
-  _fromJsonObject(object: any): CreditNoteId {
-    return object;
+  parse(json: any): CreditNoteId {
+    return json;
   },
 
-  _toJsonObject(self: CreditNoteId): any {
-    return self;
+  serialize(value: CreditNoteId): any {
+    return value;
   },
 };

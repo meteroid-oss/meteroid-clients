@@ -1,0 +1,84 @@
+// this file is @generated
+//! The generated tests: every call gets a canned response from a mock middleware.
+#![allow(deprecated)]
+mod add_ons;
+mod batch_jobs;
+mod checkout_sessions;
+mod connect;
+mod coupons;
+mod credit_notes;
+mod custom_properties;
+mod customers;
+mod events;
+mod features;
+mod invoices;
+mod metrics;
+mod oauth;
+mod oauth_apps;
+mod plans;
+mod product_families;
+mod products;
+mod subscriptions;
+mod usage;
+
+use std::sync::{Arc, Mutex};
+
+use meteroid_rs::api::{
+    http::{header::CONTENT_TYPE, HeaderMap, HeaderValue, StatusCode},
+    middleware::{BoxError, BoxFuture, Middleware, Next, Request, Response},
+    Bytes, Meteroid,
+};
+
+/// Answers every request with the same response, recording the method and path of each.
+struct Mock {
+    status: u16,
+    content_type: Option<&'static str>,
+    body: &'static str,
+    requests: Arc<Mutex<Vec<String>>>,
+}
+
+impl Middleware for Mock {
+    fn handle<'a>(
+        &'a self,
+        request: Request,
+        _next: Next<'a>,
+    ) -> BoxFuture<'a, Result<Response, BoxError>> {
+        let call = format!("{} {}", request.method(), request.uri().path());
+        self.requests.lock().unwrap().push(call);
+        let mut headers = HeaderMap::new();
+        if let Some(content_type) = self.content_type {
+            headers.insert(CONTENT_TYPE, HeaderValue::from_static(content_type));
+        }
+        let status = StatusCode::from_u16(self.status).unwrap();
+        let response =
+            Response::buffered(status, headers, Bytes::from_static(self.body.as_bytes()));
+        Box::pin(async move { Ok(response) })
+    }
+}
+
+/// A client answering every request with this response, and the method and path of each request.
+fn mock(
+    status: u16,
+    content_type: Option<&'static str>,
+    body: &'static str,
+) -> (Meteroid, Arc<Mutex<Vec<String>>>) {
+    let requests = Arc::new(Mutex::new(Vec::new()));
+    let client = Meteroid::builder()
+        .base_url("http://localhost")
+        .max_retries(0)
+        .middleware(Mock {
+            status,
+            content_type,
+            body,
+            requests: requests.clone(),
+        })
+        .build()
+        .unwrap();
+    (client, requests)
+}
+
+/// The `T` that JSON `text` holds.
+#[allow(dead_code)]
+fn decode<T: serde::de::DeserializeOwned>(text: &str) -> T {
+    serde_json::from_str(text).unwrap()
+}

@@ -1,52 +1,66 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type Address, AddressSerializer } from "./address";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type Address, AddressSerializer } from "./address.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
 
 export interface CustomerDetails {
-  alias?: string | null;
-
-  billingAddress?: Address | null;
-
-  email?: string | null;
-
+  alias?: string | null | undefined;
+  billingAddress?: Address | null | undefined;
+  email?: string | null | undefined;
   id: CustomerId;
-
   name: string;
-
   snapshotAt: Date;
-
-  vatNumber?: string | null;
+  vatNumber?: string | null | undefined;
 }
 
+/** Converts `CustomerDetails` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomerDetailsSerializer = {
-  _fromJsonObject(object: any): CustomerDetails {
+  parse(json: any): CustomerDetails {
     return {
-      alias: object["alias"],
+      ...extraProperties(json, [
+        "alias",
+        "billing_address",
+        "email",
+        "id",
+        "name",
+        "snapshot_at",
+        "vat_number",
+      ]),
+      alias: json["alias"],
       billingAddress:
-        object["billing_address"] != null
-          ? AddressSerializer._fromJsonObject(object["billing_address"])
-          : undefined,
-      email: object["email"],
-      id: CustomerIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
-      snapshotAt: parseDateTime(object["snapshot_at"]),
-      vatNumber: object["vat_number"],
+        json["billing_address"] != null
+          ? AddressSerializer.parse(json["billing_address"])
+          : json["billing_address"],
+      email: json["email"],
+      id: CustomerIdSerializer.parse(json["id"]),
+      name: json["name"],
+      snapshotAt: parseDateTime(json["snapshot_at"]),
+      vatNumber: json["vat_number"],
     };
   },
 
-  _toJsonObject(self: CustomerDetails): any {
+  serialize(value: CustomerDetails): any {
     return {
-      alias: self.alias,
+      ...extraProperties(value, [
+        "alias",
+        "billingAddress",
+        "email",
+        "id",
+        "name",
+        "snapshotAt",
+        "vatNumber",
+      ]),
+      alias: value.alias,
       billing_address:
-        self.billingAddress != null
-          ? AddressSerializer._toJsonObject(self.billingAddress)
-          : undefined,
-      email: self.email,
-      id: CustomerIdSerializer._toJsonObject(self.id),
-      name: self.name,
-      snapshot_at: self.snapshotAt,
-      vat_number: self.vatNumber,
+        value.billingAddress != null
+          ? AddressSerializer.serialize(value.billingAddress)
+          : value.billingAddress,
+      email: value.email,
+      id: CustomerIdSerializer.serialize(value.id),
+      name: value.name,
+      snapshot_at: value.snapshotAt,
+      vat_number: value.vatNumber,
     };
   },
 };

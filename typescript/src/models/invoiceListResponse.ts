@@ -1,30 +1,31 @@
 // this file is @generated
-import { type Invoice, InvoiceSerializer } from "./invoice";
+import { extraProperties } from "../json.js";
+import { type Invoice, InvoiceSerializer } from "./invoice.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface InvoiceListResponse {
   data: Invoice[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `InvoiceListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const InvoiceListResponseSerializer = {
-  _fromJsonObject(object: any): InvoiceListResponse {
+  parse(json: any): InvoiceListResponse {
     return {
-      data: object["data"].map((item: any) => InvoiceSerializer._fromJsonObject(item)),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => InvoiceSerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: InvoiceListResponse): any {
+  serialize(value: InvoiceListResponse): any {
     return {
-      data: self.data.map((item: any) => InvoiceSerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => InvoiceSerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

@@ -1,10 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
+import typing as t
 
 from ..serialization import BaseModel
-from .subscription import Subscription
+
+if t.TYPE_CHECKING:
+    from .subscription import Subscription
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CancelSubscriptionResponse(BaseModel):
+    """The `CancelSubscriptionResponse` object."""
+
     subscription: Subscription

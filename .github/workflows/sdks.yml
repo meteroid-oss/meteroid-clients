@@ -1,0 +1,28 @@
+# Written by `perseid init`: regenerates the SDKs when the spec changes and opens their pull
+# requests as the perseid App, else the GitHub App set up by `perseid app` or the SDK_GITHUB_TOKEN
+# secret.
+name: SDKs
+
+on:
+  push:
+    branches: ["main"]
+    paths: ["spec/openapi.json","perseid.toml",".github/workflows/sdks.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency: sdks
+
+jobs:
+  sdks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - if: hashFiles('spec/openapi.json') != ''
+        uses: meteroid-oss/perseid@v0.10
+        with:
+          token: ${{ secrets.SDK_GITHUB_TOKEN }}
+          app-id: ${{ vars.SDK_APP_ID }}
+          app-private-key: ${{ secrets.SDK_APP_PRIVATE_KEY }}

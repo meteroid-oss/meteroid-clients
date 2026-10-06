@@ -1,11 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .bank_account_id import BankAccountId
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .bank_account_id import BankAccountId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class BankTransferPaymentMethodConfig(BaseModel):
-    account_id: t.Optional[BankAccountId] = None
+    """The `BankTransferPaymentMethodConfig` object."""
+
+    account_id: BankAccountId | None | Unset = UNSET

@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface MetricDimension {
   key: string;
-
   values: string[];
 }
 
+/** Converts `MetricDimension` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricDimensionSerializer = {
-  _fromJsonObject(object: any): MetricDimension {
+  parse(json: any): MetricDimension {
     return {
-      key: object["key"],
-      values: object["values"],
+      ...extraProperties(json, ["key", "values"]),
+      key: json["key"],
+      values: json["values"],
     };
   },
 
-  _toJsonObject(self: MetricDimension): any {
+  serialize(value: MetricDimension): any {
     return {
-      key: self.key,
-      values: self.values,
+      ...extraProperties(value, ["key", "values"]),
+      key: value.key,
+      values: value.values,
     };
   },
 };

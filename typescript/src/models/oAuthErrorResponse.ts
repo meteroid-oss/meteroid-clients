@@ -1,28 +1,30 @@
 // this file is @generated
-import { type OAuthErrorCode, OAuthErrorCodeSerializer } from "./oAuthErrorCode";
+import { extraProperties } from "../json.js";
+import { type OAuthErrorCode, OAuthErrorCodeSerializer } from "./oAuthErrorCode.js";
 /** OAuth 2.0 error response as per RFC 6749 Section 5.2 */
 export interface OAuthErrorResponse {
   error: OAuthErrorCode;
-
-  errorDescription?: string | null;
-
-  errorUri?: string | null;
+  errorDescription?: string | null | undefined;
+  errorUri?: string | null | undefined;
 }
 
+/** Converts `OAuthErrorResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OAuthErrorResponseSerializer = {
-  _fromJsonObject(object: any): OAuthErrorResponse {
+  parse(json: any): OAuthErrorResponse {
     return {
-      error: OAuthErrorCodeSerializer._fromJsonObject(object["error"]),
-      errorDescription: object["error_description"],
-      errorUri: object["error_uri"],
+      ...extraProperties(json, ["error", "error_description", "error_uri"]),
+      error: OAuthErrorCodeSerializer.parse(json["error"]),
+      errorDescription: json["error_description"],
+      errorUri: json["error_uri"],
     };
   },
 
-  _toJsonObject(self: OAuthErrorResponse): any {
+  serialize(value: OAuthErrorResponse): any {
     return {
-      error: OAuthErrorCodeSerializer._toJsonObject(self.error),
-      error_description: self.errorDescription,
-      error_uri: self.errorUri,
+      ...extraProperties(value, ["error", "errorDescription", "errorUri"]),
+      error: OAuthErrorCodeSerializer.serialize(value.error),
+      error_description: value.errorDescription,
+      error_uri: value.errorUri,
     };
   },
 };

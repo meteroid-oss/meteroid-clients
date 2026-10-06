@@ -1,32 +1,31 @@
 // this file is @generated
-import { type BatchJobResponse, BatchJobResponseSerializer } from "./batchJobResponse";
+import { extraProperties } from "../json.js";
+import { type BatchJobResponse, BatchJobResponseSerializer } from "./batchJobResponse.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface BatchJobListResponse {
   data: BatchJobResponse[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `BatchJobListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BatchJobListResponseSerializer = {
-  _fromJsonObject(object: any): BatchJobListResponse {
+  parse(json: any): BatchJobListResponse {
     return {
-      data: object["data"].map((item: any) =>
-        BatchJobResponseSerializer._fromJsonObject(item)
-      ),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => BatchJobResponseSerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: BatchJobListResponse): any {
+  serialize(value: BatchJobListResponse): any {
     return {
-      data: self.data.map((item: any) => BatchJobResponseSerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => BatchJobResponseSerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

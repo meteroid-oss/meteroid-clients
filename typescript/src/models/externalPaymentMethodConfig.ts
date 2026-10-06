@@ -1,13 +1,19 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface ExternalPaymentMethodConfig {}
 
+/** Converts `ExternalPaymentMethodConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ExternalPaymentMethodConfigSerializer = {
-  _fromJsonObject(object: any): ExternalPaymentMethodConfig {
-    return {};
+  parse(json: any): ExternalPaymentMethodConfig {
+    return {
+      ...extraProperties(json, []),
+    };
   },
 
-  _toJsonObject(self: ExternalPaymentMethodConfig): any {
-    return {};
+  serialize(value: ExternalPaymentMethodConfig): any {
+    return {
+      ...extraProperties(value, []),
+    };
   },
 };

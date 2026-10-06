@@ -9,77 +9,159 @@ use super::{
 
 #[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct CustomerPatchRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub alias: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub alias: Option<Option<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub billing_address: Option<Address>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub billing_address: Option<Option<Address>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub billing_email: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub billing_email: Option<Option<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub currency: Option<Currency>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub currency: Option<Option<Currency>>,
 
     /// Partial update of custom property values (merge; send a key with `null` to remove it).
     /// Omit to leave unchanged.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_properties: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub custom_taxes: Option<Vec<CustomTaxRate>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub custom_taxes: Option<Option<Vec<CustomTaxRate>>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub customer_type: Option<CustomerType>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub customer_type: Option<Option<CustomerType>>,
 
     /// Free-text legal exemption mention surfaced on exempt invoices.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub exemption_reason: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub exemption_reason: Option<Option<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub first_name: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub first_name: Option<Option<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub invoicing_emails: Option<Vec<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub invoicing_emails: Option<Option<Vec<String>>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub invoicing_entity_id: Option<InvoicingEntityId>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub invoicing_entity_id: Option<Option<InvoicingEntityId>>,
 
     /// Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.
     #[deprecated]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub invoicing_language: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub invoicing_language: Option<Option<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_tax_exempt: Option<bool>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub is_tax_exempt: Option<Option<bool>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_name: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub last_name: Option<Option<String>>,
 
     /// BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB).
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub legal_number: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub legal_number: Option<Option<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub name: Option<Option<String>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub phone: Option<Option<String>>,
 
     /// Preferred document languages, most-preferred first (BCP-47 tags, e.g.
     /// `["fr-FR", "en"]`); overrides the invoicing entity default. Omit to leave
     /// unchanged, send `[]` to reset to that default.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub preferred_locales: Option<Vec<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub preferred_locales: Option<Option<Vec<String>>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub shipping_address: Option<ShippingAddress>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub shipping_address: Option<Option<ShippingAddress>>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub vat_number: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "crate::models::codec::nullable"
+    )]
+    pub vat_number: Option<Option<String>>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CustomerPatchRequest {
+    /// Creates a value with every field unset.
+    #[must_use]
     pub fn new() -> Self {
         #[allow(deprecated)]
         Self {
@@ -103,6 +185,7 @@ impl CustomerPatchRequest {
             preferred_locales: None,
             shipping_address: None,
             vat_number: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

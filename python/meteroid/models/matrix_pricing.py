@@ -1,11 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .matrix_row import MatrixRow
+
+if t.TYPE_CHECKING:
+    from .matrix_row import MatrixRow
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MatrixPricing(BaseModel):
-    rates: t.List[MatrixRow]
+    """The `MatrixPricing` object."""
+
+    rates: list[MatrixRow]

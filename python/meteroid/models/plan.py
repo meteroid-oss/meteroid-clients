@@ -1,23 +1,29 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .available_parameters import AvailableParameters
-from .entitlement import Entitlement
-from .minimum_commitment import MinimumCommitment
-from .plan_id import PlanId
-from .plan_status_enum import PlanStatusEnum
-from .plan_type_enum import PlanTypeEnum
-from .plan_version_id import PlanVersionId
-from .price_component import PriceComponent
-from .product_family import ProductFamily
-from .trial_config import TrialConfig
+
+if t.TYPE_CHECKING:
+    from .available_parameters import AvailableParameters
+    from .entitlement import Entitlement
+    from .minimum_commitment import MinimumCommitment
+    from .plan_id import PlanId
+    from .plan_status_enum import PlanStatusEnum
+    from .plan_type_enum import PlanTypeEnum
+    from .plan_version_id import PlanVersionId
+    from .price_component import PriceComponent
+    from .product_family import ProductFamily
+    from .trial_config import TrialConfig
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Plan(BaseModel):
+    """The `Plan` object."""
+
     available_parameters: AvailableParameters
 
     created_at: datetime
@@ -32,7 +38,7 @@ class Plan(BaseModel):
 
     plan_type: PlanTypeEnum
 
-    price_components: t.List[PriceComponent]
+    price_components: list[PriceComponent]
 
     product_family: ProductFamily
 
@@ -42,16 +48,16 @@ class Plan(BaseModel):
 
     version_id: PlanVersionId
 
-    billing_cycles: t.Optional[int] = None
+    billing_cycles: int | None = None
 
-    description: t.Optional[str] = None
+    description: str | None = None
 
-    entitlements: t.Optional[t.List[Entitlement]] = None
+    entitlements: list[Entitlement] | None = None
 
-    minimum_commitment: t.Optional[MinimumCommitment] = None
+    minimum_commitment: MinimumCommitment | None = None
 
-    period_start_day: t.Optional[int] = None
+    period_start_day: int | None = None
 
-    self_service_rank: t.Optional[int] = None
+    self_service_rank: int | None = None
 
-    trial: t.Optional[TrialConfig] = None
+    trial: TrialConfig | None = None

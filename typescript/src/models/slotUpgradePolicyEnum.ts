@@ -1,15 +1,19 @@
 // this file is @generated
 
-export enum SlotUpgradePolicyEnum {
-  Prorated = "PRORATED",
-}
+export const SlotUpgradePolicyEnum = {
+  Prorated: "PRORATED",
+} as const;
+export type SlotUpgradePolicyEnum =
+  | (typeof SlotUpgradePolicyEnum)[keyof typeof SlotUpgradePolicyEnum]
+  | (string & {});
 
+/** Converts `SlotUpgradePolicyEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SlotUpgradePolicyEnumSerializer = {
-  _fromJsonObject(object: any): SlotUpgradePolicyEnum {
-    return object;
+  parse(json: any): SlotUpgradePolicyEnum {
+    return json;
   },
 
-  _toJsonObject(self: SlotUpgradePolicyEnum): any {
-    return self;
+  serialize(value: SlotUpgradePolicyEnum): any {
+    return value;
   },
 };

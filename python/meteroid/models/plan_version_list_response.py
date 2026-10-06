@@ -1,14 +1,20 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .pagination_response import PaginationResponse
-from .plan_version_summary import PlanVersionSummary
+
+if t.TYPE_CHECKING:
+    from .pagination_response import PaginationResponse
+    from .plan_version_summary import PlanVersionSummary
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class PlanVersionListResponse(BaseModel):
-    data: t.List[PlanVersionSummary]
+    """The `PlanVersionListResponse` object."""
+
+    data: list[PlanVersionSummary]
 
     pagination_meta: PaginationResponse

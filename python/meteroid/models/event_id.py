@@ -1,2 +1,4 @@
 # this file is @generated
-EventId = str
+import typing as t
+
+EventId: t.TypeAlias = str

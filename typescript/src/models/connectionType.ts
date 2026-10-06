@@ -1,16 +1,20 @@
 // this file is @generated
 /** Type of connection between platform and connected account */
-export enum ConnectionType {
-  Standard = "standard",
-  Express = "express",
-}
+export const ConnectionType = {
+  Standard: "standard",
+  Express: "express",
+} as const;
+export type ConnectionType =
+  | (typeof ConnectionType)[keyof typeof ConnectionType]
+  | (string & {});
 
+/** Converts `ConnectionType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ConnectionTypeSerializer = {
-  _fromJsonObject(object: any): ConnectionType {
-    return object;
+  parse(json: any): ConnectionType {
+    return json;
   },
 
-  _toJsonObject(self: ConnectionType): any {
-    return self;
+  serialize(value: ConnectionType): any {
+    return value;
   },
 };

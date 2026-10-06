@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface SlotPricing {
-  maxSlots?: number | null;
-
-  minSlots?: number | null;
-
+  maxSlots?: number | null | undefined;
+  minSlots?: number | null | undefined;
   unitRate: string;
 }
 
+/** Converts `SlotPricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SlotPricingSerializer = {
-  _fromJsonObject(object: any): SlotPricing {
+  parse(json: any): SlotPricing {
     return {
-      maxSlots: object["max_slots"],
-      minSlots: object["min_slots"],
-      unitRate: object["unit_rate"],
+      ...extraProperties(json, ["max_slots", "min_slots", "unit_rate"]),
+      maxSlots: json["max_slots"],
+      minSlots: json["min_slots"],
+      unitRate: json["unit_rate"],
     };
   },
 
-  _toJsonObject(self: SlotPricing): any {
+  serialize(value: SlotPricing): any {
     return {
-      max_slots: self.maxSlots,
-      min_slots: self.minSlots,
-      unit_rate: self.unitRate,
+      ...extraProperties(value, ["maxSlots", "minSlots", "unitRate"]),
+      max_slots: value.maxSlots,
+      min_slots: value.minSlots,
+      unit_rate: value.unitRate,
     };
   },
 };

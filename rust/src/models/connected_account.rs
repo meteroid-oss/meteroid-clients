@@ -8,7 +8,8 @@ use super::{
 };
 
 /// A connected account (relationship between platform and connected org)
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ConnectedAccount {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub connected_organization_id: Option<OrganizationId>,
@@ -18,7 +19,7 @@ pub struct ConnectedAccount {
 
     pub connection_type: ConnectionType,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     pub id: ConnectedAccountId,
 
@@ -26,7 +27,7 @@ pub struct ConnectedAccount {
     pub metadata: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub onboarding_completed_at: Option<String>,
+    pub onboarding_completed_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub onboarding_mode: OnboardingMode,
 
@@ -47,15 +48,21 @@ pub struct ConnectedAccount {
     pub platform_organization_id: OrganizationId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub revoked_at: Option<String>,
+    pub revoked_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub status: ConnectionStatus,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl ConnectedAccount {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         connection_type: ConnectionType,
-        created_at: String,
+        created_at: chrono::DateTime<chrono::Utc>,
         id: ConnectedAccountId,
         onboarding_mode: OnboardingMode,
         platform_organization_id: OrganizationId,
@@ -77,6 +84,7 @@ impl ConnectedAccount {
             platform_organization_id,
             revoked_at: None,
             status,
+            extra: serde_json::Map::new(),
         }
     }
 }

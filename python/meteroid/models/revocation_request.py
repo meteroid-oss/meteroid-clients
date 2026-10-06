@@ -1,16 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
-from ..serialization import BaseModel
+from ..serialization import UNSET, BaseModel, Unset
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class RevocationRequest(BaseModel):
     """Token revocation request"""
 
     token: str
     """The token to revoke"""
 
-    token_type_hint: t.Optional[str] = None
+    token_type_hint: str | None | Unset = UNSET
     """Optional hint about the token type (access_token or refresh_token)"""

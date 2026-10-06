@@ -1,5 +1,16 @@
 // this file is @generated
-#![allow(clippy::too_many_arguments)]
+//! The schemas of the API. Structs keep the properties they do not declare in `extra`.
+#![allow(
+    clippy::too_many_arguments,
+    clippy::too_many_lines,
+    clippy::default_trait_access,
+    clippy::doc_markdown
+)]
+
+#[path = "../codec.rs"]
+pub(crate) mod codec;
+#[path = "../unions.rs"]
+pub(crate) mod union_rules;
 
 pub mod add_on;
 pub mod add_on_event;
@@ -513,3 +524,15 @@ pub use self::{
     usage_pricing_model::UsagePricingModel, usage_response::UsageResponse,
     volume_plan_pricing::VolumePlanPricing, volume_pricing::VolumePricing,
 };
+
+impl crate::request::QueryParamValue for chrono::DateTime<chrono::Utc> {
+    fn encode(&self) -> String {
+        self.to_rfc3339_opts(chrono::SecondsFormat::AutoSi, true)
+    }
+}
+
+impl crate::request::QueryParamValue for chrono::NaiveDate {
+    fn encode(&self) -> String {
+        self.to_string()
+    }
+}

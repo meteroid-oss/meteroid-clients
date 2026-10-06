@@ -1,20 +1,24 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
 
 export interface CapacityFeeStructure {
   metricId: BillableMetricId;
 }
 
+/** Converts `CapacityFeeStructure` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CapacityFeeStructureSerializer = {
-  _fromJsonObject(object: any): CapacityFeeStructure {
+  parse(json: any): CapacityFeeStructure {
     return {
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
+      ...extraProperties(json, ["metric_id"]),
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
     };
   },
 
-  _toJsonObject(self: CapacityFeeStructure): any {
+  serialize(value: CapacityFeeStructure): any {
     return {
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
+      ...extraProperties(value, ["metricId"]),
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
     };
   },
 };

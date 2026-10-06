@@ -1,6 +1,6 @@
 // this file is @generated
-import { type ExistingPriceRef, ExistingPriceRefSerializer } from "./existingPriceRef";
-import { type PriceInput, PriceInputSerializer } from "./priceInput";
+import { type ExistingPriceRef, ExistingPriceRefSerializer } from "./existingPriceRef.js";
+import { type PriceInput, PriceInputSerializer } from "./priceInput.js";
 
 export interface PriceEntryExisting extends ExistingPriceRef {
   type: "EXISTING";
@@ -11,40 +11,40 @@ export interface PriceEntryNew extends PriceInput {
 
 export type PriceEntry = PriceEntryExisting | PriceEntryNew;
 
+/** Converts `PriceEntry` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PriceEntrySerializer = {
-  _fromJsonObject(object: any): PriceEntry {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): PriceEntry {
+    switch (json["type"]) {
       case "EXISTING":
         return {
-          ...ExistingPriceRefSerializer._fromJsonObject(object),
+          ...ExistingPriceRefSerializer.parse(json),
           type: "EXISTING",
         };
       case "NEW":
         return {
-          ...PriceInputSerializer._fromJsonObject(object),
+          ...PriceInputSerializer.parse(json),
           type: "NEW",
         };
       default:
-        throw new Error(`Unexpected type for PriceEntry: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: PriceEntry): any {
-    switch (self.type) {
+  serialize(value: PriceEntry): any {
+    switch (value.type) {
       case "EXISTING":
         return {
-          ...ExistingPriceRefSerializer._toJsonObject(self),
+          ...ExistingPriceRefSerializer.serialize(value),
           type: "EXISTING",
         };
       case "NEW":
         return {
-          ...PriceInputSerializer._toJsonObject(self),
+          ...PriceInputSerializer.serialize(value),
           type: "NEW",
         };
       default:
-        throw new Error(`Unexpected type for PriceEntry`);
+        return value;
     }
   },
 };

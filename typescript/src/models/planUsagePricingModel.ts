@@ -1,15 +1,24 @@
 // this file is @generated
-import { type MatrixPlanPricing, MatrixPlanPricingSerializer } from "./matrixPlanPricing";
+import {
+  type MatrixPlanPricing,
+  MatrixPlanPricingSerializer,
+} from "./matrixPlanPricing.js";
 import {
   type PackagePlanPricing,
   PackagePlanPricingSerializer,
-} from "./packagePlanPricing";
+} from "./packagePlanPricing.js";
 import {
   type PerUnitPlanPricing,
   PerUnitPlanPricingSerializer,
-} from "./perUnitPlanPricing";
-import { type TieredPlanPricing, TieredPlanPricingSerializer } from "./tieredPlanPricing";
-import { type VolumePlanPricing, VolumePlanPricingSerializer } from "./volumePlanPricing";
+} from "./perUnitPlanPricing.js";
+import {
+  type TieredPlanPricing,
+  TieredPlanPricingSerializer,
+} from "./tieredPlanPricing.js";
+import {
+  type VolumePlanPricing,
+  VolumePlanPricingSerializer,
+} from "./volumePlanPricing.js";
 
 export interface PlanUsagePricingModelPerUnit extends PerUnitPlanPricing {
   type: "PER_UNIT";
@@ -34,70 +43,70 @@ export type PlanUsagePricingModel =
   | PlanUsagePricingModelPackage
   | PlanUsagePricingModelMatrix;
 
+/** Converts `PlanUsagePricingModel` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PlanUsagePricingModelSerializer = {
-  _fromJsonObject(object: any): PlanUsagePricingModel {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): PlanUsagePricingModel {
+    switch (json["type"]) {
       case "PER_UNIT":
         return {
-          ...PerUnitPlanPricingSerializer._fromJsonObject(object),
+          ...PerUnitPlanPricingSerializer.parse(json),
           type: "PER_UNIT",
         };
       case "TIERED":
         return {
-          ...TieredPlanPricingSerializer._fromJsonObject(object),
+          ...TieredPlanPricingSerializer.parse(json),
           type: "TIERED",
         };
       case "VOLUME":
         return {
-          ...VolumePlanPricingSerializer._fromJsonObject(object),
+          ...VolumePlanPricingSerializer.parse(json),
           type: "VOLUME",
         };
       case "PACKAGE":
         return {
-          ...PackagePlanPricingSerializer._fromJsonObject(object),
+          ...PackagePlanPricingSerializer.parse(json),
           type: "PACKAGE",
         };
       case "MATRIX":
         return {
-          ...MatrixPlanPricingSerializer._fromJsonObject(object),
+          ...MatrixPlanPricingSerializer.parse(json),
           type: "MATRIX",
         };
       default:
-        throw new Error(`Unexpected type for PlanUsagePricingModel: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: PlanUsagePricingModel): any {
-    switch (self.type) {
+  serialize(value: PlanUsagePricingModel): any {
+    switch (value.type) {
       case "PER_UNIT":
         return {
-          ...PerUnitPlanPricingSerializer._toJsonObject(self),
+          ...PerUnitPlanPricingSerializer.serialize(value),
           type: "PER_UNIT",
         };
       case "TIERED":
         return {
-          ...TieredPlanPricingSerializer._toJsonObject(self),
+          ...TieredPlanPricingSerializer.serialize(value),
           type: "TIERED",
         };
       case "VOLUME":
         return {
-          ...VolumePlanPricingSerializer._toJsonObject(self),
+          ...VolumePlanPricingSerializer.serialize(value),
           type: "VOLUME",
         };
       case "PACKAGE":
         return {
-          ...PackagePlanPricingSerializer._toJsonObject(self),
+          ...PackagePlanPricingSerializer.serialize(value),
           type: "PACKAGE",
         };
       case "MATRIX":
         return {
-          ...MatrixPlanPricingSerializer._toJsonObject(self),
+          ...MatrixPlanPricingSerializer.serialize(value),
           type: "MATRIX",
         };
       default:
-        throw new Error(`Unexpected type for PlanUsagePricingModel`);
+        return value;
     }
   },
 };

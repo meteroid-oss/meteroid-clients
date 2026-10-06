@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Result of rotating a client secret */
 export interface RotatedSecret {
   clientSecret: string;
-
   clientSecretHint: string;
 }
 
+/** Converts `RotatedSecret` values from (`parse`) and to (`serialize`) their JSON form. */
 export const RotatedSecretSerializer = {
-  _fromJsonObject(object: any): RotatedSecret {
+  parse(json: any): RotatedSecret {
     return {
-      clientSecret: object["client_secret"],
-      clientSecretHint: object["client_secret_hint"],
+      ...extraProperties(json, ["client_secret", "client_secret_hint"]),
+      clientSecret: json["client_secret"],
+      clientSecretHint: json["client_secret_hint"],
     };
   },
 
-  _toJsonObject(self: RotatedSecret): any {
+  serialize(value: RotatedSecret): any {
     return {
-      client_secret: self.clientSecret,
-      client_secret_hint: self.clientSecretHint,
+      ...extraProperties(value, ["clientSecret", "clientSecretHint"]),
+      client_secret: value.clientSecret,
+      client_secret_hint: value.clientSecretHint,
     };
   },
 };

@@ -1,31 +1,57 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum CreditType {
-    #[default]
-    #[serde(rename = "CREDIT_TO_BALANCE")]
     CreditToBalance,
-
-    #[serde(rename = "REFUND")]
     Refund,
-
-    #[serde(rename = "DEBT_CANCELLATION")]
     DebtCancellation,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for CreditType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl CreditType {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::CreditToBalance => "CREDIT_TO_BALANCE",
             Self::Refund => "REFUND",
             Self::DebtCancellation => "DEBT_CANCELLATION",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for CreditType {
+    fn from(value: &str) -> Self {
+        match value {
+            "CREDIT_TO_BALANCE" => Self::CreditToBalance,
+            "REFUND" => Self::Refund,
+            "DEBT_CANCELLATION" => Self::DebtCancellation,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for CreditType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for CreditType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for CreditType {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

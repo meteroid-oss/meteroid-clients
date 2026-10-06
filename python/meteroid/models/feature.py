@@ -1,18 +1,24 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .entitlement import Entitlement
-from .entitlement_product_ref import EntitlementProductRef
-from .feature_id import FeatureId
-from .feature_status import FeatureStatus
-from .feature_type import FeatureType
+
+if t.TYPE_CHECKING:
+    from .entitlement import Entitlement
+    from .entitlement_product_ref import EntitlementProductRef
+    from .feature_id import FeatureId
+    from .feature_status import FeatureStatus
+    from .feature_type import FeatureType
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Feature(BaseModel):
+    """The `Feature` object."""
+
     code: str
     """Unique key used to reference this feature in your code. Cannot be changed after creation."""
 
@@ -26,8 +32,8 @@ class Feature(BaseModel):
 
     status: FeatureStatus
 
-    description: t.Optional[str] = None
+    description: str | None = None
 
-    entitlement: t.Optional[Entitlement] = None
+    entitlement: Entitlement | None = None
 
-    product: t.Optional[EntitlementProductRef] = None
+    product: EntitlementProductRef | None = None

@@ -1,10 +1,15 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class ExtraRecurringBillingTypeEnum(str, enum.Enum):
+class ExtraRecurringBillingTypeEnum(StrEnum):
+    """The values of `ExtraRecurringBillingTypeEnum`; others are kept as received."""
+
     ADVANCE = "ADVANCE"
     ARREARS = "ARREARS"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+ExtraRecurringBillingTypeEnumLiteral: t.TypeAlias = t.Literal["ADVANCE", "ARREARS"]
+"""The values of :class:`ExtraRecurringBillingTypeEnum`, which arguments take as plain strings too."""

@@ -1,142 +1,168 @@
 // this file is @generated
-import { type Address, AddressSerializer } from "./address";
-import { type Currency, CurrencySerializer } from "./currency";
-import { type CustomTaxRate, CustomTaxRateSerializer } from "./customTaxRate";
-import { type CustomerType, CustomerTypeSerializer } from "./customerType";
-import { type InvoicingEntityId, InvoicingEntityIdSerializer } from "./invoicingEntityId";
-import { type ShippingAddress, ShippingAddressSerializer } from "./shippingAddress";
+import { extraProperties } from "../json.js";
+import { type Address, AddressSerializer } from "./address.js";
+import { type Currency, CurrencySerializer } from "./currency.js";
+import { type CustomTaxRate, CustomTaxRateSerializer } from "./customTaxRate.js";
+import { type CustomerType, CustomerTypeSerializer } from "./customerType.js";
+import {
+  type InvoicingEntityId,
+  InvoicingEntityIdSerializer,
+} from "./invoicingEntityId.js";
+import { type ShippingAddress, ShippingAddressSerializer } from "./shippingAddress.js";
 
 export interface CustomerUpdateRequest {
-  alias?: string | null;
-
-  billingAddress?: Address | null;
-
-  billingEmail?: string | null;
-
+  alias?: string | null | undefined;
+  billingAddress?: Address | null | undefined;
+  billingEmail?: string | null | undefined;
   currency: Currency;
-
   /** User-defined custom property values (full replace). Omit to leave unchanged. */
-  customProperties?: unknown;
-
+  customProperties?: unknown | undefined;
   customTaxes: CustomTaxRate[];
-
-  customerType?: CustomerType | null;
-
+  customerType?: CustomerType | null | undefined;
   /** Free-text legal exemption mention surfaced on exempt invoices. */
-  exemptionReason?: string | null;
-
+  exemptionReason?: string | null | undefined;
   /** Omit to keep the stored value (a full replace does not blank a person's name). */
-  firstName?: string | null;
-
+  firstName?: string | null | undefined;
   invoicingEmails: string[];
-
   invoicingEntityId: InvoicingEntityId;
-
   /**
    * Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.
    *
    * @deprecated
    */
-  invoicingLanguage?: string | null;
-
-  isTaxExempt?: boolean | null;
-
-  lastName?: string | null;
-
+  invoicingLanguage?: string | null | undefined;
+  isTaxExempt?: boolean | null | undefined;
+  lastName?: string | null | undefined;
   /** BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB). */
-  legalNumber?: string | null;
-
+  legalNumber?: string | null | undefined;
   /** Required for `COMPANY`. Ignored for `INDIVIDUAL`: derived from `first_name` + `last_name`. */
-  name?: string;
-
-  phone?: string | null;
-
+  name?: string | undefined;
+  phone?: string | null | undefined;
   /**
    * Preferred document languages, most-preferred first (BCP-47 tags, e.g.
    * `["fr-FR", "en"]`); overrides the invoicing entity default. Omit or send `[]` to
    * reset to that default (full-replace update).
    */
-  preferredLocales?: string[] | null;
-
-  shippingAddress?: ShippingAddress | null;
-
-  vatNumber?: string | null;
+  preferredLocales?: string[] | null | undefined;
+  shippingAddress?: ShippingAddress | null | undefined;
+  vatNumber?: string | null | undefined;
 }
 
+/** Converts `CustomerUpdateRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomerUpdateRequestSerializer = {
-  _fromJsonObject(object: any): CustomerUpdateRequest {
+  parse(json: any): CustomerUpdateRequest {
     return {
-      alias: object["alias"],
+      ...extraProperties(json, [
+        "alias",
+        "billing_address",
+        "billing_email",
+        "currency",
+        "custom_properties",
+        "custom_taxes",
+        "customer_type",
+        "exemption_reason",
+        "first_name",
+        "invoicing_emails",
+        "invoicing_entity_id",
+        "invoicing_language",
+        "is_tax_exempt",
+        "last_name",
+        "legal_number",
+        "name",
+        "phone",
+        "preferred_locales",
+        "shipping_address",
+        "vat_number",
+      ]),
+      alias: json["alias"],
       billingAddress:
-        object["billing_address"] != null
-          ? AddressSerializer._fromJsonObject(object["billing_address"])
-          : undefined,
-      billingEmail: object["billing_email"],
-      currency: CurrencySerializer._fromJsonObject(object["currency"]),
-      customProperties: object["custom_properties"],
-      customTaxes: object["custom_taxes"].map((item: any) =>
-        CustomTaxRateSerializer._fromJsonObject(item)
+        json["billing_address"] != null
+          ? AddressSerializer.parse(json["billing_address"])
+          : json["billing_address"],
+      billingEmail: json["billing_email"],
+      currency: CurrencySerializer.parse(json["currency"]),
+      customProperties: json["custom_properties"],
+      customTaxes: json["custom_taxes"].map((item: any) =>
+        CustomTaxRateSerializer.parse(item)
       ),
       customerType:
-        object["customer_type"] != null
-          ? CustomerTypeSerializer._fromJsonObject(object["customer_type"])
-          : undefined,
-      exemptionReason: object["exemption_reason"],
-      firstName: object["first_name"],
-      invoicingEmails: object["invoicing_emails"],
-      invoicingEntityId: InvoicingEntityIdSerializer._fromJsonObject(
-        object["invoicing_entity_id"]
-      ),
-      invoicingLanguage: object["invoicing_language"],
-      isTaxExempt: object["is_tax_exempt"],
-      lastName: object["last_name"],
-      legalNumber: object["legal_number"],
-      name: object["name"],
-      phone: object["phone"],
-      preferredLocales: object["preferred_locales"],
+        json["customer_type"] != null
+          ? CustomerTypeSerializer.parse(json["customer_type"])
+          : json["customer_type"],
+      exemptionReason: json["exemption_reason"],
+      firstName: json["first_name"],
+      invoicingEmails: json["invoicing_emails"],
+      invoicingEntityId: InvoicingEntityIdSerializer.parse(json["invoicing_entity_id"]),
+      invoicingLanguage: json["invoicing_language"],
+      isTaxExempt: json["is_tax_exempt"],
+      lastName: json["last_name"],
+      legalNumber: json["legal_number"],
+      name: json["name"],
+      phone: json["phone"],
+      preferredLocales: json["preferred_locales"],
       shippingAddress:
-        object["shipping_address"] != null
-          ? ShippingAddressSerializer._fromJsonObject(object["shipping_address"])
-          : undefined,
-      vatNumber: object["vat_number"],
+        json["shipping_address"] != null
+          ? ShippingAddressSerializer.parse(json["shipping_address"])
+          : json["shipping_address"],
+      vatNumber: json["vat_number"],
     };
   },
 
-  _toJsonObject(self: CustomerUpdateRequest): any {
+  serialize(value: CustomerUpdateRequest): any {
     return {
-      alias: self.alias,
+      ...extraProperties(value, [
+        "alias",
+        "billingAddress",
+        "billingEmail",
+        "currency",
+        "customProperties",
+        "customTaxes",
+        "customerType",
+        "exemptionReason",
+        "firstName",
+        "invoicingEmails",
+        "invoicingEntityId",
+        "invoicingLanguage",
+        "isTaxExempt",
+        "lastName",
+        "legalNumber",
+        "name",
+        "phone",
+        "preferredLocales",
+        "shippingAddress",
+        "vatNumber",
+      ]),
+      alias: value.alias,
       billing_address:
-        self.billingAddress != null
-          ? AddressSerializer._toJsonObject(self.billingAddress)
-          : undefined,
-      billing_email: self.billingEmail,
-      currency: CurrencySerializer._toJsonObject(self.currency),
-      custom_properties: self.customProperties,
-      custom_taxes: self.customTaxes.map((item: any) =>
-        CustomTaxRateSerializer._toJsonObject(item)
+        value.billingAddress != null
+          ? AddressSerializer.serialize(value.billingAddress)
+          : value.billingAddress,
+      billing_email: value.billingEmail,
+      currency: CurrencySerializer.serialize(value.currency),
+      custom_properties: value.customProperties,
+      custom_taxes: value.customTaxes.map((item: any) =>
+        CustomTaxRateSerializer.serialize(item)
       ),
       customer_type:
-        self.customerType != null
-          ? CustomerTypeSerializer._toJsonObject(self.customerType)
-          : undefined,
-      exemption_reason: self.exemptionReason,
-      first_name: self.firstName,
-      invoicing_emails: self.invoicingEmails,
-      invoicing_entity_id: InvoicingEntityIdSerializer._toJsonObject(
-        self.invoicingEntityId
-      ),
-      invoicing_language: self.invoicingLanguage,
-      is_tax_exempt: self.isTaxExempt,
-      last_name: self.lastName,
-      legal_number: self.legalNumber,
-      name: self.name,
-      phone: self.phone,
-      preferred_locales: self.preferredLocales,
+        value.customerType != null
+          ? CustomerTypeSerializer.serialize(value.customerType)
+          : value.customerType,
+      exemption_reason: value.exemptionReason,
+      first_name: value.firstName,
+      invoicing_emails: value.invoicingEmails,
+      invoicing_entity_id: InvoicingEntityIdSerializer.serialize(value.invoicingEntityId),
+      invoicing_language: value.invoicingLanguage,
+      is_tax_exempt: value.isTaxExempt,
+      last_name: value.lastName,
+      legal_number: value.legalNumber,
+      name: value.name,
+      phone: value.phone,
+      preferred_locales: value.preferredLocales,
       shipping_address:
-        self.shippingAddress != null
-          ? ShippingAddressSerializer._toJsonObject(self.shippingAddress)
-          : undefined,
-      vat_number: self.vatNumber,
+        value.shippingAddress != null
+          ? ShippingAddressSerializer.serialize(value.shippingAddress)
+          : value.shippingAddress,
+      vat_number: value.vatNumber,
     };
   },
 };

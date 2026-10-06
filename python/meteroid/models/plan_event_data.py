@@ -1,16 +1,22 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .plan_id import PlanId
-from .plan_status_enum import PlanStatusEnum
-from .plan_type_enum import PlanTypeEnum
+
+if t.TYPE_CHECKING:
+    from .plan_id import PlanId
+    from .plan_status_enum import PlanStatusEnum
+    from .plan_type_enum import PlanTypeEnum
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class PlanEventData(BaseModel):
+    """The `PlanEventData` object."""
+
     created_at: datetime
 
     currency: str
@@ -25,4 +31,4 @@ class PlanEventData(BaseModel):
 
     version: int
 
-    description: t.Optional[str] = None
+    description: str | None = None

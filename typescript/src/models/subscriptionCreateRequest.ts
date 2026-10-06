@@ -1,155 +1,178 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type CreateSubscriptionAddOn,
   CreateSubscriptionAddOnSerializer,
-} from "./createSubscriptionAddOn";
+} from "./createSubscriptionAddOn.js";
 import {
   type CreateSubscriptionComponents,
   CreateSubscriptionComponentsSerializer,
-} from "./createSubscriptionComponents";
+} from "./createSubscriptionComponents.js";
 import {
   type PaymentMethodsConfig,
   PaymentMethodsConfigSerializer,
-} from "./paymentMethodsConfig";
-import { type PlanId, PlanIdSerializer } from "./planId";
+} from "./paymentMethodsConfig.js";
+import { type PlanId, PlanIdSerializer } from "./planId.js";
 import {
   type SubscriptionActivationConditionEnum,
   SubscriptionActivationConditionEnumSerializer,
-} from "./subscriptionActivationConditionEnum";
+} from "./subscriptionActivationConditionEnum.js";
 
 export interface SubscriptionCreateRequest {
   activationCondition: SubscriptionActivationConditionEnum;
-
-  addOns?: CreateSubscriptionAddOn[];
-
-  autoAdvanceInvoices?: boolean;
-
+  addOns?: CreateSubscriptionAddOn[] | undefined;
+  autoAdvanceInvoices?: boolean | undefined;
   /**
    * Historical import mode: when true, invoices finalized for this subscription keep their
    * billing-period date as the invoice date instead of being stamped with the emission date.
    */
-  backdateInvoices?: boolean;
-
-  billingDayAnchor?: number | null;
-
-  chargeAutomatically?: boolean;
-
-  couponCodes?: string[];
-
+  backdateInvoices?: boolean | undefined;
+  billingDayAnchor?: number | null | undefined;
+  chargeAutomatically?: boolean | undefined;
+  couponCodes?: string[] | undefined;
   /**
    * User-defined custom property values, keyed by definition `key`. Validated against the
    * tenant's subscription definitions.
    */
-  customProperties?: unknown;
-
+  customProperties?: unknown | undefined;
   customerIdOrAlias: string;
-
-  endDate?: string;
-
-  invoiceMemo?: string;
-
-  netTerms?: number;
-
+  endDate?: string | undefined;
+  invoiceMemo?: string | undefined;
+  netTerms?: number | undefined;
   /** Payment methods configuration. If not specified, inherits from the invoicing entity. */
-  paymentMethodsConfig?: PaymentMethodsConfig;
-
+  paymentMethodsConfig?: PaymentMethodsConfig | undefined;
   planId: PlanId;
-
-  priceComponents?: CreateSubscriptionComponents;
-
-  purchaseOrder?: string | null;
-
+  priceComponents?: CreateSubscriptionComponents | undefined;
+  purchaseOrder?: string | null | undefined;
   /**
    * Migration mode: when true with a past start_date, skip creating invoices for past cycles.
    * The subscription will be set to the current billing period with correct cycle_index.
    */
-  skipPastInvoices?: boolean;
-
+  skipPastInvoices?: boolean | undefined;
   startDate: string;
-
-  trialDays?: number;
-
-  version?: number;
+  trialDays?: number | undefined;
+  version?: number | undefined;
 }
 
+/** Converts `SubscriptionCreateRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionCreateRequestSerializer = {
-  _fromJsonObject(object: any): SubscriptionCreateRequest {
+  parse(json: any): SubscriptionCreateRequest {
     return {
-      activationCondition: SubscriptionActivationConditionEnumSerializer._fromJsonObject(
-        object["activation_condition"]
+      ...extraProperties(json, [
+        "activation_condition",
+        "add_ons",
+        "auto_advance_invoices",
+        "backdate_invoices",
+        "billing_day_anchor",
+        "charge_automatically",
+        "coupon_codes",
+        "custom_properties",
+        "customer_id_or_alias",
+        "end_date",
+        "invoice_memo",
+        "net_terms",
+        "payment_methods_config",
+        "plan_id",
+        "price_components",
+        "purchase_order",
+        "skip_past_invoices",
+        "start_date",
+        "trial_days",
+        "version",
+      ]),
+      activationCondition: SubscriptionActivationConditionEnumSerializer.parse(
+        json["activation_condition"]
       ),
       addOns:
-        object["add_ons"] != null
-          ? object["add_ons"].map((item: any) =>
-              CreateSubscriptionAddOnSerializer._fromJsonObject(item)
+        json["add_ons"] != null
+          ? json["add_ons"].map((item: any) =>
+              CreateSubscriptionAddOnSerializer.parse(item)
             )
           : undefined,
-      autoAdvanceInvoices: object["auto_advance_invoices"],
-      backdateInvoices: object["backdate_invoices"],
-      billingDayAnchor: object["billing_day_anchor"],
-      chargeAutomatically: object["charge_automatically"],
-      couponCodes: object["coupon_codes"],
-      customProperties: object["custom_properties"],
-      customerIdOrAlias: object["customer_id_or_alias"],
-      endDate: object["end_date"],
-      invoiceMemo: object["invoice_memo"],
-      netTerms: object["net_terms"],
+      autoAdvanceInvoices: json["auto_advance_invoices"],
+      backdateInvoices: json["backdate_invoices"],
+      billingDayAnchor: json["billing_day_anchor"],
+      chargeAutomatically: json["charge_automatically"],
+      couponCodes: json["coupon_codes"],
+      customProperties: json["custom_properties"],
+      customerIdOrAlias: json["customer_id_or_alias"],
+      endDate: json["end_date"],
+      invoiceMemo: json["invoice_memo"],
+      netTerms: json["net_terms"],
       paymentMethodsConfig:
-        object["payment_methods_config"] != null
-          ? PaymentMethodsConfigSerializer._fromJsonObject(
-              object["payment_methods_config"]
-            )
+        json["payment_methods_config"] != null
+          ? PaymentMethodsConfigSerializer.parse(json["payment_methods_config"])
           : undefined,
-      planId: PlanIdSerializer._fromJsonObject(object["plan_id"]),
+      planId: PlanIdSerializer.parse(json["plan_id"]),
       priceComponents:
-        object["price_components"] != null
-          ? CreateSubscriptionComponentsSerializer._fromJsonObject(
-              object["price_components"]
-            )
+        json["price_components"] != null
+          ? CreateSubscriptionComponentsSerializer.parse(json["price_components"])
           : undefined,
-      purchaseOrder: object["purchase_order"],
-      skipPastInvoices: object["skip_past_invoices"],
-      startDate: object["start_date"],
-      trialDays: object["trial_days"],
-      version: object["version"],
+      purchaseOrder: json["purchase_order"],
+      skipPastInvoices: json["skip_past_invoices"],
+      startDate: json["start_date"],
+      trialDays: json["trial_days"],
+      version: json["version"],
     };
   },
 
-  _toJsonObject(self: SubscriptionCreateRequest): any {
+  serialize(value: SubscriptionCreateRequest): any {
     return {
-      activation_condition: SubscriptionActivationConditionEnumSerializer._toJsonObject(
-        self.activationCondition
+      ...extraProperties(value, [
+        "activationCondition",
+        "addOns",
+        "autoAdvanceInvoices",
+        "backdateInvoices",
+        "billingDayAnchor",
+        "chargeAutomatically",
+        "couponCodes",
+        "customProperties",
+        "customerIdOrAlias",
+        "endDate",
+        "invoiceMemo",
+        "netTerms",
+        "paymentMethodsConfig",
+        "planId",
+        "priceComponents",
+        "purchaseOrder",
+        "skipPastInvoices",
+        "startDate",
+        "trialDays",
+        "version",
+      ]),
+      activation_condition: SubscriptionActivationConditionEnumSerializer.serialize(
+        value.activationCondition
       ),
       add_ons:
-        self.addOns != null
-          ? self.addOns.map((item: any) =>
-              CreateSubscriptionAddOnSerializer._toJsonObject(item)
+        value.addOns != null
+          ? value.addOns.map((item: any) =>
+              CreateSubscriptionAddOnSerializer.serialize(item)
             )
           : undefined,
-      auto_advance_invoices: self.autoAdvanceInvoices,
-      backdate_invoices: self.backdateInvoices,
-      billing_day_anchor: self.billingDayAnchor,
-      charge_automatically: self.chargeAutomatically,
-      coupon_codes: self.couponCodes,
-      custom_properties: self.customProperties,
-      customer_id_or_alias: self.customerIdOrAlias,
-      end_date: self.endDate,
-      invoice_memo: self.invoiceMemo,
-      net_terms: self.netTerms,
+      auto_advance_invoices: value.autoAdvanceInvoices,
+      backdate_invoices: value.backdateInvoices,
+      billing_day_anchor: value.billingDayAnchor,
+      charge_automatically: value.chargeAutomatically,
+      coupon_codes: value.couponCodes,
+      custom_properties: value.customProperties,
+      customer_id_or_alias: value.customerIdOrAlias,
+      end_date: value.endDate,
+      invoice_memo: value.invoiceMemo,
+      net_terms: value.netTerms,
       payment_methods_config:
-        self.paymentMethodsConfig != null
-          ? PaymentMethodsConfigSerializer._toJsonObject(self.paymentMethodsConfig)
+        value.paymentMethodsConfig != null
+          ? PaymentMethodsConfigSerializer.serialize(value.paymentMethodsConfig)
           : undefined,
-      plan_id: PlanIdSerializer._toJsonObject(self.planId),
+      plan_id: PlanIdSerializer.serialize(value.planId),
       price_components:
-        self.priceComponents != null
-          ? CreateSubscriptionComponentsSerializer._toJsonObject(self.priceComponents)
+        value.priceComponents != null
+          ? CreateSubscriptionComponentsSerializer.serialize(value.priceComponents)
           : undefined,
-      purchase_order: self.purchaseOrder,
-      skip_past_invoices: self.skipPastInvoices,
-      start_date: self.startDate,
-      trial_days: self.trialDays,
-      version: self.version,
+      purchase_order: value.purchaseOrder,
+      skip_past_invoices: value.skipPastInvoices,
+      start_date: value.startDate,
+      trial_days: value.trialDays,
+      version: value.version,
     };
   },
 };

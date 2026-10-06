@@ -1,56 +1,66 @@
 // this file is @generated
-import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId";
-import { type ProductId, ProductIdSerializer } from "./productId";
-import { type SubscriptionFee, SubscriptionFeeSerializer } from "./subscriptionFee";
+import { extraProperties } from "../json.js";
+import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
+import { type SubscriptionFee, SubscriptionFeeSerializer } from "./subscriptionFee.js";
 import {
   type SubscriptionFeeBillingPeriodEnum,
   SubscriptionFeeBillingPeriodEnumSerializer,
-} from "./subscriptionFeeBillingPeriodEnum";
+} from "./subscriptionFeeBillingPeriodEnum.js";
 
 export interface SubscriptionComponent {
   fee: SubscriptionFee;
-
   name: string;
-
   period: SubscriptionFeeBillingPeriodEnum;
-
-  priceComponentId?: PriceComponentId | null;
-
-  productId?: ProductId | null;
+  priceComponentId?: PriceComponentId | null | undefined;
+  productId?: ProductId | null | undefined;
 }
 
+/** Converts `SubscriptionComponent` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionComponentSerializer = {
-  _fromJsonObject(object: any): SubscriptionComponent {
+  parse(json: any): SubscriptionComponent {
     return {
-      fee: SubscriptionFeeSerializer._fromJsonObject(object["fee"]),
-      name: object["name"],
-      period: SubscriptionFeeBillingPeriodEnumSerializer._fromJsonObject(
-        object["period"]
-      ),
+      ...extraProperties(json, [
+        "fee",
+        "name",
+        "period",
+        "price_component_id",
+        "product_id",
+      ]),
+      fee: SubscriptionFeeSerializer.parse(json["fee"]),
+      name: json["name"],
+      period: SubscriptionFeeBillingPeriodEnumSerializer.parse(json["period"]),
       priceComponentId:
-        object["price_component_id"] != null
-          ? PriceComponentIdSerializer._fromJsonObject(object["price_component_id"])
-          : undefined,
+        json["price_component_id"] != null
+          ? PriceComponentIdSerializer.parse(json["price_component_id"])
+          : json["price_component_id"],
       productId:
-        object["product_id"] != null
-          ? ProductIdSerializer._fromJsonObject(object["product_id"])
-          : undefined,
+        json["product_id"] != null
+          ? ProductIdSerializer.parse(json["product_id"])
+          : json["product_id"],
     };
   },
 
-  _toJsonObject(self: SubscriptionComponent): any {
+  serialize(value: SubscriptionComponent): any {
     return {
-      fee: SubscriptionFeeSerializer._toJsonObject(self.fee),
-      name: self.name,
-      period: SubscriptionFeeBillingPeriodEnumSerializer._toJsonObject(self.period),
+      ...extraProperties(value, [
+        "fee",
+        "name",
+        "period",
+        "priceComponentId",
+        "productId",
+      ]),
+      fee: SubscriptionFeeSerializer.serialize(value.fee),
+      name: value.name,
+      period: SubscriptionFeeBillingPeriodEnumSerializer.serialize(value.period),
       price_component_id:
-        self.priceComponentId != null
-          ? PriceComponentIdSerializer._toJsonObject(self.priceComponentId)
-          : undefined,
+        value.priceComponentId != null
+          ? PriceComponentIdSerializer.serialize(value.priceComponentId)
+          : value.priceComponentId,
       product_id:
-        self.productId != null
-          ? ProductIdSerializer._toJsonObject(self.productId)
-          : undefined,
+        value.productId != null
+          ? ProductIdSerializer.serialize(value.productId)
+          : value.productId,
     };
   },
 };

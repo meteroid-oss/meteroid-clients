@@ -1,47 +1,30 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum CustomPropertyType {
-    #[default]
-    #[serde(rename = "TEXT")]
     Text,
-
-    #[serde(rename = "NUMBER")]
     Number,
-
-    #[serde(rename = "BOOLEAN")]
     Boolean,
-
-    #[serde(rename = "DATE")]
     Date,
-
-    #[serde(rename = "DATETIME")]
     Datetime,
-
-    #[serde(rename = "SINGLE_SELECT")]
     SingleSelect,
-
-    #[serde(rename = "MULTI_SELECT")]
     MultiSelect,
-
-    #[serde(rename = "JSON")]
     Json,
-
-    #[serde(rename = "URL")]
     Url,
-
-    #[serde(rename = "EMAIL")]
     Email,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for CustomPropertyType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl CustomPropertyType {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Text => "TEXT",
             Self::Number => "NUMBER",
             Self::Boolean => "BOOLEAN",
@@ -52,8 +35,44 @@ impl fmt::Display for CustomPropertyType {
             Self::Json => "JSON",
             Self::Url => "URL",
             Self::Email => "EMAIL",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for CustomPropertyType {
+    fn from(value: &str) -> Self {
+        match value {
+            "TEXT" => Self::Text,
+            "NUMBER" => Self::Number,
+            "BOOLEAN" => Self::Boolean,
+            "DATE" => Self::Date,
+            "DATETIME" => Self::Datetime,
+            "SINGLE_SELECT" => Self::SingleSelect,
+            "MULTI_SELECT" => Self::MultiSelect,
+            "JSON" => Self::Json,
+            "URL" => Self::Url,
+            "EMAIL" => Self::Email,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for CustomPropertyType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for CustomPropertyType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for CustomPropertyType {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

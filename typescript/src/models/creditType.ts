@@ -1,17 +1,19 @@
 // this file is @generated
 
-export enum CreditType {
-  CreditToBalance = "CREDIT_TO_BALANCE",
-  Refund = "REFUND",
-  DebtCancellation = "DEBT_CANCELLATION",
-}
+export const CreditType = {
+  CreditToBalance: "CREDIT_TO_BALANCE",
+  Refund: "REFUND",
+  DebtCancellation: "DEBT_CANCELLATION",
+} as const;
+export type CreditType = (typeof CreditType)[keyof typeof CreditType] | (string & {});
 
+/** Converts `CreditType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreditTypeSerializer = {
-  _fromJsonObject(object: any): CreditType {
-    return object;
+  parse(json: any): CreditType {
+    return json;
   },
 
-  _toJsonObject(self: CreditType): any {
-    return self;
+  serialize(value: CreditType): any {
+    return value;
   },
 };

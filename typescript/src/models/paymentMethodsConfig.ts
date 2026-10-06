@@ -2,15 +2,15 @@
 import {
   type BankTransferPaymentMethodConfig,
   BankTransferPaymentMethodConfigSerializer,
-} from "./bankTransferPaymentMethodConfig";
+} from "./bankTransferPaymentMethodConfig.js";
 import {
   type ExternalPaymentMethodConfig,
   ExternalPaymentMethodConfigSerializer,
-} from "./externalPaymentMethodConfig";
+} from "./externalPaymentMethodConfig.js";
 import {
   type OnlinePaymentMethodConfig,
   OnlinePaymentMethodConfigSerializer,
-} from "./onlinePaymentMethodConfig";
+} from "./onlinePaymentMethodConfig.js";
 
 export interface PaymentMethodsConfigOnline extends OnlinePaymentMethodConfig {
   type: "online";
@@ -29,50 +29,50 @@ export type PaymentMethodsConfig =
   | PaymentMethodsConfigBankTransfer
   | PaymentMethodsConfigExternal;
 
+/** Converts `PaymentMethodsConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PaymentMethodsConfigSerializer = {
-  _fromJsonObject(object: any): PaymentMethodsConfig {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): PaymentMethodsConfig {
+    switch (json["type"]) {
       case "online":
         return {
-          ...OnlinePaymentMethodConfigSerializer._fromJsonObject(object),
+          ...OnlinePaymentMethodConfigSerializer.parse(json),
           type: "online",
         };
       case "bank_transfer":
         return {
-          ...BankTransferPaymentMethodConfigSerializer._fromJsonObject(object),
+          ...BankTransferPaymentMethodConfigSerializer.parse(json),
           type: "bank_transfer",
         };
       case "external":
         return {
-          ...ExternalPaymentMethodConfigSerializer._fromJsonObject(object),
+          ...ExternalPaymentMethodConfigSerializer.parse(json),
           type: "external",
         };
       default:
-        throw new Error(`Unexpected type for PaymentMethodsConfig: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: PaymentMethodsConfig): any {
-    switch (self.type) {
+  serialize(value: PaymentMethodsConfig): any {
+    switch (value.type) {
       case "online":
         return {
-          ...OnlinePaymentMethodConfigSerializer._toJsonObject(self),
+          ...OnlinePaymentMethodConfigSerializer.serialize(value),
           type: "online",
         };
       case "bank_transfer":
         return {
-          ...BankTransferPaymentMethodConfigSerializer._toJsonObject(self),
+          ...BankTransferPaymentMethodConfigSerializer.serialize(value),
           type: "bank_transfer",
         };
       case "external":
         return {
-          ...ExternalPaymentMethodConfigSerializer._toJsonObject(self),
+          ...ExternalPaymentMethodConfigSerializer.serialize(value),
           type: "external",
         };
       default:
-        throw new Error(`Unexpected type for PaymentMethodsConfig`);
+        return value;
     }
   },
 };

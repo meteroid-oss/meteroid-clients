@@ -1,17 +1,21 @@
 // this file is @generated
 
-export enum SubscriptionActivationConditionEnum {
-  OnStart = "ON_START",
-  OnCheckout = "ON_CHECKOUT",
-  Manual = "MANUAL",
-}
+export const SubscriptionActivationConditionEnum = {
+  OnStart: "ON_START",
+  OnCheckout: "ON_CHECKOUT",
+  Manual: "MANUAL",
+} as const;
+export type SubscriptionActivationConditionEnum =
+  | (typeof SubscriptionActivationConditionEnum)[keyof typeof SubscriptionActivationConditionEnum]
+  | (string & {});
 
+/** Converts `SubscriptionActivationConditionEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionActivationConditionEnumSerializer = {
-  _fromJsonObject(object: any): SubscriptionActivationConditionEnum {
-    return object;
+  parse(json: any): SubscriptionActivationConditionEnum {
+    return json;
   },
 
-  _toJsonObject(self: SubscriptionActivationConditionEnum): any {
-    return self;
+  serialize(value: SubscriptionActivationConditionEnum): any {
+    return value;
   },
 };

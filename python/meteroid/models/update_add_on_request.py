@@ -1,19 +1,25 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .price_id import PriceId
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .price_id import PriceId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class UpdateAddOnRequest(BaseModel):
-    description: t.Optional[str] = None
+    """The `UpdateAddOnRequest` object."""
 
-    max_instances_per_subscription: t.Optional[int] = None
+    description: str | None | Unset = UNSET
 
-    name: t.Optional[str] = None
+    max_instances_per_subscription: int | None | Unset = UNSET
 
-    price_id: t.Optional[PriceId] = None
+    name: str | None | Unset = UNSET
 
-    self_serviceable: t.Optional[bool] = None
+    price_id: PriceId | None | Unset = UNSET
+
+    self_serviceable: bool | None | Unset = UNSET

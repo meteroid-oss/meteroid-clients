@@ -1,14 +1,18 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .coupon_discount import CouponDiscount
-from .coupon_id import CouponId
+
+if t.TYPE_CHECKING:
+    from .coupon_discount import CouponDiscount
+    from .coupon_id import CouponId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class SubscriptionCoupon(BaseModel):
     """Coupon as embedded in subscription details — a subset of the `Coupon` resource
     returned by the coupons API."""
@@ -25,8 +29,8 @@ class SubscriptionCoupon(BaseModel):
 
     reusable: bool
 
-    expires_at: t.Optional[datetime] = None
+    expires_at: datetime | None = None
 
-    recurring_value: t.Optional[int] = None
+    recurring_value: int | None = None
 
-    redemption_limit: t.Optional[int] = None
+    redemption_limit: int | None = None

@@ -1,22 +1,24 @@
 // this file is @generated
-import { type ConnectedAccount, ConnectedAccountSerializer } from "./connectedAccount";
+import { extraProperties } from "../json.js";
+import { type ConnectedAccount, ConnectedAccountSerializer } from "./connectedAccount.js";
 
 export interface ConnectedAccountsResponse {
   data: ConnectedAccount[];
 }
 
+/** Converts `ConnectedAccountsResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ConnectedAccountsResponseSerializer = {
-  _fromJsonObject(object: any): ConnectedAccountsResponse {
+  parse(json: any): ConnectedAccountsResponse {
     return {
-      data: object["data"].map((item: any) =>
-        ConnectedAccountSerializer._fromJsonObject(item)
-      ),
+      ...extraProperties(json, ["data"]),
+      data: json["data"].map((item: any) => ConnectedAccountSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: ConnectedAccountsResponse): any {
+  serialize(value: ConnectedAccountsResponse): any {
     return {
-      data: self.data.map((item: any) => ConnectedAccountSerializer._toJsonObject(item)),
+      ...extraProperties(value, ["data"]),
+      data: value.data.map((item: any) => ConnectedAccountSerializer.serialize(item)),
     };
   },
 };

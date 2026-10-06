@@ -1,129 +1,296 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CreateConnectedAccountRequest {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CreateConnectedAccountRequest {
     @JsonProperty("connected_organization_id")
-    private String connectedOrganizationId;
+    private UUID connectedOrganizationId;
 
     @JsonProperty("connection_type")
-    private ConnectionType connectionType;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<ConnectionType> connectionType = JsonField.missing();
 
-    @JsonProperty private Object metadata;
+    @JsonProperty("metadata")
+    private Object metadata;
 
     @JsonProperty("platform_customer_id")
-    private String platformCustomerId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> platformCustomerId = JsonField.missing();
 
-    public CreateConnectedAccountRequest() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public CreateConnectedAccountRequest connectedOrganizationId(String connectedOrganizationId) {
-        this.connectedOrganizationId = connectedOrganizationId;
-        return this;
+    private CreateConnectedAccountRequest() {}
+
+    private CreateConnectedAccountRequest(Builder builder) {
+        this.connectedOrganizationId = builder.connectedOrganizationId;
+        this.connectionType = builder.connectionType;
+        this.metadata = builder.metadata;
+        this.platformCustomerId = builder.platformCustomerId;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get connectedOrganizationId
+     * A builder of {@code CreateConnectedAccountRequest}.
      *
-     * @return connectedOrganizationId
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getConnectedOrganizationId() {
-        return connectedOrganizationId;
-    }
-
-    public void setConnectedOrganizationId(String connectedOrganizationId) {
-        this.connectedOrganizationId = connectedOrganizationId;
-    }
-
-    public CreateConnectedAccountRequest connectionType(ConnectionType connectionType) {
-        this.connectionType = connectionType;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get connectionType
+     * A builder starting from this value.
      *
-     * @return connectionType
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public ConnectionType getConnectionType() {
-        return connectionType;
-    }
-
-    public void setConnectionType(ConnectionType connectionType) {
-        this.connectionType = connectionType;
-    }
-
-    public CreateConnectedAccountRequest metadata(Object metadata) {
-        this.metadata = metadata;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.connectedOrganizationId = connectedOrganizationId;
+        builder.connectionType = connectionType;
+        builder.metadata = metadata;
+        builder.platformCustomerId = platformCustomerId;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get metadata
+     * The {@code connected_organization_id} property.
      *
-     * @return metadata
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public Object getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(Object metadata) {
-        this.metadata = metadata;
-    }
-
-    public CreateConnectedAccountRequest platformCustomerId(String platformCustomerId) {
-        this.platformCustomerId = platformCustomerId;
-        return this;
+    public UUID connectedOrganizationId() {
+        return Utils.required(connectedOrganizationId, "connected_organization_id");
     }
 
     /**
-     * Get platformCustomerId
+     * The {@code connection_type} property.
      *
-     * @return platformCustomerId
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getPlatformCustomerId() {
-        return platformCustomerId;
-    }
-
-    public void setPlatformCustomerId(String platformCustomerId) {
-        this.platformCustomerId = platformCustomerId;
+    public Optional<ConnectionType> connectionType() {
+        return connectionType.asOptional();
     }
 
     /**
-     * Create an instance of CreateConnectedAccountRequest given an JSON string
+     * The {@code metadata} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of CreateConnectedAccountRequest
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     CreateConnectedAccountRequest
+     * @return the value, empty when unset
      */
-    public static CreateConnectedAccountRequest fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CreateConnectedAccountRequest.class);
+    public Optional<Object> metadata() {
+        return Optional.ofNullable(metadata);
     }
 
     /**
-     * Convert an instance of CreateConnectedAccountRequest to an JSON string
+     * The {@code platform_customer_id} property.
      *
-     * @return JSON string
+     * @return the value, empty when unset or null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Optional<String> platformCustomerId() {
+        return platformCustomerId.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CreateConnectedAccountRequest that = (CreateConnectedAccountRequest) o;
+        return Objects.equals(connectedOrganizationId, that.connectedOrganizationId)
+                && Objects.equals(connectionType, that.connectionType)
+                && Objects.equals(metadata, that.metadata)
+                && Objects.equals(platformCustomerId, that.platformCustomerId)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                connectedOrganizationId,
+                connectionType,
+                metadata,
+                platformCustomerId,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CreateConnectedAccountRequest{"
+                + "connectedOrganizationId="
+                + connectedOrganizationId
+                + ", connectionType="
+                + connectionType
+                + ", metadata="
+                + metadata
+                + ", platformCustomerId="
+                + platformCustomerId
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CreateConnectedAccountRequest}. */
+    public static final class Builder {
+        private UUID connectedOrganizationId;
+        private JsonField<ConnectionType> connectionType = JsonField.missing();
+        private Object metadata;
+        private JsonField<String> platformCustomerId = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code connected_organization_id} property.
+         *
+         * @param connectedOrganizationId the value
+         * @return this builder
+         */
+        public Builder connectedOrganizationId(UUID connectedOrganizationId) {
+            this.connectedOrganizationId = connectedOrganizationId;
+            return this;
+        }
+
+        /**
+         * The {@code connection_type} property.
+         *
+         * @param connectionType the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder connectionType(ConnectionType connectionType) {
+            this.connectionType = JsonField.ofNullable(connectionType);
+            return this;
+        }
+
+        /**
+         * The {@code metadata} property.
+         *
+         * @param metadata the value
+         * @return this builder
+         */
+        public Builder metadata(Object metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        /**
+         * The {@code platform_customer_id} property.
+         *
+         * @param platformCustomerId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder platformCustomerId(String platformCustomerId) {
+            this.platformCustomerId = JsonField.ofNullable(platformCustomerId);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CreateConnectedAccountRequest}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CreateConnectedAccountRequest build() {
+            Utils.checkRequired(connectedOrganizationId, "connected_organization_id");
+            return new CreateConnectedAccountRequest(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code CreateConnectedAccountRequest}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static CreateConnectedAccountRequest fromJson(String json) {
+        return Utils.parse(json, CreateConnectedAccountRequest.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

@@ -1,15 +1,22 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
+from datetime import date
 
 from ..serialization import BaseModel
-from .metric_usage import MetricUsage
+
+if t.TYPE_CHECKING:
+    from .metric_usage import MetricUsage
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class UsageResponse(BaseModel):
-    period_end: str
+    """The `UsageResponse` object."""
 
-    period_start: str
+    period_end: date
 
-    usage: t.List[MetricUsage]
+    period_start: date
+
+    usage: list[MetricUsage]

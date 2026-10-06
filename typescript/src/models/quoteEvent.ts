@@ -1,39 +1,57 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type EventId, EventIdSerializer } from "./eventId";
-import { type EventType, EventTypeSerializer } from "./eventType";
-import { type QuoteEventData, QuoteEventDataSerializer } from "./quoteEventData";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties, pickProperties } from "../json.js";
+import { type EventId, EventIdSerializer } from "./eventId.js";
+import { type EventType, EventTypeSerializer } from "./eventType.js";
+import { type QuoteEventData, QuoteEventDataSerializer } from "./quoteEventData.js";
 
-export interface QuoteEvent {
-  flattenQuoteeventdata: QuoteEventData;
-
+export interface QuoteEvent extends QuoteEventData {
   id: EventId;
-
   timestamp: Date;
-
   type: EventType;
 }
 
+/** Converts `QuoteEvent` values from (`parse`) and to (`serialize`) their JSON form. */
 export const QuoteEventSerializer = {
-  _fromJsonObject(object: any): QuoteEvent {
+  parse(json: any): QuoteEvent {
     return {
-      flattenQuoteeventdata: QuoteEventDataSerializer._fromJsonObject(
-        object["__flatten_quoteeventdata"]
-      ),
-      id: EventIdSerializer._fromJsonObject(object["id"]),
-      timestamp: parseDateTime(object["timestamp"]),
-      type: EventTypeSerializer._fromJsonObject(object["type"]),
+      ...extraProperties(json, [
+        "id",
+        "timestamp",
+        "type",
+        "customer_id",
+        "quote_id",
+        "subscription_id",
+      ]),
+      ...pickProperties(QuoteEventDataSerializer.parse(json), [
+        "customerId",
+        "quoteId",
+        "subscriptionId",
+      ]),
+      id: EventIdSerializer.parse(json["id"]),
+      timestamp: parseDateTime(json["timestamp"]),
+      type: EventTypeSerializer.parse(json["type"]),
     };
   },
 
-  _toJsonObject(self: QuoteEvent): any {
+  serialize(value: QuoteEvent): any {
     return {
-      __flatten_quoteeventdata: QuoteEventDataSerializer._toJsonObject(
-        self.flattenQuoteeventdata
-      ),
-      id: EventIdSerializer._toJsonObject(self.id),
-      timestamp: self.timestamp,
-      type: EventTypeSerializer._toJsonObject(self.type),
+      ...extraProperties(value, [
+        "id",
+        "timestamp",
+        "type",
+        "customerId",
+        "quoteId",
+        "subscriptionId",
+      ]),
+      ...pickProperties(QuoteEventDataSerializer.serialize(value), [
+        "customer_id",
+        "quote_id",
+        "subscription_id",
+      ]),
+      id: EventIdSerializer.serialize(value.id),
+      timestamp: value.timestamp,
+      type: EventTypeSerializer.serialize(value.type),
     };
   },
 };

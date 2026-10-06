@@ -2,11 +2,11 @@
 import {
   type SubscriptionAddOnParameterization,
   SubscriptionAddOnParameterizationSerializer,
-} from "./subscriptionAddOnParameterization";
+} from "./subscriptionAddOnParameterization.js";
 import {
   type SubscriptionAddOnPriceOverride,
   SubscriptionAddOnPriceOverrideSerializer,
-} from "./subscriptionAddOnPriceOverride";
+} from "./subscriptionAddOnPriceOverride.js";
 
 export interface SubscriptionAddOnCustomizationPriceOverride
   extends SubscriptionAddOnPriceOverride {
@@ -21,40 +21,40 @@ export type SubscriptionAddOnCustomization =
   | SubscriptionAddOnCustomizationPriceOverride
   | SubscriptionAddOnCustomizationParameterization;
 
+/** Converts `SubscriptionAddOnCustomization` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionAddOnCustomizationSerializer = {
-  _fromJsonObject(object: any): SubscriptionAddOnCustomization {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): SubscriptionAddOnCustomization {
+    switch (json["type"]) {
       case "PRICE_OVERRIDE":
         return {
-          ...SubscriptionAddOnPriceOverrideSerializer._fromJsonObject(object),
+          ...SubscriptionAddOnPriceOverrideSerializer.parse(json),
           type: "PRICE_OVERRIDE",
         };
       case "PARAMETERIZATION":
         return {
-          ...SubscriptionAddOnParameterizationSerializer._fromJsonObject(object),
+          ...SubscriptionAddOnParameterizationSerializer.parse(json),
           type: "PARAMETERIZATION",
         };
       default:
-        throw new Error(`Unexpected type for SubscriptionAddOnCustomization: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: SubscriptionAddOnCustomization): any {
-    switch (self.type) {
+  serialize(value: SubscriptionAddOnCustomization): any {
+    switch (value.type) {
       case "PRICE_OVERRIDE":
         return {
-          ...SubscriptionAddOnPriceOverrideSerializer._toJsonObject(self),
+          ...SubscriptionAddOnPriceOverrideSerializer.serialize(value),
           type: "PRICE_OVERRIDE",
         };
       case "PARAMETERIZATION":
         return {
-          ...SubscriptionAddOnParameterizationSerializer._toJsonObject(self),
+          ...SubscriptionAddOnParameterizationSerializer.serialize(value),
           type: "PARAMETERIZATION",
         };
       default:
-        throw new Error(`Unexpected type for SubscriptionAddOnCustomization`);
+        return value;
     }
   },
 };

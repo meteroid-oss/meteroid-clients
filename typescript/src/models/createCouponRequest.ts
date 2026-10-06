@@ -1,57 +1,74 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount";
-import { type PlanId, PlanIdSerializer } from "./planId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount.js";
+import { type PlanId, PlanIdSerializer } from "./planId.js";
 
 export interface CreateCouponRequest {
   code: string;
-
-  description?: string | null;
-
+  description?: string | null | undefined;
   discount: CouponDiscount;
-
-  expiresAt?: Date | null;
-
-  planIds?: PlanId[];
-
-  recurringValue?: number | null;
-
-  redemptionLimit?: number | null;
-
-  reusable?: boolean;
+  expiresAt?: Date | null | undefined;
+  planIds?: PlanId[] | undefined;
+  recurringValue?: number | null | undefined;
+  redemptionLimit?: number | null | undefined;
+  reusable?: boolean | undefined;
 }
 
+/** Converts `CreateCouponRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateCouponRequestSerializer = {
-  _fromJsonObject(object: any): CreateCouponRequest {
+  parse(json: any): CreateCouponRequest {
     return {
-      code: object["code"],
-      description: object["description"],
-      discount: CouponDiscountSerializer._fromJsonObject(object["discount"]),
+      ...extraProperties(json, [
+        "code",
+        "description",
+        "discount",
+        "expires_at",
+        "plan_ids",
+        "recurring_value",
+        "redemption_limit",
+        "reusable",
+      ]),
+      code: json["code"],
+      description: json["description"],
+      discount: CouponDiscountSerializer.parse(json["discount"]),
       expiresAt:
-        object["expires_at"] != null ? parseDateTime(object["expires_at"]) : undefined,
+        json["expires_at"] != null
+          ? parseDateTime(json["expires_at"])
+          : json["expires_at"],
       planIds:
-        object["plan_ids"] != null
-          ? object["plan_ids"].map((item: any) => PlanIdSerializer._fromJsonObject(item))
+        json["plan_ids"] != null
+          ? json["plan_ids"].map((item: any) => PlanIdSerializer.parse(item))
           : undefined,
-      recurringValue: object["recurring_value"],
-      redemptionLimit: object["redemption_limit"],
-      reusable: object["reusable"],
+      recurringValue: json["recurring_value"],
+      redemptionLimit: json["redemption_limit"],
+      reusable: json["reusable"],
     };
   },
 
-  _toJsonObject(self: CreateCouponRequest): any {
+  serialize(value: CreateCouponRequest): any {
     return {
-      code: self.code,
-      description: self.description,
-      discount: CouponDiscountSerializer._toJsonObject(self.discount),
-      expires_at: self.expiresAt,
+      ...extraProperties(value, [
+        "code",
+        "description",
+        "discount",
+        "expiresAt",
+        "planIds",
+        "recurringValue",
+        "redemptionLimit",
+        "reusable",
+      ]),
+      code: value.code,
+      description: value.description,
+      discount: CouponDiscountSerializer.serialize(value.discount),
+      expires_at: value.expiresAt,
       plan_ids:
-        self.planIds != null
-          ? self.planIds.map((item: any) => PlanIdSerializer._toJsonObject(item))
+        value.planIds != null
+          ? value.planIds.map((item: any) => PlanIdSerializer.serialize(item))
           : undefined,
-      recurring_value: self.recurringValue,
-      redemption_limit: self.redemptionLimit,
-      reusable: self.reusable,
+      recurring_value: value.recurringValue,
+      redemption_limit: value.redemptionLimit,
+      reusable: value.reusable,
     };
   },
 };

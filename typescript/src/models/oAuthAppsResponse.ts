@@ -1,20 +1,24 @@
 // this file is @generated
-import { type OAuthApp, OAuthAppSerializer } from "./oAuthApp";
+import { extraProperties } from "../json.js";
+import { type OAuthApp, OAuthAppSerializer } from "./oAuthApp.js";
 
 export interface OAuthAppsResponse {
   data: OAuthApp[];
 }
 
+/** Converts `OAuthAppsResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OAuthAppsResponseSerializer = {
-  _fromJsonObject(object: any): OAuthAppsResponse {
+  parse(json: any): OAuthAppsResponse {
     return {
-      data: object["data"].map((item: any) => OAuthAppSerializer._fromJsonObject(item)),
+      ...extraProperties(json, ["data"]),
+      data: json["data"].map((item: any) => OAuthAppSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: OAuthAppsResponse): any {
+  serialize(value: OAuthAppsResponse): any {
     return {
-      data: self.data.map((item: any) => OAuthAppSerializer._toJsonObject(item)),
+      ...extraProperties(value, ["data"]),
+      data: value.data.map((item: any) => OAuthAppSerializer.serialize(item)),
     };
   },
 };

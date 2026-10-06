@@ -1,36 +1,38 @@
 // this file is @generated
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
-import { type QuoteId, QuoteIdSerializer } from "./quoteId";
-import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
+import { extraProperties } from "../json.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
+import { type QuoteId, QuoteIdSerializer } from "./quoteId.js";
+import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId.js";
 
 export interface QuoteEventData {
   customerId: CustomerId;
-
   quoteId: QuoteId;
-
-  subscriptionId?: SubscriptionId | null;
+  subscriptionId?: SubscriptionId | null | undefined;
 }
 
+/** Converts `QuoteEventData` values from (`parse`) and to (`serialize`) their JSON form. */
 export const QuoteEventDataSerializer = {
-  _fromJsonObject(object: any): QuoteEventData {
+  parse(json: any): QuoteEventData {
     return {
-      customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
-      quoteId: QuoteIdSerializer._fromJsonObject(object["quote_id"]),
+      ...extraProperties(json, ["customer_id", "quote_id", "subscription_id"]),
+      customerId: CustomerIdSerializer.parse(json["customer_id"]),
+      quoteId: QuoteIdSerializer.parse(json["quote_id"]),
       subscriptionId:
-        object["subscription_id"] != null
-          ? SubscriptionIdSerializer._fromJsonObject(object["subscription_id"])
-          : undefined,
+        json["subscription_id"] != null
+          ? SubscriptionIdSerializer.parse(json["subscription_id"])
+          : json["subscription_id"],
     };
   },
 
-  _toJsonObject(self: QuoteEventData): any {
+  serialize(value: QuoteEventData): any {
     return {
-      customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
-      quote_id: QuoteIdSerializer._toJsonObject(self.quoteId),
+      ...extraProperties(value, ["customerId", "quoteId", "subscriptionId"]),
+      customer_id: CustomerIdSerializer.serialize(value.customerId),
+      quote_id: QuoteIdSerializer.serialize(value.quoteId),
       subscription_id:
-        self.subscriptionId != null
-          ? SubscriptionIdSerializer._toJsonObject(self.subscriptionId)
-          : undefined,
+        value.subscriptionId != null
+          ? SubscriptionIdSerializer.serialize(value.subscriptionId)
+          : value.subscriptionId,
     };
   },
 };

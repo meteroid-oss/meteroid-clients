@@ -1,49 +1,62 @@
 // this file is @generated
-import { type PropertyConfig, PropertyConfigSerializer } from "./propertyConfig";
+import { extraProperties } from "../json.js";
+import { type PropertyConfig, PropertyConfigSerializer } from "./propertyConfig.js";
 /**
  * Update of a definition. `key`, `entity_type` and `property_type` are immutable and cannot be
  * changed here. Any field left absent is unchanged.
  */
 export interface CustomPropertyDefinitionUpdateRequest {
-  config?: PropertyConfig | null;
-
-  defaultValue?: unknown;
-
-  description?: string | null;
-
-  displayOrder?: number | null;
-
-  name?: string | null;
-
-  required?: boolean | null;
+  config?: PropertyConfig | null | undefined;
+  defaultValue?: unknown | undefined;
+  description?: string | null | undefined;
+  displayOrder?: number | null | undefined;
+  name?: string | null | undefined;
+  required?: boolean | null | undefined;
 }
 
+/** Converts `CustomPropertyDefinitionUpdateRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomPropertyDefinitionUpdateRequestSerializer = {
-  _fromJsonObject(object: any): CustomPropertyDefinitionUpdateRequest {
+  parse(json: any): CustomPropertyDefinitionUpdateRequest {
     return {
+      ...extraProperties(json, [
+        "config",
+        "default_value",
+        "description",
+        "display_order",
+        "name",
+        "required",
+      ]),
       config:
-        object["config"] != null
-          ? PropertyConfigSerializer._fromJsonObject(object["config"])
-          : undefined,
-      defaultValue: object["default_value"],
-      description: object["description"],
-      displayOrder: object["display_order"],
-      name: object["name"],
-      required: object["required"],
+        json["config"] != null
+          ? PropertyConfigSerializer.parse(json["config"])
+          : json["config"],
+      defaultValue: json["default_value"],
+      description: json["description"],
+      displayOrder: json["display_order"],
+      name: json["name"],
+      required: json["required"],
     };
   },
 
-  _toJsonObject(self: CustomPropertyDefinitionUpdateRequest): any {
+  serialize(value: CustomPropertyDefinitionUpdateRequest): any {
     return {
+      ...extraProperties(value, [
+        "config",
+        "defaultValue",
+        "description",
+        "displayOrder",
+        "name",
+        "required",
+      ]),
       config:
-        self.config != null
-          ? PropertyConfigSerializer._toJsonObject(self.config)
-          : undefined,
-      default_value: self.defaultValue,
-      description: self.description,
-      display_order: self.displayOrder,
-      name: self.name,
-      required: self.required,
+        value.config != null
+          ? PropertyConfigSerializer.serialize(value.config)
+          : value.config,
+      default_value: value.defaultValue,
+      description: value.description,
+      display_order: value.displayOrder,
+      name: value.name,
+      required: value.required,
     };
   },
 };

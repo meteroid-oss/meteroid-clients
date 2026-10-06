@@ -1,37 +1,38 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type CustomPropertyDefinition,
   CustomPropertyDefinitionSerializer,
-} from "./customPropertyDefinition";
+} from "./customPropertyDefinition.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface CustomPropertyDefinitionListResponse {
   data: CustomPropertyDefinition[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `CustomPropertyDefinitionListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomPropertyDefinitionListResponseSerializer = {
-  _fromJsonObject(object: any): CustomPropertyDefinitionListResponse {
+  parse(json: any): CustomPropertyDefinitionListResponse {
     return {
-      data: object["data"].map((item: any) =>
-        CustomPropertyDefinitionSerializer._fromJsonObject(item)
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) =>
+        CustomPropertyDefinitionSerializer.parse(item)
       ),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: CustomPropertyDefinitionListResponse): any {
+  serialize(value: CustomPropertyDefinitionListResponse): any {
     return {
-      data: self.data.map((item: any) =>
-        CustomPropertyDefinitionSerializer._toJsonObject(item)
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) =>
+        CustomPropertyDefinitionSerializer.serialize(item)
       ),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

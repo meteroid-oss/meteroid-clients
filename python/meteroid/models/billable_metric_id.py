@@ -1,2 +1,4 @@
 # this file is @generated
-BillableMetricId = str
+import typing as t
+
+BillableMetricId: t.TypeAlias = str

@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface OneTimePricing {
   quantity: number;
-
   unitPrice: string;
 }
 
+/** Converts `OneTimePricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OneTimePricingSerializer = {
-  _fromJsonObject(object: any): OneTimePricing {
+  parse(json: any): OneTimePricing {
     return {
-      quantity: object["quantity"],
-      unitPrice: object["unit_price"],
+      ...extraProperties(json, ["quantity", "unit_price"]),
+      quantity: json["quantity"],
+      unitPrice: json["unit_price"],
     };
   },
 
-  _toJsonObject(self: OneTimePricing): any {
+  serialize(value: OneTimePricing): any {
     return {
-      quantity: self.quantity,
-      unit_price: self.unitPrice,
+      ...extraProperties(value, ["quantity", "unitPrice"]),
+      quantity: value.quantity,
+      unit_price: value.unitPrice,
     };
   },
 };

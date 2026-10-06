@@ -1,142 +1,178 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
-import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
+import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId.js";
 import {
   type SubscriptionStatusEnum,
   SubscriptionStatusEnumSerializer,
-} from "./subscriptionStatusEnum";
+} from "./subscriptionStatusEnum.js";
 import {
   type SubscriptionUpdateType,
   SubscriptionUpdateTypeSerializer,
-} from "./subscriptionUpdateType";
+} from "./subscriptionUpdateType.js";
 
 export interface SubscriptionEventData {
-  activatedAt?: Date | null;
-
+  activatedAt?: Date | null | undefined;
   autoAdvanceInvoices: boolean;
-
   billingDayAnchor: number;
-
-  billingStartDate?: string | null;
-
+  billingStartDate?: string | null | undefined;
   /** Present on `subscription.cancelled` when a reason was supplied. */
-  cancellationReason?: string | null;
-
-  changeType?: SubscriptionUpdateType | null;
-
+  cancellationReason?: string | null | undefined;
+  changeType?: SubscriptionUpdateType | null | undefined;
   chargeAutomatically: boolean;
-
   createdAt: Date;
-
   currency: string;
-
   /** User-defined custom property values, keyed by definition key. */
   customProperties: unknown;
-
-  customerAlias?: string | null;
-
+  customerAlias?: string | null | undefined;
   customerId: CustomerId;
-
   customerName: string;
-
-  endDate?: string | null;
-
-  invoiceMemo?: string | null;
-
-  invoiceThreshold?: string | null;
-
+  endDate?: string | null | undefined;
+  invoiceMemo?: string | null | undefined;
+  invoiceThreshold?: string | null | undefined;
   mrrCents: number;
-
   netTerms: number;
-
   period: BillingPeriodEnum;
-
   planName: string;
-
-  purchaseOrder?: string | null;
-
+  purchaseOrder?: string | null | undefined;
   startDate: string;
-
   status: SubscriptionStatusEnum;
-
   subscriptionId: SubscriptionId;
-
-  trialDuration?: number | null;
-
+  trialDuration?: number | null | undefined;
   version: number;
 }
 
+/** Converts `SubscriptionEventData` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionEventDataSerializer = {
-  _fromJsonObject(object: any): SubscriptionEventData {
+  parse(json: any): SubscriptionEventData {
     return {
+      ...extraProperties(json, [
+        "activated_at",
+        "auto_advance_invoices",
+        "billing_day_anchor",
+        "billing_start_date",
+        "cancellation_reason",
+        "change_type",
+        "charge_automatically",
+        "created_at",
+        "currency",
+        "custom_properties",
+        "customer_alias",
+        "customer_id",
+        "customer_name",
+        "end_date",
+        "invoice_memo",
+        "invoice_threshold",
+        "mrr_cents",
+        "net_terms",
+        "period",
+        "plan_name",
+        "purchase_order",
+        "start_date",
+        "status",
+        "subscription_id",
+        "trial_duration",
+        "version",
+      ]),
       activatedAt:
-        object["activated_at"] != null
-          ? parseDateTime(object["activated_at"])
-          : undefined,
-      autoAdvanceInvoices: object["auto_advance_invoices"],
-      billingDayAnchor: object["billing_day_anchor"],
-      billingStartDate: object["billing_start_date"],
-      cancellationReason: object["cancellation_reason"],
+        json["activated_at"] != null
+          ? parseDateTime(json["activated_at"])
+          : json["activated_at"],
+      autoAdvanceInvoices: json["auto_advance_invoices"],
+      billingDayAnchor: json["billing_day_anchor"],
+      billingStartDate: json["billing_start_date"],
+      cancellationReason: json["cancellation_reason"],
       changeType:
-        object["change_type"] != null
-          ? SubscriptionUpdateTypeSerializer._fromJsonObject(object["change_type"])
-          : undefined,
-      chargeAutomatically: object["charge_automatically"],
-      createdAt: parseDateTime(object["created_at"]),
-      currency: object["currency"],
-      customProperties: object["custom_properties"],
-      customerAlias: object["customer_alias"],
-      customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
-      customerName: object["customer_name"],
-      endDate: object["end_date"],
-      invoiceMemo: object["invoice_memo"],
-      invoiceThreshold: object["invoice_threshold"],
-      mrrCents: object["mrr_cents"],
-      netTerms: object["net_terms"],
-      period: BillingPeriodEnumSerializer._fromJsonObject(object["period"]),
-      planName: object["plan_name"],
-      purchaseOrder: object["purchase_order"],
-      startDate: object["start_date"],
-      status: SubscriptionStatusEnumSerializer._fromJsonObject(object["status"]),
-      subscriptionId: SubscriptionIdSerializer._fromJsonObject(object["subscription_id"]),
-      trialDuration: object["trial_duration"],
-      version: object["version"],
+        json["change_type"] != null
+          ? SubscriptionUpdateTypeSerializer.parse(json["change_type"])
+          : json["change_type"],
+      chargeAutomatically: json["charge_automatically"],
+      createdAt: parseDateTime(json["created_at"]),
+      currency: json["currency"],
+      customProperties: json["custom_properties"],
+      customerAlias: json["customer_alias"],
+      customerId: CustomerIdSerializer.parse(json["customer_id"]),
+      customerName: json["customer_name"],
+      endDate: json["end_date"],
+      invoiceMemo: json["invoice_memo"],
+      invoiceThreshold: json["invoice_threshold"],
+      mrrCents: json["mrr_cents"],
+      netTerms: json["net_terms"],
+      period: BillingPeriodEnumSerializer.parse(json["period"]),
+      planName: json["plan_name"],
+      purchaseOrder: json["purchase_order"],
+      startDate: json["start_date"],
+      status: SubscriptionStatusEnumSerializer.parse(json["status"]),
+      subscriptionId: SubscriptionIdSerializer.parse(json["subscription_id"]),
+      trialDuration: json["trial_duration"],
+      version: json["version"],
     };
   },
 
-  _toJsonObject(self: SubscriptionEventData): any {
+  serialize(value: SubscriptionEventData): any {
     return {
-      activated_at: self.activatedAt,
-      auto_advance_invoices: self.autoAdvanceInvoices,
-      billing_day_anchor: self.billingDayAnchor,
-      billing_start_date: self.billingStartDate,
-      cancellation_reason: self.cancellationReason,
+      ...extraProperties(value, [
+        "activatedAt",
+        "autoAdvanceInvoices",
+        "billingDayAnchor",
+        "billingStartDate",
+        "cancellationReason",
+        "changeType",
+        "chargeAutomatically",
+        "createdAt",
+        "currency",
+        "customProperties",
+        "customerAlias",
+        "customerId",
+        "customerName",
+        "endDate",
+        "invoiceMemo",
+        "invoiceThreshold",
+        "mrrCents",
+        "netTerms",
+        "period",
+        "planName",
+        "purchaseOrder",
+        "startDate",
+        "status",
+        "subscriptionId",
+        "trialDuration",
+        "version",
+      ]),
+      activated_at: value.activatedAt,
+      auto_advance_invoices: value.autoAdvanceInvoices,
+      billing_day_anchor: value.billingDayAnchor,
+      billing_start_date: value.billingStartDate,
+      cancellation_reason: value.cancellationReason,
       change_type:
-        self.changeType != null
-          ? SubscriptionUpdateTypeSerializer._toJsonObject(self.changeType)
-          : undefined,
-      charge_automatically: self.chargeAutomatically,
-      created_at: self.createdAt,
-      currency: self.currency,
-      custom_properties: self.customProperties,
-      customer_alias: self.customerAlias,
-      customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
-      customer_name: self.customerName,
-      end_date: self.endDate,
-      invoice_memo: self.invoiceMemo,
-      invoice_threshold: self.invoiceThreshold,
-      mrr_cents: self.mrrCents,
-      net_terms: self.netTerms,
-      period: BillingPeriodEnumSerializer._toJsonObject(self.period),
-      plan_name: self.planName,
-      purchase_order: self.purchaseOrder,
-      start_date: self.startDate,
-      status: SubscriptionStatusEnumSerializer._toJsonObject(self.status),
-      subscription_id: SubscriptionIdSerializer._toJsonObject(self.subscriptionId),
-      trial_duration: self.trialDuration,
-      version: self.version,
+        value.changeType != null
+          ? SubscriptionUpdateTypeSerializer.serialize(value.changeType)
+          : value.changeType,
+      charge_automatically: value.chargeAutomatically,
+      created_at: value.createdAt,
+      currency: value.currency,
+      custom_properties: value.customProperties,
+      customer_alias: value.customerAlias,
+      customer_id: CustomerIdSerializer.serialize(value.customerId),
+      customer_name: value.customerName,
+      end_date: value.endDate,
+      invoice_memo: value.invoiceMemo,
+      invoice_threshold: value.invoiceThreshold,
+      mrr_cents: value.mrrCents,
+      net_terms: value.netTerms,
+      period: BillingPeriodEnumSerializer.serialize(value.period),
+      plan_name: value.planName,
+      purchase_order: value.purchaseOrder,
+      start_date: value.startDate,
+      status: SubscriptionStatusEnumSerializer.serialize(value.status),
+      subscription_id: SubscriptionIdSerializer.serialize(value.subscriptionId),
+      trial_duration: value.trialDuration,
+      version: value.version,
     };
   },
 };

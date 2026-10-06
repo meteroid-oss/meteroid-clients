@@ -1,13 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .term_rate import TermRate
+
+if t.TYPE_CHECKING:
+    from .term_rate import TermRate
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class RatePlanFee(BaseModel):
     """Recurring rate fee (e.g., monthly subscription)"""
 
-    rates: t.List[TermRate]
+    rates: list[TermRate]

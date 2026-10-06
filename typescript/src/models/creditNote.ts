@@ -1,148 +1,181 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type CreditNoteId, CreditNoteIdSerializer } from "./creditNoteId";
-import { type CreditNoteStatus, CreditNoteStatusSerializer } from "./creditNoteStatus";
-import { type CreditType, CreditTypeSerializer } from "./creditType";
-import { type Currency, CurrencySerializer } from "./currency";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
-import { type InvoiceId, InvoiceIdSerializer } from "./invoiceId";
-import { type InvoiceLineItem, InvoiceLineItemSerializer } from "./invoiceLineItem";
-import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId";
-import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
-import { type TaxBreakdownItem, TaxBreakdownItemSerializer } from "./taxBreakdownItem";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type CreditNoteId, CreditNoteIdSerializer } from "./creditNoteId.js";
+import { type CreditNoteStatus, CreditNoteStatusSerializer } from "./creditNoteStatus.js";
+import { type CreditType, CreditTypeSerializer } from "./creditType.js";
+import { type Currency, CurrencySerializer } from "./currency.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
+import { type InvoiceId, InvoiceIdSerializer } from "./invoiceId.js";
+import { type InvoiceLineItem, InvoiceLineItemSerializer } from "./invoiceLineItem.js";
+import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId.js";
+import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId.js";
+import { type TaxBreakdownItem, TaxBreakdownItemSerializer } from "./taxBreakdownItem.js";
 
 export interface CreditNote {
   createdAt: Date;
-
   creditNoteNumber: string;
-
   creditType: CreditType;
-
   creditedAmountCents: number;
-
   currency: Currency;
-
   /** User-defined custom property values, keyed by definition `key`. */
   customProperties: unknown;
-
   customerId: CustomerId;
-
-  finalizedAt?: Date | null;
-
+  finalizedAt?: Date | null | undefined;
   id: CreditNoteId;
-
   invoiceId: InvoiceId;
-
   invoiceNumber: string;
-
   lineItems: InvoiceLineItem[];
-
-  memo?: string | null;
-
-  planVersionId?: PlanVersionId | null;
-
-  reason?: string | null;
-
+  memo?: string | null | undefined;
+  planVersionId?: PlanVersionId | null | undefined;
+  reason?: string | null | undefined;
   refundedAmountCents: number;
-
   status: CreditNoteStatus;
-
-  subscriptionId?: SubscriptionId | null;
-
+  subscriptionId?: SubscriptionId | null | undefined;
   subtotal: number;
-
   taxAmount: number;
-
   taxBreakdown: TaxBreakdownItem[];
-
   total: number;
-
-  updatedAt?: Date | null;
-
-  voidedAt?: Date | null;
+  updatedAt?: Date | null | undefined;
+  voidedAt?: Date | null | undefined;
 }
 
+/** Converts `CreditNote` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreditNoteSerializer = {
-  _fromJsonObject(object: any): CreditNote {
+  parse(json: any): CreditNote {
     return {
-      createdAt: parseDateTime(object["created_at"]),
-      creditNoteNumber: object["credit_note_number"],
-      creditType: CreditTypeSerializer._fromJsonObject(object["credit_type"]),
-      creditedAmountCents: object["credited_amount_cents"],
-      currency: CurrencySerializer._fromJsonObject(object["currency"]),
-      customProperties: object["custom_properties"],
-      customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
+      ...extraProperties(json, [
+        "created_at",
+        "credit_note_number",
+        "credit_type",
+        "credited_amount_cents",
+        "currency",
+        "custom_properties",
+        "customer_id",
+        "finalized_at",
+        "id",
+        "invoice_id",
+        "invoice_number",
+        "line_items",
+        "memo",
+        "plan_version_id",
+        "reason",
+        "refunded_amount_cents",
+        "status",
+        "subscription_id",
+        "subtotal",
+        "tax_amount",
+        "tax_breakdown",
+        "total",
+        "updated_at",
+        "voided_at",
+      ]),
+      createdAt: parseDateTime(json["created_at"]),
+      creditNoteNumber: json["credit_note_number"],
+      creditType: CreditTypeSerializer.parse(json["credit_type"]),
+      creditedAmountCents: json["credited_amount_cents"],
+      currency: CurrencySerializer.parse(json["currency"]),
+      customProperties: json["custom_properties"],
+      customerId: CustomerIdSerializer.parse(json["customer_id"]),
       finalizedAt:
-        object["finalized_at"] != null
-          ? parseDateTime(object["finalized_at"])
-          : undefined,
-      id: CreditNoteIdSerializer._fromJsonObject(object["id"]),
-      invoiceId: InvoiceIdSerializer._fromJsonObject(object["invoice_id"]),
-      invoiceNumber: object["invoice_number"],
-      lineItems: object["line_items"].map((item: any) =>
-        InvoiceLineItemSerializer._fromJsonObject(item)
+        json["finalized_at"] != null
+          ? parseDateTime(json["finalized_at"])
+          : json["finalized_at"],
+      id: CreditNoteIdSerializer.parse(json["id"]),
+      invoiceId: InvoiceIdSerializer.parse(json["invoice_id"]),
+      invoiceNumber: json["invoice_number"],
+      lineItems: json["line_items"].map((item: any) =>
+        InvoiceLineItemSerializer.parse(item)
       ),
-      memo: object["memo"],
+      memo: json["memo"],
       planVersionId:
-        object["plan_version_id"] != null
-          ? PlanVersionIdSerializer._fromJsonObject(object["plan_version_id"])
-          : undefined,
-      reason: object["reason"],
-      refundedAmountCents: object["refunded_amount_cents"],
-      status: CreditNoteStatusSerializer._fromJsonObject(object["status"]),
+        json["plan_version_id"] != null
+          ? PlanVersionIdSerializer.parse(json["plan_version_id"])
+          : json["plan_version_id"],
+      reason: json["reason"],
+      refundedAmountCents: json["refunded_amount_cents"],
+      status: CreditNoteStatusSerializer.parse(json["status"]),
       subscriptionId:
-        object["subscription_id"] != null
-          ? SubscriptionIdSerializer._fromJsonObject(object["subscription_id"])
-          : undefined,
-      subtotal: object["subtotal"],
-      taxAmount: object["tax_amount"],
-      taxBreakdown: object["tax_breakdown"].map((item: any) =>
-        TaxBreakdownItemSerializer._fromJsonObject(item)
+        json["subscription_id"] != null
+          ? SubscriptionIdSerializer.parse(json["subscription_id"])
+          : json["subscription_id"],
+      subtotal: json["subtotal"],
+      taxAmount: json["tax_amount"],
+      taxBreakdown: json["tax_breakdown"].map((item: any) =>
+        TaxBreakdownItemSerializer.parse(item)
       ),
-      total: object["total"],
+      total: json["total"],
       updatedAt:
-        object["updated_at"] != null ? parseDateTime(object["updated_at"]) : undefined,
+        json["updated_at"] != null
+          ? parseDateTime(json["updated_at"])
+          : json["updated_at"],
       voidedAt:
-        object["voided_at"] != null ? parseDateTime(object["voided_at"]) : undefined,
+        json["voided_at"] != null ? parseDateTime(json["voided_at"]) : json["voided_at"],
     };
   },
 
-  _toJsonObject(self: CreditNote): any {
+  serialize(value: CreditNote): any {
     return {
-      created_at: self.createdAt,
-      credit_note_number: self.creditNoteNumber,
-      credit_type: CreditTypeSerializer._toJsonObject(self.creditType),
-      credited_amount_cents: self.creditedAmountCents,
-      currency: CurrencySerializer._toJsonObject(self.currency),
-      custom_properties: self.customProperties,
-      customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
-      finalized_at: self.finalizedAt,
-      id: CreditNoteIdSerializer._toJsonObject(self.id),
-      invoice_id: InvoiceIdSerializer._toJsonObject(self.invoiceId),
-      invoice_number: self.invoiceNumber,
-      line_items: self.lineItems.map((item: any) =>
-        InvoiceLineItemSerializer._toJsonObject(item)
+      ...extraProperties(value, [
+        "createdAt",
+        "creditNoteNumber",
+        "creditType",
+        "creditedAmountCents",
+        "currency",
+        "customProperties",
+        "customerId",
+        "finalizedAt",
+        "id",
+        "invoiceId",
+        "invoiceNumber",
+        "lineItems",
+        "memo",
+        "planVersionId",
+        "reason",
+        "refundedAmountCents",
+        "status",
+        "subscriptionId",
+        "subtotal",
+        "taxAmount",
+        "taxBreakdown",
+        "total",
+        "updatedAt",
+        "voidedAt",
+      ]),
+      created_at: value.createdAt,
+      credit_note_number: value.creditNoteNumber,
+      credit_type: CreditTypeSerializer.serialize(value.creditType),
+      credited_amount_cents: value.creditedAmountCents,
+      currency: CurrencySerializer.serialize(value.currency),
+      custom_properties: value.customProperties,
+      customer_id: CustomerIdSerializer.serialize(value.customerId),
+      finalized_at: value.finalizedAt,
+      id: CreditNoteIdSerializer.serialize(value.id),
+      invoice_id: InvoiceIdSerializer.serialize(value.invoiceId),
+      invoice_number: value.invoiceNumber,
+      line_items: value.lineItems.map((item: any) =>
+        InvoiceLineItemSerializer.serialize(item)
       ),
-      memo: self.memo,
+      memo: value.memo,
       plan_version_id:
-        self.planVersionId != null
-          ? PlanVersionIdSerializer._toJsonObject(self.planVersionId)
-          : undefined,
-      reason: self.reason,
-      refunded_amount_cents: self.refundedAmountCents,
-      status: CreditNoteStatusSerializer._toJsonObject(self.status),
+        value.planVersionId != null
+          ? PlanVersionIdSerializer.serialize(value.planVersionId)
+          : value.planVersionId,
+      reason: value.reason,
+      refunded_amount_cents: value.refundedAmountCents,
+      status: CreditNoteStatusSerializer.serialize(value.status),
       subscription_id:
-        self.subscriptionId != null
-          ? SubscriptionIdSerializer._toJsonObject(self.subscriptionId)
-          : undefined,
-      subtotal: self.subtotal,
-      tax_amount: self.taxAmount,
-      tax_breakdown: self.taxBreakdown.map((item: any) =>
-        TaxBreakdownItemSerializer._toJsonObject(item)
+        value.subscriptionId != null
+          ? SubscriptionIdSerializer.serialize(value.subscriptionId)
+          : value.subscriptionId,
+      subtotal: value.subtotal,
+      tax_amount: value.taxAmount,
+      tax_breakdown: value.taxBreakdown.map((item: any) =>
+        TaxBreakdownItemSerializer.serialize(item)
       ),
-      total: self.total,
-      updated_at: self.updatedAt,
-      voided_at: self.voidedAt,
+      total: value.total,
+      updated_at: value.updatedAt,
+      voided_at: value.voidedAt,
     };
   },
 };

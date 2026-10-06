@@ -1,17 +1,21 @@
 // this file is @generated
 /** Lifecycle status of a feature. */
-export enum FeatureStatus {
-  Active = "ACTIVE",
-  Disabled = "DISABLED",
-  Archived = "ARCHIVED",
-}
+export const FeatureStatus = {
+  Active: "ACTIVE",
+  Disabled: "DISABLED",
+  Archived: "ARCHIVED",
+} as const;
+export type FeatureStatus =
+  | (typeof FeatureStatus)[keyof typeof FeatureStatus]
+  | (string & {});
 
+/** Converts `FeatureStatus` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FeatureStatusSerializer = {
-  _fromJsonObject(object: any): FeatureStatus {
-    return object;
+  parse(json: any): FeatureStatus {
+    return json;
   },
 
-  _toJsonObject(self: FeatureStatus): any {
-    return self;
+  serialize(value: FeatureStatus): any {
+    return value;
   },
 };

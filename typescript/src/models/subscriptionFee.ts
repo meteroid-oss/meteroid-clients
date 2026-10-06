@@ -1,10 +1,10 @@
 // this file is @generated
-import { type CapacityFee, CapacityFeeSerializer } from "./capacityFee";
-import { type OneTimeFee, OneTimeFeeSerializer } from "./oneTimeFee";
-import { type RateFee, RateFeeSerializer } from "./rateFee";
-import { type RecurringFee, RecurringFeeSerializer } from "./recurringFee";
-import { type SlotFee, SlotFeeSerializer } from "./slotFee";
-import { type UsageFee, UsageFeeSerializer } from "./usageFee";
+import { type CapacityFee, CapacityFeeSerializer } from "./capacityFee.js";
+import { type OneTimeFee, OneTimeFeeSerializer } from "./oneTimeFee.js";
+import { type RateFee, RateFeeSerializer } from "./rateFee.js";
+import { type RecurringFee, RecurringFeeSerializer } from "./recurringFee.js";
+import { type SlotFee, SlotFeeSerializer } from "./slotFee.js";
+import { type UsageFee, UsageFeeSerializer } from "./usageFee.js";
 
 export interface SubscriptionFeeRate extends RateFee {
   type: "RATE";
@@ -33,80 +33,80 @@ export type SubscriptionFee =
   | SubscriptionFeeSlot
   | SubscriptionFeeUsage;
 
+/** Converts `SubscriptionFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionFeeSerializer = {
-  _fromJsonObject(object: any): SubscriptionFee {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): SubscriptionFee {
+    switch (json["type"]) {
       case "RATE":
         return {
-          ...RateFeeSerializer._fromJsonObject(object),
+          ...RateFeeSerializer.parse(json),
           type: "RATE",
         };
       case "ONE_TIME":
         return {
-          ...OneTimeFeeSerializer._fromJsonObject(object),
+          ...OneTimeFeeSerializer.parse(json),
           type: "ONE_TIME",
         };
       case "RECURRING":
         return {
-          ...RecurringFeeSerializer._fromJsonObject(object),
+          ...RecurringFeeSerializer.parse(json),
           type: "RECURRING",
         };
       case "CAPACITY":
         return {
-          ...CapacityFeeSerializer._fromJsonObject(object),
+          ...CapacityFeeSerializer.parse(json),
           type: "CAPACITY",
         };
       case "SLOT":
         return {
-          ...SlotFeeSerializer._fromJsonObject(object),
+          ...SlotFeeSerializer.parse(json),
           type: "SLOT",
         };
       case "USAGE":
         return {
-          ...UsageFeeSerializer._fromJsonObject(object),
+          ...UsageFeeSerializer.parse(json),
           type: "USAGE",
         };
       default:
-        throw new Error(`Unexpected type for SubscriptionFee: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: SubscriptionFee): any {
-    switch (self.type) {
+  serialize(value: SubscriptionFee): any {
+    switch (value.type) {
       case "RATE":
         return {
-          ...RateFeeSerializer._toJsonObject(self),
+          ...RateFeeSerializer.serialize(value),
           type: "RATE",
         };
       case "ONE_TIME":
         return {
-          ...OneTimeFeeSerializer._toJsonObject(self),
+          ...OneTimeFeeSerializer.serialize(value),
           type: "ONE_TIME",
         };
       case "RECURRING":
         return {
-          ...RecurringFeeSerializer._toJsonObject(self),
+          ...RecurringFeeSerializer.serialize(value),
           type: "RECURRING",
         };
       case "CAPACITY":
         return {
-          ...CapacityFeeSerializer._toJsonObject(self),
+          ...CapacityFeeSerializer.serialize(value),
           type: "CAPACITY",
         };
       case "SLOT":
         return {
-          ...SlotFeeSerializer._toJsonObject(self),
+          ...SlotFeeSerializer.serialize(value),
           type: "SLOT",
         };
       case "USAGE":
         return {
-          ...UsageFeeSerializer._toJsonObject(self),
+          ...UsageFeeSerializer.serialize(value),
           type: "USAGE",
         };
       default:
-        throw new Error(`Unexpected type for SubscriptionFee`);
+        return value;
     }
   },
 };

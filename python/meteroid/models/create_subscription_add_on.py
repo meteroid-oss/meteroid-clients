@@ -1,16 +1,22 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .add_on_id import AddOnId
-from .subscription_add_on_customization import SubscriptionAddOnCustomization
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .add_on_id import AddOnId
+    from .subscription_add_on_customization import SubscriptionAddOnCustomization
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CreateSubscriptionAddOn(BaseModel):
+    """The `CreateSubscriptionAddOn` object."""
+
     add_on_id: AddOnId
 
-    customization: t.Optional[SubscriptionAddOnCustomization] = None
+    customization: SubscriptionAddOnCustomization | None | Unset = UNSET
 
-    quantity: t.Optional[int] = None
+    quantity: int | None = None

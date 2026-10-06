@@ -1,13 +1,13 @@
 // this file is @generated
-import { type CapacityPricing, CapacityPricingSerializer } from "./capacityPricing";
+import { type CapacityPricing, CapacityPricingSerializer } from "./capacityPricing.js";
 import {
   type ExtraRecurringPricing,
   ExtraRecurringPricingSerializer,
-} from "./extraRecurringPricing";
-import { type OneTimePricing, OneTimePricingSerializer } from "./oneTimePricing";
-import { type RatePricing, RatePricingSerializer } from "./ratePricing";
-import { type SlotPricing, SlotPricingSerializer } from "./slotPricing";
-import { type UsagePricing, UsagePricingSerializer } from "./usagePricing";
+} from "./extraRecurringPricing.js";
+import { type OneTimePricing, OneTimePricingSerializer } from "./oneTimePricing.js";
+import { type RatePricing, RatePricingSerializer } from "./ratePricing.js";
+import { type SlotPricing, SlotPricingSerializer } from "./slotPricing.js";
+import { type UsagePricing, UsagePricingSerializer } from "./usagePricing.js";
 
 export interface PricingRate extends RatePricing {
   type: "RATE";
@@ -36,80 +36,80 @@ export type Pricing =
   | PricingExtraRecurring
   | PricingOneTime;
 
+/** Converts `Pricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PricingSerializer = {
-  _fromJsonObject(object: any): Pricing {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): Pricing {
+    switch (json["type"]) {
       case "RATE":
         return {
-          ...RatePricingSerializer._fromJsonObject(object),
+          ...RatePricingSerializer.parse(json),
           type: "RATE",
         };
       case "SLOT":
         return {
-          ...SlotPricingSerializer._fromJsonObject(object),
+          ...SlotPricingSerializer.parse(json),
           type: "SLOT",
         };
       case "CAPACITY":
         return {
-          ...CapacityPricingSerializer._fromJsonObject(object),
+          ...CapacityPricingSerializer.parse(json),
           type: "CAPACITY",
         };
       case "USAGE":
         return {
-          ...UsagePricingSerializer._fromJsonObject(object),
+          ...UsagePricingSerializer.parse(json),
           type: "USAGE",
         };
       case "EXTRA_RECURRING":
         return {
-          ...ExtraRecurringPricingSerializer._fromJsonObject(object),
+          ...ExtraRecurringPricingSerializer.parse(json),
           type: "EXTRA_RECURRING",
         };
       case "ONE_TIME":
         return {
-          ...OneTimePricingSerializer._fromJsonObject(object),
+          ...OneTimePricingSerializer.parse(json),
           type: "ONE_TIME",
         };
       default:
-        throw new Error(`Unexpected type for Pricing: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: Pricing): any {
-    switch (self.type) {
+  serialize(value: Pricing): any {
+    switch (value.type) {
       case "RATE":
         return {
-          ...RatePricingSerializer._toJsonObject(self),
+          ...RatePricingSerializer.serialize(value),
           type: "RATE",
         };
       case "SLOT":
         return {
-          ...SlotPricingSerializer._toJsonObject(self),
+          ...SlotPricingSerializer.serialize(value),
           type: "SLOT",
         };
       case "CAPACITY":
         return {
-          ...CapacityPricingSerializer._toJsonObject(self),
+          ...CapacityPricingSerializer.serialize(value),
           type: "CAPACITY",
         };
       case "USAGE":
         return {
-          ...UsagePricingSerializer._toJsonObject(self),
+          ...UsagePricingSerializer.serialize(value),
           type: "USAGE",
         };
       case "EXTRA_RECURRING":
         return {
-          ...ExtraRecurringPricingSerializer._toJsonObject(self),
+          ...ExtraRecurringPricingSerializer.serialize(value),
           type: "EXTRA_RECURRING",
         };
       case "ONE_TIME":
         return {
-          ...OneTimePricingSerializer._toJsonObject(self),
+          ...OneTimePricingSerializer.serialize(value),
           type: "ONE_TIME",
         };
       default:
-        throw new Error(`Unexpected type for Pricing`);
+        return value;
     }
   },
 };

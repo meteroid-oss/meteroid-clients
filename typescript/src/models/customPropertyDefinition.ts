@@ -1,74 +1,90 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type CustomPropertyDefinitionId,
   CustomPropertyDefinitionIdSerializer,
-} from "./customPropertyDefinitionId";
+} from "./customPropertyDefinitionId.js";
 import {
   type CustomPropertyEntityType,
   CustomPropertyEntityTypeSerializer,
-} from "./customPropertyEntityType";
+} from "./customPropertyEntityType.js";
 import {
   type CustomPropertyType,
   CustomPropertyTypeSerializer,
-} from "./customPropertyType";
-import { type PropertyConfig, PropertyConfigSerializer } from "./propertyConfig";
+} from "./customPropertyType.js";
+import { type PropertyConfig, PropertyConfigSerializer } from "./propertyConfig.js";
 
 export interface CustomPropertyDefinition {
   archived: boolean;
-
   config: PropertyConfig;
-
-  defaultValue?: unknown;
-
-  description?: string | null;
-
+  defaultValue?: unknown | undefined;
+  description?: string | null | undefined;
   displayOrder: number;
-
   entityType: CustomPropertyEntityType;
-
   id: CustomPropertyDefinitionId;
-
   key: string;
-
   name: string;
-
   propertyType: CustomPropertyType;
-
   required: boolean;
 }
 
+/** Converts `CustomPropertyDefinition` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomPropertyDefinitionSerializer = {
-  _fromJsonObject(object: any): CustomPropertyDefinition {
+  parse(json: any): CustomPropertyDefinition {
     return {
-      archived: object["archived"],
-      config: PropertyConfigSerializer._fromJsonObject(object["config"]),
-      defaultValue: object["default_value"],
-      description: object["description"],
-      displayOrder: object["display_order"],
-      entityType: CustomPropertyEntityTypeSerializer._fromJsonObject(
-        object["entity_type"]
-      ),
-      id: CustomPropertyDefinitionIdSerializer._fromJsonObject(object["id"]),
-      key: object["key"],
-      name: object["name"],
-      propertyType: CustomPropertyTypeSerializer._fromJsonObject(object["property_type"]),
-      required: object["required"],
+      ...extraProperties(json, [
+        "archived",
+        "config",
+        "default_value",
+        "description",
+        "display_order",
+        "entity_type",
+        "id",
+        "key",
+        "name",
+        "property_type",
+        "required",
+      ]),
+      archived: json["archived"],
+      config: PropertyConfigSerializer.parse(json["config"]),
+      defaultValue: json["default_value"],
+      description: json["description"],
+      displayOrder: json["display_order"],
+      entityType: CustomPropertyEntityTypeSerializer.parse(json["entity_type"]),
+      id: CustomPropertyDefinitionIdSerializer.parse(json["id"]),
+      key: json["key"],
+      name: json["name"],
+      propertyType: CustomPropertyTypeSerializer.parse(json["property_type"]),
+      required: json["required"],
     };
   },
 
-  _toJsonObject(self: CustomPropertyDefinition): any {
+  serialize(value: CustomPropertyDefinition): any {
     return {
-      archived: self.archived,
-      config: PropertyConfigSerializer._toJsonObject(self.config),
-      default_value: self.defaultValue,
-      description: self.description,
-      display_order: self.displayOrder,
-      entity_type: CustomPropertyEntityTypeSerializer._toJsonObject(self.entityType),
-      id: CustomPropertyDefinitionIdSerializer._toJsonObject(self.id),
-      key: self.key,
-      name: self.name,
-      property_type: CustomPropertyTypeSerializer._toJsonObject(self.propertyType),
-      required: self.required,
+      ...extraProperties(value, [
+        "archived",
+        "config",
+        "defaultValue",
+        "description",
+        "displayOrder",
+        "entityType",
+        "id",
+        "key",
+        "name",
+        "propertyType",
+        "required",
+      ]),
+      archived: value.archived,
+      config: PropertyConfigSerializer.serialize(value.config),
+      default_value: value.defaultValue,
+      description: value.description,
+      display_order: value.displayOrder,
+      entity_type: CustomPropertyEntityTypeSerializer.serialize(value.entityType),
+      id: CustomPropertyDefinitionIdSerializer.serialize(value.id),
+      key: value.key,
+      name: value.name,
+      property_type: CustomPropertyTypeSerializer.serialize(value.propertyType),
+      required: value.required,
     };
   },
 };

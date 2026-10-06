@@ -1,41 +1,54 @@
 // this file is @generated
-import { type PriceId, PriceIdSerializer } from "./priceId";
-import { type ProductId, ProductIdSerializer } from "./productId";
+import { extraProperties } from "../json.js";
+import { type PriceId, PriceIdSerializer } from "./priceId.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
 
 export interface CreateAddOnRequest {
-  description?: string | null;
-
-  maxInstancesPerSubscription?: number | null;
-
+  description?: string | null | undefined;
+  maxInstancesPerSubscription?: number | null | undefined;
   name: string;
-
   priceId: PriceId;
-
   productId: ProductId;
-
-  selfServiceable?: boolean;
+  selfServiceable?: boolean | undefined;
 }
 
+/** Converts `CreateAddOnRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateAddOnRequestSerializer = {
-  _fromJsonObject(object: any): CreateAddOnRequest {
+  parse(json: any): CreateAddOnRequest {
     return {
-      description: object["description"],
-      maxInstancesPerSubscription: object["max_instances_per_subscription"],
-      name: object["name"],
-      priceId: PriceIdSerializer._fromJsonObject(object["price_id"]),
-      productId: ProductIdSerializer._fromJsonObject(object["product_id"]),
-      selfServiceable: object["self_serviceable"],
+      ...extraProperties(json, [
+        "description",
+        "max_instances_per_subscription",
+        "name",
+        "price_id",
+        "product_id",
+        "self_serviceable",
+      ]),
+      description: json["description"],
+      maxInstancesPerSubscription: json["max_instances_per_subscription"],
+      name: json["name"],
+      priceId: PriceIdSerializer.parse(json["price_id"]),
+      productId: ProductIdSerializer.parse(json["product_id"]),
+      selfServiceable: json["self_serviceable"],
     };
   },
 
-  _toJsonObject(self: CreateAddOnRequest): any {
+  serialize(value: CreateAddOnRequest): any {
     return {
-      description: self.description,
-      max_instances_per_subscription: self.maxInstancesPerSubscription,
-      name: self.name,
-      price_id: PriceIdSerializer._toJsonObject(self.priceId),
-      product_id: ProductIdSerializer._toJsonObject(self.productId),
-      self_serviceable: self.selfServiceable,
+      ...extraProperties(value, [
+        "description",
+        "maxInstancesPerSubscription",
+        "name",
+        "priceId",
+        "productId",
+        "selfServiceable",
+      ]),
+      description: value.description,
+      max_instances_per_subscription: value.maxInstancesPerSubscription,
+      name: value.name,
+      price_id: PriceIdSerializer.serialize(value.priceId),
+      product_id: ProductIdSerializer.serialize(value.productId),
+      self_serviceable: value.selfServiceable,
     };
   },
 };

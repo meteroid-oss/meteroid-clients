@@ -1,30 +1,31 @@
 // this file is @generated
-import { type AddOn, AddOnSerializer } from "./addOn";
+import { extraProperties } from "../json.js";
+import { type AddOn, AddOnSerializer } from "./addOn.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface AddOnListResponse {
   data: AddOn[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `AddOnListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const AddOnListResponseSerializer = {
-  _fromJsonObject(object: any): AddOnListResponse {
+  parse(json: any): AddOnListResponse {
     return {
-      data: object["data"].map((item: any) => AddOnSerializer._fromJsonObject(item)),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => AddOnSerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: AddOnListResponse): any {
+  serialize(value: AddOnListResponse): any {
     return {
-      data: self.data.map((item: any) => AddOnSerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => AddOnSerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

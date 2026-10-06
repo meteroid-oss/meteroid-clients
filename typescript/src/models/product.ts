@@ -1,67 +1,81 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId.js";
 import {
   type ProductFeeStructure,
   ProductFeeStructureSerializer,
-} from "./productFeeStructure";
+} from "./productFeeStructure.js";
 import {
   type ProductFeeTypeEnum,
   ProductFeeTypeEnumSerializer,
-} from "./productFeeTypeEnum";
-import { type ProductId, ProductIdSerializer } from "./productId";
+} from "./productFeeTypeEnum.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
 
 export interface Product {
-  archivedAt?: Date | null;
-
+  archivedAt?: Date | null | undefined;
   catalog: boolean;
-
   createdAt: Date;
-
-  description?: string | null;
-
+  description?: string | null | undefined;
   feeStructure: ProductFeeStructure;
-
   feeType: ProductFeeTypeEnum;
-
   id: ProductId;
-
   name: string;
-
   productFamilyId: ProductFamilyId;
 }
 
+/** Converts `Product` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductSerializer = {
-  _fromJsonObject(object: any): Product {
+  parse(json: any): Product {
     return {
+      ...extraProperties(json, [
+        "archived_at",
+        "catalog",
+        "created_at",
+        "description",
+        "fee_structure",
+        "fee_type",
+        "id",
+        "name",
+        "product_family_id",
+      ]),
       archivedAt:
-        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
-      catalog: object["catalog"],
-      createdAt: parseDateTime(object["created_at"]),
-      description: object["description"],
-      feeStructure: ProductFeeStructureSerializer._fromJsonObject(
-        object["fee_structure"]
-      ),
-      feeType: ProductFeeTypeEnumSerializer._fromJsonObject(object["fee_type"]),
-      id: ProductIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
-      productFamilyId: ProductFamilyIdSerializer._fromJsonObject(
-        object["product_family_id"]
-      ),
+        json["archived_at"] != null
+          ? parseDateTime(json["archived_at"])
+          : json["archived_at"],
+      catalog: json["catalog"],
+      createdAt: parseDateTime(json["created_at"]),
+      description: json["description"],
+      feeStructure: ProductFeeStructureSerializer.parse(json["fee_structure"]),
+      feeType: ProductFeeTypeEnumSerializer.parse(json["fee_type"]),
+      id: ProductIdSerializer.parse(json["id"]),
+      name: json["name"],
+      productFamilyId: ProductFamilyIdSerializer.parse(json["product_family_id"]),
     };
   },
 
-  _toJsonObject(self: Product): any {
+  serialize(value: Product): any {
     return {
-      archived_at: self.archivedAt,
-      catalog: self.catalog,
-      created_at: self.createdAt,
-      description: self.description,
-      fee_structure: ProductFeeStructureSerializer._toJsonObject(self.feeStructure),
-      fee_type: ProductFeeTypeEnumSerializer._toJsonObject(self.feeType),
-      id: ProductIdSerializer._toJsonObject(self.id),
-      name: self.name,
-      product_family_id: ProductFamilyIdSerializer._toJsonObject(self.productFamilyId),
+      ...extraProperties(value, [
+        "archivedAt",
+        "catalog",
+        "createdAt",
+        "description",
+        "feeStructure",
+        "feeType",
+        "id",
+        "name",
+        "productFamilyId",
+      ]),
+      archived_at: value.archivedAt,
+      catalog: value.catalog,
+      created_at: value.createdAt,
+      description: value.description,
+      fee_structure: ProductFeeStructureSerializer.serialize(value.feeStructure),
+      fee_type: ProductFeeTypeEnumSerializer.serialize(value.feeType),
+      id: ProductIdSerializer.serialize(value.id),
+      name: value.name,
+      product_family_id: ProductFamilyIdSerializer.serialize(value.productFamilyId),
     };
   },
 };

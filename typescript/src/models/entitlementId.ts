@@ -2,12 +2,13 @@
 
 export type EntitlementId = string;
 
+/** Converts `EntitlementId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const EntitlementIdSerializer = {
-  _fromJsonObject(object: any): EntitlementId {
-    return object;
+  parse(json: any): EntitlementId {
+    return json;
   },
 
-  _toJsonObject(self: EntitlementId): any {
-    return self;
+  serialize(value: EntitlementId): any {
+    return value;
   },
 };

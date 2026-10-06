@@ -1,66 +1,62 @@
 // this file is @generated
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
+import { extraProperties } from "../json.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
 
 export interface AvailableParameters {
   /** Map of component_id -> available billing periods (e.g., "MONTHLY", "ANNUAL") */
-  billingPeriods?: { [key: string]: BillingPeriodEnum[] };
-
+  billingPeriods?: { [key: string]: BillingPeriodEnum[] } | undefined;
   /** Map of component_id -> available capacity values */
-  capacityThresholds?: { [key: string]: number[] };
-
+  capacityThresholds?: { [key: string]: number[] } | undefined;
   /** List of component_ids that support slot parametrization (initial slot count) */
-  slotComponents?: string[];
+  slotComponents?: string[] | undefined;
 }
 
+/** Converts `AvailableParameters` values from (`parse`) and to (`serialize`) their JSON form. */
 export const AvailableParametersSerializer = {
-  _fromJsonObject(object: any): AvailableParameters {
+  parse(json: any): AvailableParameters {
     return {
+      ...extraProperties(json, [
+        "billing_periods",
+        "capacity_thresholds",
+        "slot_components",
+      ]),
       billingPeriods:
-        object["billing_periods"] != null
+        json["billing_periods"] != null
           ? Object.fromEntries(
-              Object.entries(object["billing_periods"]).map((entry: [string, any]) => [
-                entry[0],
-                entry[1].map((item: any) =>
-                  BillingPeriodEnumSerializer._fromJsonObject(item)
-                ),
-              ])
-            )
-          : undefined,
-      capacityThresholds:
-        object["capacity_thresholds"] != null
-          ? Object.fromEntries(
-              Object.entries(object["capacity_thresholds"]).map(
-                (entry: [string, any]) => [entry[0], entry[1]]
+              Object.entries(json["billing_periods"]).map(
+                ([key, entry]: [string, any]) => [
+                  key,
+                  entry.map((item: any) => BillingPeriodEnumSerializer.parse(item)),
+                ]
               )
             )
           : undefined,
-      slotComponents: object["slot_components"],
+      capacityThresholds: json["capacity_thresholds"],
+      slotComponents: json["slot_components"],
     };
   },
 
-  _toJsonObject(self: AvailableParameters): any {
+  serialize(value: AvailableParameters): any {
     return {
+      ...extraProperties(value, [
+        "billingPeriods",
+        "capacityThresholds",
+        "slotComponents",
+      ]),
       billing_periods:
-        self.billingPeriods != null
+        value.billingPeriods != null
           ? Object.fromEntries(
-              Object.entries(self.billingPeriods).map((entry: [string, any]) => [
-                entry[0],
-                entry[1].map((item: any) =>
-                  BillingPeriodEnumSerializer._toJsonObject(item)
-                ),
+              Object.entries(value.billingPeriods).map(([key, entry]) => [
+                key,
+                entry.map((item: any) => BillingPeriodEnumSerializer.serialize(item)),
               ])
             )
           : undefined,
-      capacity_thresholds:
-        self.capacityThresholds != null
-          ? Object.fromEntries(
-              Object.entries(self.capacityThresholds).map((entry: [string, any]) => [
-                entry[0],
-                entry[1],
-              ])
-            )
-          : undefined,
-      slot_components: self.slotComponents,
+      capacity_thresholds: value.capacityThresholds,
+      slot_components: value.slotComponents,
     };
   },
 };

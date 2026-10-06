@@ -1,231 +1,579 @@
 # this file is @generated
+"""Add ons API."""
+
+from __future__ import annotations
+
 import typing as t
 
+from .. import models as _models
 from ..models import (
     AddOn,
     AddOnListResponse,
     CreateAddOnRequest,
+    PriceId,
+    ProductId,
     ResolvedEntitlementListResponse,
     UpdateAddOnRequest,
 )
-from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
+from ..serialization import UNSET, Unset, to_json_value
+from ._response import async_to_raw_response_wrapper, to_raw_response_wrapper
+from .common import (
+    ApiBaseAsync,
+    ApiBaseSync,
+    ApiRequest,
+    Timeout,
+    decode_response,
+    serialize_query_params,
+)
 
 
-class AddOnsAsync(ApiBaseAsync):
-    """add ons API."""
+class AsyncAddOns(ApiBaseAsync):
+    """Add ons API, for asyncio."""
 
-    async def list_addons(
+    @property
+    def with_raw_response(self) -> AsyncAddOnsWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return AsyncAddOnsWithRawResponse(self)
+
+    async def list(
         self,
         *,
-        search: t.Optional[str] = None,
-        currency: t.Optional[str] = None,
-        include_archived: t.Optional[bool] = None,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
+        search: str | None = None,
+        currency: str | None = None,
+        include_archived: bool | None = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOnListResponse:
-        """:param include_archived: Include archived add-ons in the results (default: false)
+        """List add-ons
+
+        :param include_archived: Include archived add-ons in the results (default: false)
         :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/addons",
-            query_params=serialize_query_params(
-                {
-                    "search": search,
-                    "currency": currency,
-                    "include_archived": include_archived,
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/addons",
+                query_params=serialize_query_params(
+                    {
+                        "search": search,
+                        "currency": currency,
+                        "include_archived": include_archived,
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOnListResponse)
 
-    async def create_addon(
+    async def create(
         self,
-        create_add_on_request: CreateAddOnRequest,
+        *,
+        name: str,
+        price_id: PriceId,
+        product_id: ProductId,
+        description: str | None | Unset = UNSET,
+        max_instances_per_subscription: int | None | Unset = UNSET,
+        self_serviceable: bool | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOn:
-        response = await self._request_asyncio(
-            method="post",
-            path="/api/v1/addons",
-            json_body=create_add_on_request.to_dict(),
+        """Create an add-on"""
+        response = await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/addons",
+                json_body=to_json_value(
+                    CreateAddOnRequest(
+                        description=description,
+                        max_instances_per_subscription=max_instances_per_subscription,
+                        name=name,
+                        price_id=price_id,
+                        product_id=product_id,
+                        self_serviceable=self_serviceable,
+                    ),
+                    CreateAddOnRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOn)
 
-    async def get_addon(
+    async def retrieve(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOn:
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/addons/{addon_id}",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """Get add-on details"""
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/addons/{addon_id}",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOn)
 
-    async def update_addon(
+    async def update(
         self,
         addon_id: str,
-        update_add_on_request: UpdateAddOnRequest,
+        *,
+        description: str | None | Unset = UNSET,
+        max_instances_per_subscription: int | None | Unset = UNSET,
+        name: str | None | Unset = UNSET,
+        price_id: PriceId | None | Unset = UNSET,
+        self_serviceable: bool | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOn:
-        response = await self._request_asyncio(
-            method="patch",
-            path="/api/v1/addons/{addon_id}",
-            path_params={
-                "addon_id": addon_id,
-            },
-            json_body=update_add_on_request.to_dict(),
+        """Update an add-on"""
+        response = await self._request(
+            ApiRequest(
+                method="patch",
+                path="/api/v1/addons/{addon_id}",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                json_body=to_json_value(
+                    UpdateAddOnRequest(
+                        description=description,
+                        max_instances_per_subscription=max_instances_per_subscription,
+                        name=name,
+                        price_id=price_id,
+                        self_serviceable=self_serviceable,
+                    ),
+                    UpdateAddOnRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOn)
 
-    async def archive_addon(
+    async def archive(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        await self._request_asyncio(
-            method="post",
-            path="/api/v1/addons/{addon_id}/archive",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """Archive an add-on"""
+        await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/addons/{addon_id}/archive",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
 
-    async def list_add_on_entitlements(
+    async def list_entitlements(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ResolvedEntitlementListResponse:
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/addons/{addon_id}/entitlements",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """List add-on entitlements"""
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/addons/{addon_id}/entitlements",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ResolvedEntitlementListResponse)
 
-    async def unarchive_addon(
+    async def unarchive(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        await self._request_asyncio(
-            method="post",
-            path="/api/v1/addons/{addon_id}/unarchive",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """Unarchive an add-on"""
+        await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/addons/{addon_id}/unarchive",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
+
+
+class AsyncAddOnsWithRawResponse:
+    """The methods of :class:`AsyncAddOns`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: AsyncAddOns) -> None:
+        self.list = async_to_raw_response_wrapper(resource.list)
+        self.create = async_to_raw_response_wrapper(resource.create)
+        self.retrieve = async_to_raw_response_wrapper(resource.retrieve)
+        self.update = async_to_raw_response_wrapper(resource.update)
+        self.archive = async_to_raw_response_wrapper(resource.archive)
+        self.list_entitlements = async_to_raw_response_wrapper(
+            resource.list_entitlements
+        )
+        self.unarchive = async_to_raw_response_wrapper(resource.unarchive)
 
 
 class AddOns(ApiBaseSync):
-    """add ons API."""
+    """Add ons API."""
 
-    def list_addons(
+    @property
+    def with_raw_response(self) -> AddOnsWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return AddOnsWithRawResponse(self)
+
+    def list(
         self,
         *,
-        search: t.Optional[str] = None,
-        currency: t.Optional[str] = None,
-        include_archived: t.Optional[bool] = None,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
+        search: str | None = None,
+        currency: str | None = None,
+        include_archived: bool | None = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOnListResponse:
-        """:param include_archived: Include archived add-ons in the results (default: false)
+        """List add-ons
+
+        :param include_archived: Include archived add-ons in the results (default: false)
         :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/addons",
-            query_params=serialize_query_params(
-                {
-                    "search": search,
-                    "currency": currency,
-                    "include_archived": include_archived,
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/addons",
+                query_params=serialize_query_params(
+                    {
+                        "search": search,
+                        "currency": currency,
+                        "include_archived": include_archived,
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOnListResponse)
 
-    def create_addon(
+    def create(
         self,
-        create_add_on_request: CreateAddOnRequest,
+        *,
+        name: str,
+        price_id: PriceId,
+        product_id: ProductId,
+        description: str | None | Unset = UNSET,
+        max_instances_per_subscription: int | None | Unset = UNSET,
+        self_serviceable: bool | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOn:
-        response = self._request_sync(
-            method="post",
-            path="/api/v1/addons",
-            json_body=create_add_on_request.to_dict(),
+        """Create an add-on"""
+        response = self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/addons",
+                json_body=to_json_value(
+                    CreateAddOnRequest(
+                        description=description,
+                        max_instances_per_subscription=max_instances_per_subscription,
+                        name=name,
+                        price_id=price_id,
+                        product_id=product_id,
+                        self_serviceable=self_serviceable,
+                    ),
+                    CreateAddOnRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOn)
 
-    def get_addon(
+    def retrieve(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOn:
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/addons/{addon_id}",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """Get add-on details"""
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/addons/{addon_id}",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOn)
 
-    def update_addon(
+    def update(
         self,
         addon_id: str,
-        update_add_on_request: UpdateAddOnRequest,
+        *,
+        description: str | None | Unset = UNSET,
+        max_instances_per_subscription: int | None | Unset = UNSET,
+        name: str | None | Unset = UNSET,
+        price_id: PriceId | None | Unset = UNSET,
+        self_serviceable: bool | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> AddOn:
-        response = self._request_sync(
-            method="patch",
-            path="/api/v1/addons/{addon_id}",
-            path_params={
-                "addon_id": addon_id,
-            },
-            json_body=update_add_on_request.to_dict(),
+        """Update an add-on"""
+        response = self._request(
+            ApiRequest(
+                method="patch",
+                path="/api/v1/addons/{addon_id}",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                json_body=to_json_value(
+                    UpdateAddOnRequest(
+                        description=description,
+                        max_instances_per_subscription=max_instances_per_subscription,
+                        name=name,
+                        price_id=price_id,
+                        self_serviceable=self_serviceable,
+                    ),
+                    UpdateAddOnRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, AddOn)
 
-    def archive_addon(
+    def archive(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        self._request_sync(
-            method="post",
-            path="/api/v1/addons/{addon_id}/archive",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """Archive an add-on"""
+        self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/addons/{addon_id}/archive",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
 
-    def list_add_on_entitlements(
+    def list_entitlements(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ResolvedEntitlementListResponse:
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/addons/{addon_id}/entitlements",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """List add-on entitlements"""
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/addons/{addon_id}/entitlements",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ResolvedEntitlementListResponse)
 
-    def unarchive_addon(
+    def unarchive(
         self,
         addon_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        self._request_sync(
-            method="post",
-            path="/api/v1/addons/{addon_id}/unarchive",
-            path_params={
-                "addon_id": addon_id,
-            },
+        """Unarchive an add-on"""
+        self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/addons/{addon_id}/unarchive",
+                path_params={
+                    "addon_id": addon_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
+
+
+class AddOnsWithRawResponse:
+    """The methods of :class:`AddOns`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: AddOns) -> None:
+        self.list = to_raw_response_wrapper(resource.list)
+        self.create = to_raw_response_wrapper(resource.create)
+        self.retrieve = to_raw_response_wrapper(resource.retrieve)
+        self.update = to_raw_response_wrapper(resource.update)
+        self.archive = to_raw_response_wrapper(resource.archive)
+        self.list_entitlements = to_raw_response_wrapper(resource.list_entitlements)
+        self.unarchive = to_raw_response_wrapper(resource.unarchive)

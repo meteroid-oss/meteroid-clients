@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface PercentageDiscount {
   percentage: string;
 }
 
+/** Converts `PercentageDiscount` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PercentageDiscountSerializer = {
-  _fromJsonObject(object: any): PercentageDiscount {
+  parse(json: any): PercentageDiscount {
     return {
-      percentage: object["percentage"],
+      ...extraProperties(json, ["percentage"]),
+      percentage: json["percentage"],
     };
   },
 
-  _toJsonObject(self: PercentageDiscount): any {
+  serialize(value: PercentageDiscount): any {
     return {
-      percentage: self.percentage,
+      ...extraProperties(value, ["percentage"]),
+      percentage: value.percentage,
     };
   },
 };

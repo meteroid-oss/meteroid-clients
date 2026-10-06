@@ -1,12 +1,15 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class OnboardingMode(str, enum.Enum):
+class OnboardingMode(StrEnum):
     """Onboarding mode for connected accounts"""
 
     EXPRESS = "express"
     FULL = "full"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+OnboardingModeLiteral: t.TypeAlias = t.Literal["express", "full"]
+"""The values of :class:`OnboardingMode`, which arguments take as plain strings too."""

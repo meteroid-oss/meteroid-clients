@@ -1,24 +1,27 @@
 // this file is @generated
-import { type PriceEntry, PriceEntrySerializer } from "./priceEntry";
+import { extraProperties } from "../json.js";
+import { type PriceEntry, PriceEntrySerializer } from "./priceEntry.js";
 
 export interface SubscriptionAddOnPriceOverride {
-  name?: string | null;
-
+  name?: string | null | undefined;
   priceEntry: PriceEntry;
 }
 
+/** Converts `SubscriptionAddOnPriceOverride` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionAddOnPriceOverrideSerializer = {
-  _fromJsonObject(object: any): SubscriptionAddOnPriceOverride {
+  parse(json: any): SubscriptionAddOnPriceOverride {
     return {
-      name: object["name"],
-      priceEntry: PriceEntrySerializer._fromJsonObject(object["price_entry"]),
+      ...extraProperties(json, ["name", "price_entry"]),
+      name: json["name"],
+      priceEntry: PriceEntrySerializer.parse(json["price_entry"]),
     };
   },
 
-  _toJsonObject(self: SubscriptionAddOnPriceOverride): any {
+  serialize(value: SubscriptionAddOnPriceOverride): any {
     return {
-      name: self.name,
-      price_entry: PriceEntrySerializer._toJsonObject(self.priceEntry),
+      ...extraProperties(value, ["name", "priceEntry"]),
+      name: value.name,
+      price_entry: PriceEntrySerializer.serialize(value.priceEntry),
     };
   },
 };

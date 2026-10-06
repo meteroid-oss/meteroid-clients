@@ -1,24 +1,25 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
 from ..serialization import BaseModel
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class TokenIntrospectionResponse(BaseModel):
     """Token introspection response as per RFC 7662"""
 
     active: bool
 
-    client_id: t.Optional[str] = None
+    client_id: str | None = None
 
-    exp: t.Optional[int] = None
+    exp: int | None = None
 
-    iat: t.Optional[int] = None
+    iat: int | None = None
 
-    scope: t.Optional[str] = None
+    scope: str | None = None
 
-    sub: t.Optional[str] = None
+    sub: str | None = None
 
-    token_type: t.Optional[str] = None
+    token_type: str | None = None

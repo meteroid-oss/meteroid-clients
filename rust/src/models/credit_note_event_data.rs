@@ -7,9 +7,10 @@ use super::{
     tax_breakdown_item::TaxBreakdownItem,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CreditNoteEventData {
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     pub credit_note_id: CreditNoteId,
 
@@ -17,7 +18,7 @@ pub struct CreditNoteEventData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub credit_note_number: Option<String>,
 
-    pub credited_amount_cents: i32,
+    pub credited_amount_cents: i64,
 
     pub currency: String,
 
@@ -41,43 +42,49 @@ pub struct CreditNoteEventData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 
-    pub refunded_amount_cents: i32,
+    pub refunded_amount_cents: i64,
 
     pub status: CreditNoteStatus,
 
-    pub subtotal: i32,
+    pub subtotal: i64,
 
-    pub tax_amount: i32,
+    pub tax_amount: i64,
 
     /// Per-rate tax (VAT) breakdown for the credited amount.
     pub tax_breakdown: Vec<TaxBreakdownItem>,
 
-    pub total: i32,
+    pub total: i64,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CreditNoteEventData {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
-        created_at: String,
+        created_at: chrono::DateTime<chrono::Utc>,
         credit_note_id: CreditNoteId,
-        credited_amount_cents: i32,
-        currency: String,
+        credited_amount_cents: i64,
+        currency: impl Into<String>,
         custom_properties: serde_json::Value,
         customer_id: CustomerId,
         invoice_id: InvoiceId,
         line_items: Vec<InvoiceLineItem>,
-        refunded_amount_cents: i32,
+        refunded_amount_cents: i64,
         status: CreditNoteStatus,
-        subtotal: i32,
-        tax_amount: i32,
+        subtotal: i64,
+        tax_amount: i64,
         tax_breakdown: Vec<TaxBreakdownItem>,
-        total: i32,
+        total: i64,
     ) -> Self {
         Self {
             created_at,
             credit_note_id,
             credit_note_number: None,
             credited_amount_cents,
-            currency,
+            currency: currency.into(),
             custom_properties,
             customer_id,
             invoice_id,
@@ -91,6 +98,7 @@ impl CreditNoteEventData {
             tax_amount,
             tax_breakdown,
             total,
+            extra: serde_json::Map::new(),
         }
     }
 }

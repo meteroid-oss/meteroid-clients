@@ -1,20 +1,24 @@
 // this file is @generated
 
-export enum ProductFeeTypeEnum {
-  Rate = "RATE",
-  Slot = "SLOT",
-  Capacity = "CAPACITY",
-  Usage = "USAGE",
-  ExtraRecurring = "EXTRA_RECURRING",
-  OneTime = "ONE_TIME",
-}
+export const ProductFeeTypeEnum = {
+  Rate: "RATE",
+  Slot: "SLOT",
+  Capacity: "CAPACITY",
+  Usage: "USAGE",
+  ExtraRecurring: "EXTRA_RECURRING",
+  OneTime: "ONE_TIME",
+} as const;
+export type ProductFeeTypeEnum =
+  | (typeof ProductFeeTypeEnum)[keyof typeof ProductFeeTypeEnum]
+  | (string & {});
 
+/** Converts `ProductFeeTypeEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductFeeTypeEnumSerializer = {
-  _fromJsonObject(object: any): ProductFeeTypeEnum {
-    return object;
+  parse(json: any): ProductFeeTypeEnum {
+    return json;
   },
 
-  _toJsonObject(self: ProductFeeTypeEnum): any {
-    return self;
+  serialize(value: ProductFeeTypeEnum): any {
+    return value;
   },
 };

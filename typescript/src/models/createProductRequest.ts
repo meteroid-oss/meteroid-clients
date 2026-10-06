@@ -1,44 +1,52 @@
 // this file is @generated
-import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
+import { extraProperties } from "../json.js";
+import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId.js";
 import {
   type ProductFeeStructure,
   ProductFeeStructureSerializer,
-} from "./productFeeStructure";
+} from "./productFeeStructure.js";
 
 export interface CreateProductRequest {
-  catalog?: boolean;
-
-  description?: string | null;
-
+  catalog?: boolean | undefined;
+  description?: string | null | undefined;
   feeStructure: ProductFeeStructure;
-
   name: string;
-
   productFamilyId: ProductFamilyId;
 }
 
+/** Converts `CreateProductRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateProductRequestSerializer = {
-  _fromJsonObject(object: any): CreateProductRequest {
+  parse(json: any): CreateProductRequest {
     return {
-      catalog: object["catalog"],
-      description: object["description"],
-      feeStructure: ProductFeeStructureSerializer._fromJsonObject(
-        object["fee_structure"]
-      ),
-      name: object["name"],
-      productFamilyId: ProductFamilyIdSerializer._fromJsonObject(
-        object["product_family_id"]
-      ),
+      ...extraProperties(json, [
+        "catalog",
+        "description",
+        "fee_structure",
+        "name",
+        "product_family_id",
+      ]),
+      catalog: json["catalog"],
+      description: json["description"],
+      feeStructure: ProductFeeStructureSerializer.parse(json["fee_structure"]),
+      name: json["name"],
+      productFamilyId: ProductFamilyIdSerializer.parse(json["product_family_id"]),
     };
   },
 
-  _toJsonObject(self: CreateProductRequest): any {
+  serialize(value: CreateProductRequest): any {
     return {
-      catalog: self.catalog,
-      description: self.description,
-      fee_structure: ProductFeeStructureSerializer._toJsonObject(self.feeStructure),
-      name: self.name,
-      product_family_id: ProductFamilyIdSerializer._toJsonObject(self.productFamilyId),
+      ...extraProperties(value, [
+        "catalog",
+        "description",
+        "feeStructure",
+        "name",
+        "productFamilyId",
+      ]),
+      catalog: value.catalog,
+      description: value.description,
+      fee_structure: ProductFeeStructureSerializer.serialize(value.feeStructure),
+      name: value.name,
+      product_family_id: ProductFamilyIdSerializer.serialize(value.productFamilyId),
     };
   },
 };

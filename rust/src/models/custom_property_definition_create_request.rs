@@ -6,7 +6,7 @@ use super::{
     custom_property_type::CustomPropertyType, property_config::PropertyConfig,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct CustomPropertyDefinitionCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<PropertyConfig>,
@@ -31,13 +31,19 @@ pub struct CustomPropertyDefinitionCreateRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CustomPropertyDefinitionCreateRequest {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         entity_type: CustomPropertyEntityType,
-        key: String,
-        name: String,
+        key: impl Into<String>,
+        name: impl Into<String>,
         property_type: CustomPropertyType,
     ) -> Self {
         Self {
@@ -46,10 +52,11 @@ impl CustomPropertyDefinitionCreateRequest {
             description: None,
             display_order: None,
             entity_type,
-            key,
-            name,
+            key: key.into(),
+            name: name.into(),
             property_type,
             required: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

@@ -1,82 +1,229 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class MinimumCommitment {
-    @JsonProperty private String amount;
-    @JsonProperty private MinimumCommitmentScope scope;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class MinimumCommitment {
+    @JsonProperty("amount")
+    private String amount;
 
-    public MinimumCommitment() {}
+    @JsonProperty("scope")
+    private MinimumCommitmentScope scope;
 
-    public MinimumCommitment amount(String amount) {
-        this.amount = amount;
-        return this;
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    private MinimumCommitment() {}
+
+    private MinimumCommitment(Builder builder) {
+        this.amount = builder.amount;
+        this.scope = builder.scope;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Decimal string in the plan currency, e.g. &quot;100.00&quot;.
+     * A builder of {@code MinimumCommitment}.
      *
-     * @return amount
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getAmount() {
-        return amount;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
-    public MinimumCommitment scope(MinimumCommitmentScope scope) {
-        this.scope = scope;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get scope
+     * A builder starting from this value.
      *
-     * @return scope
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public MinimumCommitmentScope getScope() {
-        return scope;
-    }
-
-    public void setScope(MinimumCommitmentScope scope) {
-        this.scope = scope;
-    }
-
-    /**
-     * Create an instance of MinimumCommitment given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of MinimumCommitment
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     MinimumCommitment
-     */
-    public static MinimumCommitment fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, MinimumCommitment.class);
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.amount = amount;
+        builder.scope = scope;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Convert an instance of MinimumCommitment to an JSON string
+     * Decimal string in the plan currency, e.g. "100.00".
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String amount() {
+        return Utils.required(amount, "amount");
+    }
+
+    /**
+     * The {@code scope} property.
+     *
+     * @return the value, never null
+     */
+    public MinimumCommitmentScope scope() {
+        return Utils.required(scope, "scope");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MinimumCommitment that = (MinimumCommitment) o;
+        return Objects.equals(amount, that.amount)
+                && Objects.equals(scope, that.scope)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, scope, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "MinimumCommitment{"
+                + "amount="
+                + amount
+                + ", scope="
+                + scope
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link MinimumCommitment}. */
+    public static final class Builder {
+        private String amount;
+        private MinimumCommitmentScope scope;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * Decimal string in the plan currency, e.g. "100.00".
+         *
+         * @param amount the value
+         * @return this builder
+         */
+        public Builder amount(String amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        /**
+         * The {@code scope} property.
+         *
+         * @param scope the value
+         * @return this builder
+         */
+        public Builder scope(MinimumCommitmentScope scope) {
+            this.scope = scope;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code MinimumCommitment}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public MinimumCommitment build() {
+            Utils.checkRequired(amount, "amount");
+            Utils.checkRequired(scope, "scope");
+            return new MinimumCommitment(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code MinimumCommitment}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static MinimumCommitment fromJson(String json) {
+        return Utils.parse(json, MinimumCommitment.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

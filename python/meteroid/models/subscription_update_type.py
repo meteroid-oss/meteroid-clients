@@ -1,8 +1,10 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class SubscriptionUpdateType(str, enum.Enum):
+class SubscriptionUpdateType(StrEnum):
     """Identifies which mutation triggered a `subscription.updated` webhook."""
 
     ACTIVATED = "activated"
@@ -14,5 +16,15 @@ class SubscriptionUpdateType(str, enum.Enum):
     PAUSED = "paused"
     CANCELLATION_SCHEDULED = "cancellation_scheduled"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+SubscriptionUpdateTypeLiteral: t.TypeAlias = t.Literal[
+    "activated",
+    "trial_ended",
+    "billing_configuration_updated",
+    "plan_changed",
+    "amended",
+    "units_changed",
+    "paused",
+    "cancellation_scheduled",
+]
+"""The values of :class:`SubscriptionUpdateType`, which arguments take as plain strings too."""

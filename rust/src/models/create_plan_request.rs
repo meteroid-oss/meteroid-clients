@@ -8,7 +8,7 @@ use super::{
     trial_config::TrialConfig,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct CreatePlanRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub add_ons: Option<Vec<PlanAddOnInput>>,
@@ -36,13 +36,19 @@ pub struct CreatePlanRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trial: Option<TrialConfig>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CreatePlanRequest {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         components: Vec<PriceComponentInput>,
-        currency: String,
-        name: String,
+        currency: impl Into<String>,
+        name: impl Into<String>,
         plan_type: PlanTypeEnum,
         product_family_id: ProductFamilyId,
         status: PlanStatusEnum,
@@ -51,14 +57,15 @@ impl CreatePlanRequest {
             add_ons: None,
             billing: None,
             components,
-            currency,
+            currency: currency.into(),
             description: None,
-            name,
+            name: name.into(),
             plan_type,
             product_family_id,
             self_service_rank: None,
             status,
             trial: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

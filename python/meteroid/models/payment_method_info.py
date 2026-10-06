@@ -1,17 +1,23 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .payment_method_type_enum import PaymentMethodTypeEnum
+
+if t.TYPE_CHECKING:
+    from .payment_method_type_enum import PaymentMethodTypeEnum
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class PaymentMethodInfo(BaseModel):
+    """The `PaymentMethodInfo` object."""
+
     payment_method_type: PaymentMethodTypeEnum
 
-    account_number_hint: t.Optional[str] = None
+    account_number_hint: str | None = None
 
-    card_brand: t.Optional[str] = None
+    card_brand: str | None = None
 
-    card_last4: t.Optional[str] = None
+    card_last4: str | None = None

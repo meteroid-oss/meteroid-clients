@@ -1,16 +1,22 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .custom_property_definition_id import CustomPropertyDefinitionId
-from .custom_property_entity_type import CustomPropertyEntityType
-from .custom_property_type import CustomPropertyType
-from .property_config import PropertyConfig
+
+if t.TYPE_CHECKING:
+    from .custom_property_definition_id import CustomPropertyDefinitionId
+    from .custom_property_entity_type import CustomPropertyEntityType
+    from .custom_property_type import CustomPropertyType
+    from .property_config import PropertyConfig
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CustomPropertyDefinition(BaseModel):
+    """The `CustomPropertyDefinition` object."""
+
     archived: bool
 
     config: PropertyConfig
@@ -29,6 +35,6 @@ class CustomPropertyDefinition(BaseModel):
 
     required: bool
 
-    default_value: t.Optional[t.Any] = None
+    default_value: t.Any = None
 
-    description: t.Optional[str] = None
+    description: str | None = None

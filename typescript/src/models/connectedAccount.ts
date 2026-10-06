@@ -1,121 +1,145 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
 import {
   type ConnectedAccountId,
   ConnectedAccountIdSerializer,
-} from "./connectedAccountId";
-import { type ConnectionStatus, ConnectionStatusSerializer } from "./connectionStatus";
-import { type ConnectionType, ConnectionTypeSerializer } from "./connectionType";
-import { type CountryCode, CountryCodeSerializer } from "./countryCode";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
-import { type OnboardingMode, OnboardingModeSerializer } from "./onboardingMode";
-import { type OrganizationId, OrganizationIdSerializer } from "./organizationId";
-import { type TenantId, TenantIdSerializer } from "./tenantId";
+} from "./connectedAccountId.js";
+import { type ConnectionStatus, ConnectionStatusSerializer } from "./connectionStatus.js";
+import { type ConnectionType, ConnectionTypeSerializer } from "./connectionType.js";
+import { type CountryCode, CountryCodeSerializer } from "./countryCode.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
+import { type OnboardingMode, OnboardingModeSerializer } from "./onboardingMode.js";
+import { type OrganizationId, OrganizationIdSerializer } from "./organizationId.js";
+import { type TenantId, TenantIdSerializer } from "./tenantId.js";
 /** A connected account (relationship between platform and connected org) */
 export interface ConnectedAccount {
-  connectedOrganizationId?: OrganizationId | null;
-
-  connectedTenantId?: TenantId | null;
-
+  connectedOrganizationId?: OrganizationId | null | undefined;
+  connectedTenantId?: TenantId | null | undefined;
   connectionType: ConnectionType;
-
   createdAt: Date;
-
   id: ConnectedAccountId;
-
-  metadata?: unknown;
-
-  onboardingCompletedAt?: Date | null;
-
+  metadata?: unknown | undefined;
+  onboardingCompletedAt?: Date | null | undefined;
   onboardingMode: OnboardingMode;
-
-  pendingCountry?: CountryCode | null;
-
+  pendingCountry?: CountryCode | null | undefined;
   /** Email of the user being invited (express flow only) */
-  pendingEmail?: string | null;
-
+  pendingEmail?: string | null | undefined;
   /** Name of the organization to be created (express flow only) */
-  pendingOrganizationName?: string | null;
-
-  platformCustomerId?: CustomerId | null;
-
+  pendingOrganizationName?: string | null | undefined;
+  platformCustomerId?: CustomerId | null | undefined;
   platformOrganizationId: OrganizationId;
-
-  revokedAt?: Date | null;
-
+  revokedAt?: Date | null | undefined;
   status: ConnectionStatus;
 }
 
+/** Converts `ConnectedAccount` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ConnectedAccountSerializer = {
-  _fromJsonObject(object: any): ConnectedAccount {
+  parse(json: any): ConnectedAccount {
     return {
+      ...extraProperties(json, [
+        "connected_organization_id",
+        "connected_tenant_id",
+        "connection_type",
+        "created_at",
+        "id",
+        "metadata",
+        "onboarding_completed_at",
+        "onboarding_mode",
+        "pending_country",
+        "pending_email",
+        "pending_organization_name",
+        "platform_customer_id",
+        "platform_organization_id",
+        "revoked_at",
+        "status",
+      ]),
       connectedOrganizationId:
-        object["connected_organization_id"] != null
-          ? OrganizationIdSerializer._fromJsonObject(object["connected_organization_id"])
-          : undefined,
+        json["connected_organization_id"] != null
+          ? OrganizationIdSerializer.parse(json["connected_organization_id"])
+          : json["connected_organization_id"],
       connectedTenantId:
-        object["connected_tenant_id"] != null
-          ? TenantIdSerializer._fromJsonObject(object["connected_tenant_id"])
-          : undefined,
-      connectionType: ConnectionTypeSerializer._fromJsonObject(object["connection_type"]),
-      createdAt: parseDateTime(object["created_at"]),
-      id: ConnectedAccountIdSerializer._fromJsonObject(object["id"]),
-      metadata: object["metadata"],
+        json["connected_tenant_id"] != null
+          ? TenantIdSerializer.parse(json["connected_tenant_id"])
+          : json["connected_tenant_id"],
+      connectionType: ConnectionTypeSerializer.parse(json["connection_type"]),
+      createdAt: parseDateTime(json["created_at"]),
+      id: ConnectedAccountIdSerializer.parse(json["id"]),
+      metadata: json["metadata"],
       onboardingCompletedAt:
-        object["onboarding_completed_at"] != null
-          ? parseDateTime(object["onboarding_completed_at"])
-          : undefined,
-      onboardingMode: OnboardingModeSerializer._fromJsonObject(object["onboarding_mode"]),
+        json["onboarding_completed_at"] != null
+          ? parseDateTime(json["onboarding_completed_at"])
+          : json["onboarding_completed_at"],
+      onboardingMode: OnboardingModeSerializer.parse(json["onboarding_mode"]),
       pendingCountry:
-        object["pending_country"] != null
-          ? CountryCodeSerializer._fromJsonObject(object["pending_country"])
-          : undefined,
-      pendingEmail: object["pending_email"],
-      pendingOrganizationName: object["pending_organization_name"],
+        json["pending_country"] != null
+          ? CountryCodeSerializer.parse(json["pending_country"])
+          : json["pending_country"],
+      pendingEmail: json["pending_email"],
+      pendingOrganizationName: json["pending_organization_name"],
       platformCustomerId:
-        object["platform_customer_id"] != null
-          ? CustomerIdSerializer._fromJsonObject(object["platform_customer_id"])
-          : undefined,
-      platformOrganizationId: OrganizationIdSerializer._fromJsonObject(
-        object["platform_organization_id"]
+        json["platform_customer_id"] != null
+          ? CustomerIdSerializer.parse(json["platform_customer_id"])
+          : json["platform_customer_id"],
+      platformOrganizationId: OrganizationIdSerializer.parse(
+        json["platform_organization_id"]
       ),
       revokedAt:
-        object["revoked_at"] != null ? parseDateTime(object["revoked_at"]) : undefined,
-      status: ConnectionStatusSerializer._fromJsonObject(object["status"]),
+        json["revoked_at"] != null
+          ? parseDateTime(json["revoked_at"])
+          : json["revoked_at"],
+      status: ConnectionStatusSerializer.parse(json["status"]),
     };
   },
 
-  _toJsonObject(self: ConnectedAccount): any {
+  serialize(value: ConnectedAccount): any {
     return {
+      ...extraProperties(value, [
+        "connectedOrganizationId",
+        "connectedTenantId",
+        "connectionType",
+        "createdAt",
+        "id",
+        "metadata",
+        "onboardingCompletedAt",
+        "onboardingMode",
+        "pendingCountry",
+        "pendingEmail",
+        "pendingOrganizationName",
+        "platformCustomerId",
+        "platformOrganizationId",
+        "revokedAt",
+        "status",
+      ]),
       connected_organization_id:
-        self.connectedOrganizationId != null
-          ? OrganizationIdSerializer._toJsonObject(self.connectedOrganizationId)
-          : undefined,
+        value.connectedOrganizationId != null
+          ? OrganizationIdSerializer.serialize(value.connectedOrganizationId)
+          : value.connectedOrganizationId,
       connected_tenant_id:
-        self.connectedTenantId != null
-          ? TenantIdSerializer._toJsonObject(self.connectedTenantId)
-          : undefined,
-      connection_type: ConnectionTypeSerializer._toJsonObject(self.connectionType),
-      created_at: self.createdAt,
-      id: ConnectedAccountIdSerializer._toJsonObject(self.id),
-      metadata: self.metadata,
-      onboarding_completed_at: self.onboardingCompletedAt,
-      onboarding_mode: OnboardingModeSerializer._toJsonObject(self.onboardingMode),
+        value.connectedTenantId != null
+          ? TenantIdSerializer.serialize(value.connectedTenantId)
+          : value.connectedTenantId,
+      connection_type: ConnectionTypeSerializer.serialize(value.connectionType),
+      created_at: value.createdAt,
+      id: ConnectedAccountIdSerializer.serialize(value.id),
+      metadata: value.metadata,
+      onboarding_completed_at: value.onboardingCompletedAt,
+      onboarding_mode: OnboardingModeSerializer.serialize(value.onboardingMode),
       pending_country:
-        self.pendingCountry != null
-          ? CountryCodeSerializer._toJsonObject(self.pendingCountry)
-          : undefined,
-      pending_email: self.pendingEmail,
-      pending_organization_name: self.pendingOrganizationName,
+        value.pendingCountry != null
+          ? CountryCodeSerializer.serialize(value.pendingCountry)
+          : value.pendingCountry,
+      pending_email: value.pendingEmail,
+      pending_organization_name: value.pendingOrganizationName,
       platform_customer_id:
-        self.platformCustomerId != null
-          ? CustomerIdSerializer._toJsonObject(self.platformCustomerId)
-          : undefined,
-      platform_organization_id: OrganizationIdSerializer._toJsonObject(
-        self.platformOrganizationId
+        value.platformCustomerId != null
+          ? CustomerIdSerializer.serialize(value.platformCustomerId)
+          : value.platformCustomerId,
+      platform_organization_id: OrganizationIdSerializer.serialize(
+        value.platformOrganizationId
       ),
-      revoked_at: self.revokedAt,
-      status: ConnectionStatusSerializer._toJsonObject(self.status),
+      revoked_at: value.revokedAt,
+      status: ConnectionStatusSerializer.serialize(value.status),
     };
   },
 };

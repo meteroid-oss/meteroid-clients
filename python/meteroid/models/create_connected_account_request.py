@@ -1,18 +1,25 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
+from uuid import UUID
 
-from ..serialization import BaseModel
-from .connection_type import ConnectionType
-from .customer_id import CustomerId
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .connection_type import ConnectionType
+    from .customer_id import CustomerId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CreateConnectedAccountRequest(BaseModel):
-    connected_organization_id: str
+    """The `CreateConnectedAccountRequest` object."""
 
-    connection_type: t.Optional[ConnectionType] = None
+    connected_organization_id: UUID
 
-    metadata: t.Optional[t.Any] = None
+    connection_type: ConnectionType | None | Unset = UNSET
 
-    platform_customer_id: t.Optional[CustomerId] = None
+    metadata: t.Any = None
+
+    platform_customer_id: CustomerId | None | Unset = UNSET

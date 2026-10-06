@@ -1,28 +1,31 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type ComponentParameters,
   ComponentParametersSerializer,
-} from "./componentParameters";
-import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId";
+} from "./componentParameters.js";
+import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId.js";
 
 export interface ComponentParameterization {
   componentId: PriceComponentId;
-
   parameters: ComponentParameters;
 }
 
+/** Converts `ComponentParameterization` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ComponentParameterizationSerializer = {
-  _fromJsonObject(object: any): ComponentParameterization {
+  parse(json: any): ComponentParameterization {
     return {
-      componentId: PriceComponentIdSerializer._fromJsonObject(object["component_id"]),
-      parameters: ComponentParametersSerializer._fromJsonObject(object["parameters"]),
+      ...extraProperties(json, ["component_id", "parameters"]),
+      componentId: PriceComponentIdSerializer.parse(json["component_id"]),
+      parameters: ComponentParametersSerializer.parse(json["parameters"]),
     };
   },
 
-  _toJsonObject(self: ComponentParameterization): any {
+  serialize(value: ComponentParameterization): any {
     return {
-      component_id: PriceComponentIdSerializer._toJsonObject(self.componentId),
-      parameters: ComponentParametersSerializer._toJsonObject(self.parameters),
+      ...extraProperties(value, ["componentId", "parameters"]),
+      component_id: PriceComponentIdSerializer.serialize(value.componentId),
+      parameters: ComponentParametersSerializer.serialize(value.parameters),
     };
   },
 };

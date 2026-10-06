@@ -1,24 +1,27 @@
 // this file is @generated
-import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit";
+import { extraProperties } from "../json.js";
+import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit.js";
 /** Resets on calendar boundaries (e.g. the 1st of every month) — not tied to subscription start date. */
 export interface CalendarResetPeriod {
   interval: number;
-
   unit: CalendarUnit;
 }
 
+/** Converts `CalendarResetPeriod` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CalendarResetPeriodSerializer = {
-  _fromJsonObject(object: any): CalendarResetPeriod {
+  parse(json: any): CalendarResetPeriod {
     return {
-      interval: object["interval"],
-      unit: CalendarUnitSerializer._fromJsonObject(object["unit"]),
+      ...extraProperties(json, ["interval", "unit"]),
+      interval: json["interval"],
+      unit: CalendarUnitSerializer.parse(json["unit"]),
     };
   },
 
-  _toJsonObject(self: CalendarResetPeriod): any {
+  serialize(value: CalendarResetPeriod): any {
     return {
-      interval: self.interval,
-      unit: CalendarUnitSerializer._toJsonObject(self.unit),
+      ...extraProperties(value, ["interval", "unit"]),
+      interval: value.interval,
+      unit: CalendarUnitSerializer.serialize(value.unit),
     };
   },
 };

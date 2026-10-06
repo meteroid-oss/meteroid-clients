@@ -1,18 +1,28 @@
 // this file is @generated
+
 import {
   type IngestEventsRequest,
   IngestEventsRequestSerializer,
-} from "../models/ingestEventsRequest";
+} from "../models/ingestEventsRequest.js";
 import {
   type IngestEventsResponse,
   IngestEventsResponseSerializer,
-} from "../models/ingestEventsResponse";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/ingestEventsResponse.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
+/** The events operations, reached through the client's `events`. */
 export class Events {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
   /**
+   * Ingest events
+   *
    * Ingest usage events for metering and billing purposes.
    *
    * Events are deduplicated by `(event_id, customer_id)` — re-sending the same pair will not be
@@ -20,12 +30,17 @@ export class Events {
    *
    * By default, any invalid event rejects the entire batch. Set `allow_partial_failures` to `true` to ingest valid events and receive per-event failure details in the response body.
    */
-  public ingestEvents(
-    ingestEventsRequest: IngestEventsRequest
-  ): Promise<IngestEventsResponse> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/events/ingest");
+  public ingest(
+    ingestEventsRequest: IngestEventsRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<IngestEventsResponse> {
+    const request = new MeteroidRequest("POST", "/api/v1/events/ingest");
 
-    request.setBody(IngestEventsRequestSerializer._toJsonObject(ingestEventsRequest));
-    return request.send(this.requestCtx, IngestEventsResponseSerializer._fromJsonObject);
+    request.setBody(IngestEventsRequestSerializer.serialize(ingestEventsRequest));
+    return request.send(
+      this.requestCtx,
+      IngestEventsResponseSerializer.parse,
+      requestOptions
+    );
   }
 }

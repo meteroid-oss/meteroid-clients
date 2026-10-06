@@ -1,84 +1,231 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class OnlineMethodsConfig {
-    @JsonProperty private OnlineMethodConfig card;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class OnlineMethodsConfig {
+    @JsonProperty("card")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<OnlineMethodConfig> card = JsonField.missing();
 
     @JsonProperty("direct_debit")
-    private OnlineMethodConfig directDebit;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<OnlineMethodConfig> directDebit = JsonField.missing();
 
-    public OnlineMethodsConfig() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public OnlineMethodsConfig card(OnlineMethodConfig card) {
-        this.card = card;
-        return this;
+    private OnlineMethodsConfig() {}
+
+    private OnlineMethodsConfig(Builder builder) {
+        this.card = builder.card;
+        this.directDebit = builder.directDebit;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get card
+     * A builder of {@code OnlineMethodsConfig}.
      *
-     * @return card
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public OnlineMethodConfig getCard() {
-        return card;
-    }
-
-    public void setCard(OnlineMethodConfig card) {
-        this.card = card;
-    }
-
-    public OnlineMethodsConfig directDebit(OnlineMethodConfig directDebit) {
-        this.directDebit = directDebit;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get directDebit
+     * A builder starting from this value.
      *
-     * @return directDebit
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public OnlineMethodConfig getDirectDebit() {
-        return directDebit;
-    }
-
-    public void setDirectDebit(OnlineMethodConfig directDebit) {
-        this.directDebit = directDebit;
-    }
-
-    /**
-     * Create an instance of OnlineMethodsConfig given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of OnlineMethodsConfig
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     OnlineMethodsConfig
-     */
-    public static OnlineMethodsConfig fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, OnlineMethodsConfig.class);
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.card = card;
+        builder.directDebit = directDebit;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Convert an instance of OnlineMethodsConfig to an JSON string
+     * The {@code card} property.
      *
-     * @return JSON string
+     * @return the value, empty when unset or null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Optional<OnlineMethodConfig> card() {
+        return card.asOptional();
+    }
+
+    /**
+     * The {@code direct_debit} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<OnlineMethodConfig> directDebit() {
+        return directDebit.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        OnlineMethodsConfig that = (OnlineMethodsConfig) o;
+        return Objects.equals(card, that.card)
+                && Objects.equals(directDebit, that.directDebit)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(card, directDebit, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "OnlineMethodsConfig{"
+                + "card="
+                + card
+                + ", directDebit="
+                + directDebit
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link OnlineMethodsConfig}. */
+    public static final class Builder {
+        private JsonField<OnlineMethodConfig> card = JsonField.missing();
+        private JsonField<OnlineMethodConfig> directDebit = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code card} property.
+         *
+         * @param card the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder card(OnlineMethodConfig card) {
+            this.card = JsonField.ofNullable(card);
+            return this;
+        }
+
+        /**
+         * The {@code direct_debit} property.
+         *
+         * @param directDebit the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder directDebit(OnlineMethodConfig directDebit) {
+            this.directDebit = JsonField.ofNullable(directDebit);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code OnlineMethodsConfig}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public OnlineMethodsConfig build() {
+            return new OnlineMethodsConfig(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code OnlineMethodsConfig}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static OnlineMethodsConfig fromJson(String json) {
+        return Utils.parse(json, OnlineMethodsConfig.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

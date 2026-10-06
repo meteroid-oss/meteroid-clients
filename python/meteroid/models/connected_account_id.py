@@ -1,2 +1,4 @@
 # this file is @generated
-ConnectedAccountId = str
+import typing as t
+
+ConnectedAccountId: t.TypeAlias = str

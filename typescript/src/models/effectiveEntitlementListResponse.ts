@@ -1,27 +1,27 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type EffectiveEntitlement,
   EffectiveEntitlementSerializer,
-} from "./effectiveEntitlement";
+} from "./effectiveEntitlement.js";
 
 export interface EffectiveEntitlementListResponse {
   data: EffectiveEntitlement[];
 }
 
+/** Converts `EffectiveEntitlementListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const EffectiveEntitlementListResponseSerializer = {
-  _fromJsonObject(object: any): EffectiveEntitlementListResponse {
+  parse(json: any): EffectiveEntitlementListResponse {
     return {
-      data: object["data"].map((item: any) =>
-        EffectiveEntitlementSerializer._fromJsonObject(item)
-      ),
+      ...extraProperties(json, ["data"]),
+      data: json["data"].map((item: any) => EffectiveEntitlementSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: EffectiveEntitlementListResponse): any {
+  serialize(value: EffectiveEntitlementListResponse): any {
     return {
-      data: self.data.map((item: any) =>
-        EffectiveEntitlementSerializer._toJsonObject(item)
-      ),
+      ...extraProperties(value, ["data"]),
+      data: value.data.map((item: any) => EffectiveEntitlementSerializer.serialize(item)),
     };
   },
 };

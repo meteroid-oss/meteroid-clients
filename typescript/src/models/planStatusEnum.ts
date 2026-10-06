@@ -1,18 +1,22 @@
 // this file is @generated
 
-export enum PlanStatusEnum {
-  Draft = "DRAFT",
-  Active = "ACTIVE",
-  Inactive = "INACTIVE",
-  Archived = "ARCHIVED",
-}
+export const PlanStatusEnum = {
+  Draft: "DRAFT",
+  Active: "ACTIVE",
+  Inactive: "INACTIVE",
+  Archived: "ARCHIVED",
+} as const;
+export type PlanStatusEnum =
+  | (typeof PlanStatusEnum)[keyof typeof PlanStatusEnum]
+  | (string & {});
 
+/** Converts `PlanStatusEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PlanStatusEnumSerializer = {
-  _fromJsonObject(object: any): PlanStatusEnum {
-    return object;
+  parse(json: any): PlanStatusEnum {
+    return json;
   },
 
-  _toJsonObject(self: PlanStatusEnum): any {
-    return self;
+  serialize(value: PlanStatusEnum): any {
+    return value;
   },
 };

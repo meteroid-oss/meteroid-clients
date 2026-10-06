@@ -1,2 +1,4 @@
 # this file is @generated
-CountryCode = str
+import typing as t
+
+CountryCode: t.TypeAlias = str

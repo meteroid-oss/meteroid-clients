@@ -1,37 +1,34 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 import {
   type PlanVersionSummary,
   PlanVersionSummarySerializer,
-} from "./planVersionSummary";
+} from "./planVersionSummary.js";
 
 export interface PlanVersionListResponse {
   data: PlanVersionSummary[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `PlanVersionListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PlanVersionListResponseSerializer = {
-  _fromJsonObject(object: any): PlanVersionListResponse {
+  parse(json: any): PlanVersionListResponse {
     return {
-      data: object["data"].map((item: any) =>
-        PlanVersionSummarySerializer._fromJsonObject(item)
-      ),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => PlanVersionSummarySerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: PlanVersionListResponse): any {
+  serialize(value: PlanVersionListResponse): any {
     return {
-      data: self.data.map((item: any) =>
-        PlanVersionSummarySerializer._toJsonObject(item)
-      ),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => PlanVersionSummarySerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

@@ -1,96 +1,134 @@
 // this file is @generated
+
 import {
   type ConnectedAccount,
   ConnectedAccountSerializer,
-} from "../models/connectedAccount";
+} from "../models/connectedAccount.js";
 import {
   type ConnectedAccountsResponse,
   ConnectedAccountsResponseSerializer,
-} from "../models/connectedAccountsResponse";
+} from "../models/connectedAccountsResponse.js";
 import {
   type CreateConnectedAccountRequest,
   CreateConnectedAccountRequestSerializer,
-} from "../models/createConnectedAccountRequest";
+} from "../models/createConnectedAccountRequest.js";
 import {
   type CreateOnboardingLinkRequest,
   CreateOnboardingLinkRequestSerializer,
-} from "../models/createOnboardingLinkRequest";
+} from "../models/createOnboardingLinkRequest.js";
 import {
   type OnboardingLinkResponse,
   OnboardingLinkResponseSerializer,
-} from "../models/onboardingLinkResponse";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/onboardingLinkResponse.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
+/** The connect operations, reached through the client's `connect`. */
 export class Connect {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /** List all connected accounts for this platform. */
-  public listConnectedAccounts(): Promise<ConnectedAccountsResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/connected-accounts");
+  /**
+   * List connected accounts
+   *
+   * List all connected accounts for this platform.
+   */
+  public listConnectedAccounts(
+    requestOptions?: RequestOptions
+  ): APIPromise<ConnectedAccountsResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/connected-accounts");
 
     return request.send(
       this.requestCtx,
-      ConnectedAccountsResponseSerializer._fromJsonObject
+      ConnectedAccountsResponseSerializer.parse,
+      requestOptions
     );
   }
 
   /**
+   * Create connected account
+   *
    * Create a new connected account (Express flow). Returns the account
    * and an onboarding link for the user to complete setup.
    */
   public createConnectedAccount(
-    createConnectedAccountRequest: CreateConnectedAccountRequest
-  ): Promise<ConnectedAccount> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/connected-accounts");
+    createConnectedAccountRequest: CreateConnectedAccountRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<ConnectedAccount> {
+    const request = new MeteroidRequest("POST", "/api/v1/connected-accounts");
 
     request.setBody(
-      CreateConnectedAccountRequestSerializer._toJsonObject(createConnectedAccountRequest)
+      CreateConnectedAccountRequestSerializer.serialize(createConnectedAccountRequest)
     );
-    return request.send(this.requestCtx, ConnectedAccountSerializer._fromJsonObject);
-  }
-
-  /** Retrieve a connected account by ID. */
-  public getConnectedAccount(id: string): Promise<ConnectedAccount> {
-    const request = new MeteroidRequest(
-      HttpMethod.GET,
-      "/api/v1/connected-accounts/{id}"
+    return request.send(
+      this.requestCtx,
+      ConnectedAccountSerializer.parse,
+      requestOptions
     );
-
-    request.setPathParam("id", id);
-    return request.send(this.requestCtx, ConnectedAccountSerializer._fromJsonObject);
-  }
-
-  /** Revoke a connected account. All associated tokens are invalidated. */
-  public disconnectAccount(id: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.DELETE,
-      "/api/v1/connected-accounts/{id}"
-    );
-
-    request.setPathParam("id", id);
-    return request.sendNoResponseBody(this.requestCtx);
   }
 
   /**
+   * Get connected account
+   *
+   * Retrieve a connected account by ID.
+   */
+  public retrieveConnectedAccount(
+    id: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<ConnectedAccount> {
+    const request = new MeteroidRequest("GET", "/api/v1/connected-accounts/{id}");
+
+    request.setPathParam("id", id);
+    return request.send(
+      this.requestCtx,
+      ConnectedAccountSerializer.parse,
+      requestOptions
+    );
+  }
+
+  /**
+   * Disconnect account
+   *
+   * Revoke a connected account. All associated tokens are invalidated.
+   */
+  public disconnectAccount(
+    id: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<void> {
+    const request = new MeteroidRequest("DELETE", "/api/v1/connected-accounts/{id}");
+
+    request.setPathParam("id", id);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
+  }
+
+  /**
+   * Create onboarding link
+   *
    * Generate a new onboarding link for a connected account. Any existing
    * unused link is invalidated. The link expires after a configured duration.
    */
   public createOnboardingLink(
     id: string,
-    createOnboardingLinkRequest: CreateOnboardingLinkRequest
-  ): Promise<OnboardingLinkResponse> {
+    createOnboardingLinkRequest: CreateOnboardingLinkRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<OnboardingLinkResponse> {
     const request = new MeteroidRequest(
-      HttpMethod.POST,
+      "POST",
       "/api/v1/connected-accounts/{id}/onboarding"
     );
 
     request.setPathParam("id", id);
     request.setBody(
-      CreateOnboardingLinkRequestSerializer._toJsonObject(createOnboardingLinkRequest)
+      CreateOnboardingLinkRequestSerializer.serialize(createOnboardingLinkRequest)
     );
     return request.send(
       this.requestCtx,
-      OnboardingLinkResponseSerializer._fromJsonObject
+      OnboardingLinkResponseSerializer.parse,
+      requestOptions
     );
   }
 }

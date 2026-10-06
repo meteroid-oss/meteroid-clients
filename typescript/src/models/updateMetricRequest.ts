@@ -1,64 +1,72 @@
 // this file is @generated
-import { type MetricFilter, MetricFilterSerializer } from "./metricFilter";
+import { extraProperties } from "../json.js";
+import { type MetricFilter, MetricFilterSerializer } from "./metricFilter.js";
 import {
   type MetricSegmentationMatrix,
   MetricSegmentationMatrixSerializer,
-} from "./metricSegmentationMatrix";
-import { type UnitConversion, UnitConversionSerializer } from "./unitConversion";
+} from "./metricSegmentationMatrix.js";
+import { type UnitConversion, UnitConversionSerializer } from "./unitConversion.js";
 
 export interface UpdateMetricRequest {
-  description?: string | null;
-
+  description?: string | null | undefined;
   /** Absent = leave filters untouched; present (even empty) = replace them. */
-  filters?: MetricFilter[] | null;
-
-  name?: string | null;
-
-  segmentationMatrix?: MetricSegmentationMatrix | null;
-
-  unitConversion?: UnitConversion | null;
+  filters?: MetricFilter[] | null | undefined;
+  name?: string | null | undefined;
+  segmentationMatrix?: MetricSegmentationMatrix | null | undefined;
+  unitConversion?: UnitConversion | null | undefined;
 }
 
+/** Converts `UpdateMetricRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UpdateMetricRequestSerializer = {
-  _fromJsonObject(object: any): UpdateMetricRequest {
+  parse(json: any): UpdateMetricRequest {
     return {
-      description: object["description"],
+      ...extraProperties(json, [
+        "description",
+        "filters",
+        "name",
+        "segmentation_matrix",
+        "unit_conversion",
+      ]),
+      description: json["description"],
       filters:
-        object["filters"] != null
-          ? object["filters"].map((item: any) =>
-              MetricFilterSerializer._fromJsonObject(item)
-            )
-          : undefined,
-      name: object["name"],
+        json["filters"] != null
+          ? json["filters"].map((item: any) => MetricFilterSerializer.parse(item))
+          : json["filters"],
+      name: json["name"],
       segmentationMatrix:
-        object["segmentation_matrix"] != null
-          ? MetricSegmentationMatrixSerializer._fromJsonObject(
-              object["segmentation_matrix"]
-            )
-          : undefined,
+        json["segmentation_matrix"] != null
+          ? MetricSegmentationMatrixSerializer.parse(json["segmentation_matrix"])
+          : json["segmentation_matrix"],
       unitConversion:
-        object["unit_conversion"] != null
-          ? UnitConversionSerializer._fromJsonObject(object["unit_conversion"])
-          : undefined,
+        json["unit_conversion"] != null
+          ? UnitConversionSerializer.parse(json["unit_conversion"])
+          : json["unit_conversion"],
     };
   },
 
-  _toJsonObject(self: UpdateMetricRequest): any {
+  serialize(value: UpdateMetricRequest): any {
     return {
-      description: self.description,
+      ...extraProperties(value, [
+        "description",
+        "filters",
+        "name",
+        "segmentationMatrix",
+        "unitConversion",
+      ]),
+      description: value.description,
       filters:
-        self.filters != null
-          ? self.filters.map((item: any) => MetricFilterSerializer._toJsonObject(item))
-          : undefined,
-      name: self.name,
+        value.filters != null
+          ? value.filters.map((item: any) => MetricFilterSerializer.serialize(item))
+          : value.filters,
+      name: value.name,
       segmentation_matrix:
-        self.segmentationMatrix != null
-          ? MetricSegmentationMatrixSerializer._toJsonObject(self.segmentationMatrix)
-          : undefined,
+        value.segmentationMatrix != null
+          ? MetricSegmentationMatrixSerializer.serialize(value.segmentationMatrix)
+          : value.segmentationMatrix,
       unit_conversion:
-        self.unitConversion != null
-          ? UnitConversionSerializer._toJsonObject(self.unitConversion)
-          : undefined,
+        value.unitConversion != null
+          ? UnitConversionSerializer.serialize(value.unitConversion)
+          : value.unitConversion,
     };
   },
 };

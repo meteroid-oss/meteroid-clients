@@ -1,12 +1,15 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
 from ..serialization import BaseModel
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MetricDimension(BaseModel):
+    """The `MetricDimension` object."""
+
     key: str
 
-    values: t.List[str]
+    values: list[str]

@@ -1,35 +1,35 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface SubLineItem {
   id: string;
-
   name: string;
-
   quantity: string;
-
   total: number;
-
   unitPrice: string;
 }
 
+/** Converts `SubLineItem` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubLineItemSerializer = {
-  _fromJsonObject(object: any): SubLineItem {
+  parse(json: any): SubLineItem {
     return {
-      id: object["id"],
-      name: object["name"],
-      quantity: object["quantity"],
-      total: object["total"],
-      unitPrice: object["unit_price"],
+      ...extraProperties(json, ["id", "name", "quantity", "total", "unit_price"]),
+      id: json["id"],
+      name: json["name"],
+      quantity: json["quantity"],
+      total: json["total"],
+      unitPrice: json["unit_price"],
     };
   },
 
-  _toJsonObject(self: SubLineItem): any {
+  serialize(value: SubLineItem): any {
     return {
-      id: self.id,
-      name: self.name,
-      quantity: self.quantity,
-      total: self.total,
-      unit_price: self.unitPrice,
+      ...extraProperties(value, ["id", "name", "quantity", "total", "unitPrice"]),
+      id: value.id,
+      name: value.name,
+      quantity: value.quantity,
+      total: value.total,
+      unit_price: value.unitPrice,
     };
   },
 };

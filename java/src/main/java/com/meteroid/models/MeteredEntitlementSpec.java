@@ -1,25 +1,38 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class MeteredEntitlementSpec {
-    @JsonProperty private Boolean enabled;
-    @JsonProperty private BigDecimal limit;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class MeteredEntitlementSpec {
+    @JsonProperty("enabled")
+    private Boolean enabled;
+
+    @JsonProperty("limit")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<BigDecimal> limit = JsonField.missing();
 
     @JsonProperty("metric_id")
     private String metricId;
@@ -27,103 +40,253 @@ public class MeteredEntitlementSpec {
     @JsonProperty("reset_period")
     private ResetPeriod resetPeriod;
 
-    public MeteredEntitlementSpec() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public MeteredEntitlementSpec enabled(Boolean enabled) {
-        this.enabled = enabled;
-        return this;
+    private MeteredEntitlementSpec() {}
+
+    private MeteredEntitlementSpec(Builder builder) {
+        this.enabled = builder.enabled;
+        this.limit = builder.limit;
+        this.metricId = builder.metricId;
+        this.resetPeriod = builder.resetPeriod;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get enabled
+     * A builder of {@code MeteredEntitlementSpec}.
      *
-     * @return enabled
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public MeteredEntitlementSpec limit(BigDecimal limit) {
-        this.limit = limit;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get limit
+     * A builder starting from this value.
      *
-     * @return limit
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public BigDecimal getLimit() {
-        return limit;
-    }
-
-    public void setLimit(BigDecimal limit) {
-        this.limit = limit;
-    }
-
-    public MeteredEntitlementSpec metricId(String metricId) {
-        this.metricId = metricId;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.enabled = enabled;
+        builder.limit = limit;
+        builder.metricId = metricId;
+        builder.resetPeriod = resetPeriod;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get metricId
+     * The {@code enabled} property.
      *
-     * @return metricId
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getMetricId() {
-        return metricId;
-    }
-
-    public void setMetricId(String metricId) {
-        this.metricId = metricId;
-    }
-
-    public MeteredEntitlementSpec resetPeriod(ResetPeriod resetPeriod) {
-        this.resetPeriod = resetPeriod;
-        return this;
+    public Boolean enabled() {
+        return Utils.required(enabled, "enabled");
     }
 
     /**
-     * Get resetPeriod
+     * The {@code limit} property.
      *
-     * @return resetPeriod
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public ResetPeriod getResetPeriod() {
-        return resetPeriod;
-    }
-
-    public void setResetPeriod(ResetPeriod resetPeriod) {
-        this.resetPeriod = resetPeriod;
+    public Optional<BigDecimal> limit() {
+        return limit.asOptional();
     }
 
     /**
-     * Create an instance of MeteredEntitlementSpec given an JSON string
+     * The {@code metric_id} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of MeteredEntitlementSpec
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     MeteredEntitlementSpec
+     * @return the value, never null
      */
-    public static MeteredEntitlementSpec fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, MeteredEntitlementSpec.class);
+    public String metricId() {
+        return Utils.required(metricId, "metric_id");
     }
 
     /**
-     * Convert an instance of MeteredEntitlementSpec to an JSON string
+     * The {@code reset_period} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public ResetPeriod resetPeriod() {
+        return Utils.required(resetPeriod, "reset_period");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MeteredEntitlementSpec that = (MeteredEntitlementSpec) o;
+        return Objects.equals(enabled, that.enabled)
+                && Objects.equals(limit, that.limit)
+                && Objects.equals(metricId, that.metricId)
+                && Objects.equals(resetPeriod, that.resetPeriod)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(enabled, limit, metricId, resetPeriod, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "MeteredEntitlementSpec{"
+                + "enabled="
+                + enabled
+                + ", limit="
+                + limit
+                + ", metricId="
+                + metricId
+                + ", resetPeriod="
+                + resetPeriod
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link MeteredEntitlementSpec}. */
+    public static final class Builder {
+        private Boolean enabled;
+        private JsonField<BigDecimal> limit = JsonField.missing();
+        private String metricId;
+        private ResetPeriod resetPeriod;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code enabled} property.
+         *
+         * @param enabled the value
+         * @return this builder
+         */
+        public Builder enabled(Boolean enabled) {
+            this.enabled = enabled;
+            return this;
+        }
+
+        /**
+         * The {@code limit} property.
+         *
+         * @param limit the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder limit(BigDecimal limit) {
+            this.limit = JsonField.ofNullable(limit);
+            return this;
+        }
+
+        /**
+         * The {@code metric_id} property.
+         *
+         * @param metricId the value
+         * @return this builder
+         */
+        public Builder metricId(String metricId) {
+            this.metricId = metricId;
+            return this;
+        }
+
+        /**
+         * The {@code reset_period} property.
+         *
+         * @param resetPeriod the value
+         * @return this builder
+         */
+        public Builder resetPeriod(ResetPeriod resetPeriod) {
+            this.resetPeriod = resetPeriod;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code MeteredEntitlementSpec}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public MeteredEntitlementSpec build() {
+            Utils.checkRequired(enabled, "enabled");
+            Utils.checkRequired(metricId, "metric_id");
+            Utils.checkRequired(resetPeriod, "reset_period");
+            return new MeteredEntitlementSpec(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code MeteredEntitlementSpec}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static MeteredEntitlementSpec fromJson(String json) {
+        return Utils.parse(json, MeteredEntitlementSpec.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

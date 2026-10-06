@@ -1,30 +1,31 @@
 // this file is @generated
-import { type Customer, CustomerSerializer } from "./customer";
+import { extraProperties } from "../json.js";
+import { type Customer, CustomerSerializer } from "./customer.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface CustomerListResponse {
   data: Customer[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `CustomerListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomerListResponseSerializer = {
-  _fromJsonObject(object: any): CustomerListResponse {
+  parse(json: any): CustomerListResponse {
     return {
-      data: object["data"].map((item: any) => CustomerSerializer._fromJsonObject(item)),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => CustomerSerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: CustomerListResponse): any {
+  serialize(value: CustomerListResponse): any {
     return {
-      data: self.data.map((item: any) => CustomerSerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => CustomerSerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

@@ -1,32 +1,38 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .billing_config import BillingConfig
-from .minimum_commitment_input import MinimumCommitmentInput
-from .plan_add_on_input import PlanAddOnInput
-from .plan_status_enum import PlanStatusEnum
-from .price_component_input import PriceComponentInput
-from .trial_config import TrialConfig
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .billing_config import BillingConfig
+    from .minimum_commitment_input import MinimumCommitmentInput
+    from .plan_add_on_input import PlanAddOnInput
+    from .plan_status_enum import PlanStatusEnum
+    from .price_component_input import PriceComponentInput
+    from .trial_config import TrialConfig
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class ReplacePlanRequest(BaseModel):
-    components: t.List[PriceComponentInput]
+    """The `ReplacePlanRequest` object."""
+
+    components: list[PriceComponentInput]
 
     currency: str
 
     name: str
 
-    add_ons: t.Optional[t.List[PlanAddOnInput]] = None
+    add_ons: list[PlanAddOnInput] | None = None
 
-    billing: t.Optional[BillingConfig] = None
+    billing: BillingConfig | None | Unset = UNSET
 
-    description: t.Optional[str] = None
+    description: str | None | Unset = UNSET
 
-    minimum_commitment: t.Optional[MinimumCommitmentInput] = None
+    minimum_commitment: MinimumCommitmentInput | None | Unset = UNSET
 
-    status: t.Optional[PlanStatusEnum] = None
+    status: PlanStatusEnum | None | Unset = UNSET
 
-    trial: t.Optional[TrialConfig] = None
+    trial: TrialConfig | None | Unset = UNSET

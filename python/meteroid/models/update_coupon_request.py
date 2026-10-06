@@ -1,16 +1,22 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .coupon_discount import CouponDiscount
-from .plan_id import PlanId
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .coupon_discount import CouponDiscount
+    from .plan_id import PlanId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class UpdateCouponRequest(BaseModel):
-    description: t.Optional[str] = None
+    """The `UpdateCouponRequest` object."""
 
-    discount: t.Optional[CouponDiscount] = None
+    description: str | None | Unset = UNSET
 
-    plan_ids: t.Optional[t.List[PlanId]] = None
+    discount: CouponDiscount | None | Unset = UNSET
+
+    plan_ids: list[PlanId] | None | Unset = UNSET

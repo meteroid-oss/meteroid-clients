@@ -1,14 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
-from ..serialization import BaseModel
+from ..serialization import UNSET, BaseModel, Unset
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class PatchPlanRequest(BaseModel):
-    description: t.Optional[str] = None
+    """The `PatchPlanRequest` object."""
 
-    name: t.Optional[str] = None
+    description: str | None | Unset = UNSET
 
-    self_service_rank: t.Optional[int] = None
+    name: str | None | Unset = UNSET
+
+    self_service_rank: int | None | Unset = UNSET

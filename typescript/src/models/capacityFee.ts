@@ -1,32 +1,33 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
 
 export interface CapacityFee {
   included: number;
-
   metricId: BillableMetricId;
-
   overageRate: string;
-
   rate: string;
 }
 
+/** Converts `CapacityFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CapacityFeeSerializer = {
-  _fromJsonObject(object: any): CapacityFee {
+  parse(json: any): CapacityFee {
     return {
-      included: object["included"],
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
-      overageRate: object["overage_rate"],
-      rate: object["rate"],
+      ...extraProperties(json, ["included", "metric_id", "overage_rate", "rate"]),
+      included: json["included"],
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
+      overageRate: json["overage_rate"],
+      rate: json["rate"],
     };
   },
 
-  _toJsonObject(self: CapacityFee): any {
+  serialize(value: CapacityFee): any {
     return {
-      included: self.included,
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
-      overage_rate: self.overageRate,
-      rate: self.rate,
+      ...extraProperties(value, ["included", "metricId", "overageRate", "rate"]),
+      included: value.included,
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
+      overage_rate: value.overageRate,
+      rate: value.rate,
     };
   },
 };

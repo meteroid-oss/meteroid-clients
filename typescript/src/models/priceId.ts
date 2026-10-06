@@ -2,12 +2,13 @@
 
 export type PriceId = string;
 
+/** Converts `PriceId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PriceIdSerializer = {
-  _fromJsonObject(object: any): PriceId {
-    return object;
+  parse(json: any): PriceId {
+    return json;
   },
 
-  _toJsonObject(self: PriceId): any {
-    return self;
+  serialize(value: PriceId): any {
+    return value;
   },
 };

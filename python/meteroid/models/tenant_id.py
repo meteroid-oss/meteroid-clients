@@ -1,2 +1,4 @@
 # this file is @generated
-TenantId = str
+import typing as t
+
+TenantId: t.TypeAlias = str

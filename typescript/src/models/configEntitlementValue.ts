@@ -1,20 +1,24 @@
 // this file is @generated
-import { type ConfigValue, ConfigValueSerializer } from "./configValue";
+import { extraProperties } from "../json.js";
+import { type ConfigValue, ConfigValueSerializer } from "./configValue.js";
 
 export interface ConfigEntitlementValue {
   value: ConfigValue;
 }
 
+/** Converts `ConfigEntitlementValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ConfigEntitlementValueSerializer = {
-  _fromJsonObject(object: any): ConfigEntitlementValue {
+  parse(json: any): ConfigEntitlementValue {
     return {
-      value: ConfigValueSerializer._fromJsonObject(object["value"]),
+      ...extraProperties(json, ["value"]),
+      value: ConfigValueSerializer.parse(json["value"]),
     };
   },
 
-  _toJsonObject(self: ConfigEntitlementValue): any {
+  serialize(value: ConfigEntitlementValue): any {
     return {
-      value: ConfigValueSerializer._toJsonObject(self.value),
+      ...extraProperties(value, ["value"]),
+      value: ConfigValueSerializer.serialize(value.value),
     };
   },
 };

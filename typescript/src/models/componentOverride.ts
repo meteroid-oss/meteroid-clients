@@ -1,29 +1,31 @@
 // this file is @generated
-import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId";
-import { type PriceEntry, PriceEntrySerializer } from "./priceEntry";
+import { extraProperties } from "../json.js";
+import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId.js";
+import { type PriceEntry, PriceEntrySerializer } from "./priceEntry.js";
 
 export interface ComponentOverride {
   componentId: PriceComponentId;
-
   name: string;
-
   priceEntry: PriceEntry;
 }
 
+/** Converts `ComponentOverride` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ComponentOverrideSerializer = {
-  _fromJsonObject(object: any): ComponentOverride {
+  parse(json: any): ComponentOverride {
     return {
-      componentId: PriceComponentIdSerializer._fromJsonObject(object["component_id"]),
-      name: object["name"],
-      priceEntry: PriceEntrySerializer._fromJsonObject(object["price_entry"]),
+      ...extraProperties(json, ["component_id", "name", "price_entry"]),
+      componentId: PriceComponentIdSerializer.parse(json["component_id"]),
+      name: json["name"],
+      priceEntry: PriceEntrySerializer.parse(json["price_entry"]),
     };
   },
 
-  _toJsonObject(self: ComponentOverride): any {
+  serialize(value: ComponentOverride): any {
     return {
-      component_id: PriceComponentIdSerializer._toJsonObject(self.componentId),
-      name: self.name,
-      price_entry: PriceEntrySerializer._toJsonObject(self.priceEntry),
+      ...extraProperties(value, ["componentId", "name", "priceEntry"]),
+      component_id: PriceComponentIdSerializer.serialize(value.componentId),
+      name: value.name,
+      price_entry: PriceEntrySerializer.serialize(value.priceEntry),
     };
   },
 };

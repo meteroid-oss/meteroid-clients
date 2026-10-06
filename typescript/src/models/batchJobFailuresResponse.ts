@@ -1,31 +1,34 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type BatchJobItemFailureResponse,
   BatchJobItemFailureResponseSerializer,
-} from "./batchJobItemFailureResponse";
+} from "./batchJobItemFailureResponse.js";
 
 export interface BatchJobFailuresResponse {
   data: BatchJobItemFailureResponse[];
-
   totalCount: number;
 }
 
+/** Converts `BatchJobFailuresResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BatchJobFailuresResponseSerializer = {
-  _fromJsonObject(object: any): BatchJobFailuresResponse {
+  parse(json: any): BatchJobFailuresResponse {
     return {
-      data: object["data"].map((item: any) =>
-        BatchJobItemFailureResponseSerializer._fromJsonObject(item)
+      ...extraProperties(json, ["data", "total_count"]),
+      data: json["data"].map((item: any) =>
+        BatchJobItemFailureResponseSerializer.parse(item)
       ),
-      totalCount: object["total_count"],
+      totalCount: json["total_count"],
     };
   },
 
-  _toJsonObject(self: BatchJobFailuresResponse): any {
+  serialize(value: BatchJobFailuresResponse): any {
     return {
-      data: self.data.map((item: any) =>
-        BatchJobItemFailureResponseSerializer._toJsonObject(item)
+      ...extraProperties(value, ["data", "totalCount"]),
+      data: value.data.map((item: any) =>
+        BatchJobItemFailureResponseSerializer.serialize(item)
       ),
-      total_count: self.totalCount,
+      total_count: value.totalCount,
     };
   },
 };

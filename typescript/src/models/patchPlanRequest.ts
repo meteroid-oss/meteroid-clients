@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface PatchPlanRequest {
-  description?: string | null;
-
-  name?: string | null;
-
-  selfServiceRank?: number | null;
+  description?: string | null | undefined;
+  name?: string | null | undefined;
+  selfServiceRank?: number | null | undefined;
 }
 
+/** Converts `PatchPlanRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PatchPlanRequestSerializer = {
-  _fromJsonObject(object: any): PatchPlanRequest {
+  parse(json: any): PatchPlanRequest {
     return {
-      description: object["description"],
-      name: object["name"],
-      selfServiceRank: object["self_service_rank"],
+      ...extraProperties(json, ["description", "name", "self_service_rank"]),
+      description: json["description"],
+      name: json["name"],
+      selfServiceRank: json["self_service_rank"],
     };
   },
 
-  _toJsonObject(self: PatchPlanRequest): any {
+  serialize(value: PatchPlanRequest): any {
     return {
-      description: self.description,
-      name: self.name,
-      self_service_rank: self.selfServiceRank,
+      ...extraProperties(value, ["description", "name", "selfServiceRank"]),
+      description: value.description,
+      name: value.name,
+      self_service_rank: value.selfServiceRank,
     };
   },
 };

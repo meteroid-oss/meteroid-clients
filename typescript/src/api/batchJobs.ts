@@ -1,73 +1,98 @@
 // this file is @generated
-import type { BatchJobChunkId } from "../models/batchJobChunkId";
+
+import type { BatchJobChunkId } from "../models/batchJobChunkId.js";
 import {
   type BatchJobDetailResponse,
   BatchJobDetailResponseSerializer,
-} from "../models/batchJobDetailResponse";
+} from "../models/batchJobDetailResponse.js";
 import {
   type BatchJobFailuresResponse,
   BatchJobFailuresResponseSerializer,
-} from "../models/batchJobFailuresResponse";
+} from "../models/batchJobFailuresResponse.js";
 import {
   type BatchJobListResponse,
   BatchJobListResponseSerializer,
-} from "../models/batchJobListResponse";
-import type { BatchJobStatus } from "../models/batchJobStatus";
-import type { BatchJobType } from "../models/batchJobType";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/batchJobListResponse.js";
+import type { BatchJobStatus } from "../models/batchJobStatus.js";
+import type { BatchJobType } from "../models/batchJobType.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface BatchJobsListBatchJobsOptions {
-  jobType?: BatchJobType;
-  status?: BatchJobStatus[];
+/** The query and header parameters of `list`. */
+export interface BatchJobsListOptions {
+  jobType?: BatchJobType | undefined;
+  status?: BatchJobStatus[] | undefined;
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
+  perPage?: number | undefined;
 }
 
-export interface BatchJobsListBatchJobFailuresOptions {
-  chunkId?: BatchJobChunkId;
-  limit?: number;
-  offset?: number;
+/** The query and header parameters of `listFailures`. */
+export interface BatchJobsListFailuresOptions {
+  chunkId?: BatchJobChunkId | undefined;
+  limit?: number | undefined;
+  offset?: number | undefined;
 }
 
+/** The batch jobs operations, reached through the client's `batchJobs`. */
 export class BatchJobs {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
   /** List batch jobs with optional filtering by type and status. */
-  public listBatchJobs(
-    options?: BatchJobsListBatchJobsOptions
-  ): Promise<BatchJobListResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/batch-jobs");
+  public list(
+    options?: BatchJobsListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<BatchJobListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/batch-jobs");
 
     request.setQueryParam("job_type", options?.jobType);
     request.setExplodedQueryParam("status", options?.status);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
-    return request.send(this.requestCtx, BatchJobListResponseSerializer._fromJsonObject);
+    return request.send(
+      this.requestCtx,
+      BatchJobListResponseSerializer.parse,
+      requestOptions
+    );
   }
 
-  /** Retrieve a single batch job with its chunks and failures. */
-  public getBatchJob(batchJobId: string): Promise<BatchJobDetailResponse> {
-    const request = new MeteroidRequest(
-      HttpMethod.GET,
-      "/api/v1/batch-jobs/{batch_job_id}"
-    );
+  /**
+   * Get batch job detail
+   *
+   * Retrieve a single batch job with its chunks and failures.
+   */
+  public retrieve(
+    batchJobId: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<BatchJobDetailResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/batch-jobs/{batch_job_id}");
 
     request.setPathParam("batch_job_id", batchJobId);
     return request.send(
       this.requestCtx,
-      BatchJobDetailResponseSerializer._fromJsonObject
+      BatchJobDetailResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /** Retrieve paginated failures for a batch job. */
-  public listBatchJobFailures(
+  /**
+   * List batch job failures
+   *
+   * Retrieve paginated failures for a batch job.
+   */
+  public listFailures(
     batchJobId: string,
-    options?: BatchJobsListBatchJobFailuresOptions
-  ): Promise<BatchJobFailuresResponse> {
+    options?: BatchJobsListFailuresOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<BatchJobFailuresResponse> {
     const request = new MeteroidRequest(
-      HttpMethod.GET,
+      "GET",
       "/api/v1/batch-jobs/{batch_job_id}/failures"
     );
 
@@ -77,7 +102,8 @@ export class BatchJobs {
     request.setQueryParam("offset", options?.offset);
     return request.send(
       this.requestCtx,
-      BatchJobFailuresResponseSerializer._fromJsonObject
+      BatchJobFailuresResponseSerializer.parse,
+      requestOptions
     );
   }
 }

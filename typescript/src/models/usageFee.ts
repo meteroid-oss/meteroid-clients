@@ -1,25 +1,31 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
-import { type UsagePricingModel, UsagePricingModelSerializer } from "./usagePricingModel";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
+import {
+  type UsagePricingModel,
+  UsagePricingModelSerializer,
+} from "./usagePricingModel.js";
 
 export interface UsageFee {
   metricId: BillableMetricId;
-
   model: UsagePricingModel;
 }
 
+/** Converts `UsageFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UsageFeeSerializer = {
-  _fromJsonObject(object: any): UsageFee {
+  parse(json: any): UsageFee {
     return {
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
-      model: UsagePricingModelSerializer._fromJsonObject(object["model"]),
+      ...extraProperties(json, ["metric_id", "model"]),
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
+      model: UsagePricingModelSerializer.parse(json["model"]),
     };
   },
 
-  _toJsonObject(self: UsageFee): any {
+  serialize(value: UsageFee): any {
     return {
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
-      model: UsagePricingModelSerializer._toJsonObject(self.model),
+      ...extraProperties(value, ["metricId", "model"]),
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
+      model: UsagePricingModelSerializer.serialize(value.model),
     };
   },
 };

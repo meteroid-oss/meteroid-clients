@@ -1,252 +1,348 @@
 // this file is @generated
-import { AddOns } from "./api/addOns";
-import { BatchJobs } from "./api/batchJobs";
-import { CheckoutSessions } from "./api/checkoutSessions";
-import { Connect } from "./api/connect";
-import { Coupons } from "./api/coupons";
-import { CreditNotes } from "./api/creditNotes";
-import { CustomProperties } from "./api/customProperties";
-import { Customers } from "./api/customers";
-import { Events } from "./api/events";
-import { Features } from "./api/features";
-import { Invoices } from "./api/invoices";
-import { Metrics } from "./api/metrics";
-import { OAuth } from "./api/oAuth";
-import { OAuthApps } from "./api/oAuthApps";
-import { Plans } from "./api/plans";
-import { ProductFamilies } from "./api/productFamilies";
-import { Products } from "./api/products";
-import { Subscriptions } from "./api/subscriptions";
-import { Usage } from "./api/usage";
-import type { MeteroidRequestContext } from "./request";
-import type { XOR } from "./util";
+import { AddOns } from "./api/addOns.js";
+import { BatchJobs } from "./api/batchJobs.js";
+import { CheckoutSessions } from "./api/checkoutSessions.js";
+import { Connect } from "./api/connect.js";
+import { Coupons } from "./api/coupons.js";
+import { CreditNotes } from "./api/creditNotes.js";
+import { CustomProperties } from "./api/customProperties.js";
+import { Customers } from "./api/customers.js";
+import { Events } from "./api/events.js";
+import { Features } from "./api/features.js";
+import { Invoices } from "./api/invoices.js";
+import { Metrics } from "./api/metrics.js";
+import { Oauth } from "./api/oauth.js";
+import { OauthApps } from "./api/oauthApps.js";
+import { Plans } from "./api/plans.js";
+import { ProductFamilies } from "./api/productFamilies.js";
+import { Products } from "./api/products.js";
+import { Subscriptions } from "./api/subscriptions.js";
+import { Usage } from "./api/usage.js";
+import type { Security, SecurityScheme } from "./auth.js";
+import type { Middleware } from "./middleware.js";
+import { readEnv, type MeteroidRequestContext } from "./request.js";
+import {
+  MeteroidError,
+  APIError,
+  BadRequestError,
+  AuthenticationError,
+  PermissionDeniedError,
+  NotFoundError,
+  ConflictError,
+  UnprocessableEntityError,
+  RateLimitError,
+  InternalServerError,
+  APIConnectionError,
+  APIConnectionTimeoutError,
+  APIUserAbortError,
+  APIDecodeError,
+} from "./apiErrors.js";
+import { RestErrorResponseSerializer } from "./models/restErrorResponse.js";
 
-export { ApiException } from "./util";
-export type { XOR } from "./util";
-export * from "./webhook";
-export * from "./models/index";
-export { LIB_VERSION } from "./request";
+export {
+  MeteroidError,
+  APIError,
+  BadRequestError,
+  AuthenticationError,
+  PermissionDeniedError,
+  NotFoundError,
+  ConflictError,
+  UnprocessableEntityError,
+  RateLimitError,
+  InternalServerError,
+  APIConnectionError,
+  APIConnectionTimeoutError,
+  APIUserAbortError,
+  APIDecodeError,
+} from "./apiErrors.js";
+/** The error bodies the API declares, `APIError.error` once parsed. */
+export type MeteroidErrorBody =
+  | import("./models/oAuthErrorResponse.js").OAuthErrorResponse
+  | import("./models/restErrorResponse.js").RestErrorResponse;
+export type { Middleware } from "./middleware.js";
+export { parseJson, stringifyJson } from "./json.js";
+export { expandableId } from "./unions.js";
+export { LIB_VERSION, type RequestOptions } from "./request.js";
+export { APIPromise } from "./apiPromise.js";
+export { Page, PagePromise } from "./pagination.js";
+export { EventStream, Stream } from "./streaming.js";
+export type { WithResponse } from "./apiPromise.js";
+export * from "./webhook.js";
+export * from "./models/index.js";
+export type { SseEvent, Upload, UploadBody } from "./streaming.js";
 
-export { AddOns } from "./api/addOns";
-export type { AddOnsListAddonsOptions } from "./api/addOns";
-export { BatchJobs } from "./api/batchJobs";
-export type { BatchJobsListBatchJobsOptions } from "./api/batchJobs";
-export type { BatchJobsListBatchJobFailuresOptions } from "./api/batchJobs";
-export { CheckoutSessions } from "./api/checkoutSessions";
-export type { CheckoutSessionsListCheckoutSessionsOptions } from "./api/checkoutSessions";
-export { Connect } from "./api/connect";
-export { Coupons } from "./api/coupons";
-export type { CouponsListCouponsOptions } from "./api/coupons";
-export { CreditNotes } from "./api/creditNotes";
-export type { CreditNotesListCreditNotesOptions } from "./api/creditNotes";
-export { CustomProperties } from "./api/customProperties";
-export type { CustomPropertiesListDefinitionsOptions } from "./api/customProperties";
-export { Customers } from "./api/customers";
-export type { CustomersListCustomersOptions } from "./api/customers";
-export { Events } from "./api/events";
-export { Features } from "./api/features";
-export type { FeaturesListFeaturesOptions } from "./api/features";
-export { Invoices } from "./api/invoices";
-export type { InvoicesListInvoicesOptions } from "./api/invoices";
-export { Metrics } from "./api/metrics";
-export type { MetricsListMetricsOptions } from "./api/metrics";
-export { OAuth } from "./api/oAuth";
-export { OAuthApps } from "./api/oAuthApps";
-export { Plans } from "./api/plans";
-export type { PlansListPlansOptions } from "./api/plans";
-export type { PlansGetPlanDetailsOptions } from "./api/plans";
-export type { PlansListPlanVersionsOptions } from "./api/plans";
-export { ProductFamilies } from "./api/productFamilies";
-export type { ProductFamiliesListProductFamiliesOptions } from "./api/productFamilies";
-export { Products } from "./api/products";
-export type { ProductsListProductsOptions } from "./api/products";
-export { Subscriptions } from "./api/subscriptions";
-export type { SubscriptionsListSubscriptionsOptions } from "./api/subscriptions";
-export { Usage } from "./api/usage";
-export type { UsageGetCustomerUsageOptions } from "./api/usage";
-export type { UsageGetSubscriptionUsageOptions } from "./api/usage";
-export type { UsageGetUsageSummaryOptions } from "./api/usage";
+export { AddOns } from "./api/addOns.js";
+export type { AddOnsListOptions } from "./api/addOns.js";
+export { BatchJobs } from "./api/batchJobs.js";
+export type { BatchJobsListOptions } from "./api/batchJobs.js";
+export type { BatchJobsListFailuresOptions } from "./api/batchJobs.js";
+export { CheckoutSessions } from "./api/checkoutSessions.js";
+export type { CheckoutSessionsListOptions } from "./api/checkoutSessions.js";
+export { Connect } from "./api/connect.js";
+export { Coupons } from "./api/coupons.js";
+export type { CouponsListOptions } from "./api/coupons.js";
+export { CreditNotes } from "./api/creditNotes.js";
+export type { CreditNotesListOptions } from "./api/creditNotes.js";
+export { CustomProperties } from "./api/customProperties.js";
+export type { CustomPropertiesListCustomPropertyDefinitionsOptions } from "./api/customProperties.js";
+export { Customers } from "./api/customers.js";
+export type { CustomersListOptions } from "./api/customers.js";
+export { Events } from "./api/events.js";
+export { Features } from "./api/features.js";
+export type { FeaturesListOptions } from "./api/features.js";
+export { Invoices } from "./api/invoices.js";
+export type { InvoicesListOptions } from "./api/invoices.js";
+export { Metrics } from "./api/metrics.js";
+export type { MetricsListOptions } from "./api/metrics.js";
+export { Oauth } from "./api/oauth.js";
+export { OauthApps } from "./api/oauthApps.js";
+export { Plans } from "./api/plans.js";
+export type { PlansListOptions } from "./api/plans.js";
+export type { PlansRetrieveOptions } from "./api/plans.js";
+export type { PlansListVersionsOptions } from "./api/plans.js";
+export { ProductFamilies } from "./api/productFamilies.js";
+export type { ProductFamiliesListOptions } from "./api/productFamilies.js";
+export { Products } from "./api/products.js";
+export type { ProductsListOptions } from "./api/products.js";
+export { Subscriptions } from "./api/subscriptions.js";
+export type { SubscriptionsListOptions } from "./api/subscriptions.js";
+export { Usage } from "./api/usage.js";
+export type { UsageRetrieveCustomerOptions } from "./api/usage.js";
+export type { UsageRetrieveSubscriptionOptions } from "./api/usage.js";
+export type { UsageRetrieveSummaryOptions } from "./api/usage.js";
 
 export type MeteroidOptions = {
-  /** Write a one-line summary of every request and response to stderr. */
-  debug?: boolean;
-  /** Custom API server URL. Defaults to `https://api.meteroid.com`. */
-  serverUrl?: string;
-  /** Time in milliseconds to wait for requests to get a response. */
-  requestTimeout?: number;
   /**
-   * Custom fetch implementation to use for HTTP requests.
-   * Useful for testing, adding custom middleware, or running in non-standard environments.
+   * The API key or bearer token sent with every request. Defaults to the `METEROID_API_KEY` environment variable.
    */
-  fetch?: typeof fetch;
-} & XOR<
-  {
-    /** List of delays (in milliseconds) to wait before each retry attempt. */
-    retryScheduleInMs?: number[];
-  },
-  {
-    /**
-     * The number of times the client will retry if a server-side error
-     * or timeout is received.
-     * Default: 2
-     */
-    numRetries?: number;
-  }
->;
+  apiKey?: string | null | undefined;
+  /**
+   * The API server URL. Defaults to the `METEROID_BASE_URL` environment variable, then
+   * `https://api.meteroid.com`.
+   */
+  baseURL?: string | null | undefined;
+  /**
+   * Time in milliseconds to wait for each attempt to get a response. Default:
+   * 60000 (60 seconds); `Infinity` waits forever.
+   */
+  timeout?: number | undefined;
+  /**
+   * How many times a failed request is retried: connection errors, timeouts, 408, 429
+   * and 5xx responses. Default: 2, or the length of `retryScheduleInMs`.
+   */
+  maxRetries?: number | undefined;
+  /** Headers sent with every request; `null` removes a header the SDK sets. */
+  defaultHeaders?: Record<string, string | null | undefined> | undefined;
+  /** Query parameters sent with every request. */
+  defaultQuery?: Record<string, string | undefined> | undefined;
+  /** Custom fetch implementation, for tests or non-standard runtimes. */
+  fetch?: typeof fetch | undefined;
+  /** Wraps every HTTP attempt: caching, logging, custom headers. */
+  middleware?: Middleware[] | undefined;
+  /** Write a one-line summary of every request and response to stderr. */
+  debug?: boolean | undefined;
+  /** Delays in milliseconds before each retry, instead of the default backoff. */
+  retryScheduleInMs?: number[] | undefined;
+  /**
+   * Called before each request for a fresh bearer token, e.g. an OAuth2 access
+   * token. Takes precedence over `apiKey`.
+   */
+  tokenProvider?: (() => string | Promise<string>) | undefined;
+};
 
 const DEFAULT_BASE_URL = "https://api.meteroid.com";
+const DEFAULT_TIMEOUT_MS = 60000;
+
+const AUTH: { schemes: Record<string, SecurityScheme>; security: Security } = {
+  schemes: {
+    bearer_auth: { kind: "bearer" },
+  },
+  security: [["bearer_auth"]],
+};
 
 /**
- * Meteroid API client for billing and subscription management.
+ * Meteroid billing API client.
  *
  * @example
  * ```typescript
- * const meteroid = new Meteroid("your-api-key");
+ * const meteroid = new Meteroid({ apiKey: "your-api-key" });
  *
- * // Create a customer
- * const customer = await meteroid.customers.createCustomer({
- *   name: "Acme Inc",
- *   billingEmail: "billing@acme.com",
- * });
+ * // Access the generated resources through the client.
  * ```
  */
 export class Meteroid {
+  static readonly MeteroidError = MeteroidError;
+  static readonly APIError = APIError;
+  static readonly BadRequestError = BadRequestError;
+  static readonly AuthenticationError = AuthenticationError;
+  static readonly PermissionDeniedError = PermissionDeniedError;
+  static readonly NotFoundError = NotFoundError;
+  static readonly ConflictError = ConflictError;
+  static readonly UnprocessableEntityError = UnprocessableEntityError;
+  static readonly RateLimitError = RateLimitError;
+  static readonly InternalServerError = InternalServerError;
+  static readonly APIConnectionError = APIConnectionError;
+  static readonly APIConnectionTimeoutError = APIConnectionTimeoutError;
+  static readonly APIUserAbortError = APIUserAbortError;
+  static readonly APIDecodeError = APIDecodeError;
+
   private readonly requestCtx: MeteroidRequestContext;
+  private _addOns?: AddOns;
+  private _batchJobs?: BatchJobs;
+  private _checkoutSessions?: CheckoutSessions;
+  private _connect?: Connect;
+  private _coupons?: Coupons;
+  private _creditNotes?: CreditNotes;
+  private _customProperties?: CustomProperties;
+  private _customers?: Customers;
+  private _events?: Events;
+  private _features?: Features;
+  private _invoices?: Invoices;
+  private _metrics?: Metrics;
+  private _oauth?: Oauth;
+  private _oauthApps?: OauthApps;
+  private _plans?: Plans;
+  private _productFamilies?: ProductFamilies;
+  private _products?: Products;
+  private _subscriptions?: Subscriptions;
+  private _usage?: Usage;
 
   /**
-   * Create a new Meteroid client.
-   *
-   * @param token API token for authentication
-   * @param options Client configuration options
+   * Reads the API key from `METEROID_API_KEY` and the base URL from `METEROID_BASE_URL`
+   * unless `options` sets them.
    */
-  public constructor(token: string, options: MeteroidOptions = {}) {
-    const baseUrl: string = options.serverUrl ?? DEFAULT_BASE_URL;
-
-    if (options.retryScheduleInMs != null) {
-      this.requestCtx = {
-        baseUrl,
-        token,
-        timeout: options.requestTimeout,
-        retryScheduleInMs: options.retryScheduleInMs,
-        debug: options.debug,
-        fetch: options.fetch,
-      };
-      return;
-    }
-
-    if (options.numRetries != null) {
-      this.requestCtx = {
-        baseUrl,
-        token,
-        timeout: options.requestTimeout,
-        numRetries: options.numRetries,
-        debug: options.debug,
-        fetch: options.fetch,
-      };
-      return;
-    }
-
+  public constructor(options: MeteroidOptions = {}) {
+    const token = options.apiKey ?? readEnv("METEROID_API_KEY");
+    const baseUrl = options.baseURL ?? readEnv("METEROID_BASE_URL") ?? DEFAULT_BASE_URL;
     this.requestCtx = {
-      baseUrl,
+      auth: AUTH,
       token,
-      timeout: options.requestTimeout,
+      tokenProvider: options.tokenProvider,
+
+      baseUrl: baseUrl.replace(/\/+$/, ""),
+      timeout: options.timeout ?? DEFAULT_TIMEOUT_MS,
+      parseError: RestErrorResponseSerializer.parse,
       debug: options.debug,
       fetch: options.fetch,
+      middleware: options.middleware,
+      retryScheduleInMs: options.retryScheduleInMs,
+      maxRetries: options.maxRetries,
+      defaultHeaders: options.defaultHeaders,
+      defaultQuery: options.defaultQuery,
     };
   }
 
-  /** Access the add ons API. */
+  /** The add ons API. */
   public get addOns(): AddOns {
-    return new AddOns(this.requestCtx);
+    this._addOns ??= new AddOns(this.requestCtx);
+    return this._addOns;
   }
 
-  /** Access the batch jobs API. */
+  /** The batch jobs API. */
   public get batchJobs(): BatchJobs {
-    return new BatchJobs(this.requestCtx);
+    this._batchJobs ??= new BatchJobs(this.requestCtx);
+    return this._batchJobs;
   }
 
-  /** Access the checkout sessions API. */
+  /** The checkout sessions API. */
   public get checkoutSessions(): CheckoutSessions {
-    return new CheckoutSessions(this.requestCtx);
+    this._checkoutSessions ??= new CheckoutSessions(this.requestCtx);
+    return this._checkoutSessions;
   }
 
-  /** Access the connect API. */
+  /** The connect API. */
   public get connect(): Connect {
-    return new Connect(this.requestCtx);
+    this._connect ??= new Connect(this.requestCtx);
+    return this._connect;
   }
 
-  /** Access the coupons API. */
+  /** The coupons API. */
   public get coupons(): Coupons {
-    return new Coupons(this.requestCtx);
+    this._coupons ??= new Coupons(this.requestCtx);
+    return this._coupons;
   }
 
-  /** Access the credit notes API. */
+  /** The credit notes API. */
   public get creditNotes(): CreditNotes {
-    return new CreditNotes(this.requestCtx);
+    this._creditNotes ??= new CreditNotes(this.requestCtx);
+    return this._creditNotes;
   }
 
-  /** Access the custom properties API. */
+  /** The custom properties API. */
   public get customProperties(): CustomProperties {
-    return new CustomProperties(this.requestCtx);
+    this._customProperties ??= new CustomProperties(this.requestCtx);
+    return this._customProperties;
   }
 
-  /** Access the customers API. */
+  /** The customers API. */
   public get customers(): Customers {
-    return new Customers(this.requestCtx);
+    this._customers ??= new Customers(this.requestCtx);
+    return this._customers;
   }
 
-  /** Access the events API. */
+  /** The events API. */
   public get events(): Events {
-    return new Events(this.requestCtx);
+    this._events ??= new Events(this.requestCtx);
+    return this._events;
   }
 
-  /** Access the features API. */
+  /** The features API. */
   public get features(): Features {
-    return new Features(this.requestCtx);
+    this._features ??= new Features(this.requestCtx);
+    return this._features;
   }
 
-  /** Access the invoices API. */
+  /** The invoices API. */
   public get invoices(): Invoices {
-    return new Invoices(this.requestCtx);
+    this._invoices ??= new Invoices(this.requestCtx);
+    return this._invoices;
   }
 
-  /** Access the metrics API. */
+  /** The metrics API. */
   public get metrics(): Metrics {
-    return new Metrics(this.requestCtx);
+    this._metrics ??= new Metrics(this.requestCtx);
+    return this._metrics;
   }
 
-  /** Access the o auth API. */
-  public get oAuth(): OAuth {
-    return new OAuth(this.requestCtx);
+  /** The oauth API. */
+  public get oauth(): Oauth {
+    this._oauth ??= new Oauth(this.requestCtx);
+    return this._oauth;
   }
 
-  /** Access the o auth apps API. */
-  public get oAuthApps(): OAuthApps {
-    return new OAuthApps(this.requestCtx);
+  /** The oauth apps API. */
+  public get oauthApps(): OauthApps {
+    this._oauthApps ??= new OauthApps(this.requestCtx);
+    return this._oauthApps;
   }
 
-  /** Access the plans API. */
+  /** The plans API. */
   public get plans(): Plans {
-    return new Plans(this.requestCtx);
+    this._plans ??= new Plans(this.requestCtx);
+    return this._plans;
   }
 
-  /** Access the product families API. */
+  /** The product families API. */
   public get productFamilies(): ProductFamilies {
-    return new ProductFamilies(this.requestCtx);
+    this._productFamilies ??= new ProductFamilies(this.requestCtx);
+    return this._productFamilies;
   }
 
-  /** Access the products API. */
+  /** The products API. */
   public get products(): Products {
-    return new Products(this.requestCtx);
+    this._products ??= new Products(this.requestCtx);
+    return this._products;
   }
 
-  /** Access the subscriptions API. */
+  /** The subscriptions API. */
   public get subscriptions(): Subscriptions {
-    return new Subscriptions(this.requestCtx);
+    this._subscriptions ??= new Subscriptions(this.requestCtx);
+    return this._subscriptions;
   }
 
-  /** Access the usage API. */
+  /** The usage API. */
   public get usage(): Usage {
-    return new Usage(this.requestCtx);
+    this._usage ??= new Usage(this.requestCtx);
+    return this._usage;
   }
 }

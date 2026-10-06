@@ -7,7 +7,8 @@ use super::{
     shipping_address::ShippingAddress,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Customer {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alias: Option<String>,
@@ -66,9 +67,15 @@ pub struct Customer {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat_number: Option<String>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Customer {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         currency: Currency,
         custom_properties: serde_json::Value,
@@ -76,7 +83,7 @@ impl Customer {
         id: CustomerId,
         invoicing_emails: Vec<String>,
         invoicing_entity_id: InvoicingEntityId,
-        name: String,
+        name: impl Into<String>,
         preferred_locales: Vec<String>,
     ) -> Self {
         #[allow(deprecated)]
@@ -96,11 +103,12 @@ impl Customer {
             invoicing_language: None,
             last_name: None,
             legal_number: None,
-            name,
+            name: name.into(),
             phone: None,
             preferred_locales,
             shipping_address: None,
             vat_number: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

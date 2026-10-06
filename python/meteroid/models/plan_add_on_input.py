@@ -1,18 +1,24 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .add_on_id import AddOnId
-from .price_id import PriceId
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .add_on_id import AddOnId
+    from .price_id import PriceId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class PlanAddOnInput(BaseModel):
+    """The `PlanAddOnInput` object."""
+
     add_on_id: AddOnId
 
-    max_instances: t.Optional[int] = None
+    max_instances: int | None | Unset = UNSET
 
-    price_id: t.Optional[PriceId] = None
+    price_id: PriceId | None | Unset = UNSET
 
-    self_serviceable: t.Optional[bool] = None
+    self_serviceable: bool | None | Unset = UNSET

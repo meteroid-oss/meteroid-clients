@@ -1,20 +1,35 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
+/**
+ * One of the variants below, told apart by {@code type}. A value this version of the SDK does not
+ * know parses as {@link Unrecognized}, which keeps its properties.
+ */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "type",
-        visible = true)
+        visible = true,
+        defaultImpl = ResetPeriod.Unrecognized.class)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = ResetPeriod.BillingCycle.class, name = "BILLING_CYCLE"),
     @JsonSubTypes.Type(value = ResetPeriod.Calendar.class, name = "CALENDAR"),
@@ -22,205 +37,660 @@ import lombok.*;
     @JsonSubTypes.Type(value = ResetPeriod.SlidingWindow.class, name = "SLIDING_WINDOW"),
     @JsonSubTypes.Type(value = ResetPeriod.Never.class, name = "NEVER")
 })
-@ToString
-@EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
 public abstract class ResetPeriod {
-    /** Get the discriminator value identifying this variant. */
-    public abstract String getType();
+
+    private ResetPeriod() {}
 
     /**
-     * Convert an instance of ResetPeriod to a JSON string.
+     * The discriminator value identifying this variant.
      *
-     * @return JSON string
+     * @return the {@code type} value
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    @JsonProperty("type")
+    public abstract String type();
+
+    /**
+     * Whether this is the {@code BILLING_CYCLE} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isBillingCycle() {
+        return this instanceof BillingCycle;
     }
 
     /**
-     * Create an instance of ResetPeriod from a JSON string.
+     * This value as the {@code BILLING_CYCLE} variant.
      *
-     * @param jsonString JSON string
-     * @return An instance of ResetPeriod
-     * @throws JsonProcessingException if the JSON string is invalid
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
      */
-    public static ResetPeriod fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, ResetPeriod.class);
+    public final BillingCycle asBillingCycle() {
+        if (this instanceof BillingCycle) {
+            return (BillingCycle) this;
+        }
+        throw new IllegalStateException("not the BILLING_CYCLE variant: " + type());
     }
 
-    // Variant classes
     /**
-     * Variant: BILLING_CYCLE
+     * Whether this is the {@code CALENDAR} variant.
      *
-     * <p>This variant wraps BillingCycleResetPeriod.
+     * @return whether it is
      */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    public final boolean isCalendar() {
+        return this instanceof Calendar;
+    }
+
+    /**
+     * This value as the {@code CALENDAR} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Calendar asCalendar() {
+        if (this instanceof Calendar) {
+            return (Calendar) this;
+        }
+        throw new IllegalStateException("not the CALENDAR variant: " + type());
+    }
+
+    /**
+     * Whether this is the {@code FIXED_WINDOW} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isFixedWindow() {
+        return this instanceof FixedWindow;
+    }
+
+    /**
+     * This value as the {@code FIXED_WINDOW} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final FixedWindow asFixedWindow() {
+        if (this instanceof FixedWindow) {
+            return (FixedWindow) this;
+        }
+        throw new IllegalStateException("not the FIXED_WINDOW variant: " + type());
+    }
+
+    /**
+     * Whether this is the {@code SLIDING_WINDOW} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isSlidingWindow() {
+        return this instanceof SlidingWindow;
+    }
+
+    /**
+     * This value as the {@code SLIDING_WINDOW} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final SlidingWindow asSlidingWindow() {
+        if (this instanceof SlidingWindow) {
+            return (SlidingWindow) this;
+        }
+        throw new IllegalStateException("not the SLIDING_WINDOW variant: " + type());
+    }
+
+    /**
+     * Whether this is the {@code NEVER} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isNever() {
+        return this instanceof Never;
+    }
+
+    /**
+     * This value as the {@code NEVER} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Never asNever() {
+        if (this instanceof Never) {
+            return (Never) this;
+        }
+        throw new IllegalStateException("not the NEVER variant: " + type());
+    }
+
+    /**
+     * Whether this is a variant this version of the SDK does not know.
+     *
+     * @return whether it is
+     */
+    public final boolean isUnrecognized() {
+        return this instanceof Unrecognized;
+    }
+
+    /**
+     * This value as a variant this version of the SDK does not know.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Unrecognized asUnrecognized() {
+        if (this instanceof Unrecognized) {
+            return (Unrecognized) this;
+        }
+        throw new IllegalStateException("not a known variant: " + type());
+    }
+
+    /**
+     * Calls the method of {@code visitor} for this variant.
+     *
+     * @param <R> the result type
+     * @param visitor the visitor
+     * @return the result of the visitor
+     */
+    public abstract <R> R accept(Visitor<R> visitor);
+
+    /**
+     * A function of each variant, called by {@link #accept}.
+     *
+     * @param <R> the result type
+     */
+    public interface Visitor<R> {
+        /**
+         * Visits the {@code BILLING_CYCLE} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitBillingCycle(BillingCycleResetPeriod value);
+
+        /**
+         * Visits the {@code CALENDAR} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitCalendar(CalendarResetPeriod value);
+
+        /**
+         * Visits the {@code FIXED_WINDOW} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitFixedWindow(FixedWindowResetPeriod value);
+
+        /**
+         * Visits the {@code SLIDING_WINDOW} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitSlidingWindow(SlidingWindowResetPeriod value);
+
+        /**
+         * Visits the {@code NEVER} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitNever(NeverResetPeriod value);
+
+        /**
+         * Visits a variant this version of the SDK does not know.
+         *
+         * @param value the variant, with its properties
+         * @return the result
+         * @throws com.meteroid.exceptions.InvalidDataException unless overridden
+         */
+        default R visitUnknown(Unrecognized value) {
+            throw new com.meteroid.exceptions.InvalidDataException(
+                    "unknown ResetPeriod variant: " + value.type());
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code ResetPeriod}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static ResetPeriod fromJson(String json) {
+        return Utils.parse(json, ResetPeriod.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
+    }
+
+    /** The {@code BILLING_CYCLE} variant. */
     @JsonTypeName("BILLING_CYCLE")
-    public static class BillingCycle extends ResetPeriod {
-        @JsonUnwrapped private BillingCycleResetPeriod data;
+    public static final class BillingCycle extends ResetPeriod {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private BillingCycleResetPeriod data;
 
-        public BillingCycle() {}
+        private BillingCycle() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public BillingCycle(BillingCycleResetPeriod data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static BillingCycle of(BillingCycleResetPeriod data) {
+            return new BillingCycle(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "BILLING_CYCLE";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public BillingCycleResetPeriod getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public BillingCycleResetPeriod data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public BillingCycle data(BillingCycleResetPeriod data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            BillingCycle that = (BillingCycle) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "BillingCycle{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBillingCycle(data);
         }
     }
 
-    /**
-     * Variant: CALENDAR
-     *
-     * <p>This variant wraps CalendarResetPeriod.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code CALENDAR} variant. */
     @JsonTypeName("CALENDAR")
-    public static class Calendar extends ResetPeriod {
-        @JsonUnwrapped private CalendarResetPeriod data;
+    public static final class Calendar extends ResetPeriod {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private CalendarResetPeriod data;
 
-        public Calendar() {}
+        private Calendar() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Calendar(CalendarResetPeriod data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Calendar of(CalendarResetPeriod data) {
+            return new Calendar(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "CALENDAR";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public CalendarResetPeriod getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public CalendarResetPeriod data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Calendar data(CalendarResetPeriod data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Calendar that = (Calendar) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Calendar{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitCalendar(data);
         }
     }
 
-    /**
-     * Variant: FIXED_WINDOW
-     *
-     * <p>This variant wraps FixedWindowResetPeriod.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code FIXED_WINDOW} variant. */
     @JsonTypeName("FIXED_WINDOW")
-    public static class FixedWindow extends ResetPeriod {
-        @JsonUnwrapped private FixedWindowResetPeriod data;
+    public static final class FixedWindow extends ResetPeriod {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private FixedWindowResetPeriod data;
 
-        public FixedWindow() {}
+        private FixedWindow() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public FixedWindow(FixedWindowResetPeriod data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static FixedWindow of(FixedWindowResetPeriod data) {
+            return new FixedWindow(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "FIXED_WINDOW";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public FixedWindowResetPeriod getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public FixedWindowResetPeriod data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public FixedWindow data(FixedWindowResetPeriod data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            FixedWindow that = (FixedWindow) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "FixedWindow{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitFixedWindow(data);
         }
     }
 
-    /**
-     * Variant: SLIDING_WINDOW
-     *
-     * <p>This variant wraps SlidingWindowResetPeriod.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code SLIDING_WINDOW} variant. */
     @JsonTypeName("SLIDING_WINDOW")
-    public static class SlidingWindow extends ResetPeriod {
-        @JsonUnwrapped private SlidingWindowResetPeriod data;
+    public static final class SlidingWindow extends ResetPeriod {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private SlidingWindowResetPeriod data;
 
-        public SlidingWindow() {}
+        private SlidingWindow() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public SlidingWindow(SlidingWindowResetPeriod data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static SlidingWindow of(SlidingWindowResetPeriod data) {
+            return new SlidingWindow(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "SLIDING_WINDOW";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public SlidingWindowResetPeriod getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public SlidingWindowResetPeriod data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public SlidingWindow data(SlidingWindowResetPeriod data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            SlidingWindow that = (SlidingWindow) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "SlidingWindow{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitSlidingWindow(data);
         }
     }
 
-    /**
-     * Variant: NEVER
-     *
-     * <p>This variant wraps NeverResetPeriod.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code NEVER} variant. */
     @JsonTypeName("NEVER")
-    public static class Never extends ResetPeriod {
-        @JsonUnwrapped private NeverResetPeriod data;
+    public static final class Never extends ResetPeriod {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private NeverResetPeriod data;
 
-        public Never() {}
+        private Never() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Never(NeverResetPeriod data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Never of(NeverResetPeriod data) {
+            return new Never(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "NEVER";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public NeverResetPeriod getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public NeverResetPeriod data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Never data(NeverResetPeriod data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Never that = (Never) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Never{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitNever(data);
+        }
+    }
+
+    /** A variant this version of the SDK does not know. */
+    public static final class Unrecognized extends ResetPeriod {
+        @JsonProperty("type")
+        private String discriminator;
+
+        private final Map<String, JsonNode> properties = new LinkedHashMap<>();
+
+        private Unrecognized() {}
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
+            return discriminator;
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitUnknown(this);
+        }
+
+        /**
+         * Every other property of the variant.
+         *
+         * @return the properties by name, unmodifiable
+         */
+        @JsonAnyGetter
+        public Map<String, JsonNode> properties() {
+            return Collections.unmodifiableMap(properties);
+        }
+
+        @JsonAnySetter
+        private void putProperty(String name, JsonNode value) {
+            properties.put(name, value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Unrecognized that = (Unrecognized) o;
+            return Objects.equals(discriminator, that.discriminator)
+                    && Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(discriminator, properties);
+        }
+
+        @Override
+        public String toString() {
+            return "Unrecognized{"
+                    + "discriminator="
+                    + discriminator
+                    + ", properties="
+                    + properties
+                    + "}";
         }
     }
 }

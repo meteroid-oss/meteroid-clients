@@ -6,12 +6,13 @@ use super::{
     feature_id::FeatureId, feature_status::FeatureStatus, feature_type::FeatureType,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Feature {
     /// Unique key used to reference this feature in your code. Cannot be changed after creation.
     pub code: String,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -29,27 +30,34 @@ pub struct Feature {
     pub product: Option<EntitlementProductRef>,
 
     pub status: FeatureStatus,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Feature {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
-        code: String,
-        created_at: String,
+        code: impl Into<String>,
+        created_at: chrono::DateTime<chrono::Utc>,
         feature_type: FeatureType,
         id: FeatureId,
-        name: String,
+        name: impl Into<String>,
         status: FeatureStatus,
     ) -> Self {
         Self {
-            code,
+            code: code.into(),
             created_at,
             description: None,
             entitlement: None,
             feature_type,
             id,
-            name,
+            name: name.into(),
             product: None,
             status,
+            extra: serde_json::Map::new(),
         }
     }
 }

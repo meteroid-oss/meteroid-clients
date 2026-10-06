@@ -2,8 +2,8 @@
 import {
   type ExistingProductRef,
   ExistingProductRefSerializer,
-} from "./existingProductRef";
-import { type NewProductRef, NewProductRefSerializer } from "./newProductRef";
+} from "./existingProductRef.js";
+import { type NewProductRef, NewProductRefSerializer } from "./newProductRef.js";
 
 export interface ProductRefExisting extends ExistingProductRef {
   type: "EXISTING";
@@ -14,40 +14,40 @@ export interface ProductRefNew extends NewProductRef {
 
 export type ProductRef = ProductRefExisting | ProductRefNew;
 
+/** Converts `ProductRef` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductRefSerializer = {
-  _fromJsonObject(object: any): ProductRef {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): ProductRef {
+    switch (json["type"]) {
       case "EXISTING":
         return {
-          ...ExistingProductRefSerializer._fromJsonObject(object),
+          ...ExistingProductRefSerializer.parse(json),
           type: "EXISTING",
         };
       case "NEW":
         return {
-          ...NewProductRefSerializer._fromJsonObject(object),
+          ...NewProductRefSerializer.parse(json),
           type: "NEW",
         };
       default:
-        throw new Error(`Unexpected type for ProductRef: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: ProductRef): any {
-    switch (self.type) {
+  serialize(value: ProductRef): any {
+    switch (value.type) {
       case "EXISTING":
         return {
-          ...ExistingProductRefSerializer._toJsonObject(self),
+          ...ExistingProductRefSerializer.serialize(value),
           type: "EXISTING",
         };
       case "NEW":
         return {
-          ...NewProductRefSerializer._toJsonObject(self),
+          ...NewProductRefSerializer.serialize(value),
           type: "NEW",
         };
       default:
-        throw new Error(`Unexpected type for ProductRef`);
+        return value;
     }
   },
 };

@@ -7,7 +7,7 @@ use super::{
     payment_methods_config::PaymentMethodsConfig, plan_version_id::PlanVersionId,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct CreateCheckoutSessionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub add_ons: Option<Vec<CreateSubscriptionAddOn>>,
@@ -20,7 +20,7 @@ pub struct CreateCheckoutSessionRequest {
     pub billing_day_anchor: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub billing_start_date: Option<String>,
+    pub billing_start_date: Option<chrono::NaiveDate>,
 
     /// Absolute http(s) URL offered to the customer to leave the checkout without paying.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,7 +43,7 @@ pub struct CreateCheckoutSessionRequest {
     pub customer_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub end_date: Option<String>,
+    pub end_date: Option<chrono::NaiveDate>,
 
     /// Session expiry time in hours. Default is 1 hour for self-serve checkout.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,10 +77,16 @@ pub struct CreateCheckoutSessionRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trial_duration_days: Option<i32>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CreateCheckoutSessionRequest {
-    pub fn new(customer_id: String, plan_version_id: PlanVersionId) -> Self {
+    /// Creates a value from its required fields.
+    #[must_use]
+    pub fn new(customer_id: impl Into<String>, plan_version_id: PlanVersionId) -> Self {
         Self {
             add_ons: None,
             auto_advance_invoices: None,
@@ -91,7 +97,7 @@ impl CreateCheckoutSessionRequest {
             components: None,
             coupon_code: None,
             coupon_ids: None,
-            customer_id,
+            customer_id: customer_id.into(),
             end_date: None,
             expires_in_hours: None,
             invoice_memo: None,
@@ -103,6 +109,7 @@ impl CreateCheckoutSessionRequest {
             purchase_order: None,
             success_url: None,
             trial_duration_days: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

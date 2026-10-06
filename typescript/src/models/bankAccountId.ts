@@ -2,12 +2,13 @@
 
 export type BankAccountId = string;
 
+/** Converts `BankAccountId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BankAccountIdSerializer = {
-  _fromJsonObject(object: any): BankAccountId {
-    return object;
+  parse(json: any): BankAccountId {
+    return json;
   },
 
-  _toJsonObject(self: BankAccountId): any {
-    return self;
+  serialize(value: BankAccountId): any {
+    return value;
   },
 };

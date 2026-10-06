@@ -1,94 +1,112 @@
 // this file is @generated
+
 import {
   type CreateMetricRequest,
   CreateMetricRequestSerializer,
-} from "../models/createMetricRequest";
-import { type Metric, MetricSerializer } from "../models/metric";
+} from "../models/createMetricRequest.js";
+import { type Metric, MetricSerializer } from "../models/metric.js";
 import {
   type MetricListResponse,
   MetricListResponseSerializer,
-} from "../models/metricListResponse";
-import type { ProductFamilyId } from "../models/productFamilyId";
+} from "../models/metricListResponse.js";
+import type { ProductFamilyId } from "../models/productFamilyId.js";
 import {
   type UpdateMetricRequest,
   UpdateMetricRequestSerializer,
-} from "../models/updateMetricRequest";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/updateMetricRequest.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface MetricsListMetricsOptions {
-  productFamilyId?: ProductFamilyId;
+/** The query and header parameters of `list`. */
+export interface MetricsListOptions {
+  productFamilyId?: ProductFamilyId | undefined;
   /** Search by metric name or code */
-  search?: string;
+  search?: string | undefined;
   /** Sort order. Format: `column.direction`. Allowed columns: `name`, `code`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`. */
-  orderBy?: string;
+  orderBy?: string | undefined;
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
+  perPage?: number | undefined;
 }
 
+/** The metrics operations, reached through the client's `metrics`. */
 export class Metrics {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /**  */
-  public listMetrics(options?: MetricsListMetricsOptions): Promise<MetricListResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/metrics");
+  /** List billable metrics */
+  public list(
+    options?: MetricsListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<MetricListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/metrics");
 
     request.setQueryParam("product_family_id", options?.productFamilyId);
     request.setQueryParam("search", options?.search);
     request.setQueryParam("order_by", options?.orderBy);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
-    return request.send(this.requestCtx, MetricListResponseSerializer._fromJsonObject);
+    return request.send(
+      this.requestCtx,
+      MetricListResponseSerializer.parse,
+      requestOptions
+    );
   }
 
-  /**  */
-  public createMetric(createMetricRequest: CreateMetricRequest): Promise<Metric> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/metrics");
+  /** Create a billable metric */
+  public create(
+    createMetricRequest: CreateMetricRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Metric> {
+    const request = new MeteroidRequest("POST", "/api/v1/metrics");
 
-    request.setBody(CreateMetricRequestSerializer._toJsonObject(createMetricRequest));
-    return request.send(this.requestCtx, MetricSerializer._fromJsonObject);
+    request.setBody(CreateMetricRequestSerializer.serialize(createMetricRequest));
+    return request.send(this.requestCtx, MetricSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public getMetric(metricId: string): Promise<Metric> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/metrics/{metric_id}");
+  /** Get metric details */
+  public retrieve(metricId: string, requestOptions?: RequestOptions): APIPromise<Metric> {
+    const request = new MeteroidRequest("GET", "/api/v1/metrics/{metric_id}");
 
     request.setPathParam("metric_id", metricId);
-    return request.send(this.requestCtx, MetricSerializer._fromJsonObject);
+    return request.send(this.requestCtx, MetricSerializer.parse, requestOptions);
   }
 
-  /** Partially update metric fields. Code and aggregation_type are immutable. */
-  public updateMetric(
+  /**
+   * Update a billable metric
+   *
+   * Partially update metric fields. Code and aggregation_type are immutable.
+   */
+  public update(
     metricId: string,
-    updateMetricRequest: UpdateMetricRequest
-  ): Promise<Metric> {
-    const request = new MeteroidRequest(HttpMethod.PATCH, "/api/v1/metrics/{metric_id}");
+    updateMetricRequest: UpdateMetricRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Metric> {
+    const request = new MeteroidRequest("PATCH", "/api/v1/metrics/{metric_id}");
 
     request.setPathParam("metric_id", metricId);
-    request.setBody(UpdateMetricRequestSerializer._toJsonObject(updateMetricRequest));
-    return request.send(this.requestCtx, MetricSerializer._fromJsonObject);
+    request.setBody(UpdateMetricRequestSerializer.serialize(updateMetricRequest));
+    return request.send(this.requestCtx, MetricSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public archiveMetric(metricId: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/metrics/{metric_id}/archive"
-    );
+  /** Archive a billable metric */
+  public archive(metricId: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("POST", "/api/v1/metrics/{metric_id}/archive");
 
     request.setPathParam("metric_id", metricId);
-    return request.sendNoResponseBody(this.requestCtx);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
   }
 
-  /**  */
-  public unarchiveMetric(metricId: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/metrics/{metric_id}/unarchive"
-    );
+  /** Unarchive a billable metric */
+  public unarchive(metricId: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("POST", "/api/v1/metrics/{metric_id}/unarchive");
 
     request.setPathParam("metric_id", metricId);
-    return request.sendNoResponseBody(this.requestCtx);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
   }
 }

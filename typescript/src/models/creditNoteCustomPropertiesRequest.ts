@@ -1,4 +1,5 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /**
  * Merge update of a credit note's custom property values (send a key with `null` to remove it).
  * Allowed at any status — custom properties stay editable after the credit note is finalized.
@@ -7,16 +8,19 @@ export interface CreditNoteCustomPropertiesRequest {
   customProperties: unknown;
 }
 
+/** Converts `CreditNoteCustomPropertiesRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreditNoteCustomPropertiesRequestSerializer = {
-  _fromJsonObject(object: any): CreditNoteCustomPropertiesRequest {
+  parse(json: any): CreditNoteCustomPropertiesRequest {
     return {
-      customProperties: object["custom_properties"],
+      ...extraProperties(json, ["custom_properties"]),
+      customProperties: json["custom_properties"],
     };
   },
 
-  _toJsonObject(self: CreditNoteCustomPropertiesRequest): any {
+  serialize(value: CreditNoteCustomPropertiesRequest): any {
     return {
-      custom_properties: self.customProperties,
+      ...extraProperties(value, ["customProperties"]),
+      custom_properties: value.customProperties,
     };
   },
 };

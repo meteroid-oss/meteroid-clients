@@ -1,116 +1,279 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class UpdateCouponRequest {
-    @JsonProperty private String description;
-    @JsonProperty private CouponDiscount discount;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class UpdateCouponRequest {
+    @JsonProperty("description")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> description = JsonField.missing();
+
+    @JsonProperty("discount")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<CouponDiscount> discount = JsonField.missing();
 
     @JsonProperty("plan_ids")
-    private List<String> planIds;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<List<String>> planIds = JsonField.missing();
 
-    public UpdateCouponRequest() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public UpdateCouponRequest description(String description) {
-        this.description = description;
-        return this;
+    private UpdateCouponRequest() {}
+
+    private UpdateCouponRequest(Builder builder) {
+        this.description = builder.description;
+        this.discount = builder.discount;
+        this.planIds = builder.planIds.map(Utils::copyList);
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get description
+     * A builder of {@code UpdateCouponRequest}.
      *
-     * @return description
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public UpdateCouponRequest discount(CouponDiscount discount) {
-        this.discount = discount;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get discount
+     * A builder starting from this value.
      *
-     * @return discount
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public CouponDiscount getDiscount() {
-        return discount;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.description = description;
+        builder.discount = discount;
+        builder.planIds = planIds.map(Utils::mutableList);
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
-    public void setDiscount(CouponDiscount discount) {
-        this.discount = discount;
+    /**
+     * The {@code description} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> description() {
+        return description.asOptional();
     }
 
-    public UpdateCouponRequest planIds(List<String> planIds) {
-        this.planIds = planIds;
-        return this;
+    /**
+     * The {@code discount} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<CouponDiscount> discount() {
+        return discount.asOptional();
     }
 
-    public UpdateCouponRequest addPlanIdsItem(String planIdsItem) {
-        if (this.planIds == null) {
-            this.planIds = new ArrayList<>();
+    /**
+     * The {@code plan_ids} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<List<String>> planIds() {
+        return planIds.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.planIds.add(planIdsItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UpdateCouponRequest that = (UpdateCouponRequest) o;
+        return Objects.equals(description, that.description)
+                && Objects.equals(discount, that.discount)
+                && Objects.equals(planIds, that.planIds)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, discount, planIds, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "UpdateCouponRequest{"
+                + "description="
+                + description
+                + ", discount="
+                + discount
+                + ", planIds="
+                + planIds
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link UpdateCouponRequest}. */
+    public static final class Builder {
+        private JsonField<String> description = JsonField.missing();
+        private JsonField<CouponDiscount> discount = JsonField.missing();
+        private JsonField<List<String>> planIds = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code description} property.
+         *
+         * @param description the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder description(String description) {
+            this.description = JsonField.ofNullable(description);
+            return this;
+        }
+
+        /**
+         * The {@code discount} property.
+         *
+         * @param discount the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder discount(CouponDiscount discount) {
+            this.discount = JsonField.ofNullable(discount);
+            return this;
+        }
+
+        /**
+         * The {@code plan_ids} property.
+         *
+         * @param planIds the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder planIds(List<String> planIds) {
+            this.planIds = JsonField.ofNullable(Utils.mutableList(planIds));
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code plan_ids}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addPlanIdsItem(String item) {
+            List<String> items = this.planIds.orNull();
+            if (items == null) {
+                items = new ArrayList<>();
+                this.planIds = JsonField.ofNullable(items);
+            }
+            items.add(item);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code UpdateCouponRequest}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public UpdateCouponRequest build() {
+            return new UpdateCouponRequest(this);
+        }
     }
 
     /**
-     * Get planIds
+     * Parse {@code json} as {@code UpdateCouponRequest}.
      *
-     * @return planIds
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nullable
-    public List<String> getPlanIds() {
-        return planIds;
-    }
-
-    public void setPlanIds(List<String> planIds) {
-        this.planIds = planIds;
+    public static UpdateCouponRequest fromJson(String json) {
+        return Utils.parse(json, UpdateCouponRequest.class);
     }
 
     /**
-     * Create an instance of UpdateCouponRequest given an JSON string
+     * This value as JSON.
      *
-     * @param jsonString JSON string
-     * @return An instance of UpdateCouponRequest
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     UpdateCouponRequest
+     * @return the JSON text
      */
-    public static UpdateCouponRequest fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, UpdateCouponRequest.class);
-    }
-
-    /**
-     * Convert an instance of UpdateCouponRequest to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

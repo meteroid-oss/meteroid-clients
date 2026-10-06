@@ -1,37 +1,39 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type ProductFeeStructure,
   ProductFeeStructureSerializer,
-} from "./productFeeStructure";
+} from "./productFeeStructure.js";
 
 export interface UpdateProductRequest {
-  description?: string | null;
-
-  feeStructure?: ProductFeeStructure | null;
-
-  name?: string | null;
+  description?: string | null | undefined;
+  feeStructure?: ProductFeeStructure | null | undefined;
+  name?: string | null | undefined;
 }
 
+/** Converts `UpdateProductRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UpdateProductRequestSerializer = {
-  _fromJsonObject(object: any): UpdateProductRequest {
+  parse(json: any): UpdateProductRequest {
     return {
-      description: object["description"],
+      ...extraProperties(json, ["description", "fee_structure", "name"]),
+      description: json["description"],
       feeStructure:
-        object["fee_structure"] != null
-          ? ProductFeeStructureSerializer._fromJsonObject(object["fee_structure"])
-          : undefined,
-      name: object["name"],
+        json["fee_structure"] != null
+          ? ProductFeeStructureSerializer.parse(json["fee_structure"])
+          : json["fee_structure"],
+      name: json["name"],
     };
   },
 
-  _toJsonObject(self: UpdateProductRequest): any {
+  serialize(value: UpdateProductRequest): any {
     return {
-      description: self.description,
+      ...extraProperties(value, ["description", "feeStructure", "name"]),
+      description: value.description,
       fee_structure:
-        self.feeStructure != null
-          ? ProductFeeStructureSerializer._toJsonObject(self.feeStructure)
-          : undefined,
-      name: self.name,
+        value.feeStructure != null
+          ? ProductFeeStructureSerializer.serialize(value.feeStructure)
+          : value.feeStructure,
+      name: value.name,
     };
   },
 };

@@ -1,62 +1,203 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/**
+ * Token introspection request
+ *
+ * <p>Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class IntrospectionRequest {
-    @JsonProperty private String token;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class IntrospectionRequest {
+    @JsonProperty("token")
+    private String token;
 
-    public IntrospectionRequest() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public IntrospectionRequest token(String token) {
-        this.token = token;
-        return this;
+    private IntrospectionRequest() {}
+
+    private IntrospectionRequest(Builder builder) {
+        this.token = builder.token;
+        this.additionalProperties.putAll(builder.additionalProperties);
+    }
+
+    /**
+     * A builder of {@code IntrospectionRequest}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * A builder starting from this value.
+     *
+     * @return a new builder
+     */
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.token = token;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
      * The token to introspect
      *
-     * @return token
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
+    public String token() {
+        return Utils.required(token, "token");
     }
 
     /**
-     * Create an instance of IntrospectionRequest given an JSON string
+     * Properties this version of the SDK does not know, kept as received and sent back.
      *
-     * @param jsonString JSON string
-     * @return An instance of IntrospectionRequest
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     IntrospectionRequest
+     * @return the properties by name, unmodifiable
      */
-    public static IntrospectionRequest fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, IntrospectionRequest.class);
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        IntrospectionRequest that = (IntrospectionRequest) o;
+        return Objects.equals(token, that.token)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(token, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "IntrospectionRequest{"
+                + "token="
+                + token
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link IntrospectionRequest}. */
+    public static final class Builder {
+        private String token;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The token to introspect
+         *
+         * @param token the value
+         * @return this builder
+         */
+        public Builder token(String token) {
+            this.token = token;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code IntrospectionRequest}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public IntrospectionRequest build() {
+            Utils.checkRequired(token, "token");
+            return new IntrospectionRequest(this);
+        }
     }
 
     /**
-     * Convert an instance of IntrospectionRequest to an JSON string
+     * Parse {@code json} as {@code IntrospectionRequest}.
      *
-     * @return JSON string
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public static IntrospectionRequest fromJson(String json) {
+        return Utils.parse(json, IntrospectionRequest.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

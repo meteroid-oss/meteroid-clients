@@ -1,28 +1,31 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type MinimumCommitmentInputScope,
   MinimumCommitmentInputScopeSerializer,
-} from "./minimumCommitmentInputScope";
+} from "./minimumCommitmentInputScope.js";
 
 export interface MinimumCommitmentInput {
   /** Decimal string in the plan currency. */
   amount: string;
-
   scope: MinimumCommitmentInputScope;
 }
 
+/** Converts `MinimumCommitmentInput` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MinimumCommitmentInputSerializer = {
-  _fromJsonObject(object: any): MinimumCommitmentInput {
+  parse(json: any): MinimumCommitmentInput {
     return {
-      amount: object["amount"],
-      scope: MinimumCommitmentInputScopeSerializer._fromJsonObject(object["scope"]),
+      ...extraProperties(json, ["amount", "scope"]),
+      amount: json["amount"],
+      scope: MinimumCommitmentInputScopeSerializer.parse(json["scope"]),
     };
   },
 
-  _toJsonObject(self: MinimumCommitmentInput): any {
+  serialize(value: MinimumCommitmentInput): any {
     return {
-      amount: self.amount,
-      scope: MinimumCommitmentInputScopeSerializer._toJsonObject(self.scope),
+      ...extraProperties(value, ["amount", "scope"]),
+      amount: value.amount,
+      scope: MinimumCommitmentInputScopeSerializer.serialize(value.scope),
     };
   },
 };

@@ -1,164 +1,348 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class SubscriptionAddOn {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class SubscriptionAddOn {
     @JsonProperty("add_on_id")
     private String addOnId;
 
-    @JsonProperty private SubscriptionFee fee;
-    @JsonProperty private String id;
-    @JsonProperty private String name;
-    @JsonProperty private SubscriptionFeeBillingPeriodEnum period;
-    @JsonProperty private Integer quantity;
+    @JsonProperty("fee")
+    private SubscriptionFee fee;
 
-    public SubscriptionAddOn() {}
+    @JsonProperty("id")
+    private String id;
 
-    public SubscriptionAddOn addOnId(String addOnId) {
-        this.addOnId = addOnId;
-        return this;
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("period")
+    private SubscriptionFeeBillingPeriodEnum period;
+
+    @JsonProperty("quantity")
+    private Integer quantity;
+
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    private SubscriptionAddOn() {}
+
+    private SubscriptionAddOn(Builder builder) {
+        this.addOnId = builder.addOnId;
+        this.fee = builder.fee;
+        this.id = builder.id;
+        this.name = builder.name;
+        this.period = builder.period;
+        this.quantity = builder.quantity;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get addOnId
+     * A builder of {@code SubscriptionAddOn}.
      *
-     * @return addOnId
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getAddOnId() {
-        return addOnId;
-    }
-
-    public void setAddOnId(String addOnId) {
-        this.addOnId = addOnId;
-    }
-
-    public SubscriptionAddOn fee(SubscriptionFee fee) {
-        this.fee = fee;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get fee
+     * A builder starting from this value.
      *
-     * @return fee
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public SubscriptionFee getFee() {
-        return fee;
-    }
-
-    public void setFee(SubscriptionFee fee) {
-        this.fee = fee;
-    }
-
-    public SubscriptionAddOn id(String id) {
-        this.id = id;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.addOnId = addOnId;
+        builder.fee = fee;
+        builder.id = id;
+        builder.name = name;
+        builder.period = period;
+        builder.quantity = quantity;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get id
+     * The {@code add_on_id} property.
      *
-     * @return id
+     * @return the value, empty when unset
      */
-    @javax.annotation.Nullable
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public SubscriptionAddOn name(String name) {
-        this.name = name;
-        return this;
+    public Optional<String> addOnId() {
+        return Optional.ofNullable(addOnId);
     }
 
     /**
-     * Get name
+     * The {@code fee} property.
      *
-     * @return name
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public SubscriptionAddOn period(SubscriptionFeeBillingPeriodEnum period) {
-        this.period = period;
-        return this;
+    public SubscriptionFee fee() {
+        return Utils.required(fee, "fee");
     }
 
     /**
-     * Get period
+     * The {@code id} property.
      *
-     * @return period
+     * @return the value, empty when unset
      */
-    @javax.annotation.Nonnull
-    public SubscriptionFeeBillingPeriodEnum getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(SubscriptionFeeBillingPeriodEnum period) {
-        this.period = period;
-    }
-
-    public SubscriptionAddOn quantity(Integer quantity) {
-        this.quantity = quantity;
-        return this;
+    public Optional<String> id() {
+        return Optional.ofNullable(id);
     }
 
     /**
-     * Get quantity
+     * The {@code name} property.
      *
-     * @return quantity
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public String name() {
+        return Utils.required(name, "name");
     }
 
     /**
-     * Create an instance of SubscriptionAddOn given an JSON string
+     * The {@code period} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of SubscriptionAddOn
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     SubscriptionAddOn
+     * @return the value, never null
      */
-    public static SubscriptionAddOn fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, SubscriptionAddOn.class);
+    public SubscriptionFeeBillingPeriodEnum period() {
+        return Utils.required(period, "period");
     }
 
     /**
-     * Convert an instance of SubscriptionAddOn to an JSON string
+     * The {@code quantity} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Integer quantity() {
+        return Utils.required(quantity, "quantity");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SubscriptionAddOn that = (SubscriptionAddOn) o;
+        return Objects.equals(addOnId, that.addOnId)
+                && Objects.equals(fee, that.fee)
+                && Objects.equals(id, that.id)
+                && Objects.equals(name, that.name)
+                && Objects.equals(period, that.period)
+                && Objects.equals(quantity, that.quantity)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(addOnId, fee, id, name, period, quantity, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "SubscriptionAddOn{"
+                + "addOnId="
+                + addOnId
+                + ", fee="
+                + fee
+                + ", id="
+                + id
+                + ", name="
+                + name
+                + ", period="
+                + period
+                + ", quantity="
+                + quantity
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link SubscriptionAddOn}. */
+    public static final class Builder {
+        private String addOnId;
+        private SubscriptionFee fee;
+        private String id;
+        private String name;
+        private SubscriptionFeeBillingPeriodEnum period;
+        private Integer quantity;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code add_on_id} property.
+         *
+         * @param addOnId the value
+         * @return this builder
+         */
+        public Builder addOnId(String addOnId) {
+            this.addOnId = addOnId;
+            return this;
+        }
+
+        /**
+         * The {@code fee} property.
+         *
+         * @param fee the value
+         * @return this builder
+         */
+        public Builder fee(SubscriptionFee fee) {
+            this.fee = fee;
+            return this;
+        }
+
+        /**
+         * The {@code id} property.
+         *
+         * @param id the value
+         * @return this builder
+         */
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code period} property.
+         *
+         * @param period the value
+         * @return this builder
+         */
+        public Builder period(SubscriptionFeeBillingPeriodEnum period) {
+            this.period = period;
+            return this;
+        }
+
+        /**
+         * The {@code quantity} property.
+         *
+         * @param quantity the value
+         * @return this builder
+         */
+        public Builder quantity(Integer quantity) {
+            this.quantity = quantity;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code SubscriptionAddOn}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public SubscriptionAddOn build() {
+            Utils.checkRequired(fee, "fee");
+            Utils.checkRequired(name, "name");
+            Utils.checkRequired(period, "period");
+            Utils.checkRequired(quantity, "quantity");
+            return new SubscriptionAddOn(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code SubscriptionAddOn}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static SubscriptionAddOn fromJson(String json) {
+        return Utils.parse(json, SubscriptionAddOn.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

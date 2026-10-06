@@ -1,20 +1,24 @@
 // this file is @generated
-import { type TermRate, TermRateSerializer } from "./termRate";
+import { extraProperties } from "../json.js";
+import { type TermRate, TermRateSerializer } from "./termRate.js";
 /** Recurring rate fee (e.g., monthly subscription) */
 export interface RatePlanFee {
   rates: TermRate[];
 }
 
+/** Converts `RatePlanFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const RatePlanFeeSerializer = {
-  _fromJsonObject(object: any): RatePlanFee {
+  parse(json: any): RatePlanFee {
     return {
-      rates: object["rates"].map((item: any) => TermRateSerializer._fromJsonObject(item)),
+      ...extraProperties(json, ["rates"]),
+      rates: json["rates"].map((item: any) => TermRateSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: RatePlanFee): any {
+  serialize(value: RatePlanFee): any {
     return {
-      rates: self.rates.map((item: any) => TermRateSerializer._toJsonObject(item)),
+      ...extraProperties(value, ["rates"]),
+      rates: value.rates.map((item: any) => TermRateSerializer.serialize(item)),
     };
   },
 };

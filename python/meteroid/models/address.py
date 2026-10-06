@@ -1,21 +1,27 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .country_code import CountryCode
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .country_code import CountryCode
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Address(BaseModel):
-    city: t.Optional[str] = None
+    """The `Address` object."""
 
-    country: t.Optional[CountryCode] = None
+    city: str | None | Unset = UNSET
 
-    line1: t.Optional[str] = None
+    country: CountryCode | None | Unset = UNSET
 
-    line2: t.Optional[str] = None
+    line1: str | None | Unset = UNSET
 
-    state: t.Optional[str] = None
+    line2: str | None | Unset = UNSET
 
-    zip_code: t.Optional[str] = None
+    state: str | None | Unset = UNSET
+
+    zip_code: str | None | Unset = UNSET

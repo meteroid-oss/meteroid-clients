@@ -1,494 +1,179 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum Currency {
-    #[default]
-    #[serde(rename = "AED")]
     Aed,
-
-    #[serde(rename = "AFN")]
     Afn,
-
-    #[serde(rename = "ALL")]
     All,
-
-    #[serde(rename = "AMD")]
     Amd,
-
-    #[serde(rename = "ANG")]
     Ang,
-
-    #[serde(rename = "AOA")]
     Aoa,
-
-    #[serde(rename = "ARS")]
     Ars,
-
-    #[serde(rename = "AUD")]
     Aud,
-
-    #[serde(rename = "AWG")]
     Awg,
-
-    #[serde(rename = "AZN")]
     Azn,
-
-    #[serde(rename = "BAM")]
     Bam,
-
-    #[serde(rename = "BBD")]
     Bbd,
-
-    #[serde(rename = "BDT")]
     Bdt,
-
-    #[serde(rename = "BGN")]
     Bgn,
-
-    #[serde(rename = "BHD")]
     Bhd,
-
-    #[serde(rename = "BIF")]
     Bif,
-
-    #[serde(rename = "BMD")]
     Bmd,
-
-    #[serde(rename = "BND")]
     Bnd,
-
-    #[serde(rename = "BOB")]
     Bob,
-
-    #[serde(rename = "BRL")]
     Brl,
-
-    #[serde(rename = "BSD")]
     Bsd,
-
-    #[serde(rename = "BTN")]
     Btn,
-
-    #[serde(rename = "BWP")]
     Bwp,
-
-    #[serde(rename = "BYN")]
     Byn,
-
-    #[serde(rename = "BZD")]
     Bzd,
-
-    #[serde(rename = "CAD")]
     Cad,
-
-    #[serde(rename = "CDF")]
     Cdf,
-
-    #[serde(rename = "CHF")]
     Chf,
-
-    #[serde(rename = "CLP")]
     Clp,
-
-    #[serde(rename = "CNH")]
     Cnh,
-
-    #[serde(rename = "CNY")]
     Cny,
-
-    #[serde(rename = "COP")]
     Cop,
-
-    #[serde(rename = "CRC")]
     Crc,
-
-    #[serde(rename = "CUC")]
     Cuc,
-
-    #[serde(rename = "CUP")]
     Cup,
-
-    #[serde(rename = "CVE")]
     Cve,
-
-    #[serde(rename = "CZK")]
     Czk,
-
-    #[serde(rename = "DJF")]
     Djf,
-
-    #[serde(rename = "DKK")]
     Dkk,
-
-    #[serde(rename = "DOP")]
     Dop,
-
-    #[serde(rename = "DZD")]
     Dzd,
-
-    #[serde(rename = "EGP")]
     Egp,
-
-    #[serde(rename = "ERN")]
     Ern,
-
-    #[serde(rename = "ETB")]
     Etb,
-
-    #[serde(rename = "EUR")]
     Eur,
-
-    #[serde(rename = "FJD")]
     Fjd,
-
-    #[serde(rename = "FKP")]
     Fkp,
-
-    #[serde(rename = "GBP")]
     Gbp,
-
-    #[serde(rename = "GEL")]
     Gel,
-
-    #[serde(rename = "GHS")]
     Ghs,
-
-    #[serde(rename = "GIP")]
     Gip,
-
-    #[serde(rename = "GMD")]
     Gmd,
-
-    #[serde(rename = "GNF")]
     Gnf,
-
-    #[serde(rename = "GTQ")]
     Gtq,
-
-    #[serde(rename = "GYD")]
     Gyd,
-
-    #[serde(rename = "HKD")]
     Hkd,
-
-    #[serde(rename = "HNL")]
     Hnl,
-
-    #[serde(rename = "HRK")]
     Hrk,
-
-    #[serde(rename = "HTG")]
     Htg,
-
-    #[serde(rename = "HUF")]
     Huf,
-
-    #[serde(rename = "IDR")]
     Idr,
-
-    #[serde(rename = "ILS")]
     Ils,
-
-    #[serde(rename = "INR")]
     Inr,
-
-    #[serde(rename = "IQD")]
     Iqd,
-
-    #[serde(rename = "IRR")]
     Irr,
-
-    #[serde(rename = "ISK")]
     Isk,
-
-    #[serde(rename = "JMD")]
     Jmd,
-
-    #[serde(rename = "JOD")]
     Jod,
-
-    #[serde(rename = "JPY")]
     Jpy,
-
-    #[serde(rename = "KES")]
     Kes,
-
-    #[serde(rename = "KGS")]
     Kgs,
-
-    #[serde(rename = "KHR")]
     Khr,
-
-    #[serde(rename = "KMF")]
     Kmf,
-
-    #[serde(rename = "KPW")]
     Kpw,
-
-    #[serde(rename = "KRW")]
     Krw,
-
-    #[serde(rename = "KWD")]
     Kwd,
-
-    #[serde(rename = "KYD")]
     Kyd,
-
-    #[serde(rename = "KZT")]
     Kzt,
-
-    #[serde(rename = "LAK")]
     Lak,
-
-    #[serde(rename = "LBP")]
     Lbp,
-
-    #[serde(rename = "LKR")]
     Lkr,
-
-    #[serde(rename = "LRD")]
     Lrd,
-
-    #[serde(rename = "LSL")]
     Lsl,
-
-    #[serde(rename = "LYD")]
     Lyd,
-
-    #[serde(rename = "MAD")]
     Mad,
-
-    #[serde(rename = "MDL")]
     Mdl,
-
-    #[serde(rename = "MGA")]
     Mga,
-
-    #[serde(rename = "MKD")]
     Mkd,
-
-    #[serde(rename = "MMK")]
     Mmk,
-
-    #[serde(rename = "MNT")]
     Mnt,
-
-    #[serde(rename = "MOP")]
     Mop,
-
-    #[serde(rename = "MRU")]
     Mru,
-
-    #[serde(rename = "MUR")]
     Mur,
-
-    #[serde(rename = "MVR")]
     Mvr,
-
-    #[serde(rename = "MWK")]
     Mwk,
-
-    #[serde(rename = "MXN")]
     Mxn,
-
-    #[serde(rename = "MYR")]
     Myr,
-
-    #[serde(rename = "MZN")]
     Mzn,
-
-    #[serde(rename = "NAD")]
     Nad,
-
-    #[serde(rename = "NGN")]
     Ngn,
-
-    #[serde(rename = "NIO")]
     Nio,
-
-    #[serde(rename = "NOK")]
     Nok,
-
-    #[serde(rename = "NPR")]
     Npr,
-
-    #[serde(rename = "NZD")]
     Nzd,
-
-    #[serde(rename = "OMR")]
     Omr,
-
-    #[serde(rename = "PAB")]
     Pab,
-
-    #[serde(rename = "PEN")]
     Pen,
-
-    #[serde(rename = "PGK")]
     Pgk,
-
-    #[serde(rename = "PHP")]
     Php,
-
-    #[serde(rename = "PKR")]
     Pkr,
-
-    #[serde(rename = "PLN")]
     Pln,
-
-    #[serde(rename = "PYG")]
     Pyg,
-
-    #[serde(rename = "QAR")]
     Qar,
-
-    #[serde(rename = "RON")]
     Ron,
-
-    #[serde(rename = "RSD")]
     Rsd,
-
-    #[serde(rename = "RUB")]
     Rub,
-
-    #[serde(rename = "RWF")]
     Rwf,
-
-    #[serde(rename = "SAR")]
     Sar,
-
-    #[serde(rename = "SBD")]
     Sbd,
-
-    #[serde(rename = "SCR")]
     Scr,
-
-    #[serde(rename = "SDG")]
     Sdg,
-
-    #[serde(rename = "SEK")]
     Sek,
-
-    #[serde(rename = "SGD")]
     Sgd,
-
-    #[serde(rename = "SHP")]
     Shp,
-
-    #[serde(rename = "SLL")]
     Sll,
-
-    #[serde(rename = "SOS")]
     Sos,
-
-    #[serde(rename = "SRD")]
     Srd,
-
-    #[serde(rename = "SSP")]
     Ssp,
-
-    #[serde(rename = "STD")]
     Std,
-
-    #[serde(rename = "STN")]
     Stn,
-
-    #[serde(rename = "SVC")]
     Svc,
-
-    #[serde(rename = "SYP")]
     Syp,
-
-    #[serde(rename = "SZL")]
     Szl,
-
-    #[serde(rename = "THB")]
     Thb,
-
-    #[serde(rename = "TJS")]
     Tjs,
-
-    #[serde(rename = "TMT")]
     Tmt,
-
-    #[serde(rename = "TND")]
     Tnd,
-
-    #[serde(rename = "TOP")]
     Top,
-
-    #[serde(rename = "TRY")]
     Try,
-
-    #[serde(rename = "TTD")]
     Ttd,
-
-    #[serde(rename = "TWD")]
     Twd,
-
-    #[serde(rename = "TZS")]
     Tzs,
-
-    #[serde(rename = "UAH")]
     Uah,
-
-    #[serde(rename = "UGX")]
     Ugx,
-
-    #[serde(rename = "USD")]
     Usd,
-
-    #[serde(rename = "UYU")]
     Uyu,
-
-    #[serde(rename = "UZS")]
     Uzs,
-
-    #[serde(rename = "VES")]
     Ves,
-
-    #[serde(rename = "VND")]
     Vnd,
-
-    #[serde(rename = "VUV")]
     Vuv,
-
-    #[serde(rename = "WST")]
     Wst,
-
-    #[serde(rename = "XAF")]
     Xaf,
-
-    #[serde(rename = "XCD")]
     Xcd,
-
-    #[serde(rename = "XOF")]
     Xof,
-
-    #[serde(rename = "XPF")]
     Xpf,
-
-    #[serde(rename = "YER")]
     Yer,
-
-    #[serde(rename = "ZAR")]
     Zar,
-
-    #[serde(rename = "ZMW")]
     Zmw,
-
-    #[serde(rename = "ZWL")]
     Zwl,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for Currency {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl Currency {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Aed => "AED",
             Self::Afn => "AFN",
             Self::All => "ALL",
@@ -648,8 +333,193 @@ impl fmt::Display for Currency {
             Self::Zar => "ZAR",
             Self::Zmw => "ZMW",
             Self::Zwl => "ZWL",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for Currency {
+    fn from(value: &str) -> Self {
+        match value {
+            "AED" => Self::Aed,
+            "AFN" => Self::Afn,
+            "ALL" => Self::All,
+            "AMD" => Self::Amd,
+            "ANG" => Self::Ang,
+            "AOA" => Self::Aoa,
+            "ARS" => Self::Ars,
+            "AUD" => Self::Aud,
+            "AWG" => Self::Awg,
+            "AZN" => Self::Azn,
+            "BAM" => Self::Bam,
+            "BBD" => Self::Bbd,
+            "BDT" => Self::Bdt,
+            "BGN" => Self::Bgn,
+            "BHD" => Self::Bhd,
+            "BIF" => Self::Bif,
+            "BMD" => Self::Bmd,
+            "BND" => Self::Bnd,
+            "BOB" => Self::Bob,
+            "BRL" => Self::Brl,
+            "BSD" => Self::Bsd,
+            "BTN" => Self::Btn,
+            "BWP" => Self::Bwp,
+            "BYN" => Self::Byn,
+            "BZD" => Self::Bzd,
+            "CAD" => Self::Cad,
+            "CDF" => Self::Cdf,
+            "CHF" => Self::Chf,
+            "CLP" => Self::Clp,
+            "CNH" => Self::Cnh,
+            "CNY" => Self::Cny,
+            "COP" => Self::Cop,
+            "CRC" => Self::Crc,
+            "CUC" => Self::Cuc,
+            "CUP" => Self::Cup,
+            "CVE" => Self::Cve,
+            "CZK" => Self::Czk,
+            "DJF" => Self::Djf,
+            "DKK" => Self::Dkk,
+            "DOP" => Self::Dop,
+            "DZD" => Self::Dzd,
+            "EGP" => Self::Egp,
+            "ERN" => Self::Ern,
+            "ETB" => Self::Etb,
+            "EUR" => Self::Eur,
+            "FJD" => Self::Fjd,
+            "FKP" => Self::Fkp,
+            "GBP" => Self::Gbp,
+            "GEL" => Self::Gel,
+            "GHS" => Self::Ghs,
+            "GIP" => Self::Gip,
+            "GMD" => Self::Gmd,
+            "GNF" => Self::Gnf,
+            "GTQ" => Self::Gtq,
+            "GYD" => Self::Gyd,
+            "HKD" => Self::Hkd,
+            "HNL" => Self::Hnl,
+            "HRK" => Self::Hrk,
+            "HTG" => Self::Htg,
+            "HUF" => Self::Huf,
+            "IDR" => Self::Idr,
+            "ILS" => Self::Ils,
+            "INR" => Self::Inr,
+            "IQD" => Self::Iqd,
+            "IRR" => Self::Irr,
+            "ISK" => Self::Isk,
+            "JMD" => Self::Jmd,
+            "JOD" => Self::Jod,
+            "JPY" => Self::Jpy,
+            "KES" => Self::Kes,
+            "KGS" => Self::Kgs,
+            "KHR" => Self::Khr,
+            "KMF" => Self::Kmf,
+            "KPW" => Self::Kpw,
+            "KRW" => Self::Krw,
+            "KWD" => Self::Kwd,
+            "KYD" => Self::Kyd,
+            "KZT" => Self::Kzt,
+            "LAK" => Self::Lak,
+            "LBP" => Self::Lbp,
+            "LKR" => Self::Lkr,
+            "LRD" => Self::Lrd,
+            "LSL" => Self::Lsl,
+            "LYD" => Self::Lyd,
+            "MAD" => Self::Mad,
+            "MDL" => Self::Mdl,
+            "MGA" => Self::Mga,
+            "MKD" => Self::Mkd,
+            "MMK" => Self::Mmk,
+            "MNT" => Self::Mnt,
+            "MOP" => Self::Mop,
+            "MRU" => Self::Mru,
+            "MUR" => Self::Mur,
+            "MVR" => Self::Mvr,
+            "MWK" => Self::Mwk,
+            "MXN" => Self::Mxn,
+            "MYR" => Self::Myr,
+            "MZN" => Self::Mzn,
+            "NAD" => Self::Nad,
+            "NGN" => Self::Ngn,
+            "NIO" => Self::Nio,
+            "NOK" => Self::Nok,
+            "NPR" => Self::Npr,
+            "NZD" => Self::Nzd,
+            "OMR" => Self::Omr,
+            "PAB" => Self::Pab,
+            "PEN" => Self::Pen,
+            "PGK" => Self::Pgk,
+            "PHP" => Self::Php,
+            "PKR" => Self::Pkr,
+            "PLN" => Self::Pln,
+            "PYG" => Self::Pyg,
+            "QAR" => Self::Qar,
+            "RON" => Self::Ron,
+            "RSD" => Self::Rsd,
+            "RUB" => Self::Rub,
+            "RWF" => Self::Rwf,
+            "SAR" => Self::Sar,
+            "SBD" => Self::Sbd,
+            "SCR" => Self::Scr,
+            "SDG" => Self::Sdg,
+            "SEK" => Self::Sek,
+            "SGD" => Self::Sgd,
+            "SHP" => Self::Shp,
+            "SLL" => Self::Sll,
+            "SOS" => Self::Sos,
+            "SRD" => Self::Srd,
+            "SSP" => Self::Ssp,
+            "STD" => Self::Std,
+            "STN" => Self::Stn,
+            "SVC" => Self::Svc,
+            "SYP" => Self::Syp,
+            "SZL" => Self::Szl,
+            "THB" => Self::Thb,
+            "TJS" => Self::Tjs,
+            "TMT" => Self::Tmt,
+            "TND" => Self::Tnd,
+            "TOP" => Self::Top,
+            "TRY" => Self::Try,
+            "TTD" => Self::Ttd,
+            "TWD" => Self::Twd,
+            "TZS" => Self::Tzs,
+            "UAH" => Self::Uah,
+            "UGX" => Self::Ugx,
+            "USD" => Self::Usd,
+            "UYU" => Self::Uyu,
+            "UZS" => Self::Uzs,
+            "VES" => Self::Ves,
+            "VND" => Self::Vnd,
+            "VUV" => Self::Vuv,
+            "WST" => Self::Wst,
+            "XAF" => Self::Xaf,
+            "XCD" => Self::Xcd,
+            "XOF" => Self::Xof,
+            "XPF" => Self::Xpf,
+            "YER" => Self::Yer,
+            "ZAR" => Self::Zar,
+            "ZMW" => Self::Zmw,
+            "ZWL" => Self::Zwl,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for Currency {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for Currency {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for Currency {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

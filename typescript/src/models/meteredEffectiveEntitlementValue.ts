@@ -1,31 +1,34 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type MeteredEntitlementSpec,
   MeteredEntitlementSpecSerializer,
-} from "./meteredEntitlementSpec";
+} from "./meteredEntitlementSpec.js";
 import {
   type MeteredEntitlementUsage,
   MeteredEntitlementUsageSerializer,
-} from "./meteredEntitlementUsage";
+} from "./meteredEntitlementUsage.js";
 
 export interface MeteredEffectiveEntitlementValue {
   spec: MeteredEntitlementSpec;
-
   usage: MeteredEntitlementUsage;
 }
 
+/** Converts `MeteredEffectiveEntitlementValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MeteredEffectiveEntitlementValueSerializer = {
-  _fromJsonObject(object: any): MeteredEffectiveEntitlementValue {
+  parse(json: any): MeteredEffectiveEntitlementValue {
     return {
-      spec: MeteredEntitlementSpecSerializer._fromJsonObject(object["spec"]),
-      usage: MeteredEntitlementUsageSerializer._fromJsonObject(object["usage"]),
+      ...extraProperties(json, ["spec", "usage"]),
+      spec: MeteredEntitlementSpecSerializer.parse(json["spec"]),
+      usage: MeteredEntitlementUsageSerializer.parse(json["usage"]),
     };
   },
 
-  _toJsonObject(self: MeteredEffectiveEntitlementValue): any {
+  serialize(value: MeteredEffectiveEntitlementValue): any {
     return {
-      spec: MeteredEntitlementSpecSerializer._toJsonObject(self.spec),
-      usage: MeteredEntitlementUsageSerializer._toJsonObject(self.usage),
+      ...extraProperties(value, ["spec", "usage"]),
+      spec: MeteredEntitlementSpecSerializer.serialize(value.spec),
+      usage: MeteredEntitlementUsageSerializer.serialize(value.usage),
     };
   },
 };

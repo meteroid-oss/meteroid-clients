@@ -1,43 +1,44 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type EntitlementProductRef,
   EntitlementProductRefSerializer,
-} from "./entitlementProductRef";
-import { type FeatureId, FeatureIdSerializer } from "./featureId";
+} from "./entitlementProductRef.js";
+import { type FeatureId, FeatureIdSerializer } from "./featureId.js";
 
 export interface FeatureRef {
   /** Unique key used to reference this feature in your code. Cannot be changed after creation. */
   code: string;
-
   id: FeatureId;
-
   name: string;
-
-  product?: EntitlementProductRef | null;
+  product?: EntitlementProductRef | null | undefined;
 }
 
+/** Converts `FeatureRef` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FeatureRefSerializer = {
-  _fromJsonObject(object: any): FeatureRef {
+  parse(json: any): FeatureRef {
     return {
-      code: object["code"],
-      id: FeatureIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
+      ...extraProperties(json, ["code", "id", "name", "product"]),
+      code: json["code"],
+      id: FeatureIdSerializer.parse(json["id"]),
+      name: json["name"],
       product:
-        object["product"] != null
-          ? EntitlementProductRefSerializer._fromJsonObject(object["product"])
-          : undefined,
+        json["product"] != null
+          ? EntitlementProductRefSerializer.parse(json["product"])
+          : json["product"],
     };
   },
 
-  _toJsonObject(self: FeatureRef): any {
+  serialize(value: FeatureRef): any {
     return {
-      code: self.code,
-      id: FeatureIdSerializer._toJsonObject(self.id),
-      name: self.name,
+      ...extraProperties(value, ["code", "id", "name", "product"]),
+      code: value.code,
+      id: FeatureIdSerializer.serialize(value.id),
+      name: value.name,
       product:
-        self.product != null
-          ? EntitlementProductRefSerializer._toJsonObject(self.product)
-          : undefined,
+        value.product != null
+          ? EntitlementProductRefSerializer.serialize(value.product)
+          : value.product,
     };
   },
 };

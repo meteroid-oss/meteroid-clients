@@ -1,39 +1,63 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum TaxExemptionType {
-    #[default]
-    #[serde(rename = "REVERSE_CHARGE")]
     ReverseCharge,
-
-    #[serde(rename = "TAX_EXEMPT")]
     TaxExempt,
-
-    #[serde(rename = "NOT_REGISTERED")]
     NotRegistered,
-
-    #[serde(rename = "EXPORT")]
     Export,
-
-    #[serde(rename = "NO_VAT_TERRITORY")]
     NoVatTerritory,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for TaxExemptionType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl TaxExemptionType {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::ReverseCharge => "REVERSE_CHARGE",
             Self::TaxExempt => "TAX_EXEMPT",
             Self::NotRegistered => "NOT_REGISTERED",
             Self::Export => "EXPORT",
             Self::NoVatTerritory => "NO_VAT_TERRITORY",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for TaxExemptionType {
+    fn from(value: &str) -> Self {
+        match value {
+            "REVERSE_CHARGE" => Self::ReverseCharge,
+            "TAX_EXEMPT" => Self::TaxExempt,
+            "NOT_REGISTERED" => Self::NotRegistered,
+            "EXPORT" => Self::Export,
+            "NO_VAT_TERRITORY" => Self::NoVatTerritory,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for TaxExemptionType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for TaxExemptionType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for TaxExemptionType {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

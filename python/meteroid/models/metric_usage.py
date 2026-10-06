@@ -1,16 +1,22 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from decimal import Decimal
 
 from ..serialization import BaseModel
-from .billable_metric_id import BillableMetricId
-from .grouped_usage import GroupedUsage
+
+if t.TYPE_CHECKING:
+    from .billable_metric_id import BillableMetricId
+    from .grouped_usage import GroupedUsage
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MetricUsage(BaseModel):
-    grouped_usage: t.List[GroupedUsage]
+    """The `MetricUsage` object."""
+
+    grouped_usage: list[GroupedUsage]
 
     metric_code: str
 

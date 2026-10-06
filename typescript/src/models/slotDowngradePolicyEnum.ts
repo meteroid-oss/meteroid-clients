@@ -1,15 +1,19 @@
 // this file is @generated
 
-export enum SlotDowngradePolicyEnum {
-  RemoveAtEndOfPeriod = "REMOVE_AT_END_OF_PERIOD",
-}
+export const SlotDowngradePolicyEnum = {
+  RemoveAtEndOfPeriod: "REMOVE_AT_END_OF_PERIOD",
+} as const;
+export type SlotDowngradePolicyEnum =
+  | (typeof SlotDowngradePolicyEnum)[keyof typeof SlotDowngradePolicyEnum]
+  | (string & {});
 
+/** Converts `SlotDowngradePolicyEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SlotDowngradePolicyEnumSerializer = {
-  _fromJsonObject(object: any): SlotDowngradePolicyEnum {
-    return object;
+  parse(json: any): SlotDowngradePolicyEnum {
+    return json;
   },
 
-  _toJsonObject(self: SlotDowngradePolicyEnum): any {
-    return self;
+  serialize(value: SlotDowngradePolicyEnum): any {
+    return value;
   },
 };

@@ -1,228 +1,565 @@
 # this file is @generated
+"""Products API."""
+
+from __future__ import annotations
+
 import typing as t
 
+from .. import models as _models
 from ..models import (
     CreateProductRequest,
     Product,
     ProductFamilyId,
+    ProductFeeStructure,
     ProductListResponse,
     ResolvedEntitlementListResponse,
     UpdateProductRequest,
 )
-from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
+from ..serialization import UNSET, Unset, to_json_value
+from ._response import async_to_raw_response_wrapper, to_raw_response_wrapper
+from .common import (
+    ApiBaseAsync,
+    ApiBaseSync,
+    ApiRequest,
+    Timeout,
+    decode_response,
+    serialize_query_params,
+)
 
 
-class ProductsAsync(ApiBaseAsync):
-    """products API."""
+class AsyncProducts(ApiBaseAsync):
+    """Products API, for asyncio."""
 
-    async def list_products(
+    @property
+    def with_raw_response(self) -> AsyncProductsWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return AsyncProductsWithRawResponse(self)
+
+    async def list(
         self,
         *,
-        product_family_id: t.Optional[ProductFamilyId] = None,
-        search: t.Optional[str] = None,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
+        product_family_id: ProductFamilyId | None = None,
+        search: str | None = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductListResponse:
-        """:param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`.
+        """List products
+
+        :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/products",
-            query_params=serialize_query_params(
-                {
-                    "product_family_id": product_family_id,
-                    "search": search,
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/products",
+                query_params=serialize_query_params(
+                    {
+                        "product_family_id": product_family_id,
+                        "search": search,
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductListResponse)
 
-    async def create_product(
+    async def create(
         self,
-        create_product_request: CreateProductRequest,
+        *,
+        fee_structure: ProductFeeStructure,
+        name: str,
+        product_family_id: ProductFamilyId,
+        catalog: bool | None = None,
+        description: str | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Product:
-        response = await self._request_asyncio(
-            method="post",
-            path="/api/v1/products",
-            json_body=create_product_request.to_dict(),
+        """Create a product"""
+        response = await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/products",
+                json_body=to_json_value(
+                    CreateProductRequest(
+                        catalog=catalog,
+                        description=description,
+                        fee_structure=fee_structure,
+                        name=name,
+                        product_family_id=product_family_id,
+                    ),
+                    CreateProductRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Product)
 
-    async def get_product(
+    async def retrieve(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Product:
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/products/{product_id}",
-            path_params={
-                "product_id": product_id,
-            },
+        """Get product details"""
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/products/{product_id}",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Product)
 
-    async def update_product(
+    async def update(
         self,
         product_id: str,
-        update_product_request: UpdateProductRequest,
+        *,
+        description: str | None | Unset = UNSET,
+        fee_structure: ProductFeeStructure | None | Unset = UNSET,
+        name: str | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Product:
-        """Partially update product fields. The fee_type is immutable and cannot be changed."""
-        response = await self._request_asyncio(
-            method="patch",
-            path="/api/v1/products/{product_id}",
-            path_params={
-                "product_id": product_id,
-            },
-            json_body=update_product_request.to_dict(),
+        """Update a product
+
+        Partially update product fields. The fee_type is immutable and cannot be changed."""
+        response = await self._request(
+            ApiRequest(
+                method="patch",
+                path="/api/v1/products/{product_id}",
+                path_params={
+                    "product_id": product_id,
+                },
+                json_body=to_json_value(
+                    UpdateProductRequest(
+                        description=description,
+                        fee_structure=fee_structure,
+                        name=name,
+                    ),
+                    UpdateProductRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Product)
 
-    async def archive_product(
+    async def archive(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        await self._request_asyncio(
-            method="post",
-            path="/api/v1/products/{product_id}/archive",
-            path_params={
-                "product_id": product_id,
-            },
+        """Archive a product"""
+        await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/products/{product_id}/archive",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
 
-    async def list_product_entitlements(
+    async def list_entitlements(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ResolvedEntitlementListResponse:
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/products/{product_id}/entitlements",
-            path_params={
-                "product_id": product_id,
-            },
+        """List product entitlements"""
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/products/{product_id}/entitlements",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ResolvedEntitlementListResponse)
 
-    async def unarchive_product(
+    async def unarchive(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        await self._request_asyncio(
-            method="post",
-            path="/api/v1/products/{product_id}/unarchive",
-            path_params={
-                "product_id": product_id,
-            },
+        """Unarchive a product"""
+        await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/products/{product_id}/unarchive",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
+
+
+class AsyncProductsWithRawResponse:
+    """The methods of :class:`AsyncProducts`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: AsyncProducts) -> None:
+        self.list = async_to_raw_response_wrapper(resource.list)
+        self.create = async_to_raw_response_wrapper(resource.create)
+        self.retrieve = async_to_raw_response_wrapper(resource.retrieve)
+        self.update = async_to_raw_response_wrapper(resource.update)
+        self.archive = async_to_raw_response_wrapper(resource.archive)
+        self.list_entitlements = async_to_raw_response_wrapper(
+            resource.list_entitlements
+        )
+        self.unarchive = async_to_raw_response_wrapper(resource.unarchive)
 
 
 class Products(ApiBaseSync):
-    """products API."""
+    """Products API."""
 
-    def list_products(
+    @property
+    def with_raw_response(self) -> ProductsWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return ProductsWithRawResponse(self)
+
+    def list(
         self,
         *,
-        product_family_id: t.Optional[ProductFamilyId] = None,
-        search: t.Optional[str] = None,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
+        product_family_id: ProductFamilyId | None = None,
+        search: str | None = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductListResponse:
-        """:param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`.
+        """List products
+
+        :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/products",
-            query_params=serialize_query_params(
-                {
-                    "product_family_id": product_family_id,
-                    "search": search,
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/products",
+                query_params=serialize_query_params(
+                    {
+                        "product_family_id": product_family_id,
+                        "search": search,
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductListResponse)
 
-    def create_product(
+    def create(
         self,
-        create_product_request: CreateProductRequest,
+        *,
+        fee_structure: ProductFeeStructure,
+        name: str,
+        product_family_id: ProductFamilyId,
+        catalog: bool | None = None,
+        description: str | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Product:
-        response = self._request_sync(
-            method="post",
-            path="/api/v1/products",
-            json_body=create_product_request.to_dict(),
+        """Create a product"""
+        response = self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/products",
+                json_body=to_json_value(
+                    CreateProductRequest(
+                        catalog=catalog,
+                        description=description,
+                        fee_structure=fee_structure,
+                        name=name,
+                        product_family_id=product_family_id,
+                    ),
+                    CreateProductRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Product)
 
-    def get_product(
+    def retrieve(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Product:
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/products/{product_id}",
-            path_params={
-                "product_id": product_id,
-            },
+        """Get product details"""
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/products/{product_id}",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Product)
 
-    def update_product(
+    def update(
         self,
         product_id: str,
-        update_product_request: UpdateProductRequest,
+        *,
+        description: str | None | Unset = UNSET,
+        fee_structure: ProductFeeStructure | None | Unset = UNSET,
+        name: str | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Product:
-        """Partially update product fields. The fee_type is immutable and cannot be changed."""
-        response = self._request_sync(
-            method="patch",
-            path="/api/v1/products/{product_id}",
-            path_params={
-                "product_id": product_id,
-            },
-            json_body=update_product_request.to_dict(),
+        """Update a product
+
+        Partially update product fields. The fee_type is immutable and cannot be changed."""
+        response = self._request(
+            ApiRequest(
+                method="patch",
+                path="/api/v1/products/{product_id}",
+                path_params={
+                    "product_id": product_id,
+                },
+                json_body=to_json_value(
+                    UpdateProductRequest(
+                        description=description,
+                        fee_structure=fee_structure,
+                        name=name,
+                    ),
+                    UpdateProductRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Product)
 
-    def archive_product(
+    def archive(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        self._request_sync(
-            method="post",
-            path="/api/v1/products/{product_id}/archive",
-            path_params={
-                "product_id": product_id,
-            },
+        """Archive a product"""
+        self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/products/{product_id}/archive",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
 
-    def list_product_entitlements(
+    def list_entitlements(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ResolvedEntitlementListResponse:
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/products/{product_id}/entitlements",
-            path_params={
-                "product_id": product_id,
-            },
+        """List product entitlements"""
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/products/{product_id}/entitlements",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ResolvedEntitlementListResponse)
 
-    def unarchive_product(
+    def unarchive(
         self,
         product_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        self._request_sync(
-            method="post",
-            path="/api/v1/products/{product_id}/unarchive",
-            path_params={
-                "product_id": product_id,
-            },
+        """Unarchive a product"""
+        self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/products/{product_id}/unarchive",
+                path_params={
+                    "product_id": product_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
+
+
+class ProductsWithRawResponse:
+    """The methods of :class:`Products`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: Products) -> None:
+        self.list = to_raw_response_wrapper(resource.list)
+        self.create = to_raw_response_wrapper(resource.create)
+        self.retrieve = to_raw_response_wrapper(resource.retrieve)
+        self.update = to_raw_response_wrapper(resource.update)
+        self.archive = to_raw_response_wrapper(resource.archive)
+        self.list_entitlements = to_raw_response_wrapper(resource.list_entitlements)
+        self.unarchive = to_raw_response_wrapper(resource.unarchive)

@@ -1,45 +1,56 @@
 // this file is @generated
-import { type ConnectionType, ConnectionTypeSerializer } from "./connectionType";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
+import { extraProperties } from "../json.js";
+import { type ConnectionType, ConnectionTypeSerializer } from "./connectionType.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
 
 export interface CreateConnectedAccountRequest {
   connectedOrganizationId: string;
-
-  connectionType?: ConnectionType | null;
-
-  metadata?: unknown;
-
-  platformCustomerId?: CustomerId | null;
+  connectionType?: ConnectionType | null | undefined;
+  metadata?: unknown | undefined;
+  platformCustomerId?: CustomerId | null | undefined;
 }
 
+/** Converts `CreateConnectedAccountRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateConnectedAccountRequestSerializer = {
-  _fromJsonObject(object: any): CreateConnectedAccountRequest {
+  parse(json: any): CreateConnectedAccountRequest {
     return {
-      connectedOrganizationId: object["connected_organization_id"],
+      ...extraProperties(json, [
+        "connected_organization_id",
+        "connection_type",
+        "metadata",
+        "platform_customer_id",
+      ]),
+      connectedOrganizationId: json["connected_organization_id"],
       connectionType:
-        object["connection_type"] != null
-          ? ConnectionTypeSerializer._fromJsonObject(object["connection_type"])
-          : undefined,
-      metadata: object["metadata"],
+        json["connection_type"] != null
+          ? ConnectionTypeSerializer.parse(json["connection_type"])
+          : json["connection_type"],
+      metadata: json["metadata"],
       platformCustomerId:
-        object["platform_customer_id"] != null
-          ? CustomerIdSerializer._fromJsonObject(object["platform_customer_id"])
-          : undefined,
+        json["platform_customer_id"] != null
+          ? CustomerIdSerializer.parse(json["platform_customer_id"])
+          : json["platform_customer_id"],
     };
   },
 
-  _toJsonObject(self: CreateConnectedAccountRequest): any {
+  serialize(value: CreateConnectedAccountRequest): any {
     return {
-      connected_organization_id: self.connectedOrganizationId,
+      ...extraProperties(value, [
+        "connectedOrganizationId",
+        "connectionType",
+        "metadata",
+        "platformCustomerId",
+      ]),
+      connected_organization_id: value.connectedOrganizationId,
       connection_type:
-        self.connectionType != null
-          ? ConnectionTypeSerializer._toJsonObject(self.connectionType)
-          : undefined,
-      metadata: self.metadata,
+        value.connectionType != null
+          ? ConnectionTypeSerializer.serialize(value.connectionType)
+          : value.connectionType,
+      metadata: value.metadata,
       platform_customer_id:
-        self.platformCustomerId != null
-          ? CustomerIdSerializer._toJsonObject(self.platformCustomerId)
-          : undefined,
+        value.platformCustomerId != null
+          ? CustomerIdSerializer.serialize(value.platformCustomerId)
+          : value.platformCustomerId,
     };
   },
 };

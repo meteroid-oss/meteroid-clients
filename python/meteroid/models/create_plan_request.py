@@ -1,20 +1,26 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .billing_config import BillingConfig
-from .plan_add_on_input import PlanAddOnInput
-from .plan_status_enum import PlanStatusEnum
-from .plan_type_enum import PlanTypeEnum
-from .price_component_input import PriceComponentInput
-from .product_family_id import ProductFamilyId
-from .trial_config import TrialConfig
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .billing_config import BillingConfig
+    from .plan_add_on_input import PlanAddOnInput
+    from .plan_status_enum import PlanStatusEnum
+    from .plan_type_enum import PlanTypeEnum
+    from .price_component_input import PriceComponentInput
+    from .product_family_id import ProductFamilyId
+    from .trial_config import TrialConfig
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CreatePlanRequest(BaseModel):
-    components: t.List[PriceComponentInput]
+    """The `CreatePlanRequest` object."""
+
+    components: list[PriceComponentInput]
 
     currency: str
 
@@ -26,12 +32,12 @@ class CreatePlanRequest(BaseModel):
 
     status: PlanStatusEnum
 
-    add_ons: t.Optional[t.List[PlanAddOnInput]] = None
+    add_ons: list[PlanAddOnInput] | None = None
 
-    billing: t.Optional[BillingConfig] = None
+    billing: BillingConfig | None | Unset = UNSET
 
-    description: t.Optional[str] = None
+    description: str | None | Unset = UNSET
 
-    self_service_rank: t.Optional[int] = None
+    self_service_rank: int | None | Unset = UNSET
 
-    trial: t.Optional[TrialConfig] = None
+    trial: TrialConfig | None | Unset = UNSET

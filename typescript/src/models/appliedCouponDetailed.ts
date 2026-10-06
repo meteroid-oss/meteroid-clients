@@ -1,28 +1,31 @@
 // this file is @generated
-import { type AppliedCoupon, AppliedCouponSerializer } from "./appliedCoupon";
+import { extraProperties } from "../json.js";
+import { type AppliedCoupon, AppliedCouponSerializer } from "./appliedCoupon.js";
 import {
   type SubscriptionCoupon,
   SubscriptionCouponSerializer,
-} from "./subscriptionCoupon";
+} from "./subscriptionCoupon.js";
 
 export interface AppliedCouponDetailed {
   appliedCoupon: AppliedCoupon;
-
   coupon: SubscriptionCoupon;
 }
 
+/** Converts `AppliedCouponDetailed` values from (`parse`) and to (`serialize`) their JSON form. */
 export const AppliedCouponDetailedSerializer = {
-  _fromJsonObject(object: any): AppliedCouponDetailed {
+  parse(json: any): AppliedCouponDetailed {
     return {
-      appliedCoupon: AppliedCouponSerializer._fromJsonObject(object["applied_coupon"]),
-      coupon: SubscriptionCouponSerializer._fromJsonObject(object["coupon"]),
+      ...extraProperties(json, ["applied_coupon", "coupon"]),
+      appliedCoupon: AppliedCouponSerializer.parse(json["applied_coupon"]),
+      coupon: SubscriptionCouponSerializer.parse(json["coupon"]),
     };
   },
 
-  _toJsonObject(self: AppliedCouponDetailed): any {
+  serialize(value: AppliedCouponDetailed): any {
     return {
-      applied_coupon: AppliedCouponSerializer._toJsonObject(self.appliedCoupon),
-      coupon: SubscriptionCouponSerializer._toJsonObject(self.coupon),
+      ...extraProperties(value, ["appliedCoupon", "coupon"]),
+      applied_coupon: AppliedCouponSerializer.serialize(value.appliedCoupon),
+      coupon: SubscriptionCouponSerializer.serialize(value.coupon),
     };
   },
 };

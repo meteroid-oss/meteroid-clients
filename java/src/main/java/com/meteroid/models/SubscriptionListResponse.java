@@ -1,97 +1,245 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class SubscriptionListResponse {
-    @JsonProperty private List<Subscription> data;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class SubscriptionListResponse {
+    @JsonProperty("data")
+    private List<Subscription> data;
 
     @JsonProperty("pagination_meta")
     private PaginationResponse paginationMeta;
 
-    public SubscriptionListResponse() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public SubscriptionListResponse data(List<Subscription> data) {
-        this.data = data;
-        return this;
+    private SubscriptionListResponse() {}
+
+    private SubscriptionListResponse(Builder builder) {
+        this.data = Utils.copyList(builder.data);
+        this.paginationMeta = builder.paginationMeta;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
-    public SubscriptionListResponse addDataItem(Subscription dataItem) {
-        if (this.data == null) {
-            this.data = new ArrayList<>();
+    /**
+     * A builder of {@code SubscriptionListResponse}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * A builder starting from this value.
+     *
+     * @return a new builder
+     */
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.data = Utils.mutableList(data);
+        builder.paginationMeta = paginationMeta;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
+    }
+
+    /**
+     * The {@code data} property.
+     *
+     * @return the value, never null
+     */
+    public List<Subscription> data() {
+        return Utils.required(data, "data");
+    }
+
+    /**
+     * The {@code pagination_meta} property.
+     *
+     * @return the value, never null
+     */
+    public PaginationResponse paginationMeta() {
+        return Utils.required(paginationMeta, "pagination_meta");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.data.add(dataItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SubscriptionListResponse that = (SubscriptionListResponse) o;
+        return Objects.equals(data, that.data)
+                && Objects.equals(paginationMeta, that.paginationMeta)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(data, paginationMeta, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "SubscriptionListResponse{"
+                + "data="
+                + data
+                + ", paginationMeta="
+                + paginationMeta
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link SubscriptionListResponse}. */
+    public static final class Builder {
+        private List<Subscription> data;
+        private PaginationResponse paginationMeta;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code data} property.
+         *
+         * @param data the value
+         * @return this builder
+         */
+        public Builder data(List<Subscription> data) {
+            this.data = Utils.mutableList(data);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code data}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addDataItem(Subscription item) {
+            if (this.data == null) {
+                this.data = new ArrayList<>();
+            }
+            this.data.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code pagination_meta} property.
+         *
+         * @param paginationMeta the value
+         * @return this builder
+         */
+        public Builder paginationMeta(PaginationResponse paginationMeta) {
+            this.paginationMeta = paginationMeta;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code SubscriptionListResponse}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public SubscriptionListResponse build() {
+            Utils.checkRequired(data, "data");
+            Utils.checkRequired(paginationMeta, "pagination_meta");
+            return new SubscriptionListResponse(this);
+        }
     }
 
     /**
-     * Get data
+     * Parse {@code json} as {@code SubscriptionListResponse}.
      *
-     * @return data
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<Subscription> getData() {
-        return data;
-    }
-
-    public void setData(List<Subscription> data) {
-        this.data = data;
-    }
-
-    public SubscriptionListResponse paginationMeta(PaginationResponse paginationMeta) {
-        this.paginationMeta = paginationMeta;
-        return this;
+    public static SubscriptionListResponse fromJson(String json) {
+        return Utils.parse(json, SubscriptionListResponse.class);
     }
 
     /**
-     * Get paginationMeta
+     * This value as JSON.
      *
-     * @return paginationMeta
+     * @return the JSON text
      */
-    @javax.annotation.Nonnull
-    public PaginationResponse getPaginationMeta() {
-        return paginationMeta;
-    }
-
-    public void setPaginationMeta(PaginationResponse paginationMeta) {
-        this.paginationMeta = paginationMeta;
-    }
-
-    /**
-     * Create an instance of SubscriptionListResponse given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of SubscriptionListResponse
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     SubscriptionListResponse
-     */
-    public static SubscriptionListResponse fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, SubscriptionListResponse.class);
-    }
-
-    /**
-     * Convert an instance of SubscriptionListResponse to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

@@ -1,17 +1,23 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .event_id import EventId
-from .event_type import EventType
-from .invoice_event_data import InvoiceEventData
+
+if t.TYPE_CHECKING:
+    from .event_id import EventId
+    from .event_type import EventType
+    from .invoice_event_data import InvoiceEventData
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class InvoiceEvent(BaseModel):
-    _FLATTENED: t.ClassVar[t.Tuple[str, ...]] = ("invoice_event_data",)
+    """The `InvoiceEvent` object."""
+
+    _FLATTENED: t.ClassVar[tuple[str, ...]] = ("invoice_event_data",)
 
     invoice_event_data: InvoiceEventData
 

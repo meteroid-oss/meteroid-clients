@@ -1,88 +1,104 @@
 // this file is @generated
+
 import {
   type CreatePlanRequest,
   CreatePlanRequestSerializer,
-} from "../models/createPlanRequest";
+} from "../models/createPlanRequest.js";
 import {
   type MinimumCommitment,
   MinimumCommitmentSerializer,
-} from "../models/minimumCommitment";
+} from "../models/minimumCommitment.js";
 import {
   type PatchPlanRequest,
   PatchPlanRequestSerializer,
-} from "../models/patchPlanRequest";
-import { type Plan, PlanSerializer } from "../models/plan";
+} from "../models/patchPlanRequest.js";
+import { type Plan, PlanSerializer } from "../models/plan.js";
 import {
   type PlanListResponse,
   PlanListResponseSerializer,
-} from "../models/planListResponse";
-import type { PlanStatusEnum } from "../models/planStatusEnum";
-import type { PlanTypeEnum } from "../models/planTypeEnum";
+} from "../models/planListResponse.js";
+import type { PlanStatusEnum } from "../models/planStatusEnum.js";
+import type { PlanTypeEnum } from "../models/planTypeEnum.js";
 import {
   type PlanVersionListResponse,
   PlanVersionListResponseSerializer,
-} from "../models/planVersionListResponse";
-import type { ProductFamilyId } from "../models/productFamilyId";
+} from "../models/planVersionListResponse.js";
+import type { ProductFamilyId } from "../models/productFamilyId.js";
 import {
   type ReplacePlanRequest,
   ReplacePlanRequestSerializer,
-} from "../models/replacePlanRequest";
+} from "../models/replacePlanRequest.js";
 import {
   type ResolvedEntitlementListResponse,
   ResolvedEntitlementListResponseSerializer,
-} from "../models/resolvedEntitlementListResponse";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/resolvedEntitlementListResponse.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface PlansListPlansOptions {
-  productFamilyId?: ProductFamilyId;
+/** The query and header parameters of `list`. */
+export interface PlansListOptions {
+  productFamilyId?: ProductFamilyId | undefined;
   /** Search by plan name */
-  search?: string;
+  search?: string | undefined;
   /** Filter by plan status (can be repeated) */
-  status?: PlanStatusEnum[];
+  status?: PlanStatusEnum[] | undefined;
   /** Filter by plan type (can be repeated) */
-  planType?: PlanTypeEnum[];
+  planType?: PlanTypeEnum[] | undefined;
   /** Sort order. Format: `column.direction`. Allowed columns: `name`, `status`, `plan_type`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`. */
-  orderBy?: string;
+  orderBy?: string | undefined;
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
+  perPage?: number | undefined;
 }
 
-export interface PlansGetPlanDetailsOptions {
+/** The query and header parameters of `retrieve`. */
+export interface PlansRetrieveOptions {
   /** Filter by version: "draft", a version number, or omitted for active */
-  version?: string;
+  version?: string | undefined;
 }
 
-export interface PlansListPlanVersionsOptions {
+/** The query and header parameters of `listVersions`. */
+export interface PlansListVersionsOptions {
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
+  perPage?: number | undefined;
 }
 
+/** The plans operations, reached through the client's `plans`. */
 export class Plans {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /**  */
+  /** List plan version entitlements */
   public listPlanVersionEntitlements(
-    planVersionId: string
-  ): Promise<ResolvedEntitlementListResponse> {
+    planVersionId: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<ResolvedEntitlementListResponse> {
     const request = new MeteroidRequest(
-      HttpMethod.GET,
+      "GET",
       "/api/v1/plan-versions/{plan_version_id}/entitlements"
     );
 
     request.setPathParam("plan_version_id", planVersionId);
     return request.send(
       this.requestCtx,
-      ResolvedEntitlementListResponseSerializer._fromJsonObject
+      ResolvedEntitlementListResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public listPlans(options?: PlansListPlansOptions): Promise<PlanListResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/plans");
+  /** List plans */
+  public list(
+    options?: PlansListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<PlanListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/plans");
 
     request.setQueryParam("product_family_id", options?.productFamilyId);
     request.setQueryParam("search", options?.search);
@@ -91,138 +107,161 @@ export class Plans {
     request.setQueryParam("order_by", options?.orderBy);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
-    return request.send(this.requestCtx, PlanListResponseSerializer._fromJsonObject);
+    return request.send(
+      this.requestCtx,
+      PlanListResponseSerializer.parse,
+      requestOptions
+    );
   }
 
   /**
+   * Create a plan
+   *
    * Create a new plan with components and pricing. Set `status` to `ACTIVE` to
    * publish immediately, or `DRAFT` to stage for review.
    */
-  public createPlan(createPlanRequest: CreatePlanRequest): Promise<Plan> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/plans");
+  public create(
+    createPlanRequest: CreatePlanRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Plan> {
+    const request = new MeteroidRequest("POST", "/api/v1/plans");
 
-    request.setBody(CreatePlanRequestSerializer._toJsonObject(createPlanRequest));
-    return request.send(this.requestCtx, PlanSerializer._fromJsonObject);
+    request.setBody(CreatePlanRequestSerializer.serialize(createPlanRequest));
+    return request.send(this.requestCtx, PlanSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public setPlanMinimum(
+  /** Set or replace the plan-level minimum commitment for a draft plan version. */
+  public updateVersionMinimum(
     planVersionId: string,
-    minimumCommitment: MinimumCommitment
-  ): Promise<MinimumCommitment> {
+    minimumCommitment: MinimumCommitment,
+    requestOptions?: RequestOptions
+  ): APIPromise<MinimumCommitment> {
     const request = new MeteroidRequest(
-      HttpMethod.PUT,
+      "PUT",
       "/api/v1/plans/versions/{plan_version_id}/minimum"
     );
 
     request.setPathParam("plan_version_id", planVersionId);
-    request.setBody(MinimumCommitmentSerializer._toJsonObject(minimumCommitment));
-    return request.send(this.requestCtx, MinimumCommitmentSerializer._fromJsonObject);
+    request.setBody(MinimumCommitmentSerializer.serialize(minimumCommitment));
+    return request.send(
+      this.requestCtx,
+      MinimumCommitmentSerializer.parse,
+      requestOptions
+    );
   }
 
-  /**  */
-  public deletePlanMinimum(planVersionId: string): Promise<void> {
+  /** Remove the plan-level minimum commitment for a draft plan version. */
+  public deleteVersionMinimum(
+    planVersionId: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<void> {
     const request = new MeteroidRequest(
-      HttpMethod.DELETE,
+      "DELETE",
       "/api/v1/plans/versions/{plan_version_id}/minimum"
     );
 
     request.setPathParam("plan_version_id", planVersionId);
-    return request.sendNoResponseBody(this.requestCtx);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
   }
 
   /**
+   * Get plan details
+   *
    * Retrieve a specific plan. Use `?version=draft` for the draft version,
    * `?version=2` for a specific version number, or omit for the active version.
    */
-  public getPlanDetails(
+  public retrieve(
     planId: string,
-    options?: PlansGetPlanDetailsOptions
-  ): Promise<Plan> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/plans/{plan_id}");
+    options?: PlansRetrieveOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<Plan> {
+    const request = new MeteroidRequest("GET", "/api/v1/plans/{plan_id}");
 
     request.setPathParam("plan_id", planId);
     request.setQueryParam("version", options?.version);
-    return request.send(this.requestCtx, PlanSerializer._fromJsonObject);
+    return request.send(this.requestCtx, PlanSerializer.parse, requestOptions);
   }
 
   /**
+   * Replace a plan
+   *
    * Full replacement of a plan's version. On a draft plan, updates in-place.
    * On a published plan, creates a new version. Set `status` to `DRAFT` to
    * stage as a new draft without publishing.
    */
-  public replacePlan(
+  public replace(
     planId: string,
-    replacePlanRequest: ReplacePlanRequest
-  ): Promise<Plan> {
-    const request = new MeteroidRequest(HttpMethod.PUT, "/api/v1/plans/{plan_id}");
+    replacePlanRequest: ReplacePlanRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Plan> {
+    const request = new MeteroidRequest("PUT", "/api/v1/plans/{plan_id}");
 
     request.setPathParam("plan_id", planId);
-    request.setBody(ReplacePlanRequestSerializer._toJsonObject(replacePlanRequest));
-    return request.send(this.requestCtx, PlanSerializer._fromJsonObject);
+    request.setBody(ReplacePlanRequestSerializer.serialize(replacePlanRequest));
+    return request.send(this.requestCtx, PlanSerializer.parse, requestOptions);
   }
 
   /**
+   * Update plan metadata
+   *
    * Partially update plan-level fields (name, description, self_service_rank).
    * Does not modify version-level configuration or components.
    */
-  public patchPlan(planId: string, patchPlanRequest: PatchPlanRequest): Promise<Plan> {
-    const request = new MeteroidRequest(HttpMethod.PATCH, "/api/v1/plans/{plan_id}");
-
-    request.setPathParam("plan_id", planId);
-    request.setBody(PatchPlanRequestSerializer._toJsonObject(patchPlanRequest));
-    return request.send(this.requestCtx, PlanSerializer._fromJsonObject);
-  }
-
-  /**  */
-  public archivePlan(planId: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/plans/{plan_id}/archive"
-    );
-
-    request.setPathParam("plan_id", planId);
-    return request.sendNoResponseBody(this.requestCtx);
-  }
-
-  /** Publishes the current draft version, making it the active version. */
-  public publishPlan(planId: string): Promise<Plan> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/plans/{plan_id}/publish"
-    );
-
-    request.setPathParam("plan_id", planId);
-    return request.send(this.requestCtx, PlanSerializer._fromJsonObject);
-  }
-
-  /**  */
-  public unarchivePlan(planId: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/plans/{plan_id}/unarchive"
-    );
-
-    request.setPathParam("plan_id", planId);
-    return request.sendNoResponseBody(this.requestCtx);
-  }
-
-  /**  */
-  public listPlanVersions(
+  public update(
     planId: string,
-    options?: PlansListPlanVersionsOptions
-  ): Promise<PlanVersionListResponse> {
-    const request = new MeteroidRequest(
-      HttpMethod.GET,
-      "/api/v1/plans/{plan_id}/versions"
-    );
+    patchPlanRequest: PatchPlanRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Plan> {
+    const request = new MeteroidRequest("PATCH", "/api/v1/plans/{plan_id}");
+
+    request.setPathParam("plan_id", planId);
+    request.setBody(PatchPlanRequestSerializer.serialize(patchPlanRequest));
+    return request.send(this.requestCtx, PlanSerializer.parse, requestOptions);
+  }
+
+  /** Archive a plan */
+  public archive(planId: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("POST", "/api/v1/plans/{plan_id}/archive");
+
+    request.setPathParam("plan_id", planId);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
+  }
+
+  /**
+   * Publish a draft plan version
+   *
+   * Publishes the current draft version, making it the active version.
+   */
+  public publish(planId: string, requestOptions?: RequestOptions): APIPromise<Plan> {
+    const request = new MeteroidRequest("POST", "/api/v1/plans/{plan_id}/publish");
+
+    request.setPathParam("plan_id", planId);
+    return request.send(this.requestCtx, PlanSerializer.parse, requestOptions);
+  }
+
+  /** Unarchive a plan */
+  public unarchive(planId: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("POST", "/api/v1/plans/{plan_id}/unarchive");
+
+    request.setPathParam("plan_id", planId);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
+  }
+
+  /** List plan versions */
+  public listVersions(
+    planId: string,
+    options?: PlansListVersionsOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<PlanVersionListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/plans/{plan_id}/versions");
 
     request.setPathParam("plan_id", planId);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
     return request.send(
       this.requestCtx,
-      PlanVersionListResponseSerializer._fromJsonObject
+      PlanVersionListResponseSerializer.parse,
+      requestOptions
     );
   }
 }

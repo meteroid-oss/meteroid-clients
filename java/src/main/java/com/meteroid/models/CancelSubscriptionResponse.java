@@ -1,63 +1,199 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CancelSubscriptionResponse {
-    @JsonProperty private Subscription subscription;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CancelSubscriptionResponse {
+    @JsonProperty("subscription")
+    private Subscription subscription;
 
-    public CancelSubscriptionResponse() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public CancelSubscriptionResponse subscription(Subscription subscription) {
-        this.subscription = subscription;
-        return this;
+    private CancelSubscriptionResponse() {}
+
+    private CancelSubscriptionResponse(Builder builder) {
+        this.subscription = builder.subscription;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get subscription
+     * A builder of {@code CancelSubscriptionResponse}.
      *
-     * @return subscription
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public Subscription getSubscription() {
-        return subscription;
-    }
-
-    public void setSubscription(Subscription subscription) {
-        this.subscription = subscription;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Create an instance of CancelSubscriptionResponse given an JSON string
+     * A builder starting from this value.
      *
-     * @param jsonString JSON string
-     * @return An instance of CancelSubscriptionResponse
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     CancelSubscriptionResponse
+     * @return a new builder
      */
-    public static CancelSubscriptionResponse fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CancelSubscriptionResponse.class);
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.subscription = subscription;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Convert an instance of CancelSubscriptionResponse to an JSON string
+     * The {@code subscription} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Subscription subscription() {
+        return Utils.required(subscription, "subscription");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CancelSubscriptionResponse that = (CancelSubscriptionResponse) o;
+        return Objects.equals(subscription, that.subscription)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(subscription, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CancelSubscriptionResponse{"
+                + "subscription="
+                + subscription
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CancelSubscriptionResponse}. */
+    public static final class Builder {
+        private Subscription subscription;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code subscription} property.
+         *
+         * @param subscription the value
+         * @return this builder
+         */
+        public Builder subscription(Subscription subscription) {
+            this.subscription = subscription;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CancelSubscriptionResponse}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CancelSubscriptionResponse build() {
+            Utils.checkRequired(subscription, "subscription");
+            return new CancelSubscriptionResponse(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code CancelSubscriptionResponse}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static CancelSubscriptionResponse fromJson(String json) {
+        return Utils.parse(json, CancelSubscriptionResponse.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

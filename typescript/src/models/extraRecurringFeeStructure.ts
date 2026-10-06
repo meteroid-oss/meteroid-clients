@@ -1,27 +1,27 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type ExtraRecurringBillingTypeEnum,
   ExtraRecurringBillingTypeEnumSerializer,
-} from "./extraRecurringBillingTypeEnum";
+} from "./extraRecurringBillingTypeEnum.js";
 
 export interface ExtraRecurringFeeStructure {
   billingType: ExtraRecurringBillingTypeEnum;
 }
 
+/** Converts `ExtraRecurringFeeStructure` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ExtraRecurringFeeStructureSerializer = {
-  _fromJsonObject(object: any): ExtraRecurringFeeStructure {
+  parse(json: any): ExtraRecurringFeeStructure {
     return {
-      billingType: ExtraRecurringBillingTypeEnumSerializer._fromJsonObject(
-        object["billing_type"]
-      ),
+      ...extraProperties(json, ["billing_type"]),
+      billingType: ExtraRecurringBillingTypeEnumSerializer.parse(json["billing_type"]),
     };
   },
 
-  _toJsonObject(self: ExtraRecurringFeeStructure): any {
+  serialize(value: ExtraRecurringFeeStructure): any {
     return {
-      billing_type: ExtraRecurringBillingTypeEnumSerializer._toJsonObject(
-        self.billingType
-      ),
+      ...extraProperties(value, ["billingType"]),
+      billing_type: ExtraRecurringBillingTypeEnumSerializer.serialize(value.billingType),
     };
   },
 };

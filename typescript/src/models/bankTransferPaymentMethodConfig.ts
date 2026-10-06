@@ -1,26 +1,30 @@
 // this file is @generated
-import { type BankAccountId, BankAccountIdSerializer } from "./bankAccountId";
+import { extraProperties } from "../json.js";
+import { type BankAccountId, BankAccountIdSerializer } from "./bankAccountId.js";
 
 export interface BankTransferPaymentMethodConfig {
-  accountId?: BankAccountId | null;
+  accountId?: BankAccountId | null | undefined;
 }
 
+/** Converts `BankTransferPaymentMethodConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BankTransferPaymentMethodConfigSerializer = {
-  _fromJsonObject(object: any): BankTransferPaymentMethodConfig {
+  parse(json: any): BankTransferPaymentMethodConfig {
     return {
+      ...extraProperties(json, ["account_id"]),
       accountId:
-        object["account_id"] != null
-          ? BankAccountIdSerializer._fromJsonObject(object["account_id"])
-          : undefined,
+        json["account_id"] != null
+          ? BankAccountIdSerializer.parse(json["account_id"])
+          : json["account_id"],
     };
   },
 
-  _toJsonObject(self: BankTransferPaymentMethodConfig): any {
+  serialize(value: BankTransferPaymentMethodConfig): any {
     return {
+      ...extraProperties(value, ["accountId"]),
       account_id:
-        self.accountId != null
-          ? BankAccountIdSerializer._toJsonObject(self.accountId)
-          : undefined,
+        value.accountId != null
+          ? BankAccountIdSerializer.serialize(value.accountId)
+          : value.accountId,
     };
   },
 };

@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface SelectOption {
-  label?: string | null;
-
+  label?: string | null | undefined;
   value: string;
 }
 
+/** Converts `SelectOption` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SelectOptionSerializer = {
-  _fromJsonObject(object: any): SelectOption {
+  parse(json: any): SelectOption {
     return {
-      label: object["label"],
-      value: object["value"],
+      ...extraProperties(json, ["label", "value"]),
+      label: json["label"],
+      value: json["value"],
     };
   },
 
-  _toJsonObject(self: SelectOption): any {
+  serialize(value: SelectOption): any {
     return {
-      label: self.label,
-      value: self.value,
+      ...extraProperties(value, ["label", "value"]),
+      label: value.label,
+      value: value.value,
     };
   },
 };

@@ -6,9 +6,10 @@ use super::{
     product_id::ProductId,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ProductEventData {
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -20,13 +21,19 @@ pub struct ProductEventData {
     pub product_family_id: ProductFamilyId,
 
     pub product_id: ProductId,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl ProductEventData {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
-        created_at: String,
+        created_at: chrono::DateTime<chrono::Utc>,
         fee_type: ProductFeeTypeEnum,
-        name: String,
+        name: impl Into<String>,
         product_family_id: ProductFamilyId,
         product_id: ProductId,
     ) -> Self {
@@ -34,9 +41,10 @@ impl ProductEventData {
             created_at,
             description: None,
             fee_type,
-            name,
+            name: name.into(),
             product_family_id,
             product_id,
+            extra: serde_json::Map::new(),
         }
     }
 }

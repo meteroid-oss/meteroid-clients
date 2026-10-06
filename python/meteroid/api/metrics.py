@@ -1,203 +1,554 @@
 # this file is @generated
+"""Metrics API."""
+
+from __future__ import annotations
+
+import builtins
 import typing as t
 
+from .. import models as _models
 from ..models import (
+    BillingMetricAggregateEnum,
+    BillingMetricAggregateEnumLiteral,
     CreateMetricRequest,
     Metric,
+    MetricFilter,
     MetricListResponse,
+    MetricSegmentationMatrix,
     ProductFamilyId,
+    ProductId,
+    UnitConversion,
     UpdateMetricRequest,
 )
-from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
+from ..serialization import UNSET, Unset, to_json_value
+from ._response import async_to_raw_response_wrapper, to_raw_response_wrapper
+from .common import (
+    ApiBaseAsync,
+    ApiBaseSync,
+    ApiRequest,
+    Timeout,
+    decode_response,
+    serialize_query_params,
+)
 
 
-class MetricsAsync(ApiBaseAsync):
-    """metrics API."""
+class AsyncMetrics(ApiBaseAsync):
+    """Metrics API, for asyncio."""
 
-    async def list_metrics(
+    @property
+    def with_raw_response(self) -> AsyncMetricsWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return AsyncMetricsWithRawResponse(self)
+
+    async def list(
         self,
         *,
-        product_family_id: t.Optional[ProductFamilyId] = None,
-        search: t.Optional[str] = None,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
+        product_family_id: ProductFamilyId | None = None,
+        search: str | None = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> MetricListResponse:
-        """:param search: Search by metric name or code
+        """List billable metrics
+
+        :param search: Search by metric name or code
         :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `code`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/metrics",
-            query_params=serialize_query_params(
-                {
-                    "product_family_id": product_family_id,
-                    "search": search,
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/metrics",
+                query_params=serialize_query_params(
+                    {
+                        "product_family_id": product_family_id,
+                        "search": search,
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, MetricListResponse)
 
-    async def create_metric(
+    async def create(
         self,
-        create_metric_request: CreateMetricRequest,
+        *,
+        aggregation_type: BillingMetricAggregateEnum
+        | BillingMetricAggregateEnumLiteral,
+        code: str,
+        name: str,
+        product_family_id: ProductFamilyId,
+        aggregation_key: str | None | Unset = UNSET,
+        description: str | None | Unset = UNSET,
+        filters: builtins.list[MetricFilter] | None | Unset = UNSET,
+        product_id: ProductId | None | Unset = UNSET,
+        segmentation_matrix: MetricSegmentationMatrix | None | Unset = UNSET,
+        unit_conversion: UnitConversion | None | Unset = UNSET,
+        usage_group_key: str | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Metric:
-        response = await self._request_asyncio(
-            method="post",
-            path="/api/v1/metrics",
-            json_body=create_metric_request.to_dict(),
+        """Create a billable metric
+
+        :param filters: Pre-aggregation property filters. Optional and backward-compatible; omit for none."""
+        response = await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/metrics",
+                json_body=to_json_value(
+                    CreateMetricRequest(
+                        aggregation_key=aggregation_key,
+                        aggregation_type=t.cast(
+                            "BillingMetricAggregateEnum", aggregation_type
+                        ),
+                        code=code,
+                        description=description,
+                        filters=filters,
+                        name=name,
+                        product_family_id=product_family_id,
+                        product_id=product_id,
+                        segmentation_matrix=segmentation_matrix,
+                        unit_conversion=unit_conversion,
+                        usage_group_key=usage_group_key,
+                    ),
+                    CreateMetricRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Metric)
 
-    async def get_metric(
+    async def retrieve(
         self,
         metric_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Metric:
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/metrics/{metric_id}",
-            path_params={
-                "metric_id": metric_id,
-            },
+        """Get metric details"""
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/metrics/{metric_id}",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Metric)
 
-    async def update_metric(
+    async def update(
         self,
         metric_id: str,
-        update_metric_request: UpdateMetricRequest,
+        *,
+        description: str | None | Unset = UNSET,
+        filters: builtins.list[MetricFilter] | None | Unset = UNSET,
+        name: str | None | Unset = UNSET,
+        segmentation_matrix: MetricSegmentationMatrix | None | Unset = UNSET,
+        unit_conversion: UnitConversion | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Metric:
-        """Partially update metric fields. Code and aggregation_type are immutable."""
-        response = await self._request_asyncio(
-            method="patch",
-            path="/api/v1/metrics/{metric_id}",
-            path_params={
-                "metric_id": metric_id,
-            },
-            json_body=update_metric_request.to_dict(),
+        """Update a billable metric
+
+        Partially update metric fields. Code and aggregation_type are immutable.
+
+        :param filters: Absent = leave filters untouched; present (even empty) = replace them."""
+        response = await self._request(
+            ApiRequest(
+                method="patch",
+                path="/api/v1/metrics/{metric_id}",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                json_body=to_json_value(
+                    UpdateMetricRequest(
+                        description=description,
+                        filters=filters,
+                        name=name,
+                        segmentation_matrix=segmentation_matrix,
+                        unit_conversion=unit_conversion,
+                    ),
+                    UpdateMetricRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Metric)
 
-    async def archive_metric(
+    async def archive(
         self,
         metric_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        await self._request_asyncio(
-            method="post",
-            path="/api/v1/metrics/{metric_id}/archive",
-            path_params={
-                "metric_id": metric_id,
-            },
+        """Archive a billable metric"""
+        await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/metrics/{metric_id}/archive",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
 
-    async def unarchive_metric(
+    async def unarchive(
         self,
         metric_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        await self._request_asyncio(
-            method="post",
-            path="/api/v1/metrics/{metric_id}/unarchive",
-            path_params={
-                "metric_id": metric_id,
-            },
+        """Unarchive a billable metric"""
+        await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/metrics/{metric_id}/unarchive",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
+
+
+class AsyncMetricsWithRawResponse:
+    """The methods of :class:`AsyncMetrics`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: AsyncMetrics) -> None:
+        self.list = async_to_raw_response_wrapper(resource.list)
+        self.create = async_to_raw_response_wrapper(resource.create)
+        self.retrieve = async_to_raw_response_wrapper(resource.retrieve)
+        self.update = async_to_raw_response_wrapper(resource.update)
+        self.archive = async_to_raw_response_wrapper(resource.archive)
+        self.unarchive = async_to_raw_response_wrapper(resource.unarchive)
 
 
 class Metrics(ApiBaseSync):
-    """metrics API."""
+    """Metrics API."""
 
-    def list_metrics(
+    @property
+    def with_raw_response(self) -> MetricsWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return MetricsWithRawResponse(self)
+
+    def list(
         self,
         *,
-        product_family_id: t.Optional[ProductFamilyId] = None,
-        search: t.Optional[str] = None,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
+        product_family_id: ProductFamilyId | None = None,
+        search: str | None = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> MetricListResponse:
-        """:param search: Search by metric name or code
+        """List billable metrics
+
+        :param search: Search by metric name or code
         :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `code`, `created_at`. Direction: `asc` or `desc`. Default: `name.asc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/metrics",
-            query_params=serialize_query_params(
-                {
-                    "product_family_id": product_family_id,
-                    "search": search,
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/metrics",
+                query_params=serialize_query_params(
+                    {
+                        "product_family_id": product_family_id,
+                        "search": search,
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, MetricListResponse)
 
-    def create_metric(
+    def create(
         self,
-        create_metric_request: CreateMetricRequest,
+        *,
+        aggregation_type: BillingMetricAggregateEnum
+        | BillingMetricAggregateEnumLiteral,
+        code: str,
+        name: str,
+        product_family_id: ProductFamilyId,
+        aggregation_key: str | None | Unset = UNSET,
+        description: str | None | Unset = UNSET,
+        filters: builtins.list[MetricFilter] | None | Unset = UNSET,
+        product_id: ProductId | None | Unset = UNSET,
+        segmentation_matrix: MetricSegmentationMatrix | None | Unset = UNSET,
+        unit_conversion: UnitConversion | None | Unset = UNSET,
+        usage_group_key: str | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Metric:
-        response = self._request_sync(
-            method="post",
-            path="/api/v1/metrics",
-            json_body=create_metric_request.to_dict(),
+        """Create a billable metric
+
+        :param filters: Pre-aggregation property filters. Optional and backward-compatible; omit for none."""
+        response = self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/metrics",
+                json_body=to_json_value(
+                    CreateMetricRequest(
+                        aggregation_key=aggregation_key,
+                        aggregation_type=t.cast(
+                            "BillingMetricAggregateEnum", aggregation_type
+                        ),
+                        code=code,
+                        description=description,
+                        filters=filters,
+                        name=name,
+                        product_family_id=product_family_id,
+                        product_id=product_id,
+                        segmentation_matrix=segmentation_matrix,
+                        unit_conversion=unit_conversion,
+                        usage_group_key=usage_group_key,
+                    ),
+                    CreateMetricRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Metric)
 
-    def get_metric(
+    def retrieve(
         self,
         metric_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Metric:
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/metrics/{metric_id}",
-            path_params={
-                "metric_id": metric_id,
-            },
+        """Get metric details"""
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/metrics/{metric_id}",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Metric)
 
-    def update_metric(
+    def update(
         self,
         metric_id: str,
-        update_metric_request: UpdateMetricRequest,
+        *,
+        description: str | None | Unset = UNSET,
+        filters: builtins.list[MetricFilter] | None | Unset = UNSET,
+        name: str | None | Unset = UNSET,
+        segmentation_matrix: MetricSegmentationMatrix | None | Unset = UNSET,
+        unit_conversion: UnitConversion | None | Unset = UNSET,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> Metric:
-        """Partially update metric fields. Code and aggregation_type are immutable."""
-        response = self._request_sync(
-            method="patch",
-            path="/api/v1/metrics/{metric_id}",
-            path_params={
-                "metric_id": metric_id,
-            },
-            json_body=update_metric_request.to_dict(),
+        """Update a billable metric
+
+        Partially update metric fields. Code and aggregation_type are immutable.
+
+        :param filters: Absent = leave filters untouched; present (even empty) = replace them."""
+        response = self._request(
+            ApiRequest(
+                method="patch",
+                path="/api/v1/metrics/{metric_id}",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                json_body=to_json_value(
+                    UpdateMetricRequest(
+                        description=description,
+                        filters=filters,
+                        name=name,
+                        segmentation_matrix=segmentation_matrix,
+                        unit_conversion=unit_conversion,
+                    ),
+                    UpdateMetricRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, Metric)
 
-    def archive_metric(
+    def archive(
         self,
         metric_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        self._request_sync(
-            method="post",
-            path="/api/v1/metrics/{metric_id}/archive",
-            path_params={
-                "metric_id": metric_id,
-            },
+        """Archive a billable metric"""
+        self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/metrics/{metric_id}/archive",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
 
-    def unarchive_metric(
+    def unarchive(
         self,
         metric_id: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> None:
-        self._request_sync(
-            method="post",
-            path="/api/v1/metrics/{metric_id}/unarchive",
-            path_params={
-                "metric_id": metric_id,
-            },
+        """Unarchive a billable metric"""
+        self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/metrics/{metric_id}/unarchive",
+                path_params={
+                    "metric_id": metric_id,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
+
+
+class MetricsWithRawResponse:
+    """The methods of :class:`Metrics`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: Metrics) -> None:
+        self.list = to_raw_response_wrapper(resource.list)
+        self.create = to_raw_response_wrapper(resource.create)
+        self.retrieve = to_raw_response_wrapper(resource.retrieve)
+        self.update = to_raw_response_wrapper(resource.update)
+        self.archive = to_raw_response_wrapper(resource.archive)
+        self.unarchive = to_raw_response_wrapper(resource.unarchive)

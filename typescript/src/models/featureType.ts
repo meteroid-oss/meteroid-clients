@@ -2,12 +2,15 @@
 import {
   type BooleanFeatureType,
   BooleanFeatureTypeSerializer,
-} from "./booleanFeatureType";
-import { type ConfigFeatureType, ConfigFeatureTypeSerializer } from "./configFeatureType";
+} from "./booleanFeatureType.js";
+import {
+  type ConfigFeatureType,
+  ConfigFeatureTypeSerializer,
+} from "./configFeatureType.js";
 import {
   type MeteredFeatureType,
   MeteredFeatureTypeSerializer,
-} from "./meteredFeatureType";
+} from "./meteredFeatureType.js";
 
 export interface FeatureTypeBoolean extends BooleanFeatureType {
   type: "BOOLEAN";
@@ -21,50 +24,50 @@ export interface FeatureTypeConfig extends ConfigFeatureType {
 
 export type FeatureType = FeatureTypeBoolean | FeatureTypeMetered | FeatureTypeConfig;
 
+/** Converts `FeatureType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FeatureTypeSerializer = {
-  _fromJsonObject(object: any): FeatureType {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): FeatureType {
+    switch (json["type"]) {
       case "BOOLEAN":
         return {
-          ...BooleanFeatureTypeSerializer._fromJsonObject(object),
+          ...BooleanFeatureTypeSerializer.parse(json),
           type: "BOOLEAN",
         };
       case "METERED":
         return {
-          ...MeteredFeatureTypeSerializer._fromJsonObject(object),
+          ...MeteredFeatureTypeSerializer.parse(json),
           type: "METERED",
         };
       case "CONFIG":
         return {
-          ...ConfigFeatureTypeSerializer._fromJsonObject(object),
+          ...ConfigFeatureTypeSerializer.parse(json),
           type: "CONFIG",
         };
       default:
-        throw new Error(`Unexpected type for FeatureType: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: FeatureType): any {
-    switch (self.type) {
+  serialize(value: FeatureType): any {
+    switch (value.type) {
       case "BOOLEAN":
         return {
-          ...BooleanFeatureTypeSerializer._toJsonObject(self),
+          ...BooleanFeatureTypeSerializer.serialize(value),
           type: "BOOLEAN",
         };
       case "METERED":
         return {
-          ...MeteredFeatureTypeSerializer._toJsonObject(self),
+          ...MeteredFeatureTypeSerializer.serialize(value),
           type: "METERED",
         };
       case "CONFIG":
         return {
-          ...ConfigFeatureTypeSerializer._toJsonObject(self),
+          ...ConfigFeatureTypeSerializer.serialize(value),
           type: "CONFIG",
         };
       default:
-        throw new Error(`Unexpected type for FeatureType`);
+        return value;
     }
   },
 };

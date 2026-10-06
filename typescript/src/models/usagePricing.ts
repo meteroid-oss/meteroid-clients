@@ -1,20 +1,27 @@
 // this file is @generated
-import { type UsagePricingModel, UsagePricingModelSerializer } from "./usagePricingModel";
+import { extraProperties } from "../json.js";
+import {
+  type UsagePricingModel,
+  UsagePricingModelSerializer,
+} from "./usagePricingModel.js";
 
 export interface UsagePricing {
   model: UsagePricingModel;
 }
 
+/** Converts `UsagePricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UsagePricingSerializer = {
-  _fromJsonObject(object: any): UsagePricing {
+  parse(json: any): UsagePricing {
     return {
-      model: UsagePricingModelSerializer._fromJsonObject(object["model"]),
+      ...extraProperties(json, ["model"]),
+      model: UsagePricingModelSerializer.parse(json["model"]),
     };
   },
 
-  _toJsonObject(self: UsagePricing): any {
+  serialize(value: UsagePricing): any {
     return {
-      model: UsagePricingModelSerializer._toJsonObject(self.model),
+      ...extraProperties(value, ["model"]),
+      model: UsagePricingModelSerializer.serialize(value.model),
     };
   },
 };

@@ -1,84 +1,235 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/**
+ * Token revocation request
+ *
+ * <p>Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class RevocationRequest {
-    @JsonProperty private String token;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class RevocationRequest {
+    @JsonProperty("token")
+    private String token;
 
     @JsonProperty("token_type_hint")
-    private String tokenTypeHint;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> tokenTypeHint = JsonField.missing();
 
-    public RevocationRequest() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public RevocationRequest token(String token) {
-        this.token = token;
-        return this;
+    private RevocationRequest() {}
+
+    private RevocationRequest(Builder builder) {
+        this.token = builder.token;
+        this.tokenTypeHint = builder.tokenTypeHint;
+        this.additionalProperties.putAll(builder.additionalProperties);
+    }
+
+    /**
+     * A builder of {@code RevocationRequest}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * A builder starting from this value.
+     *
+     * @return a new builder
+     */
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.token = token;
+        builder.tokenTypeHint = tokenTypeHint;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
      * The token to revoke
      *
-     * @return token
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public RevocationRequest tokenTypeHint(String tokenTypeHint) {
-        this.tokenTypeHint = tokenTypeHint;
-        return this;
+    public String token() {
+        return Utils.required(token, "token");
     }
 
     /**
      * Optional hint about the token type (access_token or refresh_token)
      *
-     * @return tokenTypeHint
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getTokenTypeHint() {
-        return tokenTypeHint;
-    }
-
-    public void setTokenTypeHint(String tokenTypeHint) {
-        this.tokenTypeHint = tokenTypeHint;
+    public Optional<String> tokenTypeHint() {
+        return tokenTypeHint.asOptional();
     }
 
     /**
-     * Create an instance of RevocationRequest given an JSON string
+     * Properties this version of the SDK does not know, kept as received and sent back.
      *
-     * @param jsonString JSON string
-     * @return An instance of RevocationRequest
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     RevocationRequest
+     * @return the properties by name, unmodifiable
      */
-    public static RevocationRequest fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, RevocationRequest.class);
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RevocationRequest that = (RevocationRequest) o;
+        return Objects.equals(token, that.token)
+                && Objects.equals(tokenTypeHint, that.tokenTypeHint)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(token, tokenTypeHint, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "RevocationRequest{"
+                + "token="
+                + token
+                + ", tokenTypeHint="
+                + tokenTypeHint
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link RevocationRequest}. */
+    public static final class Builder {
+        private String token;
+        private JsonField<String> tokenTypeHint = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The token to revoke
+         *
+         * @param token the value
+         * @return this builder
+         */
+        public Builder token(String token) {
+            this.token = token;
+            return this;
+        }
+
+        /**
+         * Optional hint about the token type (access_token or refresh_token)
+         *
+         * @param tokenTypeHint the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder tokenTypeHint(String tokenTypeHint) {
+            this.tokenTypeHint = JsonField.ofNullable(tokenTypeHint);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code RevocationRequest}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public RevocationRequest build() {
+            Utils.checkRequired(token, "token");
+            return new RevocationRequest(this);
+        }
     }
 
     /**
-     * Convert an instance of RevocationRequest to an JSON string
+     * Parse {@code json} as {@code RevocationRequest}.
      *
-     * @return JSON string
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public static RevocationRequest fromJson(String json) {
+        return Utils.parse(json, RevocationRequest.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

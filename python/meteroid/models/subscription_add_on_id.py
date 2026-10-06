@@ -1,2 +1,4 @@
 # this file is @generated
-SubscriptionAddOnId = str
+import typing as t
+
+SubscriptionAddOnId: t.TypeAlias = str

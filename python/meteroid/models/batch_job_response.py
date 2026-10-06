@@ -1,19 +1,26 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
+from uuid import UUID
 
 from ..serialization import BaseModel
-from .batch_job_id import BatchJobId
-from .batch_job_status import BatchJobStatus
-from .batch_job_type import BatchJobType
+
+if t.TYPE_CHECKING:
+    from .batch_job_id import BatchJobId
+    from .batch_job_status import BatchJobStatus
+    from .batch_job_type import BatchJobType
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class BatchJobResponse(BaseModel):
+    """The `BatchJobResponse` object."""
+
     created_at: datetime
 
-    created_by: str
+    created_by: UUID
 
     failed_items: int
 
@@ -25,8 +32,8 @@ class BatchJobResponse(BaseModel):
 
     status: BatchJobStatus
 
-    completed_at: t.Optional[datetime] = None
+    completed_at: datetime | None = None
 
-    input_file_name: t.Optional[str] = None
+    input_file_name: str | None = None
 
-    total_items: t.Optional[int] = None
+    total_items: int | None = None

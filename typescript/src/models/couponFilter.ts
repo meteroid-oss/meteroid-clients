@@ -1,18 +1,22 @@
 // this file is @generated
 
-export enum CouponFilter {
-  All = "ALL",
-  Active = "ACTIVE",
-  Inactive = "INACTIVE",
-  Archived = "ARCHIVED",
-}
+export const CouponFilter = {
+  All: "ALL",
+  Active: "ACTIVE",
+  Inactive: "INACTIVE",
+  Archived: "ARCHIVED",
+} as const;
+export type CouponFilter =
+  | (typeof CouponFilter)[keyof typeof CouponFilter]
+  | (string & {});
 
+/** Converts `CouponFilter` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CouponFilterSerializer = {
-  _fromJsonObject(object: any): CouponFilter {
-    return object;
+  parse(json: any): CouponFilter {
+    return json;
   },
 
-  _toJsonObject(self: CouponFilter): any {
-    return self;
+  serialize(value: CouponFilter): any {
+    return value;
   },
 };

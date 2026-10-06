@@ -1,120 +1,137 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
 import {
   type BillingMetricAggregateEnum,
   BillingMetricAggregateEnumSerializer,
-} from "./billingMetricAggregateEnum";
-import { type MetricFilter, MetricFilterSerializer } from "./metricFilter";
+} from "./billingMetricAggregateEnum.js";
+import { type MetricFilter, MetricFilterSerializer } from "./metricFilter.js";
 import {
   type MetricSegmentationMatrix,
   MetricSegmentationMatrixSerializer,
-} from "./metricSegmentationMatrix";
-import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
-import { type ProductId, ProductIdSerializer } from "./productId";
-import { type UnitConversion, UnitConversionSerializer } from "./unitConversion";
+} from "./metricSegmentationMatrix.js";
+import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
+import { type UnitConversion, UnitConversionSerializer } from "./unitConversion.js";
 
 export interface Metric {
-  aggregationKey?: string | null;
-
+  aggregationKey?: string | null | undefined;
   aggregationType: BillingMetricAggregateEnum;
-
-  archivedAt?: Date | null;
-
+  archivedAt?: Date | null | undefined;
   code: string;
-
   createdAt: Date;
-
-  description?: string | null;
-
-  filters?: MetricFilter[];
-
+  description?: string | null | undefined;
+  filters?: MetricFilter[] | undefined;
   id: BillableMetricId;
-
   name: string;
-
   productFamilyId: ProductFamilyId;
-
-  productId?: ProductId | null;
-
-  segmentationMatrix?: MetricSegmentationMatrix | null;
-
-  unitConversion?: UnitConversion | null;
-
-  usageGroupKey?: string | null;
+  productId?: ProductId | null | undefined;
+  segmentationMatrix?: MetricSegmentationMatrix | null | undefined;
+  unitConversion?: UnitConversion | null | undefined;
+  usageGroupKey?: string | null | undefined;
 }
 
+/** Converts `Metric` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricSerializer = {
-  _fromJsonObject(object: any): Metric {
+  parse(json: any): Metric {
     return {
-      aggregationKey: object["aggregation_key"],
-      aggregationType: BillingMetricAggregateEnumSerializer._fromJsonObject(
-        object["aggregation_type"]
+      ...extraProperties(json, [
+        "aggregation_key",
+        "aggregation_type",
+        "archived_at",
+        "code",
+        "created_at",
+        "description",
+        "filters",
+        "id",
+        "name",
+        "product_family_id",
+        "product_id",
+        "segmentation_matrix",
+        "unit_conversion",
+        "usage_group_key",
+      ]),
+      aggregationKey: json["aggregation_key"],
+      aggregationType: BillingMetricAggregateEnumSerializer.parse(
+        json["aggregation_type"]
       ),
       archivedAt:
-        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
-      code: object["code"],
-      createdAt: parseDateTime(object["created_at"]),
-      description: object["description"],
+        json["archived_at"] != null
+          ? parseDateTime(json["archived_at"])
+          : json["archived_at"],
+      code: json["code"],
+      createdAt: parseDateTime(json["created_at"]),
+      description: json["description"],
       filters:
-        object["filters"] != null
-          ? object["filters"].map((item: any) =>
-              MetricFilterSerializer._fromJsonObject(item)
-            )
+        json["filters"] != null
+          ? json["filters"].map((item: any) => MetricFilterSerializer.parse(item))
           : undefined,
-      id: BillableMetricIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
-      productFamilyId: ProductFamilyIdSerializer._fromJsonObject(
-        object["product_family_id"]
-      ),
+      id: BillableMetricIdSerializer.parse(json["id"]),
+      name: json["name"],
+      productFamilyId: ProductFamilyIdSerializer.parse(json["product_family_id"]),
       productId:
-        object["product_id"] != null
-          ? ProductIdSerializer._fromJsonObject(object["product_id"])
-          : undefined,
+        json["product_id"] != null
+          ? ProductIdSerializer.parse(json["product_id"])
+          : json["product_id"],
       segmentationMatrix:
-        object["segmentation_matrix"] != null
-          ? MetricSegmentationMatrixSerializer._fromJsonObject(
-              object["segmentation_matrix"]
-            )
-          : undefined,
+        json["segmentation_matrix"] != null
+          ? MetricSegmentationMatrixSerializer.parse(json["segmentation_matrix"])
+          : json["segmentation_matrix"],
       unitConversion:
-        object["unit_conversion"] != null
-          ? UnitConversionSerializer._fromJsonObject(object["unit_conversion"])
-          : undefined,
-      usageGroupKey: object["usage_group_key"],
+        json["unit_conversion"] != null
+          ? UnitConversionSerializer.parse(json["unit_conversion"])
+          : json["unit_conversion"],
+      usageGroupKey: json["usage_group_key"],
     };
   },
 
-  _toJsonObject(self: Metric): any {
+  serialize(value: Metric): any {
     return {
-      aggregation_key: self.aggregationKey,
-      aggregation_type: BillingMetricAggregateEnumSerializer._toJsonObject(
-        self.aggregationType
+      ...extraProperties(value, [
+        "aggregationKey",
+        "aggregationType",
+        "archivedAt",
+        "code",
+        "createdAt",
+        "description",
+        "filters",
+        "id",
+        "name",
+        "productFamilyId",
+        "productId",
+        "segmentationMatrix",
+        "unitConversion",
+        "usageGroupKey",
+      ]),
+      aggregation_key: value.aggregationKey,
+      aggregation_type: BillingMetricAggregateEnumSerializer.serialize(
+        value.aggregationType
       ),
-      archived_at: self.archivedAt,
-      code: self.code,
-      created_at: self.createdAt,
-      description: self.description,
+      archived_at: value.archivedAt,
+      code: value.code,
+      created_at: value.createdAt,
+      description: value.description,
       filters:
-        self.filters != null
-          ? self.filters.map((item: any) => MetricFilterSerializer._toJsonObject(item))
+        value.filters != null
+          ? value.filters.map((item: any) => MetricFilterSerializer.serialize(item))
           : undefined,
-      id: BillableMetricIdSerializer._toJsonObject(self.id),
-      name: self.name,
-      product_family_id: ProductFamilyIdSerializer._toJsonObject(self.productFamilyId),
+      id: BillableMetricIdSerializer.serialize(value.id),
+      name: value.name,
+      product_family_id: ProductFamilyIdSerializer.serialize(value.productFamilyId),
       product_id:
-        self.productId != null
-          ? ProductIdSerializer._toJsonObject(self.productId)
-          : undefined,
+        value.productId != null
+          ? ProductIdSerializer.serialize(value.productId)
+          : value.productId,
       segmentation_matrix:
-        self.segmentationMatrix != null
-          ? MetricSegmentationMatrixSerializer._toJsonObject(self.segmentationMatrix)
-          : undefined,
+        value.segmentationMatrix != null
+          ? MetricSegmentationMatrixSerializer.serialize(value.segmentationMatrix)
+          : value.segmentationMatrix,
       unit_conversion:
-        self.unitConversion != null
-          ? UnitConversionSerializer._toJsonObject(self.unitConversion)
-          : undefined,
-      usage_group_key: self.usageGroupKey,
+        value.unitConversion != null
+          ? UnitConversionSerializer.serialize(value.unitConversion)
+          : value.unitConversion,
+      usage_group_key: value.usageGroupKey,
     };
   },
 };

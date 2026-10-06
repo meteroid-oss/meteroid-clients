@@ -1,13 +1,19 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .tier_row import TierRow
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .tier_row import TierRow
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class TieredPlanPricing(BaseModel):
-    tiers: t.List[TierRow]
+    """The `TieredPlanPricing` object."""
 
-    block_size: t.Optional[int] = None
+    tiers: list[TierRow]
+
+    block_size: int | None | Unset = UNSET

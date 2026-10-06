@@ -1,17 +1,23 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .product_family_id import ProductFamilyId
-from .product_fee_structure import ProductFeeStructure
-from .product_fee_type_enum import ProductFeeTypeEnum
-from .product_id import ProductId
+
+if t.TYPE_CHECKING:
+    from .product_family_id import ProductFamilyId
+    from .product_fee_structure import ProductFeeStructure
+    from .product_fee_type_enum import ProductFeeTypeEnum
+    from .product_id import ProductId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Product(BaseModel):
+    """The `Product` object."""
+
     catalog: bool
 
     created_at: datetime
@@ -26,6 +32,6 @@ class Product(BaseModel):
 
     product_family_id: ProductFamilyId
 
-    archived_at: t.Optional[datetime] = None
+    archived_at: datetime | None = None
 
-    description: t.Optional[str] = None
+    description: str | None = None

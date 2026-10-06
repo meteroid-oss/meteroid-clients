@@ -1,13 +1,19 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface BooleanFeatureType {}
 
+/** Converts `BooleanFeatureType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BooleanFeatureTypeSerializer = {
-  _fromJsonObject(object: any): BooleanFeatureType {
-    return {};
+  parse(json: any): BooleanFeatureType {
+    return {
+      ...extraProperties(json, []),
+    };
   },
 
-  _toJsonObject(self: BooleanFeatureType): any {
-    return {};
+  serialize(value: BooleanFeatureType): any {
+    return {
+      ...extraProperties(value, []),
+    };
   },
 };

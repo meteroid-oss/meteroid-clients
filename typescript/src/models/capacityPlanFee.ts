@@ -1,33 +1,41 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
-import { type CapacityThreshold, CapacityThresholdSerializer } from "./capacityThreshold";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
+import {
+  type CapacityThreshold,
+  CapacityThresholdSerializer,
+} from "./capacityThreshold.js";
 /** Capacity-based fee with included committed usage and overage */
 export interface CapacityPlanFee {
   cadence: BillingPeriodEnum;
-
   metricId: BillableMetricId;
-
   thresholds: CapacityThreshold[];
 }
 
+/** Converts `CapacityPlanFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CapacityPlanFeeSerializer = {
-  _fromJsonObject(object: any): CapacityPlanFee {
+  parse(json: any): CapacityPlanFee {
     return {
-      cadence: BillingPeriodEnumSerializer._fromJsonObject(object["cadence"]),
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
-      thresholds: object["thresholds"].map((item: any) =>
-        CapacityThresholdSerializer._fromJsonObject(item)
+      ...extraProperties(json, ["cadence", "metric_id", "thresholds"]),
+      cadence: BillingPeriodEnumSerializer.parse(json["cadence"]),
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
+      thresholds: json["thresholds"].map((item: any) =>
+        CapacityThresholdSerializer.parse(item)
       ),
     };
   },
 
-  _toJsonObject(self: CapacityPlanFee): any {
+  serialize(value: CapacityPlanFee): any {
     return {
-      cadence: BillingPeriodEnumSerializer._toJsonObject(self.cadence),
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
-      thresholds: self.thresholds.map((item: any) =>
-        CapacityThresholdSerializer._toJsonObject(item)
+      ...extraProperties(value, ["cadence", "metricId", "thresholds"]),
+      cadence: BillingPeriodEnumSerializer.serialize(value.cadence),
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
+      thresholds: value.thresholds.map((item: any) =>
+        CapacityThresholdSerializer.serialize(item)
       ),
     };
   },

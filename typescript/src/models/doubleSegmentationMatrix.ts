@@ -1,24 +1,27 @@
 // this file is @generated
-import { type MetricDimension, MetricDimensionSerializer } from "./metricDimension";
+import { extraProperties } from "../json.js";
+import { type MetricDimension, MetricDimensionSerializer } from "./metricDimension.js";
 
 export interface DoubleSegmentationMatrix {
   dimension1: MetricDimension;
-
   dimension2: MetricDimension;
 }
 
+/** Converts `DoubleSegmentationMatrix` values from (`parse`) and to (`serialize`) their JSON form. */
 export const DoubleSegmentationMatrixSerializer = {
-  _fromJsonObject(object: any): DoubleSegmentationMatrix {
+  parse(json: any): DoubleSegmentationMatrix {
     return {
-      dimension1: MetricDimensionSerializer._fromJsonObject(object["dimension1"]),
-      dimension2: MetricDimensionSerializer._fromJsonObject(object["dimension2"]),
+      ...extraProperties(json, ["dimension1", "dimension2"]),
+      dimension1: MetricDimensionSerializer.parse(json["dimension1"]),
+      dimension2: MetricDimensionSerializer.parse(json["dimension2"]),
     };
   },
 
-  _toJsonObject(self: DoubleSegmentationMatrix): any {
+  serialize(value: DoubleSegmentationMatrix): any {
     return {
-      dimension1: MetricDimensionSerializer._toJsonObject(self.dimension1),
-      dimension2: MetricDimensionSerializer._toJsonObject(self.dimension2),
+      ...extraProperties(value, ["dimension1", "dimension2"]),
+      dimension1: MetricDimensionSerializer.serialize(value.dimension1),
+      dimension2: MetricDimensionSerializer.serialize(value.dimension2),
     };
   },
 };

@@ -2,12 +2,12 @@
 import {
   type DoubleSegmentationMatrix,
   DoubleSegmentationMatrixSerializer,
-} from "./doubleSegmentationMatrix";
+} from "./doubleSegmentationMatrix.js";
 import {
   type LinkedSegmentationMatrix,
   LinkedSegmentationMatrixSerializer,
-} from "./linkedSegmentationMatrix";
-import { type MetricDimension, MetricDimensionSerializer } from "./metricDimension";
+} from "./linkedSegmentationMatrix.js";
+import { type MetricDimension, MetricDimensionSerializer } from "./metricDimension.js";
 
 export interface MetricSegmentationMatrixSingle extends MetricDimension {
   type: "SINGLE";
@@ -24,50 +24,50 @@ export type MetricSegmentationMatrix =
   | MetricSegmentationMatrixDouble
   | MetricSegmentationMatrixLinked;
 
+/** Converts `MetricSegmentationMatrix` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricSegmentationMatrixSerializer = {
-  _fromJsonObject(object: any): MetricSegmentationMatrix {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): MetricSegmentationMatrix {
+    switch (json["type"]) {
       case "SINGLE":
         return {
-          ...MetricDimensionSerializer._fromJsonObject(object),
+          ...MetricDimensionSerializer.parse(json),
           type: "SINGLE",
         };
       case "DOUBLE":
         return {
-          ...DoubleSegmentationMatrixSerializer._fromJsonObject(object),
+          ...DoubleSegmentationMatrixSerializer.parse(json),
           type: "DOUBLE",
         };
       case "LINKED":
         return {
-          ...LinkedSegmentationMatrixSerializer._fromJsonObject(object),
+          ...LinkedSegmentationMatrixSerializer.parse(json),
           type: "LINKED",
         };
       default:
-        throw new Error(`Unexpected type for MetricSegmentationMatrix: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: MetricSegmentationMatrix): any {
-    switch (self.type) {
+  serialize(value: MetricSegmentationMatrix): any {
+    switch (value.type) {
       case "SINGLE":
         return {
-          ...MetricDimensionSerializer._toJsonObject(self),
+          ...MetricDimensionSerializer.serialize(value),
           type: "SINGLE",
         };
       case "DOUBLE":
         return {
-          ...DoubleSegmentationMatrixSerializer._toJsonObject(self),
+          ...DoubleSegmentationMatrixSerializer.serialize(value),
           type: "DOUBLE",
         };
       case "LINKED":
         return {
-          ...LinkedSegmentationMatrixSerializer._toJsonObject(self),
+          ...LinkedSegmentationMatrixSerializer.serialize(value),
           type: "LINKED",
         };
       default:
-        throw new Error(`Unexpected type for MetricSegmentationMatrix`);
+        return value;
     }
   },
 };

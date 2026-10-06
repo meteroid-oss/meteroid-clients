@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface BillingConfig {
-  billingCycles?: number | null;
-
-  netTerms?: number;
-
-  periodStartDay?: number | null;
+  billingCycles?: number | null | undefined;
+  netTerms?: number | undefined;
+  periodStartDay?: number | null | undefined;
 }
 
+/** Converts `BillingConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BillingConfigSerializer = {
-  _fromJsonObject(object: any): BillingConfig {
+  parse(json: any): BillingConfig {
     return {
-      billingCycles: object["billing_cycles"],
-      netTerms: object["net_terms"],
-      periodStartDay: object["period_start_day"],
+      ...extraProperties(json, ["billing_cycles", "net_terms", "period_start_day"]),
+      billingCycles: json["billing_cycles"],
+      netTerms: json["net_terms"],
+      periodStartDay: json["period_start_day"],
     };
   },
 
-  _toJsonObject(self: BillingConfig): any {
+  serialize(value: BillingConfig): any {
     return {
-      billing_cycles: self.billingCycles,
-      net_terms: self.netTerms,
-      period_start_day: self.periodStartDay,
+      ...extraProperties(value, ["billingCycles", "netTerms", "periodStartDay"]),
+      billing_cycles: value.billingCycles,
+      net_terms: value.netTerms,
+      period_start_day: value.periodStartDay,
     };
   },
 };

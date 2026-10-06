@@ -1,93 +1,107 @@
 // this file is @generated
-import { type BillingConfig, BillingConfigSerializer } from "./billingConfig";
-import { type PlanAddOnInput, PlanAddOnInputSerializer } from "./planAddOnInput";
-import { type PlanStatusEnum, PlanStatusEnumSerializer } from "./planStatusEnum";
-import { type PlanTypeEnum, PlanTypeEnumSerializer } from "./planTypeEnum";
+import { extraProperties } from "../json.js";
+import { type BillingConfig, BillingConfigSerializer } from "./billingConfig.js";
+import { type PlanAddOnInput, PlanAddOnInputSerializer } from "./planAddOnInput.js";
+import { type PlanStatusEnum, PlanStatusEnumSerializer } from "./planStatusEnum.js";
+import { type PlanTypeEnum, PlanTypeEnumSerializer } from "./planTypeEnum.js";
 import {
   type PriceComponentInput,
   PriceComponentInputSerializer,
-} from "./priceComponentInput";
-import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
-import { type TrialConfig, TrialConfigSerializer } from "./trialConfig";
+} from "./priceComponentInput.js";
+import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId.js";
+import { type TrialConfig, TrialConfigSerializer } from "./trialConfig.js";
 
 export interface CreatePlanRequest {
-  addOns?: PlanAddOnInput[];
-
-  billing?: BillingConfig | null;
-
+  addOns?: PlanAddOnInput[] | undefined;
+  billing?: BillingConfig | null | undefined;
   components: PriceComponentInput[];
-
   currency: string;
-
-  description?: string | null;
-
+  description?: string | null | undefined;
   name: string;
-
   planType: PlanTypeEnum;
-
   productFamilyId: ProductFamilyId;
-
-  selfServiceRank?: number | null;
-
+  selfServiceRank?: number | null | undefined;
   status: PlanStatusEnum;
-
-  trial?: TrialConfig | null;
+  trial?: TrialConfig | null | undefined;
 }
 
+/** Converts `CreatePlanRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreatePlanRequestSerializer = {
-  _fromJsonObject(object: any): CreatePlanRequest {
+  parse(json: any): CreatePlanRequest {
     return {
+      ...extraProperties(json, [
+        "add_ons",
+        "billing",
+        "components",
+        "currency",
+        "description",
+        "name",
+        "plan_type",
+        "product_family_id",
+        "self_service_rank",
+        "status",
+        "trial",
+      ]),
       addOns:
-        object["add_ons"] != null
-          ? object["add_ons"].map((item: any) =>
-              PlanAddOnInputSerializer._fromJsonObject(item)
-            )
+        json["add_ons"] != null
+          ? json["add_ons"].map((item: any) => PlanAddOnInputSerializer.parse(item))
           : undefined,
       billing:
-        object["billing"] != null
-          ? BillingConfigSerializer._fromJsonObject(object["billing"])
-          : undefined,
-      components: object["components"].map((item: any) =>
-        PriceComponentInputSerializer._fromJsonObject(item)
+        json["billing"] != null
+          ? BillingConfigSerializer.parse(json["billing"])
+          : json["billing"],
+      components: json["components"].map((item: any) =>
+        PriceComponentInputSerializer.parse(item)
       ),
-      currency: object["currency"],
-      description: object["description"],
-      name: object["name"],
-      planType: PlanTypeEnumSerializer._fromJsonObject(object["plan_type"]),
-      productFamilyId: ProductFamilyIdSerializer._fromJsonObject(
-        object["product_family_id"]
-      ),
-      selfServiceRank: object["self_service_rank"],
-      status: PlanStatusEnumSerializer._fromJsonObject(object["status"]),
+      currency: json["currency"],
+      description: json["description"],
+      name: json["name"],
+      planType: PlanTypeEnumSerializer.parse(json["plan_type"]),
+      productFamilyId: ProductFamilyIdSerializer.parse(json["product_family_id"]),
+      selfServiceRank: json["self_service_rank"],
+      status: PlanStatusEnumSerializer.parse(json["status"]),
       trial:
-        object["trial"] != null
-          ? TrialConfigSerializer._fromJsonObject(object["trial"])
-          : undefined,
+        json["trial"] != null
+          ? TrialConfigSerializer.parse(json["trial"])
+          : json["trial"],
     };
   },
 
-  _toJsonObject(self: CreatePlanRequest): any {
+  serialize(value: CreatePlanRequest): any {
     return {
+      ...extraProperties(value, [
+        "addOns",
+        "billing",
+        "components",
+        "currency",
+        "description",
+        "name",
+        "planType",
+        "productFamilyId",
+        "selfServiceRank",
+        "status",
+        "trial",
+      ]),
       add_ons:
-        self.addOns != null
-          ? self.addOns.map((item: any) => PlanAddOnInputSerializer._toJsonObject(item))
+        value.addOns != null
+          ? value.addOns.map((item: any) => PlanAddOnInputSerializer.serialize(item))
           : undefined,
       billing:
-        self.billing != null
-          ? BillingConfigSerializer._toJsonObject(self.billing)
-          : undefined,
-      components: self.components.map((item: any) =>
-        PriceComponentInputSerializer._toJsonObject(item)
+        value.billing != null
+          ? BillingConfigSerializer.serialize(value.billing)
+          : value.billing,
+      components: value.components.map((item: any) =>
+        PriceComponentInputSerializer.serialize(item)
       ),
-      currency: self.currency,
-      description: self.description,
-      name: self.name,
-      plan_type: PlanTypeEnumSerializer._toJsonObject(self.planType),
-      product_family_id: ProductFamilyIdSerializer._toJsonObject(self.productFamilyId),
-      self_service_rank: self.selfServiceRank,
-      status: PlanStatusEnumSerializer._toJsonObject(self.status),
+      currency: value.currency,
+      description: value.description,
+      name: value.name,
+      plan_type: PlanTypeEnumSerializer.serialize(value.planType),
+      product_family_id: ProductFamilyIdSerializer.serialize(value.productFamilyId),
+      self_service_rank: value.selfServiceRank,
+      status: PlanStatusEnumSerializer.serialize(value.status),
       trial:
-        self.trial != null ? TrialConfigSerializer._toJsonObject(self.trial) : undefined,
+        value.trial != null ? TrialConfigSerializer.serialize(value.trial) : value.trial,
     };
   },
 };

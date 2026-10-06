@@ -1,24 +1,27 @@
 // this file is @generated
-import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit";
+import { extraProperties } from "../json.js";
+import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit.js";
 /** Resets at regular intervals — anchored to your subscription's exact activation time. */
 export interface FixedWindowResetPeriod {
   interval: number;
-
   unit: CalendarUnit;
 }
 
+/** Converts `FixedWindowResetPeriod` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FixedWindowResetPeriodSerializer = {
-  _fromJsonObject(object: any): FixedWindowResetPeriod {
+  parse(json: any): FixedWindowResetPeriod {
     return {
-      interval: object["interval"],
-      unit: CalendarUnitSerializer._fromJsonObject(object["unit"]),
+      ...extraProperties(json, ["interval", "unit"]),
+      interval: json["interval"],
+      unit: CalendarUnitSerializer.parse(json["unit"]),
     };
   },
 
-  _toJsonObject(self: FixedWindowResetPeriod): any {
+  serialize(value: FixedWindowResetPeriod): any {
     return {
-      interval: self.interval,
-      unit: CalendarUnitSerializer._toJsonObject(self.unit),
+      ...extraProperties(value, ["interval", "unit"]),
+      interval: value.interval,
+      unit: CalendarUnitSerializer.serialize(value.unit),
     };
   },
 };

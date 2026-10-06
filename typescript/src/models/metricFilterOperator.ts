@@ -4,19 +4,23 @@
  * forms of `IN`/`NOT_IN`. Negation (`NOT_EQUAL`/`NOT_IN`) is presence-required: an event
  * missing the property is excluded.
  */
-export enum MetricFilterOperator {
-  Equal = "EQUAL",
-  NotEqual = "NOT_EQUAL",
-  In = "IN",
-  NotIn = "NOT_IN",
-}
+export const MetricFilterOperator = {
+  Equal: "EQUAL",
+  NotEqual: "NOT_EQUAL",
+  In: "IN",
+  NotIn: "NOT_IN",
+} as const;
+export type MetricFilterOperator =
+  | (typeof MetricFilterOperator)[keyof typeof MetricFilterOperator]
+  | (string & {});
 
+/** Converts `MetricFilterOperator` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricFilterOperatorSerializer = {
-  _fromJsonObject(object: any): MetricFilterOperator {
-    return object;
+  parse(json: any): MetricFilterOperator {
+    return json;
   },
 
-  _toJsonObject(self: MetricFilterOperator): any {
-    return self;
+  serialize(value: MetricFilterOperator): any {
+    return value;
   },
 };

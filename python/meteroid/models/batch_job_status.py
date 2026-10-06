@@ -1,8 +1,12 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class BatchJobStatus(str, enum.Enum):
+class BatchJobStatus(StrEnum):
+    """The values of `BatchJobStatus`; others are kept as received."""
+
     PENDING = "PENDING"
     CHUNKING = "CHUNKING"
     PROCESSING = "PROCESSING"
@@ -11,5 +15,14 @@ class BatchJobStatus(str, enum.Enum):
     FAILED = "FAILED"
     CANCELLED = "CANCELLED"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+BatchJobStatusLiteral: t.TypeAlias = t.Literal[
+    "PENDING",
+    "CHUNKING",
+    "PROCESSING",
+    "COMPLETED",
+    "COMPLETED_WITH_ERRORS",
+    "FAILED",
+    "CANCELLED",
+]
+"""The values of :class:`BatchJobStatus`, which arguments take as plain strings too."""

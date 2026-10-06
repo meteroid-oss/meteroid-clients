@@ -1,118 +1,390 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
+/**
+ * One of the variants below, told apart by {@code type}. A value this version of the SDK does not
+ * know parses as {@link Unrecognized}, which keeps its properties.
+ */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "type",
-        visible = true)
+        visible = true,
+        defaultImpl = PriceEntry.Unrecognized.class)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = PriceEntry.Existing.class, name = "EXISTING"),
     @JsonSubTypes.Type(value = PriceEntry.New.class, name = "NEW")
 })
-@ToString
-@EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
 public abstract class PriceEntry {
-    /** Get the discriminator value identifying this variant. */
-    public abstract String getType();
+
+    private PriceEntry() {}
 
     /**
-     * Convert an instance of PriceEntry to a JSON string.
+     * The discriminator value identifying this variant.
      *
-     * @return JSON string
+     * @return the {@code type} value
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    @JsonProperty("type")
+    public abstract String type();
+
+    /**
+     * Whether this is the {@code EXISTING} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isExisting() {
+        return this instanceof Existing;
     }
 
     /**
-     * Create an instance of PriceEntry from a JSON string.
+     * This value as the {@code EXISTING} variant.
      *
-     * @param jsonString JSON string
-     * @return An instance of PriceEntry
-     * @throws JsonProcessingException if the JSON string is invalid
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
      */
-    public static PriceEntry fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, PriceEntry.class);
+    public final Existing asExisting() {
+        if (this instanceof Existing) {
+            return (Existing) this;
+        }
+        throw new IllegalStateException("not the EXISTING variant: " + type());
     }
 
-    // Variant classes
     /**
-     * Variant: EXISTING
+     * Whether this is the {@code NEW} variant.
      *
-     * <p>This variant wraps ExistingPriceRef.
+     * @return whether it is
      */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    public final boolean isNew() {
+        return this instanceof New;
+    }
+
+    /**
+     * This value as the {@code NEW} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final New asNew() {
+        if (this instanceof New) {
+            return (New) this;
+        }
+        throw new IllegalStateException("not the NEW variant: " + type());
+    }
+
+    /**
+     * Whether this is a variant this version of the SDK does not know.
+     *
+     * @return whether it is
+     */
+    public final boolean isUnrecognized() {
+        return this instanceof Unrecognized;
+    }
+
+    /**
+     * This value as a variant this version of the SDK does not know.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Unrecognized asUnrecognized() {
+        if (this instanceof Unrecognized) {
+            return (Unrecognized) this;
+        }
+        throw new IllegalStateException("not a known variant: " + type());
+    }
+
+    /**
+     * Calls the method of {@code visitor} for this variant.
+     *
+     * @param <R> the result type
+     * @param visitor the visitor
+     * @return the result of the visitor
+     */
+    public abstract <R> R accept(Visitor<R> visitor);
+
+    /**
+     * A function of each variant, called by {@link #accept}.
+     *
+     * @param <R> the result type
+     */
+    public interface Visitor<R> {
+        /**
+         * Visits the {@code EXISTING} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitExisting(ExistingPriceRef value);
+
+        /**
+         * Visits the {@code NEW} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitNew(PriceInput value);
+
+        /**
+         * Visits a variant this version of the SDK does not know.
+         *
+         * @param value the variant, with its properties
+         * @return the result
+         * @throws com.meteroid.exceptions.InvalidDataException unless overridden
+         */
+        default R visitUnknown(Unrecognized value) {
+            throw new com.meteroid.exceptions.InvalidDataException(
+                    "unknown PriceEntry variant: " + value.type());
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code PriceEntry}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static PriceEntry fromJson(String json) {
+        return Utils.parse(json, PriceEntry.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
+    }
+
+    /** The {@code EXISTING} variant. */
     @JsonTypeName("EXISTING")
-    public static class Existing extends PriceEntry {
-        @JsonUnwrapped private ExistingPriceRef data;
+    public static final class Existing extends PriceEntry {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private ExistingPriceRef data;
 
-        public Existing() {}
+        private Existing() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Existing(ExistingPriceRef data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Existing of(ExistingPriceRef data) {
+            return new Existing(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "EXISTING";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public ExistingPriceRef getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public ExistingPriceRef data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Existing data(ExistingPriceRef data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Existing that = (Existing) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Existing{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitExisting(data);
         }
     }
 
-    /**
-     * Variant: NEW
-     *
-     * <p>This variant wraps PriceInput.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code NEW} variant. */
     @JsonTypeName("NEW")
-    public static class New extends PriceEntry {
-        @JsonUnwrapped private PriceInput data;
+    public static final class New extends PriceEntry {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private PriceInput data;
 
-        public New() {}
+        private New() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public New(PriceInput data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static New of(PriceInput data) {
+            return new New(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "NEW";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public PriceInput getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public PriceInput data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public New data(PriceInput data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            New that = (New) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "New{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitNew(data);
+        }
+    }
+
+    /** A variant this version of the SDK does not know. */
+    public static final class Unrecognized extends PriceEntry {
+        @JsonProperty("type")
+        private String discriminator;
+
+        private final Map<String, JsonNode> properties = new LinkedHashMap<>();
+
+        private Unrecognized() {}
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
+            return discriminator;
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitUnknown(this);
+        }
+
+        /**
+         * Every other property of the variant.
+         *
+         * @return the properties by name, unmodifiable
+         */
+        @JsonAnyGetter
+        public Map<String, JsonNode> properties() {
+            return Collections.unmodifiableMap(properties);
+        }
+
+        @JsonAnySetter
+        private void putProperty(String name, JsonNode value) {
+            properties.put(name, value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Unrecognized that = (Unrecognized) o;
+            return Objects.equals(discriminator, that.discriminator)
+                    && Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(discriminator, properties);
+        }
+
+        @Override
+        public String toString() {
+            return "Unrecognized{"
+                    + "discriminator="
+                    + discriminator
+                    + ", properties="
+                    + properties
+                    + "}";
         }
     }
 }

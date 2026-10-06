@@ -2,8 +2,8 @@
 import {
   type AllComponentsScope,
   AllComponentsScopeSerializer,
-} from "./allComponentsScope";
-import { type ComponentsScope, ComponentsScopeSerializer } from "./componentsScope";
+} from "./allComponentsScope.js";
+import { type ComponentsScope, ComponentsScopeSerializer } from "./componentsScope.js";
 
 export interface MinimumCommitmentInputScopeAllComponents extends AllComponentsScope {
   type: "all_components";
@@ -16,40 +16,40 @@ export type MinimumCommitmentInputScope =
   | MinimumCommitmentInputScopeAllComponents
   | MinimumCommitmentInputScopeComponents;
 
+/** Converts `MinimumCommitmentInputScope` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MinimumCommitmentInputScopeSerializer = {
-  _fromJsonObject(object: any): MinimumCommitmentInputScope {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): MinimumCommitmentInputScope {
+    switch (json["type"]) {
       case "all_components":
         return {
-          ...AllComponentsScopeSerializer._fromJsonObject(object),
+          ...AllComponentsScopeSerializer.parse(json),
           type: "all_components",
         };
       case "components":
         return {
-          ...ComponentsScopeSerializer._fromJsonObject(object),
+          ...ComponentsScopeSerializer.parse(json),
           type: "components",
         };
       default:
-        throw new Error(`Unexpected type for MinimumCommitmentInputScope: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: MinimumCommitmentInputScope): any {
-    switch (self.type) {
+  serialize(value: MinimumCommitmentInputScope): any {
+    switch (value.type) {
       case "all_components":
         return {
-          ...AllComponentsScopeSerializer._toJsonObject(self),
+          ...AllComponentsScopeSerializer.serialize(value),
           type: "all_components",
         };
       case "components":
         return {
-          ...ComponentsScopeSerializer._toJsonObject(self),
+          ...ComponentsScopeSerializer.serialize(value),
           type: "components",
         };
       default:
-        throw new Error(`Unexpected type for MinimumCommitmentInputScope`);
+        return value;
     }
   },
 };

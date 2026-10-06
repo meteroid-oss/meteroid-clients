@@ -2,12 +2,13 @@
 
 export type AddOnId = string;
 
+/** Converts `AddOnId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const AddOnIdSerializer = {
-  _fromJsonObject(object: any): AddOnId {
-    return object;
+  parse(json: any): AddOnId {
+    return json;
   },
 
-  _toJsonObject(self: AddOnId): any {
-    return self;
+  serialize(value: AddOnId): any {
+    return value;
   },
 };

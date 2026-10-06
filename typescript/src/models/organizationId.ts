@@ -2,12 +2,13 @@
 
 export type OrganizationId = string;
 
+/** Converts `OrganizationId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OrganizationIdSerializer = {
-  _fromJsonObject(object: any): OrganizationId {
-    return object;
+  parse(json: any): OrganizationId {
+    return json;
   },
 
-  _toJsonObject(self: OrganizationId): any {
-    return self;
+  serialize(value: OrganizationId): any {
+    return value;
   },
 };

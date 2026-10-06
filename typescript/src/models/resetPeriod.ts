@@ -2,20 +2,20 @@
 import {
   type BillingCycleResetPeriod,
   BillingCycleResetPeriodSerializer,
-} from "./billingCycleResetPeriod";
+} from "./billingCycleResetPeriod.js";
 import {
   type CalendarResetPeriod,
   CalendarResetPeriodSerializer,
-} from "./calendarResetPeriod";
+} from "./calendarResetPeriod.js";
 import {
   type FixedWindowResetPeriod,
   FixedWindowResetPeriodSerializer,
-} from "./fixedWindowResetPeriod";
-import { type NeverResetPeriod, NeverResetPeriodSerializer } from "./neverResetPeriod";
+} from "./fixedWindowResetPeriod.js";
+import { type NeverResetPeriod, NeverResetPeriodSerializer } from "./neverResetPeriod.js";
 import {
   type SlidingWindowResetPeriod,
   SlidingWindowResetPeriodSerializer,
-} from "./slidingWindowResetPeriod";
+} from "./slidingWindowResetPeriod.js";
 
 export interface ResetPeriodBillingCycle extends BillingCycleResetPeriod {
   type: "BILLING_CYCLE";
@@ -40,70 +40,70 @@ export type ResetPeriod =
   | ResetPeriodSlidingWindow
   | ResetPeriodNever;
 
+/** Converts `ResetPeriod` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ResetPeriodSerializer = {
-  _fromJsonObject(object: any): ResetPeriod {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): ResetPeriod {
+    switch (json["type"]) {
       case "BILLING_CYCLE":
         return {
-          ...BillingCycleResetPeriodSerializer._fromJsonObject(object),
+          ...BillingCycleResetPeriodSerializer.parse(json),
           type: "BILLING_CYCLE",
         };
       case "CALENDAR":
         return {
-          ...CalendarResetPeriodSerializer._fromJsonObject(object),
+          ...CalendarResetPeriodSerializer.parse(json),
           type: "CALENDAR",
         };
       case "FIXED_WINDOW":
         return {
-          ...FixedWindowResetPeriodSerializer._fromJsonObject(object),
+          ...FixedWindowResetPeriodSerializer.parse(json),
           type: "FIXED_WINDOW",
         };
       case "SLIDING_WINDOW":
         return {
-          ...SlidingWindowResetPeriodSerializer._fromJsonObject(object),
+          ...SlidingWindowResetPeriodSerializer.parse(json),
           type: "SLIDING_WINDOW",
         };
       case "NEVER":
         return {
-          ...NeverResetPeriodSerializer._fromJsonObject(object),
+          ...NeverResetPeriodSerializer.parse(json),
           type: "NEVER",
         };
       default:
-        throw new Error(`Unexpected type for ResetPeriod: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: ResetPeriod): any {
-    switch (self.type) {
+  serialize(value: ResetPeriod): any {
+    switch (value.type) {
       case "BILLING_CYCLE":
         return {
-          ...BillingCycleResetPeriodSerializer._toJsonObject(self),
+          ...BillingCycleResetPeriodSerializer.serialize(value),
           type: "BILLING_CYCLE",
         };
       case "CALENDAR":
         return {
-          ...CalendarResetPeriodSerializer._toJsonObject(self),
+          ...CalendarResetPeriodSerializer.serialize(value),
           type: "CALENDAR",
         };
       case "FIXED_WINDOW":
         return {
-          ...FixedWindowResetPeriodSerializer._toJsonObject(self),
+          ...FixedWindowResetPeriodSerializer.serialize(value),
           type: "FIXED_WINDOW",
         };
       case "SLIDING_WINDOW":
         return {
-          ...SlidingWindowResetPeriodSerializer._toJsonObject(self),
+          ...SlidingWindowResetPeriodSerializer.serialize(value),
           type: "SLIDING_WINDOW",
         };
       case "NEVER":
         return {
-          ...NeverResetPeriodSerializer._toJsonObject(self),
+          ...NeverResetPeriodSerializer.serialize(value),
           type: "NEVER",
         };
       default:
-        throw new Error(`Unexpected type for ResetPeriod`);
+        return value;
     }
   },
 };

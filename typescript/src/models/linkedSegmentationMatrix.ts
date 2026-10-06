@@ -1,34 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface LinkedSegmentationMatrix {
   dimension1Key: string;
-
   dimension2Key: string;
-
   values: { [key: string]: string[] };
 }
 
+/** Converts `LinkedSegmentationMatrix` values from (`parse`) and to (`serialize`) their JSON form. */
 export const LinkedSegmentationMatrixSerializer = {
-  _fromJsonObject(object: any): LinkedSegmentationMatrix {
+  parse(json: any): LinkedSegmentationMatrix {
     return {
-      dimension1Key: object["dimension1_key"],
-      dimension2Key: object["dimension2_key"],
-      values: Object.fromEntries(
-        Object.entries(object["values"]).map((entry: [string, any]) => [
-          entry[0],
-          entry[1],
-        ])
-      ),
+      ...extraProperties(json, ["dimension1_key", "dimension2_key", "values"]),
+      dimension1Key: json["dimension1_key"],
+      dimension2Key: json["dimension2_key"],
+      values: json["values"],
     };
   },
 
-  _toJsonObject(self: LinkedSegmentationMatrix): any {
+  serialize(value: LinkedSegmentationMatrix): any {
     return {
-      dimension1_key: self.dimension1Key,
-      dimension2_key: self.dimension2Key,
-      values: Object.fromEntries(
-        Object.entries(self.values).map((entry: [string, any]) => [entry[0], entry[1]])
-      ),
+      ...extraProperties(value, ["dimension1Key", "dimension2Key", "values"]),
+      dimension1_key: value.dimension1Key,
+      dimension2_key: value.dimension2Key,
+      values: value.values,
     };
   },
 };

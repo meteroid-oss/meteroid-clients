@@ -1,8 +1,12 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class BillingMetricAggregateEnum(str, enum.Enum):
+class BillingMetricAggregateEnum(StrEnum):
+    """The values of `BillingMetricAggregateEnum`; others are kept as received."""
+
     COUNT = "COUNT"
     LATEST = "LATEST"
     MAX = "MAX"
@@ -11,5 +15,8 @@ class BillingMetricAggregateEnum(str, enum.Enum):
     SUM = "SUM"
     COUNT_DISTINCT = "COUNT_DISTINCT"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+BillingMetricAggregateEnumLiteral: t.TypeAlias = t.Literal[
+    "COUNT", "LATEST", "MAX", "MIN", "MEAN", "SUM", "COUNT_DISTINCT"
+]
+"""The values of :class:`BillingMetricAggregateEnum`, which arguments take as plain strings too."""

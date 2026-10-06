@@ -9,24 +9,25 @@ use super::{
     tax_breakdown_item::TaxBreakdownItem, transaction::Transaction,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Invoice {
-    pub amount_due: i32,
+    pub amount_due: i64,
 
-    pub applied_credits: i32,
+    pub applied_credits: i64,
 
     /// The period/moment this invoice is about — the subscription period start, or the invoice's
     /// own date for manual/one-off. Stable and always present, distinct from `invoice_date` (the
     /// emission date). Shown as "Invoice date".
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub billing_period_start: Option<String>,
+    pub billing_period_start: Option<chrono::NaiveDate>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub child_invoice_id: Option<InvoiceId>,
 
     pub coupons: Vec<CouponLineItem>,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     pub currency: Currency,
 
@@ -38,17 +39,17 @@ pub struct Invoice {
     pub customer_id: CustomerId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub due_date: Option<String>,
+    pub due_date: Option<chrono::NaiveDate>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub einvoicing_status: Option<EInvoicingStatus>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub finalized_at: Option<String>,
+    pub finalized_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub id: InvoiceId,
 
-    pub invoice_date: String,
+    pub invoice_date: chrono::NaiveDate,
 
     pub invoice_number: String,
 
@@ -57,7 +58,7 @@ pub struct Invoice {
     pub line_items: Vec<InvoiceLineItem>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub marked_as_uncollectible_at: Option<String>,
+    pub marked_as_uncollectible_at: Option<chrono::DateTime<chrono::Utc>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub memo: Option<String>,
@@ -65,7 +66,7 @@ pub struct Invoice {
     pub net_terms: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub paid_at: Option<String>,
+    pub paid_at: Option<chrono::DateTime<chrono::Utc>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_invoice_id: Option<InvoiceId>,
@@ -83,48 +84,54 @@ pub struct Invoice {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<SubscriptionId>,
 
-    pub subtotal: i32,
+    pub subtotal: i64,
 
-    pub subtotal_recurring: i32,
+    pub subtotal_recurring: i64,
 
-    pub tax_amount: i32,
+    pub tax_amount: i64,
 
     pub tax_breakdown: Vec<TaxBreakdownItem>,
 
-    pub total: i32,
+    pub total: i64,
 
     pub transactions: Vec<Transaction>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<String>,
+    pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub voided_at: Option<String>,
+    pub voided_at: Option<chrono::DateTime<chrono::Utc>>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Invoice {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
-        amount_due: i32,
-        applied_credits: i32,
+        amount_due: i64,
+        applied_credits: i64,
         coupons: Vec<CouponLineItem>,
-        created_at: String,
+        created_at: chrono::DateTime<chrono::Utc>,
         currency: Currency,
         custom_properties: serde_json::Value,
         customer_details: CustomerDetails,
         customer_id: CustomerId,
         id: InvoiceId,
-        invoice_date: String,
-        invoice_number: String,
+        invoice_date: chrono::NaiveDate,
+        invoice_number: impl Into<String>,
         invoice_type: InvoiceType,
         line_items: Vec<InvoiceLineItem>,
         net_terms: i32,
         payment_status: InvoicePaymentStatus,
         status: InvoiceStatus,
-        subtotal: i32,
-        subtotal_recurring: i32,
-        tax_amount: i32,
+        subtotal: i64,
+        subtotal_recurring: i64,
+        tax_amount: i64,
         tax_breakdown: Vec<TaxBreakdownItem>,
-        total: i32,
+        total: i64,
         transactions: Vec<Transaction>,
     ) -> Self {
         Self {
@@ -143,7 +150,7 @@ impl Invoice {
             finalized_at: None,
             id,
             invoice_date,
-            invoice_number,
+            invoice_number: invoice_number.into(),
             invoice_type,
             line_items,
             marked_as_uncollectible_at: None,
@@ -164,6 +171,7 @@ impl Invoice {
             transactions,
             updated_at: None,
             voided_at: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

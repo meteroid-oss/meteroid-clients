@@ -1,190 +1,390 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CustomerDetails {
-    @JsonProperty private String alias;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CustomerDetails {
+    @JsonProperty("alias")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> alias = JsonField.missing();
 
     @JsonProperty("billing_address")
-    private Address billingAddress;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<Address> billingAddress = JsonField.missing();
 
-    @JsonProperty private String email;
-    @JsonProperty private String id;
-    @JsonProperty private String name;
+    @JsonProperty("email")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> email = JsonField.missing();
+
+    @JsonProperty("id")
+    private String id;
+
+    @JsonProperty("name")
+    private String name;
 
     @JsonProperty("snapshot_at")
     private OffsetDateTime snapshotAt;
 
     @JsonProperty("vat_number")
-    private String vatNumber;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> vatNumber = JsonField.missing();
 
-    public CustomerDetails() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public CustomerDetails alias(String alias) {
-        this.alias = alias;
-        return this;
+    private CustomerDetails() {}
+
+    private CustomerDetails(Builder builder) {
+        this.alias = builder.alias;
+        this.billingAddress = builder.billingAddress;
+        this.email = builder.email;
+        this.id = builder.id;
+        this.name = builder.name;
+        this.snapshotAt = builder.snapshotAt;
+        this.vatNumber = builder.vatNumber;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get alias
+     * A builder of {@code CustomerDetails}.
      *
-     * @return alias
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public CustomerDetails billingAddress(Address billingAddress) {
-        this.billingAddress = billingAddress;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get billingAddress
+     * A builder starting from this value.
      *
-     * @return billingAddress
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public Address getBillingAddress() {
-        return billingAddress;
-    }
-
-    public void setBillingAddress(Address billingAddress) {
-        this.billingAddress = billingAddress;
-    }
-
-    public CustomerDetails email(String email) {
-        this.email = email;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.alias = alias;
+        builder.billingAddress = billingAddress;
+        builder.email = email;
+        builder.id = id;
+        builder.name = name;
+        builder.snapshotAt = snapshotAt;
+        builder.vatNumber = vatNumber;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get email
+     * The {@code alias} property.
      *
-     * @return email
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public CustomerDetails id(String id) {
-        this.id = id;
-        return this;
+    public Optional<String> alias() {
+        return alias.asOptional();
     }
 
     /**
-     * Get id
+     * The {@code billing_address} property.
      *
-     * @return id
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public CustomerDetails name(String name) {
-        this.name = name;
-        return this;
+    public Optional<Address> billingAddress() {
+        return billingAddress.asOptional();
     }
 
     /**
-     * Get name
+     * The {@code email} property.
      *
-     * @return name
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public CustomerDetails snapshotAt(OffsetDateTime snapshotAt) {
-        this.snapshotAt = snapshotAt;
-        return this;
+    public Optional<String> email() {
+        return email.asOptional();
     }
 
     /**
-     * Get snapshotAt
+     * The {@code id} property.
      *
-     * @return snapshotAt
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public OffsetDateTime getSnapshotAt() {
-        return snapshotAt;
-    }
-
-    public void setSnapshotAt(OffsetDateTime snapshotAt) {
-        this.snapshotAt = snapshotAt;
-    }
-
-    public CustomerDetails vatNumber(String vatNumber) {
-        this.vatNumber = vatNumber;
-        return this;
+    public String id() {
+        return Utils.required(id, "id");
     }
 
     /**
-     * Get vatNumber
+     * The {@code name} property.
      *
-     * @return vatNumber
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getVatNumber() {
-        return vatNumber;
-    }
-
-    public void setVatNumber(String vatNumber) {
-        this.vatNumber = vatNumber;
+    public String name() {
+        return Utils.required(name, "name");
     }
 
     /**
-     * Create an instance of CustomerDetails given an JSON string
+     * The {@code snapshot_at} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of CustomerDetails
-     * @throws JsonProcessingException if the JSON string is invalid with respect to CustomerDetails
+     * @return the value, never null
      */
-    public static CustomerDetails fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CustomerDetails.class);
+    public OffsetDateTime snapshotAt() {
+        return Utils.required(snapshotAt, "snapshot_at");
     }
 
     /**
-     * Convert an instance of CustomerDetails to an JSON string
+     * The {@code vat_number} property.
      *
-     * @return JSON string
+     * @return the value, empty when unset or null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Optional<String> vatNumber() {
+        return vatNumber.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CustomerDetails that = (CustomerDetails) o;
+        return Objects.equals(alias, that.alias)
+                && Objects.equals(billingAddress, that.billingAddress)
+                && Objects.equals(email, that.email)
+                && Objects.equals(id, that.id)
+                && Objects.equals(name, that.name)
+                && Objects.equals(snapshotAt, that.snapshotAt)
+                && Objects.equals(vatNumber, that.vatNumber)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                alias,
+                billingAddress,
+                email,
+                id,
+                name,
+                snapshotAt,
+                vatNumber,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerDetails{"
+                + "alias="
+                + alias
+                + ", billingAddress="
+                + billingAddress
+                + ", email="
+                + email
+                + ", id="
+                + id
+                + ", name="
+                + name
+                + ", snapshotAt="
+                + snapshotAt
+                + ", vatNumber="
+                + vatNumber
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CustomerDetails}. */
+    public static final class Builder {
+        private JsonField<String> alias = JsonField.missing();
+        private JsonField<Address> billingAddress = JsonField.missing();
+        private JsonField<String> email = JsonField.missing();
+        private String id;
+        private String name;
+        private OffsetDateTime snapshotAt;
+        private JsonField<String> vatNumber = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code alias} property.
+         *
+         * @param alias the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder alias(String alias) {
+            this.alias = JsonField.ofNullable(alias);
+            return this;
+        }
+
+        /**
+         * The {@code billing_address} property.
+         *
+         * @param billingAddress the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder billingAddress(Address billingAddress) {
+            this.billingAddress = JsonField.ofNullable(billingAddress);
+            return this;
+        }
+
+        /**
+         * The {@code email} property.
+         *
+         * @param email the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder email(String email) {
+            this.email = JsonField.ofNullable(email);
+            return this;
+        }
+
+        /**
+         * The {@code id} property.
+         *
+         * @param id the value
+         * @return this builder
+         */
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code snapshot_at} property.
+         *
+         * @param snapshotAt the value
+         * @return this builder
+         */
+        public Builder snapshotAt(OffsetDateTime snapshotAt) {
+            this.snapshotAt = snapshotAt;
+            return this;
+        }
+
+        /**
+         * The {@code vat_number} property.
+         *
+         * @param vatNumber the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder vatNumber(String vatNumber) {
+            this.vatNumber = JsonField.ofNullable(vatNumber);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CustomerDetails}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CustomerDetails build() {
+            Utils.checkRequired(id, "id");
+            Utils.checkRequired(name, "name");
+            Utils.checkRequired(snapshotAt, "snapshot_at");
+            return new CustomerDetails(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code CustomerDetails}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static CustomerDetails fromJson(String json) {
+        return Utils.parse(json, CustomerDetails.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

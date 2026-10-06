@@ -1,51 +1,66 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type PlanId, PlanIdSerializer } from "./planId";
-import { type PlanStatusEnum, PlanStatusEnumSerializer } from "./planStatusEnum";
-import { type PlanTypeEnum, PlanTypeEnumSerializer } from "./planTypeEnum";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type PlanId, PlanIdSerializer } from "./planId.js";
+import { type PlanStatusEnum, PlanStatusEnumSerializer } from "./planStatusEnum.js";
+import { type PlanTypeEnum, PlanTypeEnumSerializer } from "./planTypeEnum.js";
 
 export interface PlanEventData {
   createdAt: Date;
-
   currency: string;
-
-  description?: string | null;
-
+  description?: string | null | undefined;
   name: string;
-
   planId: PlanId;
-
   planType: PlanTypeEnum;
-
   status: PlanStatusEnum;
-
   version: number;
 }
 
+/** Converts `PlanEventData` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PlanEventDataSerializer = {
-  _fromJsonObject(object: any): PlanEventData {
+  parse(json: any): PlanEventData {
     return {
-      createdAt: parseDateTime(object["created_at"]),
-      currency: object["currency"],
-      description: object["description"],
-      name: object["name"],
-      planId: PlanIdSerializer._fromJsonObject(object["plan_id"]),
-      planType: PlanTypeEnumSerializer._fromJsonObject(object["plan_type"]),
-      status: PlanStatusEnumSerializer._fromJsonObject(object["status"]),
-      version: object["version"],
+      ...extraProperties(json, [
+        "created_at",
+        "currency",
+        "description",
+        "name",
+        "plan_id",
+        "plan_type",
+        "status",
+        "version",
+      ]),
+      createdAt: parseDateTime(json["created_at"]),
+      currency: json["currency"],
+      description: json["description"],
+      name: json["name"],
+      planId: PlanIdSerializer.parse(json["plan_id"]),
+      planType: PlanTypeEnumSerializer.parse(json["plan_type"]),
+      status: PlanStatusEnumSerializer.parse(json["status"]),
+      version: json["version"],
     };
   },
 
-  _toJsonObject(self: PlanEventData): any {
+  serialize(value: PlanEventData): any {
     return {
-      created_at: self.createdAt,
-      currency: self.currency,
-      description: self.description,
-      name: self.name,
-      plan_id: PlanIdSerializer._toJsonObject(self.planId),
-      plan_type: PlanTypeEnumSerializer._toJsonObject(self.planType),
-      status: PlanStatusEnumSerializer._toJsonObject(self.status),
-      version: self.version,
+      ...extraProperties(value, [
+        "createdAt",
+        "currency",
+        "description",
+        "name",
+        "planId",
+        "planType",
+        "status",
+        "version",
+      ]),
+      created_at: value.createdAt,
+      currency: value.currency,
+      description: value.description,
+      name: value.name,
+      plan_id: PlanIdSerializer.serialize(value.planId),
+      plan_type: PlanTypeEnumSerializer.serialize(value.planType),
+      status: PlanStatusEnumSerializer.serialize(value.status),
+      version: value.version,
     };
   },
 };

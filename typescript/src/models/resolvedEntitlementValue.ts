@@ -2,15 +2,15 @@
 import {
   type BooleanResolvedEntitlementValue,
   BooleanResolvedEntitlementValueSerializer,
-} from "./booleanResolvedEntitlementValue";
+} from "./booleanResolvedEntitlementValue.js";
 import {
   type ConfigResolvedEntitlementValue,
   ConfigResolvedEntitlementValueSerializer,
-} from "./configResolvedEntitlementValue";
+} from "./configResolvedEntitlementValue.js";
 import {
   type MeteredResolvedEntitlementValue,
   MeteredResolvedEntitlementValueSerializer,
-} from "./meteredResolvedEntitlementValue";
+} from "./meteredResolvedEntitlementValue.js";
 
 export interface ResolvedEntitlementValueBoolean extends BooleanResolvedEntitlementValue {
   type: "BOOLEAN";
@@ -27,50 +27,50 @@ export type ResolvedEntitlementValue =
   | ResolvedEntitlementValueMetered
   | ResolvedEntitlementValueConfig;
 
+/** Converts `ResolvedEntitlementValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ResolvedEntitlementValueSerializer = {
-  _fromJsonObject(object: any): ResolvedEntitlementValue {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): ResolvedEntitlementValue {
+    switch (json["type"]) {
       case "BOOLEAN":
         return {
-          ...BooleanResolvedEntitlementValueSerializer._fromJsonObject(object),
+          ...BooleanResolvedEntitlementValueSerializer.parse(json),
           type: "BOOLEAN",
         };
       case "METERED":
         return {
-          ...MeteredResolvedEntitlementValueSerializer._fromJsonObject(object),
+          ...MeteredResolvedEntitlementValueSerializer.parse(json),
           type: "METERED",
         };
       case "CONFIG":
         return {
-          ...ConfigResolvedEntitlementValueSerializer._fromJsonObject(object),
+          ...ConfigResolvedEntitlementValueSerializer.parse(json),
           type: "CONFIG",
         };
       default:
-        throw new Error(`Unexpected type for ResolvedEntitlementValue: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: ResolvedEntitlementValue): any {
-    switch (self.type) {
+  serialize(value: ResolvedEntitlementValue): any {
+    switch (value.type) {
       case "BOOLEAN":
         return {
-          ...BooleanResolvedEntitlementValueSerializer._toJsonObject(self),
+          ...BooleanResolvedEntitlementValueSerializer.serialize(value),
           type: "BOOLEAN",
         };
       case "METERED":
         return {
-          ...MeteredResolvedEntitlementValueSerializer._toJsonObject(self),
+          ...MeteredResolvedEntitlementValueSerializer.serialize(value),
           type: "METERED",
         };
       case "CONFIG":
         return {
-          ...ConfigResolvedEntitlementValueSerializer._toJsonObject(self),
+          ...ConfigResolvedEntitlementValueSerializer.serialize(value),
           type: "CONFIG",
         };
       default:
-        throw new Error(`Unexpected type for ResolvedEntitlementValue`);
+        return value;
     }
   },
 };

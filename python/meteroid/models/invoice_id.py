@@ -1,2 +1,4 @@
 # this file is @generated
-InvoiceId = str
+import typing as t
+
+InvoiceId: t.TypeAlias = str

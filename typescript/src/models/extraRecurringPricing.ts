@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface ExtraRecurringPricing {
   quantity: number;
-
   unitPrice: string;
 }
 
+/** Converts `ExtraRecurringPricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ExtraRecurringPricingSerializer = {
-  _fromJsonObject(object: any): ExtraRecurringPricing {
+  parse(json: any): ExtraRecurringPricing {
     return {
-      quantity: object["quantity"],
-      unitPrice: object["unit_price"],
+      ...extraProperties(json, ["quantity", "unit_price"]),
+      quantity: json["quantity"],
+      unitPrice: json["unit_price"],
     };
   },
 
-  _toJsonObject(self: ExtraRecurringPricing): any {
+  serialize(value: ExtraRecurringPricing): any {
     return {
-      quantity: self.quantity,
-      unit_price: self.unitPrice,
+      ...extraProperties(value, ["quantity", "unitPrice"]),
+      quantity: value.quantity,
+      unit_price: value.unitPrice,
     };
   },
 };

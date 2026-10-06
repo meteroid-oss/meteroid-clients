@@ -1,229 +1,271 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
 import {
   type AppliedCouponDetailed,
   AppliedCouponDetailedSerializer,
-} from "./appliedCouponDetailed";
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
-import { type Currency, CurrencySerializer } from "./currency";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
-import { type Entitlement, EntitlementSerializer } from "./entitlement";
-import { type MinimumCommitment, MinimumCommitmentSerializer } from "./minimumCommitment";
+} from "./appliedCouponDetailed.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
+import { type Currency, CurrencySerializer } from "./currency.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
+import { type Entitlement, EntitlementSerializer } from "./entitlement.js";
+import {
+  type MinimumCommitment,
+  MinimumCommitmentSerializer,
+} from "./minimumCommitment.js";
 import {
   type PaymentMethodsConfig,
   PaymentMethodsConfigSerializer,
-} from "./paymentMethodsConfig";
-import { type PlanId, PlanIdSerializer } from "./planId";
-import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId";
-import { type SubscriptionAddOn, SubscriptionAddOnSerializer } from "./subscriptionAddOn";
+} from "./paymentMethodsConfig.js";
+import { type PlanId, PlanIdSerializer } from "./planId.js";
+import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId.js";
+import {
+  type SubscriptionAddOn,
+  SubscriptionAddOnSerializer,
+} from "./subscriptionAddOn.js";
 import {
   type SubscriptionComponent,
   SubscriptionComponentSerializer,
-} from "./subscriptionComponent";
-import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
+} from "./subscriptionComponent.js";
+import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId.js";
 import {
   type SubscriptionStatusEnum,
   SubscriptionStatusEnumSerializer,
-} from "./subscriptionStatusEnum";
+} from "./subscriptionStatusEnum.js";
 
 export interface SubscriptionDetails {
   /** When the subscription was activated (first payment or activation condition met) */
-  activatedAt?: Date | null;
-
+  activatedAt?: Date | null | undefined;
   addOns: SubscriptionAddOn[];
-
   appliedCoupons: AppliedCouponDetailed[];
-
   autoAdvanceInvoices: boolean;
-
   billingDayAnchor: number;
-
   /** When billing started (after any trial period) */
-  billingStartDate?: string | null;
-
+  billingStartDate?: string | null | undefined;
   chargeAutomatically: boolean;
-
-  checkoutUrl?: string | null;
-
+  checkoutUrl?: string | null | undefined;
   components: SubscriptionComponent[];
-
   /** When the subscription was created */
   createdAt: Date;
-
   currency: Currency;
-
   /** Current billing period end date */
-  currentPeriodEnd?: string | null;
-
+  currentPeriodEnd?: string | null | undefined;
   /** Current billing period start date */
   currentPeriodStart: string;
-
   /** User-defined custom property values, keyed by definition `key`. */
   customProperties: unknown;
-
-  customerAlias?: string | null;
-
+  customerAlias?: string | null | undefined;
   customerId: CustomerId;
-
   customerName: string;
-
   /** When the subscription ends (if set) */
-  endDate?: string | null;
-
-  entitlements?: Entitlement[];
-
+  endDate?: string | null | undefined;
+  entitlements?: Entitlement[] | undefined;
   id: SubscriptionId;
-
   /** Default memo for invoices */
-  invoiceMemo?: string | null;
-
-  minimumCommitment?: MinimumCommitment | null;
-
+  invoiceMemo?: string | null | undefined;
+  minimumCommitment?: MinimumCommitment | null | undefined;
   /** Monthly recurring revenue in cents */
   mrrCents: number;
-
   /** Payment terms in days (0 = due on issue) */
   netTerms: number;
-
-  paymentMethodsConfig?: PaymentMethodsConfig | null;
-
+  paymentMethodsConfig?: PaymentMethodsConfig | null | undefined;
   /** Billing period (monthly, annual, etc.) */
   period: BillingPeriodEnum;
-
   planId: PlanId;
-
   planName: string;
-
   planVersion: number;
-
   planVersionId: PlanVersionId;
-
-  purchaseOrder?: string | null;
-
+  purchaseOrder?: string | null | undefined;
   /** When the subscription contract starts (benefits apply from this date) */
   startDate: string;
-
   status: SubscriptionStatusEnum;
-
   /** Trial duration in days */
-  trialDuration?: number | null;
+  trialDuration?: number | null | undefined;
 }
 
+/** Converts `SubscriptionDetails` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionDetailsSerializer = {
-  _fromJsonObject(object: any): SubscriptionDetails {
+  parse(json: any): SubscriptionDetails {
     return {
+      ...extraProperties(json, [
+        "activated_at",
+        "add_ons",
+        "applied_coupons",
+        "auto_advance_invoices",
+        "billing_day_anchor",
+        "billing_start_date",
+        "charge_automatically",
+        "checkout_url",
+        "components",
+        "created_at",
+        "currency",
+        "current_period_end",
+        "current_period_start",
+        "custom_properties",
+        "customer_alias",
+        "customer_id",
+        "customer_name",
+        "end_date",
+        "entitlements",
+        "id",
+        "invoice_memo",
+        "minimum_commitment",
+        "mrr_cents",
+        "net_terms",
+        "payment_methods_config",
+        "period",
+        "plan_id",
+        "plan_name",
+        "plan_version",
+        "plan_version_id",
+        "purchase_order",
+        "start_date",
+        "status",
+        "trial_duration",
+      ]),
       activatedAt:
-        object["activated_at"] != null
-          ? parseDateTime(object["activated_at"])
-          : undefined,
-      addOns: object["add_ons"].map((item: any) =>
-        SubscriptionAddOnSerializer._fromJsonObject(item)
+        json["activated_at"] != null
+          ? parseDateTime(json["activated_at"])
+          : json["activated_at"],
+      addOns: json["add_ons"].map((item: any) => SubscriptionAddOnSerializer.parse(item)),
+      appliedCoupons: json["applied_coupons"].map((item: any) =>
+        AppliedCouponDetailedSerializer.parse(item)
       ),
-      appliedCoupons: object["applied_coupons"].map((item: any) =>
-        AppliedCouponDetailedSerializer._fromJsonObject(item)
+      autoAdvanceInvoices: json["auto_advance_invoices"],
+      billingDayAnchor: json["billing_day_anchor"],
+      billingStartDate: json["billing_start_date"],
+      chargeAutomatically: json["charge_automatically"],
+      checkoutUrl: json["checkout_url"],
+      components: json["components"].map((item: any) =>
+        SubscriptionComponentSerializer.parse(item)
       ),
-      autoAdvanceInvoices: object["auto_advance_invoices"],
-      billingDayAnchor: object["billing_day_anchor"],
-      billingStartDate: object["billing_start_date"],
-      chargeAutomatically: object["charge_automatically"],
-      checkoutUrl: object["checkout_url"],
-      components: object["components"].map((item: any) =>
-        SubscriptionComponentSerializer._fromJsonObject(item)
-      ),
-      createdAt: parseDateTime(object["created_at"]),
-      currency: CurrencySerializer._fromJsonObject(object["currency"]),
-      currentPeriodEnd: object["current_period_end"],
-      currentPeriodStart: object["current_period_start"],
-      customProperties: object["custom_properties"],
-      customerAlias: object["customer_alias"],
-      customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
-      customerName: object["customer_name"],
-      endDate: object["end_date"],
+      createdAt: parseDateTime(json["created_at"]),
+      currency: CurrencySerializer.parse(json["currency"]),
+      currentPeriodEnd: json["current_period_end"],
+      currentPeriodStart: json["current_period_start"],
+      customProperties: json["custom_properties"],
+      customerAlias: json["customer_alias"],
+      customerId: CustomerIdSerializer.parse(json["customer_id"]),
+      customerName: json["customer_name"],
+      endDate: json["end_date"],
       entitlements:
-        object["entitlements"] != null
-          ? object["entitlements"].map((item: any) =>
-              EntitlementSerializer._fromJsonObject(item)
-            )
+        json["entitlements"] != null
+          ? json["entitlements"].map((item: any) => EntitlementSerializer.parse(item))
           : undefined,
-      id: SubscriptionIdSerializer._fromJsonObject(object["id"]),
-      invoiceMemo: object["invoice_memo"],
+      id: SubscriptionIdSerializer.parse(json["id"]),
+      invoiceMemo: json["invoice_memo"],
       minimumCommitment:
-        object["minimum_commitment"] != null
-          ? MinimumCommitmentSerializer._fromJsonObject(object["minimum_commitment"])
-          : undefined,
-      mrrCents: object["mrr_cents"],
-      netTerms: object["net_terms"],
+        json["minimum_commitment"] != null
+          ? MinimumCommitmentSerializer.parse(json["minimum_commitment"])
+          : json["minimum_commitment"],
+      mrrCents: json["mrr_cents"],
+      netTerms: json["net_terms"],
       paymentMethodsConfig:
-        object["payment_methods_config"] != null
-          ? PaymentMethodsConfigSerializer._fromJsonObject(
-              object["payment_methods_config"]
-            )
-          : undefined,
-      period: BillingPeriodEnumSerializer._fromJsonObject(object["period"]),
-      planId: PlanIdSerializer._fromJsonObject(object["plan_id"]),
-      planName: object["plan_name"],
-      planVersion: object["plan_version"],
-      planVersionId: PlanVersionIdSerializer._fromJsonObject(object["plan_version_id"]),
-      purchaseOrder: object["purchase_order"],
-      startDate: object["start_date"],
-      status: SubscriptionStatusEnumSerializer._fromJsonObject(object["status"]),
-      trialDuration: object["trial_duration"],
+        json["payment_methods_config"] != null
+          ? PaymentMethodsConfigSerializer.parse(json["payment_methods_config"])
+          : json["payment_methods_config"],
+      period: BillingPeriodEnumSerializer.parse(json["period"]),
+      planId: PlanIdSerializer.parse(json["plan_id"]),
+      planName: json["plan_name"],
+      planVersion: json["plan_version"],
+      planVersionId: PlanVersionIdSerializer.parse(json["plan_version_id"]),
+      purchaseOrder: json["purchase_order"],
+      startDate: json["start_date"],
+      status: SubscriptionStatusEnumSerializer.parse(json["status"]),
+      trialDuration: json["trial_duration"],
     };
   },
 
-  _toJsonObject(self: SubscriptionDetails): any {
+  serialize(value: SubscriptionDetails): any {
     return {
-      activated_at: self.activatedAt,
-      add_ons: self.addOns.map((item: any) =>
-        SubscriptionAddOnSerializer._toJsonObject(item)
+      ...extraProperties(value, [
+        "activatedAt",
+        "addOns",
+        "appliedCoupons",
+        "autoAdvanceInvoices",
+        "billingDayAnchor",
+        "billingStartDate",
+        "chargeAutomatically",
+        "checkoutUrl",
+        "components",
+        "createdAt",
+        "currency",
+        "currentPeriodEnd",
+        "currentPeriodStart",
+        "customProperties",
+        "customerAlias",
+        "customerId",
+        "customerName",
+        "endDate",
+        "entitlements",
+        "id",
+        "invoiceMemo",
+        "minimumCommitment",
+        "mrrCents",
+        "netTerms",
+        "paymentMethodsConfig",
+        "period",
+        "planId",
+        "planName",
+        "planVersion",
+        "planVersionId",
+        "purchaseOrder",
+        "startDate",
+        "status",
+        "trialDuration",
+      ]),
+      activated_at: value.activatedAt,
+      add_ons: value.addOns.map((item: any) =>
+        SubscriptionAddOnSerializer.serialize(item)
       ),
-      applied_coupons: self.appliedCoupons.map((item: any) =>
-        AppliedCouponDetailedSerializer._toJsonObject(item)
+      applied_coupons: value.appliedCoupons.map((item: any) =>
+        AppliedCouponDetailedSerializer.serialize(item)
       ),
-      auto_advance_invoices: self.autoAdvanceInvoices,
-      billing_day_anchor: self.billingDayAnchor,
-      billing_start_date: self.billingStartDate,
-      charge_automatically: self.chargeAutomatically,
-      checkout_url: self.checkoutUrl,
-      components: self.components.map((item: any) =>
-        SubscriptionComponentSerializer._toJsonObject(item)
+      auto_advance_invoices: value.autoAdvanceInvoices,
+      billing_day_anchor: value.billingDayAnchor,
+      billing_start_date: value.billingStartDate,
+      charge_automatically: value.chargeAutomatically,
+      checkout_url: value.checkoutUrl,
+      components: value.components.map((item: any) =>
+        SubscriptionComponentSerializer.serialize(item)
       ),
-      created_at: self.createdAt,
-      currency: CurrencySerializer._toJsonObject(self.currency),
-      current_period_end: self.currentPeriodEnd,
-      current_period_start: self.currentPeriodStart,
-      custom_properties: self.customProperties,
-      customer_alias: self.customerAlias,
-      customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
-      customer_name: self.customerName,
-      end_date: self.endDate,
+      created_at: value.createdAt,
+      currency: CurrencySerializer.serialize(value.currency),
+      current_period_end: value.currentPeriodEnd,
+      current_period_start: value.currentPeriodStart,
+      custom_properties: value.customProperties,
+      customer_alias: value.customerAlias,
+      customer_id: CustomerIdSerializer.serialize(value.customerId),
+      customer_name: value.customerName,
+      end_date: value.endDate,
       entitlements:
-        self.entitlements != null
-          ? self.entitlements.map((item: any) =>
-              EntitlementSerializer._toJsonObject(item)
-            )
+        value.entitlements != null
+          ? value.entitlements.map((item: any) => EntitlementSerializer.serialize(item))
           : undefined,
-      id: SubscriptionIdSerializer._toJsonObject(self.id),
-      invoice_memo: self.invoiceMemo,
+      id: SubscriptionIdSerializer.serialize(value.id),
+      invoice_memo: value.invoiceMemo,
       minimum_commitment:
-        self.minimumCommitment != null
-          ? MinimumCommitmentSerializer._toJsonObject(self.minimumCommitment)
-          : undefined,
-      mrr_cents: self.mrrCents,
-      net_terms: self.netTerms,
+        value.minimumCommitment != null
+          ? MinimumCommitmentSerializer.serialize(value.minimumCommitment)
+          : value.minimumCommitment,
+      mrr_cents: value.mrrCents,
+      net_terms: value.netTerms,
       payment_methods_config:
-        self.paymentMethodsConfig != null
-          ? PaymentMethodsConfigSerializer._toJsonObject(self.paymentMethodsConfig)
-          : undefined,
-      period: BillingPeriodEnumSerializer._toJsonObject(self.period),
-      plan_id: PlanIdSerializer._toJsonObject(self.planId),
-      plan_name: self.planName,
-      plan_version: self.planVersion,
-      plan_version_id: PlanVersionIdSerializer._toJsonObject(self.planVersionId),
-      purchase_order: self.purchaseOrder,
-      start_date: self.startDate,
-      status: SubscriptionStatusEnumSerializer._toJsonObject(self.status),
-      trial_duration: self.trialDuration,
+        value.paymentMethodsConfig != null
+          ? PaymentMethodsConfigSerializer.serialize(value.paymentMethodsConfig)
+          : value.paymentMethodsConfig,
+      period: BillingPeriodEnumSerializer.serialize(value.period),
+      plan_id: PlanIdSerializer.serialize(value.planId),
+      plan_name: value.planName,
+      plan_version: value.planVersion,
+      plan_version_id: PlanVersionIdSerializer.serialize(value.planVersionId),
+      purchase_order: value.purchaseOrder,
+      start_date: value.startDate,
+      status: SubscriptionStatusEnumSerializer.serialize(value.status),
+      trial_duration: value.trialDuration,
     };
   },
 };

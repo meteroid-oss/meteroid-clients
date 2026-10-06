@@ -1,19 +1,26 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
+from uuid import UUID
 
 from ..serialization import BaseModel
-from .batch_job_chunk_id import BatchJobChunkId
+
+if t.TYPE_CHECKING:
+    from .batch_job_chunk_id import BatchJobChunkId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class BatchJobItemFailureResponse(BaseModel):
+    """The `BatchJobItemFailureResponse` object."""
+
     chunk_id: BatchJobChunkId
 
-    id: str
+    id: UUID
 
     item_index: int
 
     reason: str
 
-    item_identifier: t.Optional[str] = None
+    item_identifier: str | None = None

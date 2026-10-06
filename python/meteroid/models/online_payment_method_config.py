@@ -1,11 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .online_methods_config import OnlineMethodsConfig
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .online_methods_config import OnlineMethodsConfig
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class OnlinePaymentMethodConfig(BaseModel):
-    config: t.Optional[OnlineMethodsConfig] = None
+    """The `OnlinePaymentMethodConfig` object."""
+
+    config: OnlineMethodsConfig | None | Unset = UNSET

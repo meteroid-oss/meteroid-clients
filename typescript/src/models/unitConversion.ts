@@ -1,27 +1,30 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type UnitConversionRoundingEnum,
   UnitConversionRoundingEnumSerializer,
-} from "./unitConversionRoundingEnum";
+} from "./unitConversionRoundingEnum.js";
 
 export interface UnitConversion {
   factor: number;
-
   rounding: UnitConversionRoundingEnum;
 }
 
+/** Converts `UnitConversion` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UnitConversionSerializer = {
-  _fromJsonObject(object: any): UnitConversion {
+  parse(json: any): UnitConversion {
     return {
-      factor: object["factor"],
-      rounding: UnitConversionRoundingEnumSerializer._fromJsonObject(object["rounding"]),
+      ...extraProperties(json, ["factor", "rounding"]),
+      factor: json["factor"],
+      rounding: UnitConversionRoundingEnumSerializer.parse(json["rounding"]),
     };
   },
 
-  _toJsonObject(self: UnitConversion): any {
+  serialize(value: UnitConversion): any {
     return {
-      factor: self.factor,
-      rounding: UnitConversionRoundingEnumSerializer._toJsonObject(self.rounding),
+      ...extraProperties(value, ["factor", "rounding"]),
+      factor: value.factor,
+      rounding: UnitConversionRoundingEnumSerializer.serialize(value.rounding),
     };
   },
 };

@@ -1,25 +1,28 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
-import { type UsageModelEnum, UsageModelEnumSerializer } from "./usageModelEnum";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
+import { type UsageModelEnum, UsageModelEnumSerializer } from "./usageModelEnum.js";
 
 export interface UsageFeeStructure {
   metricId: BillableMetricId;
-
   model: UsageModelEnum;
 }
 
+/** Converts `UsageFeeStructure` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UsageFeeStructureSerializer = {
-  _fromJsonObject(object: any): UsageFeeStructure {
+  parse(json: any): UsageFeeStructure {
     return {
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
-      model: UsageModelEnumSerializer._fromJsonObject(object["model"]),
+      ...extraProperties(json, ["metric_id", "model"]),
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
+      model: UsageModelEnumSerializer.parse(json["model"]),
     };
   },
 
-  _toJsonObject(self: UsageFeeStructure): any {
+  serialize(value: UsageFeeStructure): any {
     return {
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
-      model: UsageModelEnumSerializer._toJsonObject(self.model),
+      ...extraProperties(value, ["metricId", "model"]),
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
+      model: UsageModelEnumSerializer.serialize(value.model),
     };
   },
 };

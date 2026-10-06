@@ -1,326 +1,576 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class MetricEventData {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class MetricEventData {
     @JsonProperty("aggregation_key")
-    private String aggregationKey;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> aggregationKey = JsonField.missing();
 
     @JsonProperty("aggregation_type")
     private BillingMetricAggregateEnum aggregationType;
 
-    @JsonProperty private String code;
+    @JsonProperty("code")
+    private String code;
 
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
-    @JsonProperty private String description;
+    @JsonProperty("description")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> description = JsonField.missing();
 
     @JsonProperty("metric_id")
     private String metricId;
 
-    @JsonProperty private String name;
+    @JsonProperty("name")
+    private String name;
 
     @JsonProperty("product_family_id")
     private String productFamilyId;
 
     @JsonProperty("product_id")
-    private String productId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> productId = JsonField.missing();
 
     @JsonProperty("segmentation_matrix")
-    private MetricSegmentationMatrix segmentationMatrix;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<MetricSegmentationMatrix> segmentationMatrix = JsonField.missing();
 
     @JsonProperty("unit_conversion_factor")
-    private Integer unitConversionFactor;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<Integer> unitConversionFactor = JsonField.missing();
 
     @JsonProperty("unit_conversion_rounding")
-    private UnitConversionRoundingEnum unitConversionRounding;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<UnitConversionRoundingEnum> unitConversionRounding = JsonField.missing();
 
     @JsonProperty("usage_group_key")
-    private String usageGroupKey;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> usageGroupKey = JsonField.missing();
 
-    public MetricEventData() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public MetricEventData aggregationKey(String aggregationKey) {
-        this.aggregationKey = aggregationKey;
-        return this;
+    private MetricEventData() {}
+
+    private MetricEventData(Builder builder) {
+        this.aggregationKey = builder.aggregationKey;
+        this.aggregationType = builder.aggregationType;
+        this.code = builder.code;
+        this.createdAt = builder.createdAt;
+        this.description = builder.description;
+        this.metricId = builder.metricId;
+        this.name = builder.name;
+        this.productFamilyId = builder.productFamilyId;
+        this.productId = builder.productId;
+        this.segmentationMatrix = builder.segmentationMatrix;
+        this.unitConversionFactor = builder.unitConversionFactor;
+        this.unitConversionRounding = builder.unitConversionRounding;
+        this.usageGroupKey = builder.usageGroupKey;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get aggregationKey
+     * A builder of {@code MetricEventData}.
      *
-     * @return aggregationKey
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getAggregationKey() {
-        return aggregationKey;
-    }
-
-    public void setAggregationKey(String aggregationKey) {
-        this.aggregationKey = aggregationKey;
-    }
-
-    public MetricEventData aggregationType(BillingMetricAggregateEnum aggregationType) {
-        this.aggregationType = aggregationType;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get aggregationType
+     * A builder starting from this value.
      *
-     * @return aggregationType
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public BillingMetricAggregateEnum getAggregationType() {
-        return aggregationType;
-    }
-
-    public void setAggregationType(BillingMetricAggregateEnum aggregationType) {
-        this.aggregationType = aggregationType;
-    }
-
-    public MetricEventData code(String code) {
-        this.code = code;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.aggregationKey = aggregationKey;
+        builder.aggregationType = aggregationType;
+        builder.code = code;
+        builder.createdAt = createdAt;
+        builder.description = description;
+        builder.metricId = metricId;
+        builder.name = name;
+        builder.productFamilyId = productFamilyId;
+        builder.productId = productId;
+        builder.segmentationMatrix = segmentationMatrix;
+        builder.unitConversionFactor = unitConversionFactor;
+        builder.unitConversionRounding = unitConversionRounding;
+        builder.usageGroupKey = usageGroupKey;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get code
+     * The {@code aggregation_key} property.
      *
-     * @return code
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public MetricEventData createdAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-        return this;
+    public Optional<String> aggregationKey() {
+        return aggregationKey.asOptional();
     }
 
     /**
-     * Get createdAt
+     * The {@code aggregation_type} property.
      *
-     * @return createdAt
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public MetricEventData description(String description) {
-        this.description = description;
-        return this;
+    public BillingMetricAggregateEnum aggregationType() {
+        return Utils.required(aggregationType, "aggregation_type");
     }
 
     /**
-     * Get description
+     * The {@code code} property.
      *
-     * @return description
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public MetricEventData metricId(String metricId) {
-        this.metricId = metricId;
-        return this;
+    public String code() {
+        return Utils.required(code, "code");
     }
 
     /**
-     * Get metricId
+     * The {@code created_at} property.
      *
-     * @return metricId
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getMetricId() {
-        return metricId;
-    }
-
-    public void setMetricId(String metricId) {
-        this.metricId = metricId;
-    }
-
-    public MetricEventData name(String name) {
-        this.name = name;
-        return this;
+    public OffsetDateTime createdAt() {
+        return Utils.required(createdAt, "created_at");
     }
 
     /**
-     * Get name
+     * The {@code description} property.
      *
-     * @return name
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public MetricEventData productFamilyId(String productFamilyId) {
-        this.productFamilyId = productFamilyId;
-        return this;
+    public Optional<String> description() {
+        return description.asOptional();
     }
 
     /**
-     * Get productFamilyId
+     * The {@code metric_id} property.
      *
-     * @return productFamilyId
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getProductFamilyId() {
-        return productFamilyId;
-    }
-
-    public void setProductFamilyId(String productFamilyId) {
-        this.productFamilyId = productFamilyId;
-    }
-
-    public MetricEventData productId(String productId) {
-        this.productId = productId;
-        return this;
+    public String metricId() {
+        return Utils.required(metricId, "metric_id");
     }
 
     /**
-     * Get productId
+     * The {@code name} property.
      *
-     * @return productId
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
-    public MetricEventData segmentationMatrix(MetricSegmentationMatrix segmentationMatrix) {
-        this.segmentationMatrix = segmentationMatrix;
-        return this;
+    public String name() {
+        return Utils.required(name, "name");
     }
 
     /**
-     * Get segmentationMatrix
+     * The {@code product_family_id} property.
      *
-     * @return segmentationMatrix
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public MetricSegmentationMatrix getSegmentationMatrix() {
-        return segmentationMatrix;
-    }
-
-    public void setSegmentationMatrix(MetricSegmentationMatrix segmentationMatrix) {
-        this.segmentationMatrix = segmentationMatrix;
-    }
-
-    public MetricEventData unitConversionFactor(Integer unitConversionFactor) {
-        this.unitConversionFactor = unitConversionFactor;
-        return this;
+    public String productFamilyId() {
+        return Utils.required(productFamilyId, "product_family_id");
     }
 
     /**
-     * Get unitConversionFactor
+     * The {@code product_id} property.
      *
-     * @return unitConversionFactor
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public Integer getUnitConversionFactor() {
-        return unitConversionFactor;
-    }
-
-    public void setUnitConversionFactor(Integer unitConversionFactor) {
-        this.unitConversionFactor = unitConversionFactor;
-    }
-
-    public MetricEventData unitConversionRounding(
-            UnitConversionRoundingEnum unitConversionRounding) {
-        this.unitConversionRounding = unitConversionRounding;
-        return this;
+    public Optional<String> productId() {
+        return productId.asOptional();
     }
 
     /**
-     * Get unitConversionRounding
+     * The {@code segmentation_matrix} property.
      *
-     * @return unitConversionRounding
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public UnitConversionRoundingEnum getUnitConversionRounding() {
-        return unitConversionRounding;
-    }
-
-    public void setUnitConversionRounding(UnitConversionRoundingEnum unitConversionRounding) {
-        this.unitConversionRounding = unitConversionRounding;
-    }
-
-    public MetricEventData usageGroupKey(String usageGroupKey) {
-        this.usageGroupKey = usageGroupKey;
-        return this;
+    public Optional<MetricSegmentationMatrix> segmentationMatrix() {
+        return segmentationMatrix.asOptional();
     }
 
     /**
-     * Get usageGroupKey
+     * The {@code unit_conversion_factor} property.
      *
-     * @return usageGroupKey
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getUsageGroupKey() {
-        return usageGroupKey;
-    }
-
-    public void setUsageGroupKey(String usageGroupKey) {
-        this.usageGroupKey = usageGroupKey;
+    public Optional<Integer> unitConversionFactor() {
+        return unitConversionFactor.asOptional();
     }
 
     /**
-     * Create an instance of MetricEventData given an JSON string
+     * The {@code unit_conversion_rounding} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of MetricEventData
-     * @throws JsonProcessingException if the JSON string is invalid with respect to MetricEventData
+     * @return the value, empty when unset or null
      */
-    public static MetricEventData fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, MetricEventData.class);
+    public Optional<UnitConversionRoundingEnum> unitConversionRounding() {
+        return unitConversionRounding.asOptional();
     }
 
     /**
-     * Convert an instance of MetricEventData to an JSON string
+     * The {@code usage_group_key} property.
      *
-     * @return JSON string
+     * @return the value, empty when unset or null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Optional<String> usageGroupKey() {
+        return usageGroupKey.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MetricEventData that = (MetricEventData) o;
+        return Objects.equals(aggregationKey, that.aggregationKey)
+                && Objects.equals(aggregationType, that.aggregationType)
+                && Objects.equals(code, that.code)
+                && Objects.equals(createdAt, that.createdAt)
+                && Objects.equals(description, that.description)
+                && Objects.equals(metricId, that.metricId)
+                && Objects.equals(name, that.name)
+                && Objects.equals(productFamilyId, that.productFamilyId)
+                && Objects.equals(productId, that.productId)
+                && Objects.equals(segmentationMatrix, that.segmentationMatrix)
+                && Objects.equals(unitConversionFactor, that.unitConversionFactor)
+                && Objects.equals(unitConversionRounding, that.unitConversionRounding)
+                && Objects.equals(usageGroupKey, that.usageGroupKey)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                aggregationKey,
+                aggregationType,
+                code,
+                createdAt,
+                description,
+                metricId,
+                name,
+                productFamilyId,
+                productId,
+                segmentationMatrix,
+                unitConversionFactor,
+                unitConversionRounding,
+                usageGroupKey,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "MetricEventData{"
+                + "aggregationKey="
+                + aggregationKey
+                + ", aggregationType="
+                + aggregationType
+                + ", code="
+                + code
+                + ", createdAt="
+                + createdAt
+                + ", description="
+                + description
+                + ", metricId="
+                + metricId
+                + ", name="
+                + name
+                + ", productFamilyId="
+                + productFamilyId
+                + ", productId="
+                + productId
+                + ", segmentationMatrix="
+                + segmentationMatrix
+                + ", unitConversionFactor="
+                + unitConversionFactor
+                + ", unitConversionRounding="
+                + unitConversionRounding
+                + ", usageGroupKey="
+                + usageGroupKey
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link MetricEventData}. */
+    public static final class Builder {
+        private JsonField<String> aggregationKey = JsonField.missing();
+        private BillingMetricAggregateEnum aggregationType;
+        private String code;
+        private OffsetDateTime createdAt;
+        private JsonField<String> description = JsonField.missing();
+        private String metricId;
+        private String name;
+        private String productFamilyId;
+        private JsonField<String> productId = JsonField.missing();
+        private JsonField<MetricSegmentationMatrix> segmentationMatrix = JsonField.missing();
+        private JsonField<Integer> unitConversionFactor = JsonField.missing();
+        private JsonField<UnitConversionRoundingEnum> unitConversionRounding = JsonField.missing();
+        private JsonField<String> usageGroupKey = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code aggregation_key} property.
+         *
+         * @param aggregationKey the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder aggregationKey(String aggregationKey) {
+            this.aggregationKey = JsonField.ofNullable(aggregationKey);
+            return this;
+        }
+
+        /**
+         * The {@code aggregation_type} property.
+         *
+         * @param aggregationType the value
+         * @return this builder
+         */
+        public Builder aggregationType(BillingMetricAggregateEnum aggregationType) {
+            this.aggregationType = aggregationType;
+            return this;
+        }
+
+        /**
+         * The {@code code} property.
+         *
+         * @param code the value
+         * @return this builder
+         */
+        public Builder code(String code) {
+            this.code = code;
+            return this;
+        }
+
+        /**
+         * The {@code created_at} property.
+         *
+         * @param createdAt the value
+         * @return this builder
+         */
+        public Builder createdAt(OffsetDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        /**
+         * The {@code description} property.
+         *
+         * @param description the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder description(String description) {
+            this.description = JsonField.ofNullable(description);
+            return this;
+        }
+
+        /**
+         * The {@code metric_id} property.
+         *
+         * @param metricId the value
+         * @return this builder
+         */
+        public Builder metricId(String metricId) {
+            this.metricId = metricId;
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code product_family_id} property.
+         *
+         * @param productFamilyId the value
+         * @return this builder
+         */
+        public Builder productFamilyId(String productFamilyId) {
+            this.productFamilyId = productFamilyId;
+            return this;
+        }
+
+        /**
+         * The {@code product_id} property.
+         *
+         * @param productId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder productId(String productId) {
+            this.productId = JsonField.ofNullable(productId);
+            return this;
+        }
+
+        /**
+         * The {@code segmentation_matrix} property.
+         *
+         * @param segmentationMatrix the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder segmentationMatrix(MetricSegmentationMatrix segmentationMatrix) {
+            this.segmentationMatrix = JsonField.ofNullable(segmentationMatrix);
+            return this;
+        }
+
+        /**
+         * The {@code unit_conversion_factor} property.
+         *
+         * @param unitConversionFactor the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder unitConversionFactor(Integer unitConversionFactor) {
+            this.unitConversionFactor = JsonField.ofNullable(unitConversionFactor);
+            return this;
+        }
+
+        /**
+         * The {@code unit_conversion_rounding} property.
+         *
+         * @param unitConversionRounding the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder unitConversionRounding(UnitConversionRoundingEnum unitConversionRounding) {
+            this.unitConversionRounding = JsonField.ofNullable(unitConversionRounding);
+            return this;
+        }
+
+        /**
+         * The {@code usage_group_key} property.
+         *
+         * @param usageGroupKey the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder usageGroupKey(String usageGroupKey) {
+            this.usageGroupKey = JsonField.ofNullable(usageGroupKey);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code MetricEventData}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public MetricEventData build() {
+            Utils.checkRequired(aggregationType, "aggregation_type");
+            Utils.checkRequired(code, "code");
+            Utils.checkRequired(createdAt, "created_at");
+            Utils.checkRequired(metricId, "metric_id");
+            Utils.checkRequired(name, "name");
+            Utils.checkRequired(productFamilyId, "product_family_id");
+            return new MetricEventData(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code MetricEventData}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static MetricEventData fromJson(String json) {
+        return Utils.parse(json, MetricEventData.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

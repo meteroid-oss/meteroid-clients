@@ -2,12 +2,13 @@
 
 export type ConnectedAccountId = string;
 
+/** Converts `ConnectedAccountId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ConnectedAccountIdSerializer = {
-  _fromJsonObject(object: any): ConnectedAccountId {
-    return object;
+  parse(json: any): ConnectedAccountId {
+    return json;
   },
 
-  _toJsonObject(self: ConnectedAccountId): any {
-    return self;
+  serialize(value: ConnectedAccountId): any {
+    return value;
   },
 };

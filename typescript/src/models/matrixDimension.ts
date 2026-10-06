@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface MatrixDimension {
   key: string;
-
   value: string;
 }
 
+/** Converts `MatrixDimension` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MatrixDimensionSerializer = {
-  _fromJsonObject(object: any): MatrixDimension {
+  parse(json: any): MatrixDimension {
     return {
-      key: object["key"],
-      value: object["value"],
+      ...extraProperties(json, ["key", "value"]),
+      key: json["key"],
+      value: json["value"],
     };
   },
 
-  _toJsonObject(self: MatrixDimension): any {
+  serialize(value: MatrixDimension): any {
     return {
-      key: self.key,
-      value: self.value,
+      ...extraProperties(value, ["key", "value"]),
+      key: value.key,
+      value: value.value,
     };
   },
 };

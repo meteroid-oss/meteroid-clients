@@ -1,33 +1,38 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
 import {
   type PlanUsagePricingModel,
   PlanUsagePricingModelSerializer,
-} from "./planUsagePricingModel";
+} from "./planUsagePricingModel.js";
 /** Usage-based fee */
 export interface UsagePlanFee {
   cadence: BillingPeriodEnum;
-
   metricId: BillableMetricId;
-
   pricing: PlanUsagePricingModel;
 }
 
+/** Converts `UsagePlanFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UsagePlanFeeSerializer = {
-  _fromJsonObject(object: any): UsagePlanFee {
+  parse(json: any): UsagePlanFee {
     return {
-      cadence: BillingPeriodEnumSerializer._fromJsonObject(object["cadence"]),
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
-      pricing: PlanUsagePricingModelSerializer._fromJsonObject(object["pricing"]),
+      ...extraProperties(json, ["cadence", "metric_id", "pricing"]),
+      cadence: BillingPeriodEnumSerializer.parse(json["cadence"]),
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
+      pricing: PlanUsagePricingModelSerializer.parse(json["pricing"]),
     };
   },
 
-  _toJsonObject(self: UsagePlanFee): any {
+  serialize(value: UsagePlanFee): any {
     return {
-      cadence: BillingPeriodEnumSerializer._toJsonObject(self.cadence),
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
-      pricing: PlanUsagePricingModelSerializer._toJsonObject(self.pricing),
+      ...extraProperties(value, ["cadence", "metricId", "pricing"]),
+      cadence: BillingPeriodEnumSerializer.serialize(value.cadence),
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
+      pricing: PlanUsagePricingModelSerializer.serialize(value.pricing),
     };
   },
 };

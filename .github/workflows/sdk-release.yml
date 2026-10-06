@@ -1,0 +1,71 @@
+# Written by `perseid init` or `perseid sync`, which rewrite it when it differs: delete this line to
+# keep your edits. release-please turns conventional commits under each SDK into a release PR;
+# merging it tags the bumped SDKs and publishes them to their registries. It runs as the perseid
+# App, else your own App or token, else the default token.
+name: SDK Release
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      path:
+        description: SDK directory to publish again from the selected tag or branch (`.` for the root)
+        required: true
+
+permissions:
+  contents: read
+
+concurrency: sdk-release
+
+jobs:
+  release:
+    if: ${{ !github.event.repository.fork }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+      id-token: write
+    outputs:
+      paths: ${{ steps.release.outputs.paths }}
+      tags: ${{ steps.release.outputs.tags }}
+    steps:
+      - id: release
+        uses: meteroid-oss/perseid/release@v0
+        with:
+          path: ${{ inputs.path }}
+          app-id: ${{ vars.SDK_APP_ID }}
+          app-private-key: ${{ secrets.SDK_APP_PRIVATE_KEY }}
+          release-token: ${{ secrets.SDK_GITHUB_TOKEN }}
+          ci-workflows: ${{ vars.SDK_CI_WORKFLOWS || 'sdk-ci.yml' }}
+
+  publish:
+    needs: release
+    if: needs.release.outputs.paths != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJSON(needs.release.outputs.paths) }}
+    runs-on: ubuntu-24.04
+    # Registries trust this file name and the `release` environment: renaming either breaks publishing.
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: meteroid-oss/perseid/publish@v0
+        with:
+          path: ${{ matrix.path }}
+          tag: ${{ fromJSON(needs.release.outputs.tags)[matrix.path] }}
+          # Registries without trusted publishing, or before their first release enables it.
+          cargo-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          npm-token: ${{ secrets.NPM_TOKEN }}
+          maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          gpg-key: ${{ secrets.GPG_SECRET_KEY }}
+          gpg-password: ${{ secrets.GPG_SECRET_KEY_PASSWORD }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}

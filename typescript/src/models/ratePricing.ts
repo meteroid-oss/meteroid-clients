@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface RatePricing {
   rate: string;
 }
 
+/** Converts `RatePricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const RatePricingSerializer = {
-  _fromJsonObject(object: any): RatePricing {
+  parse(json: any): RatePricing {
     return {
-      rate: object["rate"],
+      ...extraProperties(json, ["rate"]),
+      rate: json["rate"],
     };
   },
 
-  _toJsonObject(self: RatePricing): any {
+  serialize(value: RatePricing): any {
     return {
-      rate: self.rate,
+      ...extraProperties(value, ["rate"]),
+      rate: value.rate,
     };
   },
 };

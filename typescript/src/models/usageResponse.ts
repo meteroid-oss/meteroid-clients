@@ -1,30 +1,30 @@
 // this file is @generated
-import { type MetricUsage, MetricUsageSerializer } from "./metricUsage";
+import { extraProperties } from "../json.js";
+import { type MetricUsage, MetricUsageSerializer } from "./metricUsage.js";
 
 export interface UsageResponse {
   periodEnd: string;
-
   periodStart: string;
-
   usage: MetricUsage[];
 }
 
+/** Converts `UsageResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UsageResponseSerializer = {
-  _fromJsonObject(object: any): UsageResponse {
+  parse(json: any): UsageResponse {
     return {
-      periodEnd: object["period_end"],
-      periodStart: object["period_start"],
-      usage: object["usage"].map((item: any) =>
-        MetricUsageSerializer._fromJsonObject(item)
-      ),
+      ...extraProperties(json, ["period_end", "period_start", "usage"]),
+      periodEnd: json["period_end"],
+      periodStart: json["period_start"],
+      usage: json["usage"].map((item: any) => MetricUsageSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: UsageResponse): any {
+  serialize(value: UsageResponse): any {
     return {
-      period_end: self.periodEnd,
-      period_start: self.periodStart,
-      usage: self.usage.map((item: any) => MetricUsageSerializer._toJsonObject(item)),
+      ...extraProperties(value, ["periodEnd", "periodStart", "usage"]),
+      period_end: value.periodEnd,
+      period_start: value.periodStart,
+      usage: value.usage.map((item: any) => MetricUsageSerializer.serialize(item)),
     };
   },
 };

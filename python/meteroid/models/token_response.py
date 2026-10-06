@@ -1,11 +1,12 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
 from ..serialization import BaseModel
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class TokenResponse(BaseModel):
     """Token response as per OAuth 2.0 spec"""
 
@@ -15,6 +16,6 @@ class TokenResponse(BaseModel):
 
     token_type: str
 
-    refresh_token: t.Optional[str] = None
+    refresh_token: str | None = None
 
-    scope: t.Optional[str] = None
+    scope: str | None = None

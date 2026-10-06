@@ -1,58 +1,76 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount";
-import { type CouponId, CouponIdSerializer } from "./couponId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount.js";
+import { type CouponId, CouponIdSerializer } from "./couponId.js";
 /**
  * Coupon as embedded in subscription details — a subset of the `Coupon` resource
  * returned by the coupons API.
  */
 export interface SubscriptionCoupon {
   code: string;
-
   description: string;
-
   disabled: boolean;
-
   discount: CouponDiscount;
-
-  expiresAt?: Date | null;
-
+  expiresAt?: Date | null | undefined;
   id: CouponId;
-
-  recurringValue?: number | null;
-
-  redemptionLimit?: number | null;
-
+  recurringValue?: number | null | undefined;
+  redemptionLimit?: number | null | undefined;
   reusable: boolean;
 }
 
+/** Converts `SubscriptionCoupon` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionCouponSerializer = {
-  _fromJsonObject(object: any): SubscriptionCoupon {
+  parse(json: any): SubscriptionCoupon {
     return {
-      code: object["code"],
-      description: object["description"],
-      disabled: object["disabled"],
-      discount: CouponDiscountSerializer._fromJsonObject(object["discount"]),
+      ...extraProperties(json, [
+        "code",
+        "description",
+        "disabled",
+        "discount",
+        "expires_at",
+        "id",
+        "recurring_value",
+        "redemption_limit",
+        "reusable",
+      ]),
+      code: json["code"],
+      description: json["description"],
+      disabled: json["disabled"],
+      discount: CouponDiscountSerializer.parse(json["discount"]),
       expiresAt:
-        object["expires_at"] != null ? parseDateTime(object["expires_at"]) : undefined,
-      id: CouponIdSerializer._fromJsonObject(object["id"]),
-      recurringValue: object["recurring_value"],
-      redemptionLimit: object["redemption_limit"],
-      reusable: object["reusable"],
+        json["expires_at"] != null
+          ? parseDateTime(json["expires_at"])
+          : json["expires_at"],
+      id: CouponIdSerializer.parse(json["id"]),
+      recurringValue: json["recurring_value"],
+      redemptionLimit: json["redemption_limit"],
+      reusable: json["reusable"],
     };
   },
 
-  _toJsonObject(self: SubscriptionCoupon): any {
+  serialize(value: SubscriptionCoupon): any {
     return {
-      code: self.code,
-      description: self.description,
-      disabled: self.disabled,
-      discount: CouponDiscountSerializer._toJsonObject(self.discount),
-      expires_at: self.expiresAt,
-      id: CouponIdSerializer._toJsonObject(self.id),
-      recurring_value: self.recurringValue,
-      redemption_limit: self.redemptionLimit,
-      reusable: self.reusable,
+      ...extraProperties(value, [
+        "code",
+        "description",
+        "disabled",
+        "discount",
+        "expiresAt",
+        "id",
+        "recurringValue",
+        "redemptionLimit",
+        "reusable",
+      ]),
+      code: value.code,
+      description: value.description,
+      disabled: value.disabled,
+      discount: CouponDiscountSerializer.serialize(value.discount),
+      expires_at: value.expiresAt,
+      id: CouponIdSerializer.serialize(value.id),
+      recurring_value: value.recurringValue,
+      redemption_limit: value.redemptionLimit,
+      reusable: value.reusable,
     };
   },
 };

@@ -2,12 +2,13 @@
 
 export type CheckoutSessionId = string;
 
+/** Converts `CheckoutSessionId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CheckoutSessionIdSerializer = {
-  _fromJsonObject(object: any): CheckoutSessionId {
-    return object;
+  parse(json: any): CheckoutSessionId {
+    return json;
   },
 
-  _toJsonObject(self: CheckoutSessionId): any {
-    return self;
+  serialize(value: CheckoutSessionId): any {
+    return value;
   },
 };

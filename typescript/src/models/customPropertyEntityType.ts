@@ -1,18 +1,22 @@
 // this file is @generated
 
-export enum CustomPropertyEntityType {
-  Customer = "CUSTOMER",
-  Subscription = "SUBSCRIPTION",
-  Invoice = "INVOICE",
-  CreditNote = "CREDIT_NOTE",
-}
+export const CustomPropertyEntityType = {
+  Customer: "CUSTOMER",
+  Subscription: "SUBSCRIPTION",
+  Invoice: "INVOICE",
+  CreditNote: "CREDIT_NOTE",
+} as const;
+export type CustomPropertyEntityType =
+  | (typeof CustomPropertyEntityType)[keyof typeof CustomPropertyEntityType]
+  | (string & {});
 
+/** Converts `CustomPropertyEntityType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomPropertyEntityTypeSerializer = {
-  _fromJsonObject(object: any): CustomPropertyEntityType {
-    return object;
+  parse(json: any): CustomPropertyEntityType {
+    return json;
   },
 
-  _toJsonObject(self: CustomPropertyEntityType): any {
-    return self;
+  serialize(value: CustomPropertyEntityType): any {
+    return value;
   },
 };

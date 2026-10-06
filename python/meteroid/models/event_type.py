@@ -1,8 +1,12 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class EventType(str, enum.Enum):
+class EventType(StrEnum):
+    """The values of `EventType`; others are kept as received."""
+
     METRIC_CREATED = "metric.created"
     CUSTOMER_CREATED = "customer.created"
     SUBSCRIPTION_CREATED = "subscription.created"
@@ -37,5 +41,40 @@ class EventType(str, enum.Enum):
     ADDON_UPDATED = "addon.updated"
     ADDON_ARCHIVED = "addon.archived"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+EventTypeLiteral: t.TypeAlias = t.Literal[
+    "metric.created",
+    "customer.created",
+    "subscription.created",
+    "subscription.updated",
+    "subscription.cancelled",
+    "subscription.ended",
+    "invoice.created",
+    "invoice.finalized",
+    "invoice.paid",
+    "invoice.voided",
+    "invoice.closed",
+    "invoice.consolidated",
+    "invoice.deleted",
+    "invoice.accounting_pdf_generated",
+    "quote.accepted",
+    "quote.converted",
+    "credit_note.created",
+    "credit_note.finalized",
+    "credit_note.voided",
+    "plan.created",
+    "plan.published",
+    "plan.archived",
+    "product.created",
+    "product.updated",
+    "product.archived",
+    "metric.updated",
+    "metric.archived",
+    "coupon.created",
+    "coupon.updated",
+    "coupon.archived",
+    "addon.created",
+    "addon.updated",
+    "addon.archived",
+]
+"""The values of :class:`EventType`, which arguments take as plain strings too."""

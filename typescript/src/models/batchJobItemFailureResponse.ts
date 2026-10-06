@@ -1,36 +1,48 @@
 // this file is @generated
-import { type BatchJobChunkId, BatchJobChunkIdSerializer } from "./batchJobChunkId";
+import { extraProperties } from "../json.js";
+import { type BatchJobChunkId, BatchJobChunkIdSerializer } from "./batchJobChunkId.js";
 
 export interface BatchJobItemFailureResponse {
   chunkId: BatchJobChunkId;
-
   id: string;
-
-  itemIdentifier?: string | null;
-
+  itemIdentifier?: string | null | undefined;
   itemIndex: number;
-
   reason: string;
 }
 
+/** Converts `BatchJobItemFailureResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BatchJobItemFailureResponseSerializer = {
-  _fromJsonObject(object: any): BatchJobItemFailureResponse {
+  parse(json: any): BatchJobItemFailureResponse {
     return {
-      chunkId: BatchJobChunkIdSerializer._fromJsonObject(object["chunk_id"]),
-      id: object["id"],
-      itemIdentifier: object["item_identifier"],
-      itemIndex: object["item_index"],
-      reason: object["reason"],
+      ...extraProperties(json, [
+        "chunk_id",
+        "id",
+        "item_identifier",
+        "item_index",
+        "reason",
+      ]),
+      chunkId: BatchJobChunkIdSerializer.parse(json["chunk_id"]),
+      id: json["id"],
+      itemIdentifier: json["item_identifier"],
+      itemIndex: json["item_index"],
+      reason: json["reason"],
     };
   },
 
-  _toJsonObject(self: BatchJobItemFailureResponse): any {
+  serialize(value: BatchJobItemFailureResponse): any {
     return {
-      chunk_id: BatchJobChunkIdSerializer._toJsonObject(self.chunkId),
-      id: self.id,
-      item_identifier: self.itemIdentifier,
-      item_index: self.itemIndex,
-      reason: self.reason,
+      ...extraProperties(value, [
+        "chunkId",
+        "id",
+        "itemIdentifier",
+        "itemIndex",
+        "reason",
+      ]),
+      chunk_id: BatchJobChunkIdSerializer.serialize(value.chunkId),
+      id: value.id,
+      item_identifier: value.itemIdentifier,
+      item_index: value.itemIndex,
+      reason: value.reason,
     };
   },
 };

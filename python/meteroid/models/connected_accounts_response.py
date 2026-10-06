@@ -1,11 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .connected_account import ConnectedAccount
+
+if t.TYPE_CHECKING:
+    from .connected_account import ConnectedAccount
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class ConnectedAccountsResponse(BaseModel):
-    data: t.List[ConnectedAccount]
+    """The `ConnectedAccountsResponse` object."""
+
+    data: list[ConnectedAccount]

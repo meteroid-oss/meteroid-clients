@@ -1,103 +1,259 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CustomTaxRate {
-    @JsonProperty private String name;
-    @JsonProperty private String rate;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CustomTaxRate {
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("rate")
+    private String rate;
 
     @JsonProperty("tax_code")
     private String taxCode;
 
-    public CustomTaxRate() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public CustomTaxRate name(String name) {
-        this.name = name;
-        return this;
+    private CustomTaxRate() {}
+
+    private CustomTaxRate(Builder builder) {
+        this.name = builder.name;
+        this.rate = builder.rate;
+        this.taxCode = builder.taxCode;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get name
+     * A builder of {@code CustomTaxRate}.
      *
-     * @return name
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public CustomTaxRate rate(String rate) {
-        this.rate = rate;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get rate
+     * A builder starting from this value.
      *
-     * @return rate
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getRate() {
-        return rate;
-    }
-
-    public void setRate(String rate) {
-        this.rate = rate;
-    }
-
-    public CustomTaxRate taxCode(String taxCode) {
-        this.taxCode = taxCode;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.name = name;
+        builder.rate = rate;
+        builder.taxCode = taxCode;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get taxCode
+     * The {@code name} property.
      *
-     * @return taxCode
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getTaxCode() {
-        return taxCode;
-    }
-
-    public void setTaxCode(String taxCode) {
-        this.taxCode = taxCode;
+    public String name() {
+        return Utils.required(name, "name");
     }
 
     /**
-     * Create an instance of CustomTaxRate given an JSON string
+     * The {@code rate} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of CustomTaxRate
-     * @throws JsonProcessingException if the JSON string is invalid with respect to CustomTaxRate
+     * @return the value, never null
      */
-    public static CustomTaxRate fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CustomTaxRate.class);
+    public String rate() {
+        return Utils.required(rate, "rate");
     }
 
     /**
-     * Convert an instance of CustomTaxRate to an JSON string
+     * The {@code tax_code} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String taxCode() {
+        return Utils.required(taxCode, "tax_code");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CustomTaxRate that = (CustomTaxRate) o;
+        return Objects.equals(name, that.name)
+                && Objects.equals(rate, that.rate)
+                && Objects.equals(taxCode, that.taxCode)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, rate, taxCode, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CustomTaxRate{"
+                + "name="
+                + name
+                + ", rate="
+                + rate
+                + ", taxCode="
+                + taxCode
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CustomTaxRate}. */
+    public static final class Builder {
+        private String name;
+        private String rate;
+        private String taxCode;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code rate} property.
+         *
+         * @param rate the value
+         * @return this builder
+         */
+        public Builder rate(String rate) {
+            this.rate = rate;
+            return this;
+        }
+
+        /**
+         * The {@code tax_code} property.
+         *
+         * @param taxCode the value
+         * @return this builder
+         */
+        public Builder taxCode(String taxCode) {
+            this.taxCode = taxCode;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CustomTaxRate}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CustomTaxRate build() {
+            Utils.checkRequired(name, "name");
+            Utils.checkRequired(rate, "rate");
+            Utils.checkRequired(taxCode, "tax_code");
+            return new CustomTaxRate(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code CustomTaxRate}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static CustomTaxRate fromJson(String json) {
+        return Utils.parse(json, CustomTaxRate.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

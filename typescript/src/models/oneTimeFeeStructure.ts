@@ -1,13 +1,19 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface OneTimeFeeStructure {}
 
+/** Converts `OneTimeFeeStructure` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OneTimeFeeStructureSerializer = {
-  _fromJsonObject(object: any): OneTimeFeeStructure {
-    return {};
+  parse(json: any): OneTimeFeeStructure {
+    return {
+      ...extraProperties(json, []),
+    };
   },
 
-  _toJsonObject(self: OneTimeFeeStructure): any {
-    return {};
+  serialize(value: OneTimeFeeStructure): any {
+    return {
+      ...extraProperties(value, []),
+    };
   },
 };

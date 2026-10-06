@@ -1,97 +1,111 @@
 // this file is @generated
-import { type BillingConfig, BillingConfigSerializer } from "./billingConfig";
+import { extraProperties } from "../json.js";
+import { type BillingConfig, BillingConfigSerializer } from "./billingConfig.js";
 import {
   type MinimumCommitmentInput,
   MinimumCommitmentInputSerializer,
-} from "./minimumCommitmentInput";
-import { type PlanAddOnInput, PlanAddOnInputSerializer } from "./planAddOnInput";
-import { type PlanStatusEnum, PlanStatusEnumSerializer } from "./planStatusEnum";
+} from "./minimumCommitmentInput.js";
+import { type PlanAddOnInput, PlanAddOnInputSerializer } from "./planAddOnInput.js";
+import { type PlanStatusEnum, PlanStatusEnumSerializer } from "./planStatusEnum.js";
 import {
   type PriceComponentInput,
   PriceComponentInputSerializer,
-} from "./priceComponentInput";
-import { type TrialConfig, TrialConfigSerializer } from "./trialConfig";
+} from "./priceComponentInput.js";
+import { type TrialConfig, TrialConfigSerializer } from "./trialConfig.js";
 
 export interface ReplacePlanRequest {
-  addOns?: PlanAddOnInput[];
-
-  billing?: BillingConfig | null;
-
+  addOns?: PlanAddOnInput[] | undefined;
+  billing?: BillingConfig | null | undefined;
   components: PriceComponentInput[];
-
   currency: string;
-
-  description?: string | null;
-
-  minimumCommitment?: MinimumCommitmentInput | null;
-
+  description?: string | null | undefined;
+  minimumCommitment?: MinimumCommitmentInput | null | undefined;
   name: string;
-
-  status?: PlanStatusEnum | null;
-
-  trial?: TrialConfig | null;
+  status?: PlanStatusEnum | null | undefined;
+  trial?: TrialConfig | null | undefined;
 }
 
+/** Converts `ReplacePlanRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ReplacePlanRequestSerializer = {
-  _fromJsonObject(object: any): ReplacePlanRequest {
+  parse(json: any): ReplacePlanRequest {
     return {
+      ...extraProperties(json, [
+        "add_ons",
+        "billing",
+        "components",
+        "currency",
+        "description",
+        "minimum_commitment",
+        "name",
+        "status",
+        "trial",
+      ]),
       addOns:
-        object["add_ons"] != null
-          ? object["add_ons"].map((item: any) =>
-              PlanAddOnInputSerializer._fromJsonObject(item)
-            )
+        json["add_ons"] != null
+          ? json["add_ons"].map((item: any) => PlanAddOnInputSerializer.parse(item))
           : undefined,
       billing:
-        object["billing"] != null
-          ? BillingConfigSerializer._fromJsonObject(object["billing"])
-          : undefined,
-      components: object["components"].map((item: any) =>
-        PriceComponentInputSerializer._fromJsonObject(item)
+        json["billing"] != null
+          ? BillingConfigSerializer.parse(json["billing"])
+          : json["billing"],
+      components: json["components"].map((item: any) =>
+        PriceComponentInputSerializer.parse(item)
       ),
-      currency: object["currency"],
-      description: object["description"],
+      currency: json["currency"],
+      description: json["description"],
       minimumCommitment:
-        object["minimum_commitment"] != null
-          ? MinimumCommitmentInputSerializer._fromJsonObject(object["minimum_commitment"])
-          : undefined,
-      name: object["name"],
+        json["minimum_commitment"] != null
+          ? MinimumCommitmentInputSerializer.parse(json["minimum_commitment"])
+          : json["minimum_commitment"],
+      name: json["name"],
       status:
-        object["status"] != null
-          ? PlanStatusEnumSerializer._fromJsonObject(object["status"])
-          : undefined,
+        json["status"] != null
+          ? PlanStatusEnumSerializer.parse(json["status"])
+          : json["status"],
       trial:
-        object["trial"] != null
-          ? TrialConfigSerializer._fromJsonObject(object["trial"])
-          : undefined,
+        json["trial"] != null
+          ? TrialConfigSerializer.parse(json["trial"])
+          : json["trial"],
     };
   },
 
-  _toJsonObject(self: ReplacePlanRequest): any {
+  serialize(value: ReplacePlanRequest): any {
     return {
+      ...extraProperties(value, [
+        "addOns",
+        "billing",
+        "components",
+        "currency",
+        "description",
+        "minimumCommitment",
+        "name",
+        "status",
+        "trial",
+      ]),
       add_ons:
-        self.addOns != null
-          ? self.addOns.map((item: any) => PlanAddOnInputSerializer._toJsonObject(item))
+        value.addOns != null
+          ? value.addOns.map((item: any) => PlanAddOnInputSerializer.serialize(item))
           : undefined,
       billing:
-        self.billing != null
-          ? BillingConfigSerializer._toJsonObject(self.billing)
-          : undefined,
-      components: self.components.map((item: any) =>
-        PriceComponentInputSerializer._toJsonObject(item)
+        value.billing != null
+          ? BillingConfigSerializer.serialize(value.billing)
+          : value.billing,
+      components: value.components.map((item: any) =>
+        PriceComponentInputSerializer.serialize(item)
       ),
-      currency: self.currency,
-      description: self.description,
+      currency: value.currency,
+      description: value.description,
       minimum_commitment:
-        self.minimumCommitment != null
-          ? MinimumCommitmentInputSerializer._toJsonObject(self.minimumCommitment)
-          : undefined,
-      name: self.name,
+        value.minimumCommitment != null
+          ? MinimumCommitmentInputSerializer.serialize(value.minimumCommitment)
+          : value.minimumCommitment,
+      name: value.name,
       status:
-        self.status != null
-          ? PlanStatusEnumSerializer._toJsonObject(self.status)
-          : undefined,
+        value.status != null
+          ? PlanStatusEnumSerializer.serialize(value.status)
+          : value.status,
       trial:
-        self.trial != null ? TrialConfigSerializer._toJsonObject(self.trial) : undefined,
+        value.trial != null ? TrialConfigSerializer.serialize(value.trial) : value.trial,
     };
   },
 };

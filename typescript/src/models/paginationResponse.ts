@@ -1,31 +1,32 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface PaginationResponse {
   page: number;
-
   perPage: number;
-
   totalItems: number;
-
   totalPages: number;
 }
 
+/** Converts `PaginationResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PaginationResponseSerializer = {
-  _fromJsonObject(object: any): PaginationResponse {
+  parse(json: any): PaginationResponse {
     return {
-      page: object["page"],
-      perPage: object["per_page"],
-      totalItems: object["total_items"],
-      totalPages: object["total_pages"],
+      ...extraProperties(json, ["page", "per_page", "total_items", "total_pages"]),
+      page: json["page"],
+      perPage: json["per_page"],
+      totalItems: json["total_items"],
+      totalPages: json["total_pages"],
     };
   },
 
-  _toJsonObject(self: PaginationResponse): any {
+  serialize(value: PaginationResponse): any {
     return {
-      page: self.page,
-      per_page: self.perPage,
-      total_items: self.totalItems,
-      total_pages: self.totalPages,
+      ...extraProperties(value, ["page", "perPage", "totalItems", "totalPages"]),
+      page: value.page,
+      per_page: value.perPage,
+      total_items: value.totalItems,
+      total_pages: value.totalPages,
     };
   },
 };

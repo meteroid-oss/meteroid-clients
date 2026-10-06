@@ -1,32 +1,31 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
-import { type ProductFamily, ProductFamilySerializer } from "./productFamily";
+} from "./paginationResponse.js";
+import { type ProductFamily, ProductFamilySerializer } from "./productFamily.js";
 
 export interface ProductFamilyListResponse {
   data: ProductFamily[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `ProductFamilyListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductFamilyListResponseSerializer = {
-  _fromJsonObject(object: any): ProductFamilyListResponse {
+  parse(json: any): ProductFamilyListResponse {
     return {
-      data: object["data"].map((item: any) =>
-        ProductFamilySerializer._fromJsonObject(item)
-      ),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => ProductFamilySerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: ProductFamilyListResponse): any {
+  serialize(value: ProductFamilyListResponse): any {
     return {
-      data: self.data.map((item: any) => ProductFamilySerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => ProductFamilySerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

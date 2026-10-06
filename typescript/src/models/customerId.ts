@@ -2,12 +2,13 @@
 
 export type CustomerId = string;
 
+/** Converts `CustomerId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomerIdSerializer = {
-  _fromJsonObject(object: any): CustomerId {
-    return object;
+  parse(json: any): CustomerId {
+    return json;
   },
 
-  _toJsonObject(self: CustomerId): any {
-    return self;
+  serialize(value: CustomerId): any {
+    return value;
   },
 };

@@ -1,15 +1,21 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .billable_metric_id import BillableMetricId
-from .billing_metric_aggregate_enum import BillingMetricAggregateEnum
+
+if t.TYPE_CHECKING:
+    from .billable_metric_id import BillableMetricId
+    from .billing_metric_aggregate_enum import BillingMetricAggregateEnum
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MetricSummary(BaseModel):
+    """The `MetricSummary` object."""
+
     aggregation_type: BillingMetricAggregateEnum
 
     code: str
@@ -20,8 +26,8 @@ class MetricSummary(BaseModel):
 
     name: str
 
-    aggregation_key: t.Optional[str] = None
+    aggregation_key: str | None = None
 
-    archived_at: t.Optional[datetime] = None
+    archived_at: datetime | None = None
 
-    description: t.Optional[str] = None
+    description: str | None = None

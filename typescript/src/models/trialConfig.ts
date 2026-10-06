@@ -1,34 +1,36 @@
 // this file is @generated
-import { type PlanId, PlanIdSerializer } from "./planId";
+import { extraProperties } from "../json.js";
+import { type PlanId, PlanIdSerializer } from "./planId.js";
 
 export interface TrialConfig {
   durationDays: number;
-
   isFree: boolean;
-
-  trialingPlanId?: PlanId | null;
+  trialingPlanId?: PlanId | null | undefined;
 }
 
+/** Converts `TrialConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TrialConfigSerializer = {
-  _fromJsonObject(object: any): TrialConfig {
+  parse(json: any): TrialConfig {
     return {
-      durationDays: object["duration_days"],
-      isFree: object["is_free"],
+      ...extraProperties(json, ["duration_days", "is_free", "trialing_plan_id"]),
+      durationDays: json["duration_days"],
+      isFree: json["is_free"],
       trialingPlanId:
-        object["trialing_plan_id"] != null
-          ? PlanIdSerializer._fromJsonObject(object["trialing_plan_id"])
-          : undefined,
+        json["trialing_plan_id"] != null
+          ? PlanIdSerializer.parse(json["trialing_plan_id"])
+          : json["trialing_plan_id"],
     };
   },
 
-  _toJsonObject(self: TrialConfig): any {
+  serialize(value: TrialConfig): any {
     return {
-      duration_days: self.durationDays,
-      is_free: self.isFree,
+      ...extraProperties(value, ["durationDays", "isFree", "trialingPlanId"]),
+      duration_days: value.durationDays,
+      is_free: value.isFree,
       trialing_plan_id:
-        self.trialingPlanId != null
-          ? PlanIdSerializer._toJsonObject(self.trialingPlanId)
-          : undefined,
+        value.trialingPlanId != null
+          ? PlanIdSerializer.serialize(value.trialingPlanId)
+          : value.trialingPlanId,
     };
   },
 };

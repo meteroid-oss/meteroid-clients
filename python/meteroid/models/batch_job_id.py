@@ -1,2 +1,4 @@
 # this file is @generated
-BatchJobId = str
+import typing as t
+
+BatchJobId: t.TypeAlias = str

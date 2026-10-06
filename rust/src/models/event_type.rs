@@ -1,116 +1,53 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum EventType {
-    #[default]
-    #[serde(rename = "metric.created")]
     MetricCreated,
-
-    #[serde(rename = "customer.created")]
     CustomerCreated,
-
-    #[serde(rename = "subscription.created")]
     SubscriptionCreated,
-
-    #[serde(rename = "subscription.updated")]
     SubscriptionUpdated,
-
-    #[serde(rename = "subscription.cancelled")]
     SubscriptionCancelled,
-
-    #[serde(rename = "subscription.ended")]
     SubscriptionEnded,
-
-    #[serde(rename = "invoice.created")]
     InvoiceCreated,
-
-    #[serde(rename = "invoice.finalized")]
     InvoiceFinalized,
-
-    #[serde(rename = "invoice.paid")]
     InvoicePaid,
-
-    #[serde(rename = "invoice.voided")]
     InvoiceVoided,
-
-    #[serde(rename = "invoice.closed")]
     InvoiceClosed,
-
-    #[serde(rename = "invoice.consolidated")]
     InvoiceConsolidated,
-
-    #[serde(rename = "invoice.deleted")]
     InvoiceDeleted,
-
-    #[serde(rename = "invoice.accounting_pdf_generated")]
     InvoiceAccountingPdfGenerated,
-
-    #[serde(rename = "quote.accepted")]
     QuoteAccepted,
-
-    #[serde(rename = "quote.converted")]
     QuoteConverted,
-
-    #[serde(rename = "credit_note.created")]
     CreditNoteCreated,
-
-    #[serde(rename = "credit_note.finalized")]
     CreditNoteFinalized,
-
-    #[serde(rename = "credit_note.voided")]
     CreditNoteVoided,
-
-    #[serde(rename = "plan.created")]
     PlanCreated,
-
-    #[serde(rename = "plan.published")]
     PlanPublished,
-
-    #[serde(rename = "plan.archived")]
     PlanArchived,
-
-    #[serde(rename = "product.created")]
     ProductCreated,
-
-    #[serde(rename = "product.updated")]
     ProductUpdated,
-
-    #[serde(rename = "product.archived")]
     ProductArchived,
-
-    #[serde(rename = "metric.updated")]
     MetricUpdated,
-
-    #[serde(rename = "metric.archived")]
     MetricArchived,
-
-    #[serde(rename = "coupon.created")]
     CouponCreated,
-
-    #[serde(rename = "coupon.updated")]
     CouponUpdated,
-
-    #[serde(rename = "coupon.archived")]
     CouponArchived,
-
-    #[serde(rename = "addon.created")]
     AddonCreated,
-
-    #[serde(rename = "addon.updated")]
     AddonUpdated,
-
-    #[serde(rename = "addon.archived")]
     AddonArchived,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for EventType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl EventType {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::MetricCreated => "metric.created",
             Self::CustomerCreated => "customer.created",
             Self::SubscriptionCreated => "subscription.created",
@@ -144,8 +81,67 @@ impl fmt::Display for EventType {
             Self::AddonCreated => "addon.created",
             Self::AddonUpdated => "addon.updated",
             Self::AddonArchived => "addon.archived",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for EventType {
+    fn from(value: &str) -> Self {
+        match value {
+            "metric.created" => Self::MetricCreated,
+            "customer.created" => Self::CustomerCreated,
+            "subscription.created" => Self::SubscriptionCreated,
+            "subscription.updated" => Self::SubscriptionUpdated,
+            "subscription.cancelled" => Self::SubscriptionCancelled,
+            "subscription.ended" => Self::SubscriptionEnded,
+            "invoice.created" => Self::InvoiceCreated,
+            "invoice.finalized" => Self::InvoiceFinalized,
+            "invoice.paid" => Self::InvoicePaid,
+            "invoice.voided" => Self::InvoiceVoided,
+            "invoice.closed" => Self::InvoiceClosed,
+            "invoice.consolidated" => Self::InvoiceConsolidated,
+            "invoice.deleted" => Self::InvoiceDeleted,
+            "invoice.accounting_pdf_generated" => Self::InvoiceAccountingPdfGenerated,
+            "quote.accepted" => Self::QuoteAccepted,
+            "quote.converted" => Self::QuoteConverted,
+            "credit_note.created" => Self::CreditNoteCreated,
+            "credit_note.finalized" => Self::CreditNoteFinalized,
+            "credit_note.voided" => Self::CreditNoteVoided,
+            "plan.created" => Self::PlanCreated,
+            "plan.published" => Self::PlanPublished,
+            "plan.archived" => Self::PlanArchived,
+            "product.created" => Self::ProductCreated,
+            "product.updated" => Self::ProductUpdated,
+            "product.archived" => Self::ProductArchived,
+            "metric.updated" => Self::MetricUpdated,
+            "metric.archived" => Self::MetricArchived,
+            "coupon.created" => Self::CouponCreated,
+            "coupon.updated" => Self::CouponUpdated,
+            "coupon.archived" => Self::CouponArchived,
+            "addon.created" => Self::AddonCreated,
+            "addon.updated" => Self::AddonUpdated,
+            "addon.archived" => Self::AddonArchived,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for EventType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for EventType {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for EventType {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

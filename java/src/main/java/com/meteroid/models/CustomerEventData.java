@@ -1,30 +1,43 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CustomerEventData {
-    @JsonProperty private String alias;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CustomerEventData {
+    @JsonProperty("alias")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> alias = JsonField.missing();
 
     @JsonProperty("billing_email")
-    private String billingEmail;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> billingEmail = JsonField.missing();
 
-    @JsonProperty private String currency;
+    @JsonProperty("currency")
+    private String currency;
 
     @JsonProperty("custom_properties")
     private Object customProperties;
@@ -35,190 +48,389 @@ public class CustomerEventData {
     @JsonProperty("invoicing_emails")
     private List<String> invoicingEmails;
 
-    @JsonProperty private String name;
-    @JsonProperty private String phone;
+    @JsonProperty("name")
+    private String name;
 
-    public CustomerEventData() {}
+    @JsonProperty("phone")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> phone = JsonField.missing();
 
-    public CustomerEventData alias(String alias) {
-        this.alias = alias;
-        return this;
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    private CustomerEventData() {}
+
+    private CustomerEventData(Builder builder) {
+        this.alias = builder.alias;
+        this.billingEmail = builder.billingEmail;
+        this.currency = builder.currency;
+        this.customProperties = builder.customProperties;
+        this.customerId = builder.customerId;
+        this.invoicingEmails = Utils.copyList(builder.invoicingEmails);
+        this.name = builder.name;
+        this.phone = builder.phone;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get alias
+     * A builder of {@code CustomerEventData}.
      *
-     * @return alias
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public CustomerEventData billingEmail(String billingEmail) {
-        this.billingEmail = billingEmail;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get billingEmail
+     * A builder starting from this value.
      *
-     * @return billingEmail
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getBillingEmail() {
-        return billingEmail;
-    }
-
-    public void setBillingEmail(String billingEmail) {
-        this.billingEmail = billingEmail;
-    }
-
-    public CustomerEventData currency(String currency) {
-        this.currency = currency;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.alias = alias;
+        builder.billingEmail = billingEmail;
+        builder.currency = currency;
+        builder.customProperties = customProperties;
+        builder.customerId = customerId;
+        builder.invoicingEmails = Utils.mutableList(invoicingEmails);
+        builder.name = name;
+        builder.phone = phone;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get currency
+     * The {@code alias} property.
      *
-     * @return currency
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public String getCurrency() {
-        return currency;
+    public Optional<String> alias() {
+        return alias.asOptional();
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    /**
+     * The {@code billing_email} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> billingEmail() {
+        return billingEmail.asOptional();
     }
 
-    public CustomerEventData customProperties(Object customProperties) {
-        this.customProperties = customProperties;
-        return this;
+    /**
+     * The {@code currency} property.
+     *
+     * @return the value, never null
+     */
+    public String currency() {
+        return Utils.required(currency, "currency");
     }
 
     /**
      * User-defined custom property values, keyed by definition key.
      *
-     * @return customProperties
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public Object getCustomProperties() {
-        return customProperties;
-    }
-
-    public void setCustomProperties(Object customProperties) {
-        this.customProperties = customProperties;
-    }
-
-    public CustomerEventData customerId(String customerId) {
-        this.customerId = customerId;
-        return this;
+    public Object customProperties() {
+        return Utils.required(customProperties, "custom_properties");
     }
 
     /**
-     * Get customerId
+     * The {@code customer_id} property.
      *
-     * @return customerId
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getCustomerId() {
-        return customerId;
+    public String customerId() {
+        return Utils.required(customerId, "customer_id");
     }
 
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
+    /**
+     * The {@code invoicing_emails} property.
+     *
+     * @return the value, never null
+     */
+    public List<String> invoicingEmails() {
+        return Utils.required(invoicingEmails, "invoicing_emails");
     }
 
-    public CustomerEventData invoicingEmails(List<String> invoicingEmails) {
-        this.invoicingEmails = invoicingEmails;
-        return this;
+    /**
+     * The {@code name} property.
+     *
+     * @return the value, never null
+     */
+    public String name() {
+        return Utils.required(name, "name");
     }
 
-    public CustomerEventData addInvoicingEmailsItem(String invoicingEmailsItem) {
-        if (this.invoicingEmails == null) {
-            this.invoicingEmails = new ArrayList<>();
+    /**
+     * The {@code phone} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> phone() {
+        return phone.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.invoicingEmails.add(invoicingEmailsItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CustomerEventData that = (CustomerEventData) o;
+        return Objects.equals(alias, that.alias)
+                && Objects.equals(billingEmail, that.billingEmail)
+                && Objects.equals(currency, that.currency)
+                && Objects.equals(customProperties, that.customProperties)
+                && Objects.equals(customerId, that.customerId)
+                && Objects.equals(invoicingEmails, that.invoicingEmails)
+                && Objects.equals(name, that.name)
+                && Objects.equals(phone, that.phone)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                alias,
+                billingEmail,
+                currency,
+                customProperties,
+                customerId,
+                invoicingEmails,
+                name,
+                phone,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerEventData{"
+                + "alias="
+                + alias
+                + ", billingEmail="
+                + billingEmail
+                + ", currency="
+                + currency
+                + ", customProperties="
+                + customProperties
+                + ", customerId="
+                + customerId
+                + ", invoicingEmails="
+                + invoicingEmails
+                + ", name="
+                + name
+                + ", phone="
+                + phone
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CustomerEventData}. */
+    public static final class Builder {
+        private JsonField<String> alias = JsonField.missing();
+        private JsonField<String> billingEmail = JsonField.missing();
+        private String currency;
+        private Object customProperties;
+        private String customerId;
+        private List<String> invoicingEmails;
+        private String name;
+        private JsonField<String> phone = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code alias} property.
+         *
+         * @param alias the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder alias(String alias) {
+            this.alias = JsonField.ofNullable(alias);
+            return this;
+        }
+
+        /**
+         * The {@code billing_email} property.
+         *
+         * @param billingEmail the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder billingEmail(String billingEmail) {
+            this.billingEmail = JsonField.ofNullable(billingEmail);
+            return this;
+        }
+
+        /**
+         * The {@code currency} property.
+         *
+         * @param currency the value
+         * @return this builder
+         */
+        public Builder currency(String currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        /**
+         * User-defined custom property values, keyed by definition key.
+         *
+         * @param customProperties the value
+         * @return this builder
+         */
+        public Builder customProperties(Object customProperties) {
+            this.customProperties = customProperties;
+            return this;
+        }
+
+        /**
+         * The {@code customer_id} property.
+         *
+         * @param customerId the value
+         * @return this builder
+         */
+        public Builder customerId(String customerId) {
+            this.customerId = customerId;
+            return this;
+        }
+
+        /**
+         * The {@code invoicing_emails} property.
+         *
+         * @param invoicingEmails the value
+         * @return this builder
+         */
+        public Builder invoicingEmails(List<String> invoicingEmails) {
+            this.invoicingEmails = Utils.mutableList(invoicingEmails);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code invoicing_emails}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addInvoicingEmailsItem(String item) {
+            if (this.invoicingEmails == null) {
+                this.invoicingEmails = new ArrayList<>();
+            }
+            this.invoicingEmails.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code phone} property.
+         *
+         * @param phone the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder phone(String phone) {
+            this.phone = JsonField.ofNullable(phone);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CustomerEventData}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CustomerEventData build() {
+            Utils.checkRequired(currency, "currency");
+            Utils.checkRequired(customProperties, "custom_properties");
+            Utils.checkRequired(customerId, "customer_id");
+            Utils.checkRequired(invoicingEmails, "invoicing_emails");
+            Utils.checkRequired(name, "name");
+            return new CustomerEventData(this);
+        }
     }
 
     /**
-     * Get invoicingEmails
+     * Parse {@code json} as {@code CustomerEventData}.
      *
-     * @return invoicingEmails
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<String> getInvoicingEmails() {
-        return invoicingEmails;
-    }
-
-    public void setInvoicingEmails(List<String> invoicingEmails) {
-        this.invoicingEmails = invoicingEmails;
-    }
-
-    public CustomerEventData name(String name) {
-        this.name = name;
-        return this;
+    public static CustomerEventData fromJson(String json) {
+        return Utils.parse(json, CustomerEventData.class);
     }
 
     /**
-     * Get name
+     * This value as JSON.
      *
-     * @return name
+     * @return the JSON text
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public CustomerEventData phone(String phone) {
-        this.phone = phone;
-        return this;
-    }
-
-    /**
-     * Get phone
-     *
-     * @return phone
-     */
-    @javax.annotation.Nullable
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    /**
-     * Create an instance of CustomerEventData given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of CustomerEventData
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     CustomerEventData
-     */
-    public static CustomerEventData fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CustomerEventData.class);
-    }
-
-    /**
-     * Convert an instance of CustomerEventData to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }
