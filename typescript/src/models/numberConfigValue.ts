@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** A number config value (decimal, encoded as a string). */
 export interface NumberConfigValue {
   value: string;
 }
 
+/** Converts `NumberConfigValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const NumberConfigValueSerializer = {
-  _fromJsonObject(object: any): NumberConfigValue {
+  parse(json: any): NumberConfigValue {
     return {
-      value: object["value"],
+      ...extraProperties(json, ["value"]),
+      value: json["value"],
     };
   },
 
-  _toJsonObject(self: NumberConfigValue): any {
+  serialize(value: NumberConfigValue): any {
     return {
-      value: self.value,
+      ...extraProperties(value, ["value"]),
+      value: value.value,
     };
   },
 };

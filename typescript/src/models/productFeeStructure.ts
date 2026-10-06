@@ -2,18 +2,21 @@
 import {
   type CapacityFeeStructure,
   CapacityFeeStructureSerializer,
-} from "./capacityFeeStructure";
+} from "./capacityFeeStructure.js";
 import {
   type ExtraRecurringFeeStructure,
   ExtraRecurringFeeStructureSerializer,
-} from "./extraRecurringFeeStructure";
+} from "./extraRecurringFeeStructure.js";
 import {
   type OneTimeFeeStructure,
   OneTimeFeeStructureSerializer,
-} from "./oneTimeFeeStructure";
-import { type RateFeeStructure, RateFeeStructureSerializer } from "./rateFeeStructure";
-import { type SlotFeeStructure, SlotFeeStructureSerializer } from "./slotFeeStructure";
-import { type UsageFeeStructure, UsageFeeStructureSerializer } from "./usageFeeStructure";
+} from "./oneTimeFeeStructure.js";
+import { type RateFeeStructure, RateFeeStructureSerializer } from "./rateFeeStructure.js";
+import { type SlotFeeStructure, SlotFeeStructureSerializer } from "./slotFeeStructure.js";
+import {
+  type UsageFeeStructure,
+  UsageFeeStructureSerializer,
+} from "./usageFeeStructure.js";
 
 export interface ProductFeeStructureRate extends RateFeeStructure {
   type: "RATE";
@@ -42,80 +45,80 @@ export type ProductFeeStructure =
   | ProductFeeStructureExtraRecurring
   | ProductFeeStructureOneTime;
 
+/** Converts `ProductFeeStructure` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductFeeStructureSerializer = {
-  _fromJsonObject(object: any): ProductFeeStructure {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): ProductFeeStructure {
+    switch (json["type"]) {
       case "RATE":
         return {
-          ...RateFeeStructureSerializer._fromJsonObject(object),
+          ...RateFeeStructureSerializer.parse(json),
           type: "RATE",
         };
       case "SLOT":
         return {
-          ...SlotFeeStructureSerializer._fromJsonObject(object),
+          ...SlotFeeStructureSerializer.parse(json),
           type: "SLOT",
         };
       case "CAPACITY":
         return {
-          ...CapacityFeeStructureSerializer._fromJsonObject(object),
+          ...CapacityFeeStructureSerializer.parse(json),
           type: "CAPACITY",
         };
       case "USAGE":
         return {
-          ...UsageFeeStructureSerializer._fromJsonObject(object),
+          ...UsageFeeStructureSerializer.parse(json),
           type: "USAGE",
         };
       case "EXTRA_RECURRING":
         return {
-          ...ExtraRecurringFeeStructureSerializer._fromJsonObject(object),
+          ...ExtraRecurringFeeStructureSerializer.parse(json),
           type: "EXTRA_RECURRING",
         };
       case "ONE_TIME":
         return {
-          ...OneTimeFeeStructureSerializer._fromJsonObject(object),
+          ...OneTimeFeeStructureSerializer.parse(json),
           type: "ONE_TIME",
         };
       default:
-        throw new Error(`Unexpected type for ProductFeeStructure: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: ProductFeeStructure): any {
-    switch (self.type) {
+  serialize(value: ProductFeeStructure): any {
+    switch (value.type) {
       case "RATE":
         return {
-          ...RateFeeStructureSerializer._toJsonObject(self),
+          ...RateFeeStructureSerializer.serialize(value),
           type: "RATE",
         };
       case "SLOT":
         return {
-          ...SlotFeeStructureSerializer._toJsonObject(self),
+          ...SlotFeeStructureSerializer.serialize(value),
           type: "SLOT",
         };
       case "CAPACITY":
         return {
-          ...CapacityFeeStructureSerializer._toJsonObject(self),
+          ...CapacityFeeStructureSerializer.serialize(value),
           type: "CAPACITY",
         };
       case "USAGE":
         return {
-          ...UsageFeeStructureSerializer._toJsonObject(self),
+          ...UsageFeeStructureSerializer.serialize(value),
           type: "USAGE",
         };
       case "EXTRA_RECURRING":
         return {
-          ...ExtraRecurringFeeStructureSerializer._toJsonObject(self),
+          ...ExtraRecurringFeeStructureSerializer.serialize(value),
           type: "EXTRA_RECURRING",
         };
       case "ONE_TIME":
         return {
-          ...OneTimeFeeStructureSerializer._toJsonObject(self),
+          ...OneTimeFeeStructureSerializer.serialize(value),
           type: "ONE_TIME",
         };
       default:
-        throw new Error(`Unexpected type for ProductFeeStructure`);
+        return value;
     }
   },
 };

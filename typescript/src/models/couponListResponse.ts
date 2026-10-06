@@ -1,30 +1,31 @@
 // this file is @generated
-import { type Coupon, CouponSerializer } from "./coupon";
+import { extraProperties } from "../json.js";
+import { type Coupon, CouponSerializer } from "./coupon.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface CouponListResponse {
   data: Coupon[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `CouponListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CouponListResponseSerializer = {
-  _fromJsonObject(object: any): CouponListResponse {
+  parse(json: any): CouponListResponse {
     return {
-      data: object["data"].map((item: any) => CouponSerializer._fromJsonObject(item)),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => CouponSerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: CouponListResponse): any {
+  serialize(value: CouponListResponse): any {
     return {
-      data: self.data.map((item: any) => CouponSerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => CouponSerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

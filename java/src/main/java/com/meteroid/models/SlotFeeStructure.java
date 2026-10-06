@@ -1,21 +1,29 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class SlotFeeStructure {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class SlotFeeStructure {
     @JsonProperty("downgrade_policy")
     private SlotDowngradePolicyEnum downgradePolicy;
 
@@ -25,83 +33,227 @@ public class SlotFeeStructure {
     @JsonProperty("upgrade_policy")
     private SlotUpgradePolicyEnum upgradePolicy;
 
-    public SlotFeeStructure() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public SlotFeeStructure downgradePolicy(SlotDowngradePolicyEnum downgradePolicy) {
-        this.downgradePolicy = downgradePolicy;
-        return this;
+    private SlotFeeStructure() {}
+
+    private SlotFeeStructure(Builder builder) {
+        this.downgradePolicy = builder.downgradePolicy;
+        this.slotUnitName = builder.slotUnitName;
+        this.upgradePolicy = builder.upgradePolicy;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get downgradePolicy
+     * A builder of {@code SlotFeeStructure}.
      *
-     * @return downgradePolicy
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public SlotDowngradePolicyEnum getDowngradePolicy() {
-        return downgradePolicy;
-    }
-
-    public void setDowngradePolicy(SlotDowngradePolicyEnum downgradePolicy) {
-        this.downgradePolicy = downgradePolicy;
-    }
-
-    public SlotFeeStructure slotUnitName(String slotUnitName) {
-        this.slotUnitName = slotUnitName;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get slotUnitName
+     * A builder starting from this value.
      *
-     * @return slotUnitName
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getSlotUnitName() {
-        return slotUnitName;
-    }
-
-    public void setSlotUnitName(String slotUnitName) {
-        this.slotUnitName = slotUnitName;
-    }
-
-    public SlotFeeStructure upgradePolicy(SlotUpgradePolicyEnum upgradePolicy) {
-        this.upgradePolicy = upgradePolicy;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.downgradePolicy = downgradePolicy;
+        builder.slotUnitName = slotUnitName;
+        builder.upgradePolicy = upgradePolicy;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get upgradePolicy
+     * The {@code downgrade_policy} property.
      *
-     * @return upgradePolicy
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public SlotUpgradePolicyEnum getUpgradePolicy() {
-        return upgradePolicy;
-    }
-
-    public void setUpgradePolicy(SlotUpgradePolicyEnum upgradePolicy) {
-        this.upgradePolicy = upgradePolicy;
+    public SlotDowngradePolicyEnum downgradePolicy() {
+        return Utils.required(downgradePolicy, "downgrade_policy");
     }
 
     /**
-     * Create an instance of SlotFeeStructure given an JSON string
+     * The {@code slot_unit_name} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of SlotFeeStructure
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     SlotFeeStructure
+     * @return the value, never null
      */
-    public static SlotFeeStructure fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, SlotFeeStructure.class);
+    public String slotUnitName() {
+        return Utils.required(slotUnitName, "slot_unit_name");
     }
 
     /**
-     * Convert an instance of SlotFeeStructure to an JSON string
+     * The {@code upgrade_policy} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public SlotUpgradePolicyEnum upgradePolicy() {
+        return Utils.required(upgradePolicy, "upgrade_policy");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SlotFeeStructure that = (SlotFeeStructure) o;
+        return Objects.equals(downgradePolicy, that.downgradePolicy)
+                && Objects.equals(slotUnitName, that.slotUnitName)
+                && Objects.equals(upgradePolicy, that.upgradePolicy)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(downgradePolicy, slotUnitName, upgradePolicy, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "SlotFeeStructure{"
+                + "downgradePolicy="
+                + downgradePolicy
+                + ", slotUnitName="
+                + slotUnitName
+                + ", upgradePolicy="
+                + upgradePolicy
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link SlotFeeStructure}. */
+    public static final class Builder {
+        private SlotDowngradePolicyEnum downgradePolicy;
+        private String slotUnitName;
+        private SlotUpgradePolicyEnum upgradePolicy;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code downgrade_policy} property.
+         *
+         * @param downgradePolicy the value
+         * @return this builder
+         */
+        public Builder downgradePolicy(SlotDowngradePolicyEnum downgradePolicy) {
+            this.downgradePolicy = downgradePolicy;
+            return this;
+        }
+
+        /**
+         * The {@code slot_unit_name} property.
+         *
+         * @param slotUnitName the value
+         * @return this builder
+         */
+        public Builder slotUnitName(String slotUnitName) {
+            this.slotUnitName = slotUnitName;
+            return this;
+        }
+
+        /**
+         * The {@code upgrade_policy} property.
+         *
+         * @param upgradePolicy the value
+         * @return this builder
+         */
+        public Builder upgradePolicy(SlotUpgradePolicyEnum upgradePolicy) {
+            this.upgradePolicy = upgradePolicy;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code SlotFeeStructure}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public SlotFeeStructure build() {
+            Utils.checkRequired(downgradePolicy, "downgrade_policy");
+            Utils.checkRequired(slotUnitName, "slot_unit_name");
+            Utils.checkRequired(upgradePolicy, "upgrade_policy");
+            return new SlotFeeStructure(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code SlotFeeStructure}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static SlotFeeStructure fromJson(String json) {
+        return Utils.parse(json, SlotFeeStructure.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

@@ -1,82 +1,105 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
 import {
   type CustomerPaymentMethodId,
   CustomerPaymentMethodIdSerializer,
-} from "./customerPaymentMethodId";
-import { type PaymentMethodInfo, PaymentMethodInfoSerializer } from "./paymentMethodInfo";
-import { type PaymentStatusEnum, PaymentStatusEnumSerializer } from "./paymentStatusEnum";
+} from "./customerPaymentMethodId.js";
+import {
+  type PaymentMethodInfo,
+  PaymentMethodInfoSerializer,
+} from "./paymentMethodInfo.js";
+import {
+  type PaymentStatusEnum,
+  PaymentStatusEnumSerializer,
+} from "./paymentStatusEnum.js";
 import {
   type PaymentTransactionId,
   PaymentTransactionIdSerializer,
-} from "./paymentTransactionId";
-import { type PaymentTypeEnum, PaymentTypeEnumSerializer } from "./paymentTypeEnum";
+} from "./paymentTransactionId.js";
+import { type PaymentTypeEnum, PaymentTypeEnumSerializer } from "./paymentTypeEnum.js";
 
 export interface Transaction {
   amount: number;
-
   currency: string;
-
-  error?: string | null;
-
+  error?: string | null | undefined;
   id: PaymentTransactionId;
-
-  paymentMethodId?: CustomerPaymentMethodId | null;
-
-  paymentMethodInfo?: PaymentMethodInfo | null;
-
+  paymentMethodId?: CustomerPaymentMethodId | null | undefined;
+  paymentMethodInfo?: PaymentMethodInfo | null | undefined;
   paymentType: PaymentTypeEnum;
-
-  processedAt?: Date | null;
-
-  providerTransactionId?: string | null;
-
+  processedAt?: Date | null | undefined;
+  providerTransactionId?: string | null | undefined;
   status: PaymentStatusEnum;
 }
 
+/** Converts `Transaction` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TransactionSerializer = {
-  _fromJsonObject(object: any): Transaction {
+  parse(json: any): Transaction {
     return {
-      amount: object["amount"],
-      currency: object["currency"],
-      error: object["error"],
-      id: PaymentTransactionIdSerializer._fromJsonObject(object["id"]),
+      ...extraProperties(json, [
+        "amount",
+        "currency",
+        "error",
+        "id",
+        "payment_method_id",
+        "payment_method_info",
+        "payment_type",
+        "processed_at",
+        "provider_transaction_id",
+        "status",
+      ]),
+      amount: json["amount"],
+      currency: json["currency"],
+      error: json["error"],
+      id: PaymentTransactionIdSerializer.parse(json["id"]),
       paymentMethodId:
-        object["payment_method_id"] != null
-          ? CustomerPaymentMethodIdSerializer._fromJsonObject(object["payment_method_id"])
-          : undefined,
+        json["payment_method_id"] != null
+          ? CustomerPaymentMethodIdSerializer.parse(json["payment_method_id"])
+          : json["payment_method_id"],
       paymentMethodInfo:
-        object["payment_method_info"] != null
-          ? PaymentMethodInfoSerializer._fromJsonObject(object["payment_method_info"])
-          : undefined,
-      paymentType: PaymentTypeEnumSerializer._fromJsonObject(object["payment_type"]),
+        json["payment_method_info"] != null
+          ? PaymentMethodInfoSerializer.parse(json["payment_method_info"])
+          : json["payment_method_info"],
+      paymentType: PaymentTypeEnumSerializer.parse(json["payment_type"]),
       processedAt:
-        object["processed_at"] != null
-          ? parseDateTime(object["processed_at"])
-          : undefined,
-      providerTransactionId: object["provider_transaction_id"],
-      status: PaymentStatusEnumSerializer._fromJsonObject(object["status"]),
+        json["processed_at"] != null
+          ? parseDateTime(json["processed_at"])
+          : json["processed_at"],
+      providerTransactionId: json["provider_transaction_id"],
+      status: PaymentStatusEnumSerializer.parse(json["status"]),
     };
   },
 
-  _toJsonObject(self: Transaction): any {
+  serialize(value: Transaction): any {
     return {
-      amount: self.amount,
-      currency: self.currency,
-      error: self.error,
-      id: PaymentTransactionIdSerializer._toJsonObject(self.id),
+      ...extraProperties(value, [
+        "amount",
+        "currency",
+        "error",
+        "id",
+        "paymentMethodId",
+        "paymentMethodInfo",
+        "paymentType",
+        "processedAt",
+        "providerTransactionId",
+        "status",
+      ]),
+      amount: value.amount,
+      currency: value.currency,
+      error: value.error,
+      id: PaymentTransactionIdSerializer.serialize(value.id),
       payment_method_id:
-        self.paymentMethodId != null
-          ? CustomerPaymentMethodIdSerializer._toJsonObject(self.paymentMethodId)
-          : undefined,
+        value.paymentMethodId != null
+          ? CustomerPaymentMethodIdSerializer.serialize(value.paymentMethodId)
+          : value.paymentMethodId,
       payment_method_info:
-        self.paymentMethodInfo != null
-          ? PaymentMethodInfoSerializer._toJsonObject(self.paymentMethodInfo)
-          : undefined,
-      payment_type: PaymentTypeEnumSerializer._toJsonObject(self.paymentType),
-      processed_at: self.processedAt,
-      provider_transaction_id: self.providerTransactionId,
-      status: PaymentStatusEnumSerializer._toJsonObject(self.status),
+        value.paymentMethodInfo != null
+          ? PaymentMethodInfoSerializer.serialize(value.paymentMethodInfo)
+          : value.paymentMethodInfo,
+      payment_type: PaymentTypeEnumSerializer.serialize(value.paymentType),
+      processed_at: value.processedAt,
+      provider_transaction_id: value.providerTransactionId,
+      status: PaymentStatusEnumSerializer.serialize(value.status),
     };
   },
 };

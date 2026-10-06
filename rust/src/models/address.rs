@@ -22,9 +22,15 @@ pub struct Address {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zip_code: Option<String>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Address {
+    /// Creates a value with every field unset.
+    #[must_use]
     pub fn new() -> Self {
         Self {
             city: None,
@@ -33,6 +39,7 @@ impl Address {
             line2: None,
             state: None,
             zip_code: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

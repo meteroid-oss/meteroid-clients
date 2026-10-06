@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface CreateOAuthAppRequest {
   name: string;
-
   redirectUris: string[];
-
-  scopes?: string[] | null;
+  scopes?: string[] | null | undefined;
 }
 
+/** Converts `CreateOAuthAppRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateOAuthAppRequestSerializer = {
-  _fromJsonObject(object: any): CreateOAuthAppRequest {
+  parse(json: any): CreateOAuthAppRequest {
     return {
-      name: object["name"],
-      redirectUris: object["redirect_uris"],
-      scopes: object["scopes"],
+      ...extraProperties(json, ["name", "redirect_uris", "scopes"]),
+      name: json["name"],
+      redirectUris: json["redirect_uris"],
+      scopes: json["scopes"],
     };
   },
 
-  _toJsonObject(self: CreateOAuthAppRequest): any {
+  serialize(value: CreateOAuthAppRequest): any {
     return {
-      name: self.name,
-      redirect_uris: self.redirectUris,
-      scopes: self.scopes,
+      ...extraProperties(value, ["name", "redirectUris", "scopes"]),
+      name: value.name,
+      redirect_uris: value.redirectUris,
+      scopes: value.scopes,
     };
   },
 };

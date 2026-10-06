@@ -1,18 +1,24 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .customer_payment_method_id import CustomerPaymentMethodId
-from .payment_method_info import PaymentMethodInfo
-from .payment_status_enum import PaymentStatusEnum
-from .payment_transaction_id import PaymentTransactionId
-from .payment_type_enum import PaymentTypeEnum
+
+if t.TYPE_CHECKING:
+    from .customer_payment_method_id import CustomerPaymentMethodId
+    from .payment_method_info import PaymentMethodInfo
+    from .payment_status_enum import PaymentStatusEnum
+    from .payment_transaction_id import PaymentTransactionId
+    from .payment_type_enum import PaymentTypeEnum
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Transaction(BaseModel):
+    """The `Transaction` object."""
+
     amount: int
 
     currency: str
@@ -23,12 +29,12 @@ class Transaction(BaseModel):
 
     status: PaymentStatusEnum
 
-    error: t.Optional[str] = None
+    error: str | None = None
 
-    payment_method_id: t.Optional[CustomerPaymentMethodId] = None
+    payment_method_id: CustomerPaymentMethodId | None = None
 
-    payment_method_info: t.Optional[PaymentMethodInfo] = None
+    payment_method_info: PaymentMethodInfo | None = None
 
-    processed_at: t.Optional[datetime] = None
+    processed_at: datetime | None = None
 
-    provider_transaction_id: t.Optional[str] = None
+    provider_transaction_id: str | None = None

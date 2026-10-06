@@ -1,29 +1,34 @@
 // this file is @generated
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
-import { type Pricing, PricingSerializer } from "./pricing";
+import { extraProperties } from "../json.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
+import { type Pricing, PricingSerializer } from "./pricing.js";
 
 export interface PriceInput {
   cadence: BillingPeriodEnum;
-
   currency: string;
-
   pricing: Pricing;
 }
 
+/** Converts `PriceInput` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PriceInputSerializer = {
-  _fromJsonObject(object: any): PriceInput {
+  parse(json: any): PriceInput {
     return {
-      cadence: BillingPeriodEnumSerializer._fromJsonObject(object["cadence"]),
-      currency: object["currency"],
-      pricing: PricingSerializer._fromJsonObject(object["pricing"]),
+      ...extraProperties(json, ["cadence", "currency", "pricing"]),
+      cadence: BillingPeriodEnumSerializer.parse(json["cadence"]),
+      currency: json["currency"],
+      pricing: PricingSerializer.parse(json["pricing"]),
     };
   },
 
-  _toJsonObject(self: PriceInput): any {
+  serialize(value: PriceInput): any {
     return {
-      cadence: BillingPeriodEnumSerializer._toJsonObject(self.cadence),
-      currency: self.currency,
-      pricing: PricingSerializer._toJsonObject(self.pricing),
+      ...extraProperties(value, ["cadence", "currency", "pricing"]),
+      cadence: BillingPeriodEnumSerializer.serialize(value.cadence),
+      currency: value.currency,
+      pricing: PricingSerializer.serialize(value.pricing),
     };
   },
 };

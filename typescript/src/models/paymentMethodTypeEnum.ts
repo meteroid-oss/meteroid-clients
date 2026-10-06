@@ -1,18 +1,22 @@
 // this file is @generated
 
-export enum PaymentMethodTypeEnum {
-  Card = "CARD",
-  BankTransfer = "BANK_TRANSFER",
-  Wallet = "WALLET",
-  Other = "OTHER",
-}
+export const PaymentMethodTypeEnum = {
+  Card: "CARD",
+  BankTransfer: "BANK_TRANSFER",
+  Wallet: "WALLET",
+  Other: "OTHER",
+} as const;
+export type PaymentMethodTypeEnum =
+  | (typeof PaymentMethodTypeEnum)[keyof typeof PaymentMethodTypeEnum]
+  | (string & {});
 
+/** Converts `PaymentMethodTypeEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PaymentMethodTypeEnumSerializer = {
-  _fromJsonObject(object: any): PaymentMethodTypeEnum {
-    return object;
+  parse(json: any): PaymentMethodTypeEnum {
+    return json;
   },
 
-  _toJsonObject(self: PaymentMethodTypeEnum): any {
-    return self;
+  serialize(value: PaymentMethodTypeEnum): any {
+    return value;
   },
 };

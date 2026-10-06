@@ -1,2 +1,4 @@
 # this file is @generated
-BatchJobChunkId = str
+import typing as t
+
+BatchJobChunkId: t.TypeAlias = str

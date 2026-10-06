@@ -1,2 +1,4 @@
 # this file is @generated
-QuoteId = str
+import typing as t
+
+QuoteId: t.TypeAlias = str

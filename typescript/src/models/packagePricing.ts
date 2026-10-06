@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface PackagePricing {
   blockSize: number;
-
   rate: string;
 }
 
+/** Converts `PackagePricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PackagePricingSerializer = {
-  _fromJsonObject(object: any): PackagePricing {
+  parse(json: any): PackagePricing {
     return {
-      blockSize: object["block_size"],
-      rate: object["rate"],
+      ...extraProperties(json, ["block_size", "rate"]),
+      blockSize: json["block_size"],
+      rate: json["rate"],
     };
   },
 
-  _toJsonObject(self: PackagePricing): any {
+  serialize(value: PackagePricing): any {
     return {
-      block_size: self.blockSize,
-      rate: self.rate,
+      ...extraProperties(value, ["blockSize", "rate"]),
+      block_size: value.blockSize,
+      rate: value.rate,
     };
   },
 };

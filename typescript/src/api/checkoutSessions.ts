@@ -1,87 +1,105 @@
 // this file is @generated
+
 import {
   type CancelCheckoutSessionResponse,
   CancelCheckoutSessionResponseSerializer,
-} from "../models/cancelCheckoutSessionResponse";
-import type { CheckoutSessionStatus } from "../models/checkoutSessionStatus";
+} from "../models/cancelCheckoutSessionResponse.js";
+import type { CheckoutSessionStatus } from "../models/checkoutSessionStatus.js";
 import {
   type CreateCheckoutSessionRequest,
   CreateCheckoutSessionRequestSerializer,
-} from "../models/createCheckoutSessionRequest";
+} from "../models/createCheckoutSessionRequest.js";
 import {
   type CreateCheckoutSessionResponse,
   CreateCheckoutSessionResponseSerializer,
-} from "../models/createCheckoutSessionResponse";
-import type { CustomerId } from "../models/customerId";
+} from "../models/createCheckoutSessionResponse.js";
+import type { CustomerId } from "../models/customerId.js";
 import {
   type GetCheckoutSessionResponse,
   GetCheckoutSessionResponseSerializer,
-} from "../models/getCheckoutSessionResponse";
+} from "../models/getCheckoutSessionResponse.js";
 import {
   type ListCheckoutSessionsResponse,
   ListCheckoutSessionsResponseSerializer,
-} from "../models/listCheckoutSessionsResponse";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/listCheckoutSessionsResponse.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface CheckoutSessionsListCheckoutSessionsOptions {
-  customerId?: CustomerId;
-  status?: CheckoutSessionStatus;
+/** The query and header parameters of `list`. */
+export interface CheckoutSessionsListOptions {
+  customerId?: CustomerId | undefined;
+  status?: CheckoutSessionStatus | undefined;
 }
 
+/** The checkout sessions operations, reached through the client's `checkoutSessions`. */
 export class CheckoutSessions {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /**  */
-  public listCheckoutSessions(
-    options?: CheckoutSessionsListCheckoutSessionsOptions
-  ): Promise<ListCheckoutSessionsResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/checkout-sessions");
+  /** List checkout sessions */
+  public list(
+    options?: CheckoutSessionsListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<ListCheckoutSessionsResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/checkout-sessions");
 
     request.setQueryParam("customer_id", options?.customerId);
     request.setQueryParam("status", options?.status);
     return request.send(
       this.requestCtx,
-      ListCheckoutSessionsResponseSerializer._fromJsonObject
+      ListCheckoutSessionsResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public createCheckoutSession(
-    createCheckoutSessionRequest: CreateCheckoutSessionRequest
-  ): Promise<CreateCheckoutSessionResponse> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/checkout-sessions");
+  /** Create a checkout session */
+  public create(
+    createCheckoutSessionRequest: CreateCheckoutSessionRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<CreateCheckoutSessionResponse> {
+    const request = new MeteroidRequest("POST", "/api/v1/checkout-sessions");
 
     request.setBody(
-      CreateCheckoutSessionRequestSerializer._toJsonObject(createCheckoutSessionRequest)
+      CreateCheckoutSessionRequestSerializer.serialize(createCheckoutSessionRequest)
     );
     return request.send(
       this.requestCtx,
-      CreateCheckoutSessionResponseSerializer._fromJsonObject
+      CreateCheckoutSessionResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public getCheckoutSession(id: string): Promise<GetCheckoutSessionResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/checkout-sessions/{id}");
+  /** Get a checkout session by ID */
+  public retrieve(
+    id: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<GetCheckoutSessionResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/checkout-sessions/{id}");
 
     request.setPathParam("id", id);
     return request.send(
       this.requestCtx,
-      GetCheckoutSessionResponseSerializer._fromJsonObject
+      GetCheckoutSessionResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public cancelCheckoutSession(id: string): Promise<CancelCheckoutSessionResponse> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/checkout-sessions/{id}/cancel"
-    );
+  /** Cancel a checkout session */
+  public cancel(
+    id: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<CancelCheckoutSessionResponse> {
+    const request = new MeteroidRequest("POST", "/api/v1/checkout-sessions/{id}/cancel");
 
     request.setPathParam("id", id);
     return request.send(
       this.requestCtx,
-      CancelCheckoutSessionResponseSerializer._fromJsonObject
+      CancelCheckoutSessionResponseSerializer.parse,
+      requestOptions
     );
   }
 }

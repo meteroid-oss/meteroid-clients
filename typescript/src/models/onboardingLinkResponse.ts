@@ -1,24 +1,27 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
 /** Result of creating an onboarding link */
 export interface OnboardingLinkResponse {
   expiresAt: Date;
-
   url: string;
 }
 
+/** Converts `OnboardingLinkResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OnboardingLinkResponseSerializer = {
-  _fromJsonObject(object: any): OnboardingLinkResponse {
+  parse(json: any): OnboardingLinkResponse {
     return {
-      expiresAt: parseDateTime(object["expires_at"]),
-      url: object["url"],
+      ...extraProperties(json, ["expires_at", "url"]),
+      expiresAt: parseDateTime(json["expires_at"]),
+      url: json["url"],
     };
   },
 
-  _toJsonObject(self: OnboardingLinkResponse): any {
+  serialize(value: OnboardingLinkResponse): any {
     return {
-      expires_at: self.expiresAt,
-      url: self.url,
+      ...extraProperties(value, ["expiresAt", "url"]),
+      expires_at: value.expiresAt,
+      url: value.url,
     };
   },
 };

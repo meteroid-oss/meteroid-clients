@@ -2,15 +2,15 @@
 import {
   type BooleanEffectiveEntitlementValue,
   BooleanEffectiveEntitlementValueSerializer,
-} from "./booleanEffectiveEntitlementValue";
+} from "./booleanEffectiveEntitlementValue.js";
 import {
   type ConfigEffectiveEntitlementValue,
   ConfigEffectiveEntitlementValueSerializer,
-} from "./configEffectiveEntitlementValue";
+} from "./configEffectiveEntitlementValue.js";
 import {
   type MeteredEffectiveEntitlementValue,
   MeteredEffectiveEntitlementValueSerializer,
-} from "./meteredEffectiveEntitlementValue";
+} from "./meteredEffectiveEntitlementValue.js";
 
 export interface EffectiveEntitlementValueBoolean
   extends BooleanEffectiveEntitlementValue {
@@ -29,50 +29,50 @@ export type EffectiveEntitlementValue =
   | EffectiveEntitlementValueMetered
   | EffectiveEntitlementValueConfig;
 
+/** Converts `EffectiveEntitlementValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const EffectiveEntitlementValueSerializer = {
-  _fromJsonObject(object: any): EffectiveEntitlementValue {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): EffectiveEntitlementValue {
+    switch (json["type"]) {
       case "BOOLEAN":
         return {
-          ...BooleanEffectiveEntitlementValueSerializer._fromJsonObject(object),
+          ...BooleanEffectiveEntitlementValueSerializer.parse(json),
           type: "BOOLEAN",
         };
       case "METERED":
         return {
-          ...MeteredEffectiveEntitlementValueSerializer._fromJsonObject(object),
+          ...MeteredEffectiveEntitlementValueSerializer.parse(json),
           type: "METERED",
         };
       case "CONFIG":
         return {
-          ...ConfigEffectiveEntitlementValueSerializer._fromJsonObject(object),
+          ...ConfigEffectiveEntitlementValueSerializer.parse(json),
           type: "CONFIG",
         };
       default:
-        throw new Error(`Unexpected type for EffectiveEntitlementValue: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: EffectiveEntitlementValue): any {
-    switch (self.type) {
+  serialize(value: EffectiveEntitlementValue): any {
+    switch (value.type) {
       case "BOOLEAN":
         return {
-          ...BooleanEffectiveEntitlementValueSerializer._toJsonObject(self),
+          ...BooleanEffectiveEntitlementValueSerializer.serialize(value),
           type: "BOOLEAN",
         };
       case "METERED":
         return {
-          ...MeteredEffectiveEntitlementValueSerializer._toJsonObject(self),
+          ...MeteredEffectiveEntitlementValueSerializer.serialize(value),
           type: "METERED",
         };
       case "CONFIG":
         return {
-          ...ConfigEffectiveEntitlementValueSerializer._toJsonObject(self),
+          ...ConfigEffectiveEntitlementValueSerializer.serialize(value),
           type: "CONFIG",
         };
       default:
-        throw new Error(`Unexpected type for EffectiveEntitlementValue`);
+        return value;
     }
   },
 };

@@ -1,233 +1,107 @@
 # Meteroid Rust SDK
 
-Official Rust SDK for the [Meteroid](https://meteroid.com) billing API.
+Meteroid billing API client
 
-## Installation
-
-Add `meteroid-rs` to your `Cargo.toml`:
-
-```toml
-[dependencies]
-meteroid-rs = "0.19"
+```sh
+cargo add meteroid-rs
 ```
 
-## Quick Start
+Calls are futures: run them on Tokio. Every method of the API is listed in [api.md](api.md).
+
+## Usage
 
 ```rust
-use meteroid_rs::api::{Meteroid, MeteroidOptions};
+use meteroid_rs::api::Meteroid;
 
-#[tokio::main]
-async fn main() -> Result<(), meteroid_rs::error::Error> {
-    // Create a client with your API key
-    let client = Meteroid::new("your-api-key".to_string(), None);
+let client = Meteroid::builder()
+    .token("your-api-key")
+    .build()?;
 
-    // List customers
-    let customers = client.customers().list_customers(None).await?;
-    println!("Found {} customers", customers.data.len());
+let add_on = client.add_ons().retrieve("addon_id").await?;
+println!("{add_on:?}");
+```
 
-    Ok(())
+`Meteroid::from_env()?` takes the token from `METEROID_API_KEY` and the base URL from
+`METEROID_BASE_URL` when set. The builder also sets the timeout, retries and default headers:
+
+```rust
+let client = Meteroid::builder()
+    .token("your-api-key")
+    .base_url("https://staging.example.com")
+    .timeout(std::time::Duration::from_secs(20))
+    .max_retries(3)
+    .header("x-team", "billing")
+    .build()?;
+```
+
+Building a client fails with `Error::Request` when it has no base URL (the API declares none and
+neither `base_url()` nor `METEROID_BASE_URL` is set) or an invalid one.
+
+Every API area hangs off the client (`client.add_ons()`), and `with_options` sets headers, the
+timeout, retries or the idempotency key of the calls made through it. Clients are cheap to clone
+and can move to other tasks.
+
+Operations take their path parameters, their body, then their query and header parameters as an
+options struct, built with the required ones by `new(...)`; when every parameter is optional, pass
+the struct or `None`. Models keep the properties this version of the SDK does not know in `extra`,
+and send them back. Request models are built from their required fields by `new(...)`:
+
+```rust
+use meteroid_rs::models::CreateOnboardingLinkRequest;
+
+let onboarding_link_response = client.connect().create_onboarding_link("id", CreateOnboardingLinkRequest::new("redirect_url")).await?;
+```
+
+Models only found in responses are `#[non_exhaustive]`: build them, in tests say, with
+`new(required...)` and field assignments. Operations that may answer without a body return an
+`Option`.
+
+## Raw responses
+
+Awaiting a call gives its decoded body; `with_response()` also gives the status and headers:
+
+```rust
+let response = client.add_ons().retrieve("addon_id").with_response().await?;
+println!("{} {:?}", response.status(), response.request_id());
+let add_on = response.into_data();
+```
+
+## Errors
+
+Every call fails with `meteroid_rs::error::Error`: `Api` for a non-2xx response (after
+retries), `Timeout`, `Connection`, `Decode` for an unexpected body, `Request` for a request that
+could not be built.
+
+```rust
+use meteroid_rs::error::{ApiErrorKind, Error};
+
+match client.add_ons().retrieve("addon_id").await {
+    Err(Error::Api(error)) if error.kind() == ApiErrorKind::NotFound => {}
+    Err(error) => eprintln!("{error} (request {:?})", error.api().and_then(|e| e.request_id())),
+    Ok(add_on) => println!("{add_on:?}"),
 }
 ```
 
-## Available APIs
+`ApiError::payload()` decodes the body as the API's common error schema, and `json::<T>()` as any
+other.
 
-The SDK provides access to the following Meteroid API resources:
+## Retries and timeouts
 
-| Resource                     | Description                       |
-| ---------------------------- | --------------------------------- |
-| `client.customers()`         | Manage customers                  |
-| `client.subscriptions()`     | Manage subscriptions              |
-| `client.invoices()`          | Access invoices and download PDFs |
-| `client.plans()`             | List available plans              |
-| `client.product_families()`  | Manage product families           |
-| `client.events()`            | Send usage events                 |
-| `client.checkout_sessions()` | Create checkout sessions          |
-
-## Examples
-
-### Creating a Customer
+Connection errors, timeouts, 408, 429 and 5xx responses are retried twice with jittered
+backoff, honoring `Retry-After`, when the request is idempotent: GET, PUT, DELETE, or any request
+with an `Idempotency-Key` (POST requests get one automatically). Each attempt times out after 60
+seconds by default.
 
 ```rust
-use meteroid_rs::api::Meteroid;
-use meteroid_rs::models::CustomerCreateRequest;
+use meteroid_rs::api::RequestOptions;
 
-let client = Meteroid::new("your-api-key".to_string(), None);
-
-let customer = client.customers().create_customer(CustomerCreateRequest {
-    name: Some("Acme Corp".to_string()),
-    alias: Some("acme".to_string()),
-    billing_email: Some("billing@acme.com".to_string()),
-    ..Default::default()
-}).await?;
-
-println!("Created customer: {}", customer.id);
+let options = RequestOptions::new().max_retries(0).timeout(std::time::Duration::from_secs(5));
+client.add_ons().with_options(options).retrieve("addon_id").await?;
 ```
 
-### Listing Customers with Pagination
+## Features
 
-```rust
-use meteroid_rs::api::{Meteroid, CustomersListCustomersOptions};
+`rustls-tls` (default) or `native-tls`, `http2`, and `webhooks` for the webhook verifier.
 
-let client = Meteroid::new("your-api-key".to_string(), None);
-
-let customers = client.customers().list_customers(Some(CustomersListCustomersOptions {
-    page: Some(0),
-    per_page: Some(10),
-    search: Some("acme".to_string()),
-    ..Default::default()
-})).await?;
-
-for customer in customers.data {
-    println!("Customer: {} ({})", customer.name, customer.id);
-}
-```
-
-### Downloading an Invoice PDF
-
-```rust
-use meteroid_rs::api::Meteroid;
-
-let client = Meteroid::new("your-api-key".to_string(), None);
-
-let pdf_bytes = client.invoices()
-    .download_invoice_pdf("invoice_id".to_string())
-    .await?;
-
-// Save to file
-std::fs::write("invoice.pdf", &pdf_bytes)?;
-```
-
-### Sending Usage Events
-
-```rust
-use meteroid_rs::api::Meteroid;
-use meteroid_rs::models::{IngestEventsRequest, Event};
-use std::collections::HashMap;
-
-let client = Meteroid::new("your-api-key".to_string(), None);
-
-let mut properties = HashMap::new();
-properties.insert("endpoint".to_string(), "/api/v1/users".to_string());
-properties.insert("method".to_string(), "GET".to_string());
-
-client.events().ingest_events(IngestEventsRequest {
-    events: vec![Event {
-        code: "api_call".to_string(),
-        customer_id: "customer_id".to_string(),
-        event_id: "unique_event_id".to_string(),
-        timestamp: "2024-01-15T10:30:00Z".to_string(),
-        properties: Some(properties),
-    }],
-    allow_backfilling: None,
-}).await?;
-```
-
-## Configuration
-
-### Custom Server URL
-
-For self-hosted Meteroid instances:
-
-```rust
-use meteroid_rs::api::{Meteroid, MeteroidOptions};
-
-let options = MeteroidOptions {
-    server_url: Some("https://your-meteroid-instance.com".to_string()),
-    ..Default::default()
-};
-
-let client = Meteroid::new("your-api-key".to_string(), Some(options));
-```
-
-### Timeout and Retries
-
-```rust
-use meteroid_rs::api::{Meteroid, MeteroidOptions};
-use std::time::Duration;
-
-let options = MeteroidOptions {
-    timeout: Some(Duration::from_secs(30)),
-    num_retries: Some(3),
-    ..Default::default()
-};
-
-let client = Meteroid::new("your-api-key".to_string(), Some(options));
-```
-
-### Custom Retry Schedule
-
-```rust
-use meteroid_rs::api::{Meteroid, MeteroidOptions};
-use std::time::Duration;
-
-let options = MeteroidOptions {
-    retry_schedule: Some(vec![
-        Duration::from_millis(100),
-        Duration::from_millis(500),
-        Duration::from_secs(1),
-    ]),
-    ..Default::default()
-};
-
-let client = Meteroid::new("your-api-key".to_string(), Some(options));
-```
-
-## Cargo Features
-
-| Feature      | Description                          | Default |
-| ------------ | ------------------------------------ | ------- |
-| `rustls-tls` | Use rustls for TLS                   | Yes     |
-| `native-tls` | Use native OS TLS (OpenSSL on Linux) | No      |
-| `http1`      | HTTP/1.1 support                     | Yes     |
-| `http2`      | HTTP/2 support                       | No      |
-
-### Using Native TLS
-
-```toml
-[dependencies]
-meteroid-rs = { version = "0.26.0", default-features = false, features = ["native-tls", "http1"] }
-```
-
-## Error Handling
-
-All API methods return `Result<T, meteroid_rs::error::Error>`. For a non-2xx response the body is parsed as a `RestErrorResponse` (`Error::Http`), then as an `OAuthErrorResponse` (`Error::OAuth`); if it matches neither, `Error::Http` has `payload: None`. The HTTP status and raw body are always available:
-
-```rust
-use meteroid_rs::api::Meteroid;
-use meteroid_rs::error::Error;
-use meteroid_rs::models::ErrorCode;
-
-let client = Meteroid::new("your-api-key".to_string(), None);
-
-match client.customers().get_customer("invalid-id".to_string()).await {
-    Ok(customer) => println!("Found: {}", customer.name),
-    Err(e) if e.code() == Some(ErrorCode::NotFound) => {
-        println!("Not found: {}", e.message().unwrap_or_default());
-    }
-    Err(Error::Http(e)) => {
-        println!("HTTP error {}: {:?} body={}", e.status, e.payload, e.body_as_str());
-    }
-    Err(e) => println!("Other error: {}", e),
-}
-```
-
-## Thread Safety
-
-The `Meteroid` client is both `Send` and `Sync`, making it safe to share across threads:
-
-```rust
-use meteroid_rs::api::Meteroid;
-use std::sync::Arc;
-
-let client = Arc::new(Meteroid::new("your-api-key".to_string(), None));
-
-// Clone the Arc for use in different tasks
-let client_clone = Arc::clone(&client);
-tokio::spawn(async move {
-    let customers = client_clone.customers().list_customers(None).await;
-});
-```
-
-## License
-
-MIT
+- Source: https://github.com/meteroid-oss/meteroid-clients
+- License: Apache-2.0

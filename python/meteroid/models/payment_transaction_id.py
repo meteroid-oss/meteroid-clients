@@ -1,2 +1,4 @@
 # this file is @generated
-PaymentTransactionId = str
+import typing as t
+
+PaymentTransactionId: t.TypeAlias = str

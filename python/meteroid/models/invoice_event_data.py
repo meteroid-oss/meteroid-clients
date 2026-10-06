@@ -1,16 +1,22 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .customer_id import CustomerId
-from .invoice_id import InvoiceId
-from .invoice_status import InvoiceStatus
+
+if t.TYPE_CHECKING:
+    from .customer_id import CustomerId
+    from .invoice_id import InvoiceId
+    from .invoice_status import InvoiceStatus
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class InvoiceEventData(BaseModel):
+    """The `InvoiceEventData` object."""
+
     created_at: datetime
 
     currency: str
@@ -28,9 +34,9 @@ class InvoiceEventData(BaseModel):
 
     total: int
 
-    consolidated_into_invoice_id: t.Optional[InvoiceId] = None
+    consolidated_into_invoice_id: InvoiceId | None = None
 
-    invoice_number: t.Optional[str] = None
+    invoice_number: str | None = None
     """Absent while the invoice is a draft — the number is assigned at finalization."""
 
-    parent_invoice_id: t.Optional[InvoiceId] = None
+    parent_invoice_id: InvoiceId | None = None

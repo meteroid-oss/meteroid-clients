@@ -1,169 +1,187 @@
-//! Error types for the Meteroid SDK.
+//! Errors returned by the client.
+use std::{borrow::Cow, fmt};
 
-use std::fmt;
+use bytes::Bytes;
+use http::{HeaderMap, StatusCode};
 
-use http_body_util::BodyExt;
-use hyper::body::{Bytes, Incoming};
+use crate::request::Failure;
 
-use crate::models::{ErrorCode, OAuthErrorResponse, RestErrorResponse};
+pub use crate::api::middleware::BoxError;
 
-pub type Result<T> = std::result::Result<T, Error>;
+/// A `Result` failing with the client's [`Error`].
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-/// The error type returned from the Meteroid API.
-///
-/// For a non-2xx response, the body is parsed as a [`RestErrorResponse`] first
-/// ([`Error::Http`] with `payload: Some(..)`), then as an [`OAuthErrorResponse`]
-/// ([`Error::OAuth`]). If it matches neither, the result is [`Error::Http`] with
-/// `payload: None`. The HTTP status and the raw body are always available,
-/// whatever the status code.
-///
-/// The typed parse is strict: a body carrying an error code this version of the
-/// SDK doesn't know (e.g. a new [`ErrorCode`] variant added server-side) does not
-/// parse, and only the status and raw body are available.
-#[derive(Debug, Clone)]
+/// Everything a call can fail with.
+#[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
-    /// A generic error (transport, timeout, (de)serialization of a successful response, ...).
-    Generic(String),
-    /// A non-2xx response. `payload` is the parsed [`RestErrorResponse`], or `None`
-    /// when the body matched none of the API's error schemas.
-    Http(HttpErrorContent<RestErrorResponse>),
-    /// A non-2xx response whose body is an OAuth 2.0 error (RFC 6749 §5.2).
-    OAuth(HttpErrorContent<OAuthErrorResponse>),
+    /// The API answered with a non-2xx status, after any retries.
+    Api(Box<ApiError>),
+    /// No response arrived within the configured timeout.
+    Timeout,
+    /// Connecting, sending the request or reading the response failed.
+    Connection(BoxError),
+    /// The response body does not match the expected type.
+    Decode(BoxError),
+    /// The request or the client could not be built, e.g. an invalid header value or a
+    /// missing base URL.
+    Request(BoxError),
+}
+
+/// A non-2xx response.
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub struct ApiError {
+    /// The HTTP status.
+    pub status: StatusCode,
+    /// The response headers.
+    pub headers: HeaderMap,
+    /// The raw body.
+    pub body: Bytes,
+}
+
+/// What an API error status means.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum ApiErrorKind {
+    /// 400
+    BadRequest,
+    /// 401
+    Unauthorized,
+    /// 403
+    PermissionDenied,
+    /// 404
+    NotFound,
+    /// 409
+    Conflict,
+    /// 422
+    UnprocessableEntity,
+    /// 429
+    RateLimited,
+    /// 5xx
+    InternalServer,
+    /// Any other status.
+    Other,
+}
+
+impl ApiError {
+    /// What the status means: not found, rate limited...
+    #[must_use]
+    pub fn kind(&self) -> ApiErrorKind {
+        match self.status.as_u16() {
+            400 => ApiErrorKind::BadRequest,
+            401 => ApiErrorKind::Unauthorized,
+            403 => ApiErrorKind::PermissionDenied,
+            404 => ApiErrorKind::NotFound,
+            409 => ApiErrorKind::Conflict,
+            422 => ApiErrorKind::UnprocessableEntity,
+            429 => ApiErrorKind::RateLimited,
+            500..=599 => ApiErrorKind::InternalServer,
+            _ => ApiErrorKind::Other,
+        }
+    }
+
+    /// The body as text, for logging.
+    #[must_use]
+    pub fn text(&self) -> Cow<'_, str> {
+        String::from_utf8_lossy(&self.body)
+    }
+
+    /// The body decoded as `T`, e.g. the error schema the operation documents.
+    ///
+    /// # Errors
+    ///
+    /// Fails when the body is not a `T`.
+    pub fn json<T: serde::de::DeserializeOwned>(&self) -> serde_json::Result<T> {
+        serde_json::from_slice(&self.body)
+    }
+
+    /// The body decoded as the error schema most operations document (any JSON when the API
+    /// documents none), if it is one.
+    #[must_use]
+    pub fn payload(&self) -> Option<crate::api::ErrorBody> {
+        self.json().ok()
+    }
+
+    /// The `x-request-id` (or `request-id`) response header, to quote when reporting an issue.
+    #[must_use]
+    pub fn request_id(&self) -> Option<&str> {
+        ["x-request-id", "request-id"]
+            .iter()
+            .find_map(|name| self.headers.get(*name)?.to_str().ok())
+    }
 }
 
 impl Error {
-    pub(crate) fn generic(err: impl std::error::Error) -> Self {
-        Self::Generic(format!("{err:?}"))
-    }
-
-    pub(crate) async fn from_response(status_code: http1::StatusCode, body: Incoming) -> Self {
-        match body.collect().await {
-            Ok(collected) => Self::from_body(status_code, collected.to_bytes()),
-            Err(e) => Self::Generic(e.to_string()),
+    // The runtime builds errors through these two functions only.
+    pub(crate) fn generic(failure: Failure) -> Self {
+        match failure {
+            Failure::Timeout => Self::Timeout,
+            Failure::Transport(error) => Self::Connection(error),
+            Failure::Decode(error) => Self::Decode(error),
+            Failure::Request(error) => Self::Request(error),
         }
     }
 
-    fn from_body(status: http1::StatusCode, raw_body: Bytes) -> Self {
-        if let Ok(payload) = serde_json::from_slice::<RestErrorResponse>(&raw_body) {
-            return Self::Http(HttpErrorContent {
-                status,
-                payload: Some(payload),
-                raw_body,
-            });
-        }
-        if let Ok(payload) = serde_json::from_slice::<OAuthErrorResponse>(&raw_body) {
-            return Self::OAuth(HttpErrorContent {
-                status,
-                payload: Some(payload),
-                raw_body,
-            });
-        }
-        Self::Http(HttpErrorContent {
+    pub(crate) fn from_response(status: StatusCode, headers: HeaderMap, body: Bytes) -> Self {
+        Self::Api(Box::new(ApiError {
             status,
-            payload: None,
-            raw_body,
-        })
+            headers,
+            body,
+        }))
     }
 
-    /// The HTTP status of the response, if the error came from one.
-    pub fn status(&self) -> Option<http1::StatusCode> {
-        match self {
-            Error::Generic(_) => None,
-            Error::Http(e) => Some(e.status),
-            Error::OAuth(e) => Some(e.status),
-        }
+    /// Whether no response arrived within the timeout.
+    #[must_use]
+    pub fn is_timeout(&self) -> bool {
+        matches!(self, Self::Timeout)
     }
 
-    /// The API error code, if the body parsed as a [`RestErrorResponse`].
-    pub fn code(&self) -> Option<ErrorCode> {
+    /// Whether connecting, sending the request or reading the response failed.
+    #[must_use]
+    pub fn is_connection(&self) -> bool {
+        matches!(self, Self::Connection(_))
+    }
+
+    /// The HTTP status of an API error.
+    #[must_use]
+    pub fn status(&self) -> Option<StatusCode> {
+        self.api().map(|error| error.status)
+    }
+
+    /// What the status of an API error means.
+    #[must_use]
+    pub fn kind(&self) -> Option<ApiErrorKind> {
+        self.api().map(ApiError::kind)
+    }
+
+    /// The response of an API error.
+    #[must_use]
+    pub fn api(&self) -> Option<&ApiError> {
         match self {
-            Error::Http(HttpErrorContent {
-                payload: Some(p), ..
-            }) => Some(p.code),
+            Self::Api(error) => Some(error),
             _ => None,
         }
-    }
-
-    /// The API error message, if the body parsed as a [`RestErrorResponse`].
-    pub fn message(&self) -> Option<&str> {
-        match self {
-            Error::Http(HttpErrorContent {
-                payload: Some(p), ..
-            }) => Some(&p.message),
-            _ => None,
-        }
-    }
-}
-
-impl From<Error> for String {
-    fn from(err: Error) -> Self {
-        err.to_string()
     }
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::Generic(s) => s.fmt(f),
-            Error::Http(e) => match &e.payload {
-                Some(p) => write!(
-                    f,
-                    "Http error (status={}) {}: {}",
-                    e.status, p.code, p.message
-                ),
-                None => write!(
-                    f,
-                    "Http error (status={}) body={}",
-                    e.status,
-                    e.body_as_str()
-                ),
-            },
-            Error::OAuth(e) => match &e.payload {
-                Some(p) => {
-                    write!(f, "OAuth error (status={}) {}", e.status, p.error)?;
-                    if let Some(d) = &p.error_description {
-                        write!(f, ": {d}")?;
-                    }
-                    Ok(())
-                }
-                None => write!(
-                    f,
-                    "OAuth error (status={}) body={}",
-                    e.status,
-                    e.body_as_str()
-                ),
-            },
+            Self::Api(error) => write!(f, "API error ({}): {}", error.status, error.text()),
+            Self::Timeout => f.write_str("request timed out"),
+            Self::Connection(error) => write!(f, "connection error: {error}"),
+            Self::Decode(error) => write!(f, "unexpected response body: {error}"),
+            Self::Request(error) => write!(f, "invalid request: {error}"),
         }
     }
 }
 
-impl std::error::Error for Error {}
-
-#[derive(Clone)]
-pub struct HttpErrorContent<T> {
-    pub status: http1::StatusCode,
-    /// Parsed payload if the body matched the expected error schema. `None`
-    /// when the server returned a body in a different shape (or with an error
-    /// code unknown to this SDK version); inspect [`Self::raw_body`] in that case.
-    pub payload: Option<T>,
-    /// Raw response body, always captured so debugging is possible even when
-    /// the server's error format doesn't match the SDK's expected schema.
-    pub raw_body: Bytes,
-}
-
-impl<T> HttpErrorContent<T> {
-    /// Lossy UTF-8 view of the raw response body, for logging.
-    pub fn body_as_str(&self) -> std::borrow::Cow<'_, str> {
-        String::from_utf8_lossy(&self.raw_body)
-    }
-}
-
-impl<T: fmt::Debug> fmt::Debug for HttpErrorContent<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("HttpErrorContent")
-            .field("status", &self.status)
-            .field("payload", &self.payload)
-            .field("raw_body", &self.body_as_str())
-            .finish()
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Connection(error) | Self::Decode(error) | Self::Request(error) => Some(&**error),
+            Self::Api(_) | Self::Timeout => None,
+        }
     }
 }

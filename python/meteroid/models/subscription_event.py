@@ -1,17 +1,23 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .event_id import EventId
-from .event_type import EventType
-from .subscription_event_data import SubscriptionEventData
+
+if t.TYPE_CHECKING:
+    from .event_id import EventId
+    from .event_type import EventType
+    from .subscription_event_data import SubscriptionEventData
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class SubscriptionEvent(BaseModel):
-    _FLATTENED: t.ClassVar[t.Tuple[str, ...]] = ("subscription_event_data",)
+    """The `SubscriptionEvent` object."""
+
+    _FLATTENED: t.ClassVar[tuple[str, ...]] = ("subscription_event_data",)
 
     subscription_event_data: SubscriptionEventData
 

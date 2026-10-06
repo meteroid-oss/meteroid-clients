@@ -1,2 +1,4 @@
 # this file is @generated
-CouponId = str
+import typing as t
+
+CouponId: t.TypeAlias = str

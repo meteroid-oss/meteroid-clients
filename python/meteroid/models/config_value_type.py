@@ -1,8 +1,10 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class ConfigValueType(str, enum.Enum):
+class ConfigValueType(StrEnum):
     """Authoritative value type of a Config feature. `MAP`/`JSON` both carry a JSON value."""
 
     NUMBER = "NUMBER"
@@ -12,5 +14,8 @@ class ConfigValueType(str, enum.Enum):
     JSON = "JSON"
     SELECT = "SELECT"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+ConfigValueTypeLiteral: t.TypeAlias = t.Literal[
+    "NUMBER", "BOOLEAN", "TEXT", "MAP", "JSON", "SELECT"
+]
+"""The values of :class:`ConfigValueType`, which arguments take as plain strings too."""

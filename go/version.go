@@ -1,7 +1,4 @@
 package meteroid
 
-// Version is the version of the Meteroid Go SDK.
-//
-// Keep this in sync with the repository-wide .version file; scripts/bump_version.js
-// rewrites it automatically.
+// Version is the version of this SDK, sent in the User-Agent header.
 const Version = "0.26.0"

@@ -1,129 +1,292 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class PaymentMethodInfo {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class PaymentMethodInfo {
     @JsonProperty("account_number_hint")
-    private String accountNumberHint;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> accountNumberHint = JsonField.missing();
 
     @JsonProperty("card_brand")
-    private String cardBrand;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> cardBrand = JsonField.missing();
 
     @JsonProperty("card_last4")
-    private String cardLast4;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> cardLast4 = JsonField.missing();
 
     @JsonProperty("payment_method_type")
     private PaymentMethodTypeEnum paymentMethodType;
 
-    public PaymentMethodInfo() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public PaymentMethodInfo accountNumberHint(String accountNumberHint) {
-        this.accountNumberHint = accountNumberHint;
-        return this;
+    private PaymentMethodInfo() {}
+
+    private PaymentMethodInfo(Builder builder) {
+        this.accountNumberHint = builder.accountNumberHint;
+        this.cardBrand = builder.cardBrand;
+        this.cardLast4 = builder.cardLast4;
+        this.paymentMethodType = builder.paymentMethodType;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get accountNumberHint
+     * A builder of {@code PaymentMethodInfo}.
      *
-     * @return accountNumberHint
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getAccountNumberHint() {
-        return accountNumberHint;
-    }
-
-    public void setAccountNumberHint(String accountNumberHint) {
-        this.accountNumberHint = accountNumberHint;
-    }
-
-    public PaymentMethodInfo cardBrand(String cardBrand) {
-        this.cardBrand = cardBrand;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get cardBrand
+     * A builder starting from this value.
      *
-     * @return cardBrand
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getCardBrand() {
-        return cardBrand;
-    }
-
-    public void setCardBrand(String cardBrand) {
-        this.cardBrand = cardBrand;
-    }
-
-    public PaymentMethodInfo cardLast4(String cardLast4) {
-        this.cardLast4 = cardLast4;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.accountNumberHint = accountNumberHint;
+        builder.cardBrand = cardBrand;
+        builder.cardLast4 = cardLast4;
+        builder.paymentMethodType = paymentMethodType;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get cardLast4
+     * The {@code account_number_hint} property.
      *
-     * @return cardLast4
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getCardLast4() {
-        return cardLast4;
-    }
-
-    public void setCardLast4(String cardLast4) {
-        this.cardLast4 = cardLast4;
-    }
-
-    public PaymentMethodInfo paymentMethodType(PaymentMethodTypeEnum paymentMethodType) {
-        this.paymentMethodType = paymentMethodType;
-        return this;
+    public Optional<String> accountNumberHint() {
+        return accountNumberHint.asOptional();
     }
 
     /**
-     * Get paymentMethodType
+     * The {@code card_brand} property.
      *
-     * @return paymentMethodType
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public PaymentMethodTypeEnum getPaymentMethodType() {
-        return paymentMethodType;
-    }
-
-    public void setPaymentMethodType(PaymentMethodTypeEnum paymentMethodType) {
-        this.paymentMethodType = paymentMethodType;
+    public Optional<String> cardBrand() {
+        return cardBrand.asOptional();
     }
 
     /**
-     * Create an instance of PaymentMethodInfo given an JSON string
+     * The {@code card_last4} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of PaymentMethodInfo
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     PaymentMethodInfo
+     * @return the value, empty when unset or null
      */
-    public static PaymentMethodInfo fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, PaymentMethodInfo.class);
+    public Optional<String> cardLast4() {
+        return cardLast4.asOptional();
     }
 
     /**
-     * Convert an instance of PaymentMethodInfo to an JSON string
+     * The {@code payment_method_type} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public PaymentMethodTypeEnum paymentMethodType() {
+        return Utils.required(paymentMethodType, "payment_method_type");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PaymentMethodInfo that = (PaymentMethodInfo) o;
+        return Objects.equals(accountNumberHint, that.accountNumberHint)
+                && Objects.equals(cardBrand, that.cardBrand)
+                && Objects.equals(cardLast4, that.cardLast4)
+                && Objects.equals(paymentMethodType, that.paymentMethodType)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                accountNumberHint, cardBrand, cardLast4, paymentMethodType, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "PaymentMethodInfo{"
+                + "accountNumberHint="
+                + accountNumberHint
+                + ", cardBrand="
+                + cardBrand
+                + ", cardLast4="
+                + cardLast4
+                + ", paymentMethodType="
+                + paymentMethodType
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link PaymentMethodInfo}. */
+    public static final class Builder {
+        private JsonField<String> accountNumberHint = JsonField.missing();
+        private JsonField<String> cardBrand = JsonField.missing();
+        private JsonField<String> cardLast4 = JsonField.missing();
+        private PaymentMethodTypeEnum paymentMethodType;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code account_number_hint} property.
+         *
+         * @param accountNumberHint the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder accountNumberHint(String accountNumberHint) {
+            this.accountNumberHint = JsonField.ofNullable(accountNumberHint);
+            return this;
+        }
+
+        /**
+         * The {@code card_brand} property.
+         *
+         * @param cardBrand the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder cardBrand(String cardBrand) {
+            this.cardBrand = JsonField.ofNullable(cardBrand);
+            return this;
+        }
+
+        /**
+         * The {@code card_last4} property.
+         *
+         * @param cardLast4 the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder cardLast4(String cardLast4) {
+            this.cardLast4 = JsonField.ofNullable(cardLast4);
+            return this;
+        }
+
+        /**
+         * The {@code payment_method_type} property.
+         *
+         * @param paymentMethodType the value
+         * @return this builder
+         */
+        public Builder paymentMethodType(PaymentMethodTypeEnum paymentMethodType) {
+            this.paymentMethodType = paymentMethodType;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code PaymentMethodInfo}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public PaymentMethodInfo build() {
+            Utils.checkRequired(paymentMethodType, "payment_method_type");
+            return new PaymentMethodInfo(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code PaymentMethodInfo}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static PaymentMethodInfo fromJson(String json) {
+        return Utils.parse(json, PaymentMethodInfo.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

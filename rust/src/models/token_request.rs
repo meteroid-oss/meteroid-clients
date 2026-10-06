@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Token request (from POST body, application/x-www-form-urlencoded)
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct TokenRequest {
     /// Client ID (if not using HTTP Basic auth)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,18 +30,25 @@ pub struct TokenRequest {
     /// Refresh token (for refresh_token grant)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub refresh_token: Option<String>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl TokenRequest {
-    pub fn new(grant_type: String) -> Self {
+    /// Creates a value from its required fields.
+    #[must_use]
+    pub fn new(grant_type: impl Into<String>) -> Self {
         Self {
             client_id: None,
             client_secret: None,
             code: None,
             code_verifier: None,
-            grant_type,
+            grant_type: grant_type.into(),
             redirect_uri: None,
             refresh_token: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

@@ -1,28 +1,31 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
 
 export interface MeteredEntitlementUsage {
-  consumed?: string | null;
-
-  remaining?: string | null;
-
-  resetAt?: Date | null;
+  consumed?: string | null | undefined;
+  remaining?: string | null | undefined;
+  resetAt?: Date | null | undefined;
 }
 
+/** Converts `MeteredEntitlementUsage` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MeteredEntitlementUsageSerializer = {
-  _fromJsonObject(object: any): MeteredEntitlementUsage {
+  parse(json: any): MeteredEntitlementUsage {
     return {
-      consumed: object["consumed"],
-      remaining: object["remaining"],
-      resetAt: object["reset_at"] != null ? parseDateTime(object["reset_at"]) : undefined,
+      ...extraProperties(json, ["consumed", "remaining", "reset_at"]),
+      consumed: json["consumed"],
+      remaining: json["remaining"],
+      resetAt:
+        json["reset_at"] != null ? parseDateTime(json["reset_at"]) : json["reset_at"],
     };
   },
 
-  _toJsonObject(self: MeteredEntitlementUsage): any {
+  serialize(value: MeteredEntitlementUsage): any {
     return {
-      consumed: self.consumed,
-      remaining: self.remaining,
-      reset_at: self.resetAt,
+      ...extraProperties(value, ["consumed", "remaining", "resetAt"]),
+      consumed: value.consumed,
+      remaining: value.remaining,
+      reset_at: value.resetAt,
     };
   },
 };

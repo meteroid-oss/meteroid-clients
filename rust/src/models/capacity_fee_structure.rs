@@ -3,13 +3,22 @@ use serde::{Deserialize, Serialize};
 
 use super::billable_metric_id::BillableMetricId;
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct CapacityFeeStructure {
     pub metric_id: BillableMetricId,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CapacityFeeStructure {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(metric_id: BillableMetricId) -> Self {
-        Self { metric_id }
+        Self {
+            metric_id,
+            extra: serde_json::Map::new(),
+        }
     }
 }

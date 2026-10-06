@@ -2,12 +2,13 @@
 
 export type QuoteId = string;
 
+/** Converts `QuoteId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const QuoteIdSerializer = {
-  _fromJsonObject(object: any): QuoteId {
-    return object;
+  parse(json: any): QuoteId {
+    return json;
   },
 
-  _toJsonObject(self: QuoteId): any {
-    return self;
+  serialize(value: QuoteId): any {
+    return value;
   },
 };

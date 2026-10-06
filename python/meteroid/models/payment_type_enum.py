@@ -1,10 +1,15 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class PaymentTypeEnum(str, enum.Enum):
+class PaymentTypeEnum(StrEnum):
+    """The values of `PaymentTypeEnum`; others are kept as received."""
+
     PAYMENT = "PAYMENT"
     REFUND = "REFUND"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+PaymentTypeEnumLiteral: t.TypeAlias = t.Literal["PAYMENT", "REFUND"]
+"""The values of :class:`PaymentTypeEnum`, which arguments take as plain strings too."""

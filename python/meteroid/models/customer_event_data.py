@@ -1,13 +1,19 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .customer_id import CustomerId
+
+if t.TYPE_CHECKING:
+    from .customer_id import CustomerId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CustomerEventData(BaseModel):
+    """The `CustomerEventData` object."""
+
     currency: str
 
     custom_properties: t.Any
@@ -15,12 +21,12 @@ class CustomerEventData(BaseModel):
 
     customer_id: CustomerId
 
-    invoicing_emails: t.List[str]
+    invoicing_emails: list[str]
 
     name: str
 
-    alias: t.Optional[str] = None
+    alias: str | None = None
 
-    billing_email: t.Optional[str] = None
+    billing_email: str | None = None
 
-    phone: t.Optional[str] = None
+    phone: str | None = None

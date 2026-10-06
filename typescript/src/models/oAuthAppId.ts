@@ -2,12 +2,13 @@
 
 export type OAuthAppId = string;
 
+/** Converts `OAuthAppId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OAuthAppIdSerializer = {
-  _fromJsonObject(object: any): OAuthAppId {
-    return object;
+  parse(json: any): OAuthAppId {
+    return json;
   },
 
-  _toJsonObject(self: OAuthAppId): any {
-    return self;
+  serialize(value: OAuthAppId): any {
+    return value;
   },
 };

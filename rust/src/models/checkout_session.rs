@@ -8,13 +8,14 @@ use super::{
     subscription_id::SubscriptionId,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CheckoutSession {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_day_anchor: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub billing_start_date: Option<String>,
+    pub billing_start_date: Option<chrono::NaiveDate>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cancel_url: Option<String>,
@@ -25,20 +26,18 @@ pub struct CheckoutSession {
     pub checkout_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<String>,
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coupon_code: Option<String>,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     pub customer_id: CustomerId,
 
     /// When the session expires. None means the session never expires.
-    ///
-    /// RFC3339 date string.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub expires_at: Option<String>,
+    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub id: CheckoutSessionId,
 
@@ -60,12 +59,18 @@ pub struct CheckoutSession {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trial_duration_days: Option<i32>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CheckoutSession {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         checkout_type: CheckoutType,
-        created_at: String,
+        created_at: chrono::DateTime<chrono::Utc>,
         customer_id: CustomerId,
         id: CheckoutSessionId,
         plan_version_id: PlanVersionId,
@@ -90,6 +95,7 @@ impl CheckoutSession {
             subscription_id: None,
             success_url: None,
             trial_duration_days: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

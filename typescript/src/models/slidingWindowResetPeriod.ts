@@ -1,24 +1,27 @@
 // this file is @generated
-import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit";
+import { extraProperties } from "../json.js";
+import { type CalendarUnit, CalendarUnitSerializer } from "./calendarUnit.js";
 /** Always ends at now — e.g. 30 days means the last 30 days, old usage drops off automatically. */
 export interface SlidingWindowResetPeriod {
   interval: number;
-
   unit: CalendarUnit;
 }
 
+/** Converts `SlidingWindowResetPeriod` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SlidingWindowResetPeriodSerializer = {
-  _fromJsonObject(object: any): SlidingWindowResetPeriod {
+  parse(json: any): SlidingWindowResetPeriod {
     return {
-      interval: object["interval"],
-      unit: CalendarUnitSerializer._fromJsonObject(object["unit"]),
+      ...extraProperties(json, ["interval", "unit"]),
+      interval: json["interval"],
+      unit: CalendarUnitSerializer.parse(json["unit"]),
     };
   },
 
-  _toJsonObject(self: SlidingWindowResetPeriod): any {
+  serialize(value: SlidingWindowResetPeriod): any {
     return {
-      interval: self.interval,
-      unit: CalendarUnitSerializer._toJsonObject(self.unit),
+      ...extraProperties(value, ["interval", "unit"]),
+      interval: value.interval,
+      unit: CalendarUnitSerializer.serialize(value.unit),
     };
   },
 };

@@ -1,78 +1,92 @@
 // this file is @generated
-import { type ComponentOverride, ComponentOverrideSerializer } from "./componentOverride";
+import { extraProperties } from "../json.js";
+import {
+  type ComponentOverride,
+  ComponentOverrideSerializer,
+} from "./componentOverride.js";
 import {
   type ComponentParameterization,
   ComponentParameterizationSerializer,
-} from "./componentParameterization";
-import { type ExtraComponent, ExtraComponentSerializer } from "./extraComponent";
-import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId";
+} from "./componentParameterization.js";
+import { type ExtraComponent, ExtraComponentSerializer } from "./extraComponent.js";
+import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId.js";
 
 export interface CreateSubscriptionComponents {
-  extraComponents?: ExtraComponent[] | null;
-
-  overriddenComponents?: ComponentOverride[] | null;
-
-  parameterizedComponents?: ComponentParameterization[] | null;
-
-  removeComponents?: PriceComponentId[] | null;
+  extraComponents?: ExtraComponent[] | null | undefined;
+  overriddenComponents?: ComponentOverride[] | null | undefined;
+  parameterizedComponents?: ComponentParameterization[] | null | undefined;
+  removeComponents?: PriceComponentId[] | null | undefined;
 }
 
+/** Converts `CreateSubscriptionComponents` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateSubscriptionComponentsSerializer = {
-  _fromJsonObject(object: any): CreateSubscriptionComponents {
+  parse(json: any): CreateSubscriptionComponents {
     return {
+      ...extraProperties(json, [
+        "extra_components",
+        "overridden_components",
+        "parameterized_components",
+        "remove_components",
+      ]),
       extraComponents:
-        object["extra_components"] != null
-          ? object["extra_components"].map((item: any) =>
-              ExtraComponentSerializer._fromJsonObject(item)
+        json["extra_components"] != null
+          ? json["extra_components"].map((item: any) =>
+              ExtraComponentSerializer.parse(item)
             )
-          : undefined,
+          : json["extra_components"],
       overriddenComponents:
-        object["overridden_components"] != null
-          ? object["overridden_components"].map((item: any) =>
-              ComponentOverrideSerializer._fromJsonObject(item)
+        json["overridden_components"] != null
+          ? json["overridden_components"].map((item: any) =>
+              ComponentOverrideSerializer.parse(item)
             )
-          : undefined,
+          : json["overridden_components"],
       parameterizedComponents:
-        object["parameterized_components"] != null
-          ? object["parameterized_components"].map((item: any) =>
-              ComponentParameterizationSerializer._fromJsonObject(item)
+        json["parameterized_components"] != null
+          ? json["parameterized_components"].map((item: any) =>
+              ComponentParameterizationSerializer.parse(item)
             )
-          : undefined,
+          : json["parameterized_components"],
       removeComponents:
-        object["remove_components"] != null
-          ? object["remove_components"].map((item: any) =>
-              PriceComponentIdSerializer._fromJsonObject(item)
+        json["remove_components"] != null
+          ? json["remove_components"].map((item: any) =>
+              PriceComponentIdSerializer.parse(item)
             )
-          : undefined,
+          : json["remove_components"],
     };
   },
 
-  _toJsonObject(self: CreateSubscriptionComponents): any {
+  serialize(value: CreateSubscriptionComponents): any {
     return {
+      ...extraProperties(value, [
+        "extraComponents",
+        "overriddenComponents",
+        "parameterizedComponents",
+        "removeComponents",
+      ]),
       extra_components:
-        self.extraComponents != null
-          ? self.extraComponents.map((item: any) =>
-              ExtraComponentSerializer._toJsonObject(item)
+        value.extraComponents != null
+          ? value.extraComponents.map((item: any) =>
+              ExtraComponentSerializer.serialize(item)
             )
-          : undefined,
+          : value.extraComponents,
       overridden_components:
-        self.overriddenComponents != null
-          ? self.overriddenComponents.map((item: any) =>
-              ComponentOverrideSerializer._toJsonObject(item)
+        value.overriddenComponents != null
+          ? value.overriddenComponents.map((item: any) =>
+              ComponentOverrideSerializer.serialize(item)
             )
-          : undefined,
+          : value.overriddenComponents,
       parameterized_components:
-        self.parameterizedComponents != null
-          ? self.parameterizedComponents.map((item: any) =>
-              ComponentParameterizationSerializer._toJsonObject(item)
+        value.parameterizedComponents != null
+          ? value.parameterizedComponents.map((item: any) =>
+              ComponentParameterizationSerializer.serialize(item)
             )
-          : undefined,
+          : value.parameterizedComponents,
       remove_components:
-        self.removeComponents != null
-          ? self.removeComponents.map((item: any) =>
-              PriceComponentIdSerializer._toJsonObject(item)
+        value.removeComponents != null
+          ? value.removeComponents.map((item: any) =>
+              PriceComponentIdSerializer.serialize(item)
             )
-          : undefined,
+          : value.removeComponents,
     };
   },
 };

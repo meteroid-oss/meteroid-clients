@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface BooleanEffectiveEntitlementValue {
   enabled: boolean;
 }
 
+/** Converts `BooleanEffectiveEntitlementValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BooleanEffectiveEntitlementValueSerializer = {
-  _fromJsonObject(object: any): BooleanEffectiveEntitlementValue {
+  parse(json: any): BooleanEffectiveEntitlementValue {
     return {
-      enabled: object["enabled"],
+      ...extraProperties(json, ["enabled"]),
+      enabled: json["enabled"],
     };
   },
 
-  _toJsonObject(self: BooleanEffectiveEntitlementValue): any {
+  serialize(value: BooleanEffectiveEntitlementValue): any {
     return {
-      enabled: self.enabled,
+      ...extraProperties(value, ["enabled"]),
+      enabled: value.enabled,
     };
   },
 };

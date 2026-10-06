@@ -19,15 +19,22 @@ pub struct CreateSubscriptionComponents {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remove_components: Option<Vec<PriceComponentId>>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CreateSubscriptionComponents {
+    /// Creates a value with every field unset.
+    #[must_use]
     pub fn new() -> Self {
         Self {
             extra_components: None,
             overridden_components: None,
             parameterized_components: None,
             remove_components: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

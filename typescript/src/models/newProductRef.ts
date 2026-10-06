@@ -1,37 +1,37 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type ProductFeeStructure,
   ProductFeeStructureSerializer,
-} from "./productFeeStructure";
+} from "./productFeeStructure.js";
 import {
   type ProductFeeTypeEnum,
   ProductFeeTypeEnumSerializer,
-} from "./productFeeTypeEnum";
+} from "./productFeeTypeEnum.js";
 
 export interface NewProductRef {
   feeStructure: ProductFeeStructure;
-
   feeType: ProductFeeTypeEnum;
-
   name: string;
 }
 
+/** Converts `NewProductRef` values from (`parse`) and to (`serialize`) their JSON form. */
 export const NewProductRefSerializer = {
-  _fromJsonObject(object: any): NewProductRef {
+  parse(json: any): NewProductRef {
     return {
-      feeStructure: ProductFeeStructureSerializer._fromJsonObject(
-        object["fee_structure"]
-      ),
-      feeType: ProductFeeTypeEnumSerializer._fromJsonObject(object["fee_type"]),
-      name: object["name"],
+      ...extraProperties(json, ["fee_structure", "fee_type", "name"]),
+      feeStructure: ProductFeeStructureSerializer.parse(json["fee_structure"]),
+      feeType: ProductFeeTypeEnumSerializer.parse(json["fee_type"]),
+      name: json["name"],
     };
   },
 
-  _toJsonObject(self: NewProductRef): any {
+  serialize(value: NewProductRef): any {
     return {
-      fee_structure: ProductFeeStructureSerializer._toJsonObject(self.feeStructure),
-      fee_type: ProductFeeTypeEnumSerializer._toJsonObject(self.feeType),
-      name: self.name,
+      ...extraProperties(value, ["feeStructure", "feeType", "name"]),
+      fee_structure: ProductFeeStructureSerializer.serialize(value.feeStructure),
+      fee_type: ProductFeeTypeEnumSerializer.serialize(value.feeType),
+      name: value.name,
     };
   },
 };

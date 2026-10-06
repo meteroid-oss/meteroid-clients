@@ -6,7 +6,8 @@ use super::{
     subscription_fee_billing_period_enum::SubscriptionFeeBillingPeriodEnum,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct SubscriptionComponent {
     pub fee: SubscriptionFee,
 
@@ -19,20 +20,27 @@ pub struct SubscriptionComponent {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub product_id: Option<ProductId>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl SubscriptionComponent {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         fee: SubscriptionFee,
-        name: String,
+        name: impl Into<String>,
         period: SubscriptionFeeBillingPeriodEnum,
     ) -> Self {
         Self {
             fee,
-            name,
+            name: name.into(),
             period,
             price_component_id: None,
             product_id: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

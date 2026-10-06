@@ -1,25 +1,34 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CreditNote {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CreditNote {
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
@@ -32,7 +41,8 @@ public class CreditNote {
     @JsonProperty("credited_amount_cents")
     private Long creditedAmountCents;
 
-    @JsonProperty private Currency currency;
+    @JsonProperty("currency")
+    private Currency currency;
 
     @JsonProperty("custom_properties")
     private Object customProperties;
@@ -41,9 +51,11 @@ public class CreditNote {
     private String customerId;
 
     @JsonProperty("finalized_at")
-    private OffsetDateTime finalizedAt;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<OffsetDateTime> finalizedAt = JsonField.missing();
 
-    @JsonProperty private String id;
+    @JsonProperty("id")
+    private String id;
 
     @JsonProperty("invoice_id")
     private String invoiceId;
@@ -54,22 +66,30 @@ public class CreditNote {
     @JsonProperty("line_items")
     private List<InvoiceLineItem> lineItems;
 
-    @JsonProperty private String memo;
+    @JsonProperty("memo")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> memo = JsonField.missing();
 
     @JsonProperty("plan_version_id")
-    private String planVersionId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> planVersionId = JsonField.missing();
 
-    @JsonProperty private String reason;
+    @JsonProperty("reason")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> reason = JsonField.missing();
 
     @JsonProperty("refunded_amount_cents")
     private Long refundedAmountCents;
 
-    @JsonProperty private CreditNoteStatus status;
+    @JsonProperty("status")
+    private CreditNoteStatus status;
 
     @JsonProperty("subscription_id")
-    private String subscriptionId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> subscriptionId = JsonField.missing();
 
-    @JsonProperty private Long subtotal;
+    @JsonProperty("subtotal")
+    private Long subtotal;
 
     @JsonProperty("tax_amount")
     private Long taxAmount;
@@ -77,507 +97,851 @@ public class CreditNote {
     @JsonProperty("tax_breakdown")
     private List<TaxBreakdownItem> taxBreakdown;
 
-    @JsonProperty private Long total;
+    @JsonProperty("total")
+    private Long total;
 
     @JsonProperty("updated_at")
-    private OffsetDateTime updatedAt;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<OffsetDateTime> updatedAt = JsonField.missing();
 
     @JsonProperty("voided_at")
-    private OffsetDateTime voidedAt;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<OffsetDateTime> voidedAt = JsonField.missing();
 
-    public CreditNote() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public CreditNote createdAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-        return this;
+    private CreditNote() {}
+
+    private CreditNote(Builder builder) {
+        this.createdAt = builder.createdAt;
+        this.creditNoteNumber = builder.creditNoteNumber;
+        this.creditType = builder.creditType;
+        this.creditedAmountCents = builder.creditedAmountCents;
+        this.currency = builder.currency;
+        this.customProperties = builder.customProperties;
+        this.customerId = builder.customerId;
+        this.finalizedAt = builder.finalizedAt;
+        this.id = builder.id;
+        this.invoiceId = builder.invoiceId;
+        this.invoiceNumber = builder.invoiceNumber;
+        this.lineItems = Utils.copyList(builder.lineItems);
+        this.memo = builder.memo;
+        this.planVersionId = builder.planVersionId;
+        this.reason = builder.reason;
+        this.refundedAmountCents = builder.refundedAmountCents;
+        this.status = builder.status;
+        this.subscriptionId = builder.subscriptionId;
+        this.subtotal = builder.subtotal;
+        this.taxAmount = builder.taxAmount;
+        this.taxBreakdown = Utils.copyList(builder.taxBreakdown);
+        this.total = builder.total;
+        this.updatedAt = builder.updatedAt;
+        this.voidedAt = builder.voidedAt;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get createdAt
+     * A builder of {@code CreditNote}.
      *
-     * @return createdAt
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public CreditNote creditNoteNumber(String creditNoteNumber) {
-        this.creditNoteNumber = creditNoteNumber;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get creditNoteNumber
+     * A builder starting from this value.
      *
-     * @return creditNoteNumber
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getCreditNoteNumber() {
-        return creditNoteNumber;
-    }
-
-    public void setCreditNoteNumber(String creditNoteNumber) {
-        this.creditNoteNumber = creditNoteNumber;
-    }
-
-    public CreditNote creditType(CreditType creditType) {
-        this.creditType = creditType;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.createdAt = createdAt;
+        builder.creditNoteNumber = creditNoteNumber;
+        builder.creditType = creditType;
+        builder.creditedAmountCents = creditedAmountCents;
+        builder.currency = currency;
+        builder.customProperties = customProperties;
+        builder.customerId = customerId;
+        builder.finalizedAt = finalizedAt;
+        builder.id = id;
+        builder.invoiceId = invoiceId;
+        builder.invoiceNumber = invoiceNumber;
+        builder.lineItems = Utils.mutableList(lineItems);
+        builder.memo = memo;
+        builder.planVersionId = planVersionId;
+        builder.reason = reason;
+        builder.refundedAmountCents = refundedAmountCents;
+        builder.status = status;
+        builder.subscriptionId = subscriptionId;
+        builder.subtotal = subtotal;
+        builder.taxAmount = taxAmount;
+        builder.taxBreakdown = Utils.mutableList(taxBreakdown);
+        builder.total = total;
+        builder.updatedAt = updatedAt;
+        builder.voidedAt = voidedAt;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get creditType
+     * The {@code created_at} property.
      *
-     * @return creditType
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public CreditType getCreditType() {
-        return creditType;
-    }
-
-    public void setCreditType(CreditType creditType) {
-        this.creditType = creditType;
-    }
-
-    public CreditNote creditedAmountCents(Long creditedAmountCents) {
-        this.creditedAmountCents = creditedAmountCents;
-        return this;
+    public OffsetDateTime createdAt() {
+        return Utils.required(createdAt, "created_at");
     }
 
     /**
-     * Get creditedAmountCents
+     * The {@code credit_note_number} property.
      *
-     * @return creditedAmountCents
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public Long getCreditedAmountCents() {
-        return creditedAmountCents;
-    }
-
-    public void setCreditedAmountCents(Long creditedAmountCents) {
-        this.creditedAmountCents = creditedAmountCents;
-    }
-
-    public CreditNote currency(Currency currency) {
-        this.currency = currency;
-        return this;
+    public String creditNoteNumber() {
+        return Utils.required(creditNoteNumber, "credit_note_number");
     }
 
     /**
-     * Get currency
+     * The {@code credit_type} property.
      *
-     * @return currency
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-    public CreditNote customProperties(Object customProperties) {
-        this.customProperties = customProperties;
-        return this;
+    public CreditType creditType() {
+        return Utils.required(creditType, "credit_type");
     }
 
     /**
-     * User-defined custom property values, keyed by definition `key`.
+     * The {@code credited_amount_cents} property.
      *
-     * @return customProperties
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public Object getCustomProperties() {
-        return customProperties;
-    }
-
-    public void setCustomProperties(Object customProperties) {
-        this.customProperties = customProperties;
-    }
-
-    public CreditNote customerId(String customerId) {
-        this.customerId = customerId;
-        return this;
+    public Long creditedAmountCents() {
+        return Utils.required(creditedAmountCents, "credited_amount_cents");
     }
 
     /**
-     * Get customerId
+     * The {@code currency} property.
      *
-     * @return customerId
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public CreditNote finalizedAt(OffsetDateTime finalizedAt) {
-        this.finalizedAt = finalizedAt;
-        return this;
+    public Currency currency() {
+        return Utils.required(currency, "currency");
     }
 
     /**
-     * Get finalizedAt
+     * User-defined custom property values, keyed by definition <code>key</code>.
      *
-     * @return finalizedAt
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public OffsetDateTime getFinalizedAt() {
-        return finalizedAt;
-    }
-
-    public void setFinalizedAt(OffsetDateTime finalizedAt) {
-        this.finalizedAt = finalizedAt;
-    }
-
-    public CreditNote id(String id) {
-        this.id = id;
-        return this;
+    public Object customProperties() {
+        return Utils.required(customProperties, "custom_properties");
     }
 
     /**
-     * Get id
+     * The {@code customer_id} property.
      *
-     * @return id
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public CreditNote invoiceId(String invoiceId) {
-        this.invoiceId = invoiceId;
-        return this;
+    public String customerId() {
+        return Utils.required(customerId, "customer_id");
     }
 
     /**
-     * Get invoiceId
+     * The {@code finalized_at} property.
      *
-     * @return invoiceId
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public String getInvoiceId() {
-        return invoiceId;
-    }
-
-    public void setInvoiceId(String invoiceId) {
-        this.invoiceId = invoiceId;
-    }
-
-    public CreditNote invoiceNumber(String invoiceNumber) {
-        this.invoiceNumber = invoiceNumber;
-        return this;
+    public Optional<OffsetDateTime> finalizedAt() {
+        return finalizedAt.asOptional();
     }
 
     /**
-     * Get invoiceNumber
+     * The {@code id} property.
      *
-     * @return invoiceNumber
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getInvoiceNumber() {
-        return invoiceNumber;
+    public String id() {
+        return Utils.required(id, "id");
     }
 
-    public void setInvoiceNumber(String invoiceNumber) {
-        this.invoiceNumber = invoiceNumber;
+    /**
+     * The {@code invoice_id} property.
+     *
+     * @return the value, never null
+     */
+    public String invoiceId() {
+        return Utils.required(invoiceId, "invoice_id");
     }
 
-    public CreditNote lineItems(List<InvoiceLineItem> lineItems) {
-        this.lineItems = lineItems;
-        return this;
+    /**
+     * The {@code invoice_number} property.
+     *
+     * @return the value, never null
+     */
+    public String invoiceNumber() {
+        return Utils.required(invoiceNumber, "invoice_number");
     }
 
-    public CreditNote addLineItemsItem(InvoiceLineItem lineItemsItem) {
-        if (this.lineItems == null) {
-            this.lineItems = new ArrayList<>();
+    /**
+     * The {@code line_items} property.
+     *
+     * @return the value, never null
+     */
+    public List<InvoiceLineItem> lineItems() {
+        return Utils.required(lineItems, "line_items");
+    }
+
+    /**
+     * The {@code memo} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> memo() {
+        return memo.asOptional();
+    }
+
+    /**
+     * The {@code plan_version_id} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> planVersionId() {
+        return planVersionId.asOptional();
+    }
+
+    /**
+     * The {@code reason} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> reason() {
+        return reason.asOptional();
+    }
+
+    /**
+     * The {@code refunded_amount_cents} property.
+     *
+     * @return the value, never null
+     */
+    public Long refundedAmountCents() {
+        return Utils.required(refundedAmountCents, "refunded_amount_cents");
+    }
+
+    /**
+     * The {@code status} property.
+     *
+     * @return the value, never null
+     */
+    public CreditNoteStatus status() {
+        return Utils.required(status, "status");
+    }
+
+    /**
+     * The {@code subscription_id} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> subscriptionId() {
+        return subscriptionId.asOptional();
+    }
+
+    /**
+     * The {@code subtotal} property.
+     *
+     * @return the value, never null
+     */
+    public Long subtotal() {
+        return Utils.required(subtotal, "subtotal");
+    }
+
+    /**
+     * The {@code tax_amount} property.
+     *
+     * @return the value, never null
+     */
+    public Long taxAmount() {
+        return Utils.required(taxAmount, "tax_amount");
+    }
+
+    /**
+     * The {@code tax_breakdown} property.
+     *
+     * @return the value, never null
+     */
+    public List<TaxBreakdownItem> taxBreakdown() {
+        return Utils.required(taxBreakdown, "tax_breakdown");
+    }
+
+    /**
+     * The {@code total} property.
+     *
+     * @return the value, never null
+     */
+    public Long total() {
+        return Utils.required(total, "total");
+    }
+
+    /**
+     * The {@code updated_at} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<OffsetDateTime> updatedAt() {
+        return updatedAt.asOptional();
+    }
+
+    /**
+     * The {@code voided_at} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<OffsetDateTime> voidedAt() {
+        return voidedAt.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.lineItems.add(lineItemsItem);
-
-        return this;
-    }
-
-    /**
-     * Get lineItems
-     *
-     * @return lineItems
-     */
-    @javax.annotation.Nonnull
-    public List<InvoiceLineItem> getLineItems() {
-        return lineItems;
-    }
-
-    public void setLineItems(List<InvoiceLineItem> lineItems) {
-        this.lineItems = lineItems;
-    }
-
-    public CreditNote memo(String memo) {
-        this.memo = memo;
-        return this;
-    }
-
-    /**
-     * Get memo
-     *
-     * @return memo
-     */
-    @javax.annotation.Nullable
-    public String getMemo() {
-        return memo;
-    }
-
-    public void setMemo(String memo) {
-        this.memo = memo;
-    }
-
-    public CreditNote planVersionId(String planVersionId) {
-        this.planVersionId = planVersionId;
-        return this;
-    }
-
-    /**
-     * Get planVersionId
-     *
-     * @return planVersionId
-     */
-    @javax.annotation.Nullable
-    public String getPlanVersionId() {
-        return planVersionId;
-    }
-
-    public void setPlanVersionId(String planVersionId) {
-        this.planVersionId = planVersionId;
-    }
-
-    public CreditNote reason(String reason) {
-        this.reason = reason;
-        return this;
-    }
-
-    /**
-     * Get reason
-     *
-     * @return reason
-     */
-    @javax.annotation.Nullable
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public CreditNote refundedAmountCents(Long refundedAmountCents) {
-        this.refundedAmountCents = refundedAmountCents;
-        return this;
-    }
-
-    /**
-     * Get refundedAmountCents
-     *
-     * @return refundedAmountCents
-     */
-    @javax.annotation.Nonnull
-    public Long getRefundedAmountCents() {
-        return refundedAmountCents;
-    }
-
-    public void setRefundedAmountCents(Long refundedAmountCents) {
-        this.refundedAmountCents = refundedAmountCents;
-    }
-
-    public CreditNote status(CreditNoteStatus status) {
-        this.status = status;
-        return this;
-    }
-
-    /**
-     * Get status
-     *
-     * @return status
-     */
-    @javax.annotation.Nonnull
-    public CreditNoteStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CreditNoteStatus status) {
-        this.status = status;
-    }
-
-    public CreditNote subscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
-        return this;
-    }
-
-    /**
-     * Get subscriptionId
-     *
-     * @return subscriptionId
-     */
-    @javax.annotation.Nullable
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
-    }
-
-    public CreditNote subtotal(Long subtotal) {
-        this.subtotal = subtotal;
-        return this;
-    }
-
-    /**
-     * Get subtotal
-     *
-     * @return subtotal
-     */
-    @javax.annotation.Nonnull
-    public Long getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(Long subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    public CreditNote taxAmount(Long taxAmount) {
-        this.taxAmount = taxAmount;
-        return this;
-    }
-
-    /**
-     * Get taxAmount
-     *
-     * @return taxAmount
-     */
-    @javax.annotation.Nonnull
-    public Long getTaxAmount() {
-        return taxAmount;
-    }
-
-    public void setTaxAmount(Long taxAmount) {
-        this.taxAmount = taxAmount;
-    }
-
-    public CreditNote taxBreakdown(List<TaxBreakdownItem> taxBreakdown) {
-        this.taxBreakdown = taxBreakdown;
-        return this;
-    }
-
-    public CreditNote addTaxBreakdownItem(TaxBreakdownItem taxBreakdownItem) {
-        if (this.taxBreakdown == null) {
-            this.taxBreakdown = new ArrayList<>();
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
-        this.taxBreakdown.add(taxBreakdownItem);
+        CreditNote that = (CreditNote) o;
+        return Objects.equals(createdAt, that.createdAt)
+                && Objects.equals(creditNoteNumber, that.creditNoteNumber)
+                && Objects.equals(creditType, that.creditType)
+                && Objects.equals(creditedAmountCents, that.creditedAmountCents)
+                && Objects.equals(currency, that.currency)
+                && Objects.equals(customProperties, that.customProperties)
+                && Objects.equals(customerId, that.customerId)
+                && Objects.equals(finalizedAt, that.finalizedAt)
+                && Objects.equals(id, that.id)
+                && Objects.equals(invoiceId, that.invoiceId)
+                && Objects.equals(invoiceNumber, that.invoiceNumber)
+                && Objects.equals(lineItems, that.lineItems)
+                && Objects.equals(memo, that.memo)
+                && Objects.equals(planVersionId, that.planVersionId)
+                && Objects.equals(reason, that.reason)
+                && Objects.equals(refundedAmountCents, that.refundedAmountCents)
+                && Objects.equals(status, that.status)
+                && Objects.equals(subscriptionId, that.subscriptionId)
+                && Objects.equals(subtotal, that.subtotal)
+                && Objects.equals(taxAmount, that.taxAmount)
+                && Objects.equals(taxBreakdown, that.taxBreakdown)
+                && Objects.equals(total, that.total)
+                && Objects.equals(updatedAt, that.updatedAt)
+                && Objects.equals(voidedAt, that.voidedAt)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                createdAt,
+                creditNoteNumber,
+                creditType,
+                creditedAmountCents,
+                currency,
+                customProperties,
+                customerId,
+                finalizedAt,
+                id,
+                invoiceId,
+                invoiceNumber,
+                lineItems,
+                memo,
+                planVersionId,
+                reason,
+                refundedAmountCents,
+                status,
+                subscriptionId,
+                subtotal,
+                taxAmount,
+                taxBreakdown,
+                total,
+                updatedAt,
+                voidedAt,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CreditNote{"
+                + "createdAt="
+                + createdAt
+                + ", creditNoteNumber="
+                + creditNoteNumber
+                + ", creditType="
+                + creditType
+                + ", creditedAmountCents="
+                + creditedAmountCents
+                + ", currency="
+                + currency
+                + ", customProperties="
+                + customProperties
+                + ", customerId="
+                + customerId
+                + ", finalizedAt="
+                + finalizedAt
+                + ", id="
+                + id
+                + ", invoiceId="
+                + invoiceId
+                + ", invoiceNumber="
+                + invoiceNumber
+                + ", lineItems="
+                + lineItems
+                + ", memo="
+                + memo
+                + ", planVersionId="
+                + planVersionId
+                + ", reason="
+                + reason
+                + ", refundedAmountCents="
+                + refundedAmountCents
+                + ", status="
+                + status
+                + ", subscriptionId="
+                + subscriptionId
+                + ", subtotal="
+                + subtotal
+                + ", taxAmount="
+                + taxAmount
+                + ", taxBreakdown="
+                + taxBreakdown
+                + ", total="
+                + total
+                + ", updatedAt="
+                + updatedAt
+                + ", voidedAt="
+                + voidedAt
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CreditNote}. */
+    public static final class Builder {
+        private OffsetDateTime createdAt;
+        private String creditNoteNumber;
+        private CreditType creditType;
+        private Long creditedAmountCents;
+        private Currency currency;
+        private Object customProperties;
+        private String customerId;
+        private JsonField<OffsetDateTime> finalizedAt = JsonField.missing();
+        private String id;
+        private String invoiceId;
+        private String invoiceNumber;
+        private List<InvoiceLineItem> lineItems;
+        private JsonField<String> memo = JsonField.missing();
+        private JsonField<String> planVersionId = JsonField.missing();
+        private JsonField<String> reason = JsonField.missing();
+        private Long refundedAmountCents;
+        private CreditNoteStatus status;
+        private JsonField<String> subscriptionId = JsonField.missing();
+        private Long subtotal;
+        private Long taxAmount;
+        private List<TaxBreakdownItem> taxBreakdown;
+        private Long total;
+        private JsonField<OffsetDateTime> updatedAt = JsonField.missing();
+        private JsonField<OffsetDateTime> voidedAt = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code created_at} property.
+         *
+         * @param createdAt the value
+         * @return this builder
+         */
+        public Builder createdAt(OffsetDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        /**
+         * The {@code credit_note_number} property.
+         *
+         * @param creditNoteNumber the value
+         * @return this builder
+         */
+        public Builder creditNoteNumber(String creditNoteNumber) {
+            this.creditNoteNumber = creditNoteNumber;
+            return this;
+        }
+
+        /**
+         * The {@code credit_type} property.
+         *
+         * @param creditType the value
+         * @return this builder
+         */
+        public Builder creditType(CreditType creditType) {
+            this.creditType = creditType;
+            return this;
+        }
+
+        /**
+         * The {@code credited_amount_cents} property.
+         *
+         * @param creditedAmountCents the value
+         * @return this builder
+         */
+        public Builder creditedAmountCents(Long creditedAmountCents) {
+            this.creditedAmountCents = creditedAmountCents;
+            return this;
+        }
+
+        /**
+         * The {@code currency} property.
+         *
+         * @param currency the value
+         * @return this builder
+         */
+        public Builder currency(Currency currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        /**
+         * User-defined custom property values, keyed by definition <code>key</code>.
+         *
+         * @param customProperties the value
+         * @return this builder
+         */
+        public Builder customProperties(Object customProperties) {
+            this.customProperties = customProperties;
+            return this;
+        }
+
+        /**
+         * The {@code customer_id} property.
+         *
+         * @param customerId the value
+         * @return this builder
+         */
+        public Builder customerId(String customerId) {
+            this.customerId = customerId;
+            return this;
+        }
+
+        /**
+         * The {@code finalized_at} property.
+         *
+         * @param finalizedAt the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder finalizedAt(OffsetDateTime finalizedAt) {
+            this.finalizedAt = JsonField.ofNullable(finalizedAt);
+            return this;
+        }
+
+        /**
+         * The {@code id} property.
+         *
+         * @param id the value
+         * @return this builder
+         */
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * The {@code invoice_id} property.
+         *
+         * @param invoiceId the value
+         * @return this builder
+         */
+        public Builder invoiceId(String invoiceId) {
+            this.invoiceId = invoiceId;
+            return this;
+        }
+
+        /**
+         * The {@code invoice_number} property.
+         *
+         * @param invoiceNumber the value
+         * @return this builder
+         */
+        public Builder invoiceNumber(String invoiceNumber) {
+            this.invoiceNumber = invoiceNumber;
+            return this;
+        }
+
+        /**
+         * The {@code line_items} property.
+         *
+         * @param lineItems the value
+         * @return this builder
+         */
+        public Builder lineItems(List<InvoiceLineItem> lineItems) {
+            this.lineItems = Utils.mutableList(lineItems);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code line_items}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addLineItemsItem(InvoiceLineItem item) {
+            if (this.lineItems == null) {
+                this.lineItems = new ArrayList<>();
+            }
+            this.lineItems.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code memo} property.
+         *
+         * @param memo the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder memo(String memo) {
+            this.memo = JsonField.ofNullable(memo);
+            return this;
+        }
+
+        /**
+         * The {@code plan_version_id} property.
+         *
+         * @param planVersionId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder planVersionId(String planVersionId) {
+            this.planVersionId = JsonField.ofNullable(planVersionId);
+            return this;
+        }
+
+        /**
+         * The {@code reason} property.
+         *
+         * @param reason the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder reason(String reason) {
+            this.reason = JsonField.ofNullable(reason);
+            return this;
+        }
+
+        /**
+         * The {@code refunded_amount_cents} property.
+         *
+         * @param refundedAmountCents the value
+         * @return this builder
+         */
+        public Builder refundedAmountCents(Long refundedAmountCents) {
+            this.refundedAmountCents = refundedAmountCents;
+            return this;
+        }
+
+        /**
+         * The {@code status} property.
+         *
+         * @param status the value
+         * @return this builder
+         */
+        public Builder status(CreditNoteStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        /**
+         * The {@code subscription_id} property.
+         *
+         * @param subscriptionId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder subscriptionId(String subscriptionId) {
+            this.subscriptionId = JsonField.ofNullable(subscriptionId);
+            return this;
+        }
+
+        /**
+         * The {@code subtotal} property.
+         *
+         * @param subtotal the value
+         * @return this builder
+         */
+        public Builder subtotal(Long subtotal) {
+            this.subtotal = subtotal;
+            return this;
+        }
+
+        /**
+         * The {@code tax_amount} property.
+         *
+         * @param taxAmount the value
+         * @return this builder
+         */
+        public Builder taxAmount(Long taxAmount) {
+            this.taxAmount = taxAmount;
+            return this;
+        }
+
+        /**
+         * The {@code tax_breakdown} property.
+         *
+         * @param taxBreakdown the value
+         * @return this builder
+         */
+        public Builder taxBreakdown(List<TaxBreakdownItem> taxBreakdown) {
+            this.taxBreakdown = Utils.mutableList(taxBreakdown);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code tax_breakdown}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addTaxBreakdownItem(TaxBreakdownItem item) {
+            if (this.taxBreakdown == null) {
+                this.taxBreakdown = new ArrayList<>();
+            }
+            this.taxBreakdown.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code total} property.
+         *
+         * @param total the value
+         * @return this builder
+         */
+        public Builder total(Long total) {
+            this.total = total;
+            return this;
+        }
+
+        /**
+         * The {@code updated_at} property.
+         *
+         * @param updatedAt the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder updatedAt(OffsetDateTime updatedAt) {
+            this.updatedAt = JsonField.ofNullable(updatedAt);
+            return this;
+        }
+
+        /**
+         * The {@code voided_at} property.
+         *
+         * @param voidedAt the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder voidedAt(OffsetDateTime voidedAt) {
+            this.voidedAt = JsonField.ofNullable(voidedAt);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CreditNote}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CreditNote build() {
+            Utils.checkRequired(createdAt, "created_at");
+            Utils.checkRequired(creditNoteNumber, "credit_note_number");
+            Utils.checkRequired(creditType, "credit_type");
+            Utils.checkRequired(creditedAmountCents, "credited_amount_cents");
+            Utils.checkRequired(currency, "currency");
+            Utils.checkRequired(customProperties, "custom_properties");
+            Utils.checkRequired(customerId, "customer_id");
+            Utils.checkRequired(id, "id");
+            Utils.checkRequired(invoiceId, "invoice_id");
+            Utils.checkRequired(invoiceNumber, "invoice_number");
+            Utils.checkRequired(lineItems, "line_items");
+            Utils.checkRequired(refundedAmountCents, "refunded_amount_cents");
+            Utils.checkRequired(status, "status");
+            Utils.checkRequired(subtotal, "subtotal");
+            Utils.checkRequired(taxAmount, "tax_amount");
+            Utils.checkRequired(taxBreakdown, "tax_breakdown");
+            Utils.checkRequired(total, "total");
+            return new CreditNote(this);
+        }
     }
 
     /**
-     * Get taxBreakdown
+     * Parse {@code json} as {@code CreditNote}.
      *
-     * @return taxBreakdown
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<TaxBreakdownItem> getTaxBreakdown() {
-        return taxBreakdown;
-    }
-
-    public void setTaxBreakdown(List<TaxBreakdownItem> taxBreakdown) {
-        this.taxBreakdown = taxBreakdown;
-    }
-
-    public CreditNote total(Long total) {
-        this.total = total;
-        return this;
+    public static CreditNote fromJson(String json) {
+        return Utils.parse(json, CreditNote.class);
     }
 
     /**
-     * Get total
+     * This value as JSON.
      *
-     * @return total
+     * @return the JSON text
      */
-    @javax.annotation.Nonnull
-    public Long getTotal() {
-        return total;
-    }
-
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
-    public CreditNote updatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-        return this;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return updatedAt
-     */
-    @javax.annotation.Nullable
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public CreditNote voidedAt(OffsetDateTime voidedAt) {
-        this.voidedAt = voidedAt;
-        return this;
-    }
-
-    /**
-     * Get voidedAt
-     *
-     * @return voidedAt
-     */
-    @javax.annotation.Nullable
-    public OffsetDateTime getVoidedAt() {
-        return voidedAt;
-    }
-
-    public void setVoidedAt(OffsetDateTime voidedAt) {
-        this.voidedAt = voidedAt;
-    }
-
-    /**
-     * Create an instance of CreditNote given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of CreditNote
-     * @throws JsonProcessingException if the JSON string is invalid with respect to CreditNote
-     */
-    public static CreditNote fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CreditNote.class);
-    }
-
-    /**
-     * Convert an instance of CreditNote to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

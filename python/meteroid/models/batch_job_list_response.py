@@ -1,14 +1,20 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .batch_job_response import BatchJobResponse
-from .pagination_response import PaginationResponse
+
+if t.TYPE_CHECKING:
+    from .batch_job_response import BatchJobResponse
+    from .pagination_response import PaginationResponse
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class BatchJobListResponse(BaseModel):
-    data: t.List[BatchJobResponse]
+    """The `BatchJobListResponse` object."""
+
+    data: list[BatchJobResponse]
 
     pagination_meta: PaginationResponse

@@ -1,22 +1,28 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .metric_filter import MetricFilter
-from .metric_segmentation_matrix import MetricSegmentationMatrix
-from .unit_conversion import UnitConversion
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .metric_filter import MetricFilter
+    from .metric_segmentation_matrix import MetricSegmentationMatrix
+    from .unit_conversion import UnitConversion
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class UpdateMetricRequest(BaseModel):
-    description: t.Optional[str] = None
+    """The `UpdateMetricRequest` object."""
 
-    filters: t.Optional[t.List[MetricFilter]] = None
+    description: str | None | Unset = UNSET
+
+    filters: list[MetricFilter] | None | Unset = UNSET
     """Absent = leave filters untouched; present (even empty) = replace them."""
 
-    name: t.Optional[str] = None
+    name: str | None | Unset = UNSET
 
-    segmentation_matrix: t.Optional[MetricSegmentationMatrix] = None
+    segmentation_matrix: MetricSegmentationMatrix | None | Unset = UNSET
 
-    unit_conversion: t.Optional[UnitConversion] = None
+    unit_conversion: UnitConversion | None | Unset = UNSET

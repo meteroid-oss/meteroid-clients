@@ -1,37 +1,50 @@
 // this file is @generated
-import { type AddOnId, AddOnIdSerializer } from "./addOnId";
-import { type PriceId, PriceIdSerializer } from "./priceId";
+import { extraProperties } from "../json.js";
+import { type AddOnId, AddOnIdSerializer } from "./addOnId.js";
+import { type PriceId, PriceIdSerializer } from "./priceId.js";
 
 export interface PlanAddOnInput {
   addOnId: AddOnId;
-
-  maxInstances?: number | null;
-
-  priceId?: PriceId | null;
-
-  selfServiceable?: boolean | null;
+  maxInstances?: number | null | undefined;
+  priceId?: PriceId | null | undefined;
+  selfServiceable?: boolean | null | undefined;
 }
 
+/** Converts `PlanAddOnInput` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PlanAddOnInputSerializer = {
-  _fromJsonObject(object: any): PlanAddOnInput {
+  parse(json: any): PlanAddOnInput {
     return {
-      addOnId: AddOnIdSerializer._fromJsonObject(object["add_on_id"]),
-      maxInstances: object["max_instances"],
+      ...extraProperties(json, [
+        "add_on_id",
+        "max_instances",
+        "price_id",
+        "self_serviceable",
+      ]),
+      addOnId: AddOnIdSerializer.parse(json["add_on_id"]),
+      maxInstances: json["max_instances"],
       priceId:
-        object["price_id"] != null
-          ? PriceIdSerializer._fromJsonObject(object["price_id"])
-          : undefined,
-      selfServiceable: object["self_serviceable"],
+        json["price_id"] != null
+          ? PriceIdSerializer.parse(json["price_id"])
+          : json["price_id"],
+      selfServiceable: json["self_serviceable"],
     };
   },
 
-  _toJsonObject(self: PlanAddOnInput): any {
+  serialize(value: PlanAddOnInput): any {
     return {
-      add_on_id: AddOnIdSerializer._toJsonObject(self.addOnId),
-      max_instances: self.maxInstances,
+      ...extraProperties(value, [
+        "addOnId",
+        "maxInstances",
+        "priceId",
+        "selfServiceable",
+      ]),
+      add_on_id: AddOnIdSerializer.serialize(value.addOnId),
+      max_instances: value.maxInstances,
       price_id:
-        self.priceId != null ? PriceIdSerializer._toJsonObject(self.priceId) : undefined,
-      self_serviceable: self.selfServiceable,
+        value.priceId != null
+          ? PriceIdSerializer.serialize(value.priceId)
+          : value.priceId,
+      self_serviceable: value.selfServiceable,
     };
   },
 };

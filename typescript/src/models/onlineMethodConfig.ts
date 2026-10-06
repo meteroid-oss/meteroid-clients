@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface OnlineMethodConfig {
   enabled: boolean;
 }
 
+/** Converts `OnlineMethodConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OnlineMethodConfigSerializer = {
-  _fromJsonObject(object: any): OnlineMethodConfig {
+  parse(json: any): OnlineMethodConfig {
     return {
-      enabled: object["enabled"],
+      ...extraProperties(json, ["enabled"]),
+      enabled: json["enabled"],
     };
   },
 
-  _toJsonObject(self: OnlineMethodConfig): any {
+  serialize(value: OnlineMethodConfig): any {
     return {
-      enabled: self.enabled,
+      ...extraProperties(value, ["enabled"]),
+      enabled: value.enabled,
     };
   },
 };

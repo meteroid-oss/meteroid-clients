@@ -1,13 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
+from datetime import date
 
-from ..serialization import BaseModel
+from ..serialization import UNSET, BaseModel, Unset
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CancelSubscriptionRequest(BaseModel):
-    effective_date: t.Optional[str] = None
+    """The `CancelSubscriptionRequest` object."""
+
+    effective_date: date | None | Unset = UNSET
     """If not provided, the cancellation will be effective at the end of the current billing or committed period."""
 
-    reason: t.Optional[str] = None
+    reason: str | None | Unset = UNSET

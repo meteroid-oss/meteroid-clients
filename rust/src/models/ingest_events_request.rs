@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::event::Event;
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct IngestEventsRequest {
     /// Allow events with timestamps more than 1 day in the past. Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -17,14 +17,21 @@ pub struct IngestEventsRequest {
 
     /// 1–100 events per request.
     pub events: Vec<Event>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl IngestEventsRequest {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(events: Vec<Event>) -> Self {
         Self {
             allow_backfilling: None,
             allow_partial_failures: None,
             events,
+            extra: serde_json::Map::new(),
         }
     }
 }

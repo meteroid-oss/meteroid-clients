@@ -1,14 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
-from ..serialization import BaseModel
+from ..serialization import UNSET, BaseModel, Unset
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class BillingConfig(BaseModel):
-    billing_cycles: t.Optional[int] = None
+    """The `BillingConfig` object."""
 
-    net_terms: t.Optional[int] = None
+    billing_cycles: int | None | Unset = UNSET
 
-    period_start_day: t.Optional[int] = None
+    net_terms: int | None = None
+
+    period_start_day: int | None | Unset = UNSET

@@ -1,18 +1,24 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
-from datetime import datetime
+from datetime import date, datetime
 
 from ..serialization import BaseModel
-from .billing_period_enum import BillingPeriodEnum
-from .customer_id import CustomerId
-from .subscription_id import SubscriptionId
-from .subscription_status_enum import SubscriptionStatusEnum
-from .subscription_update_type import SubscriptionUpdateType
+
+if t.TYPE_CHECKING:
+    from .billing_period_enum import BillingPeriodEnum
+    from .customer_id import CustomerId
+    from .subscription_id import SubscriptionId
+    from .subscription_status_enum import SubscriptionStatusEnum
+    from .subscription_update_type import SubscriptionUpdateType
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class SubscriptionEventData(BaseModel):
+    """The `SubscriptionEventData` object."""
+
     auto_advance_invoices: bool
 
     billing_day_anchor: int
@@ -38,7 +44,7 @@ class SubscriptionEventData(BaseModel):
 
     plan_name: str
 
-    start_date: str
+    start_date: date
 
     status: SubscriptionStatusEnum
 
@@ -46,23 +52,23 @@ class SubscriptionEventData(BaseModel):
 
     version: int
 
-    activated_at: t.Optional[datetime] = None
+    activated_at: datetime | None = None
 
-    billing_start_date: t.Optional[str] = None
+    billing_start_date: date | None = None
 
-    cancellation_reason: t.Optional[str] = None
+    cancellation_reason: str | None = None
     """Present on `subscription.cancelled` when a reason was supplied."""
 
-    change_type: t.Optional[SubscriptionUpdateType] = None
+    change_type: SubscriptionUpdateType | None = None
 
-    customer_alias: t.Optional[str] = None
+    customer_alias: str | None = None
 
-    end_date: t.Optional[str] = None
+    end_date: date | None = None
 
-    invoice_memo: t.Optional[str] = None
+    invoice_memo: str | None = None
 
-    invoice_threshold: t.Optional[str] = None
+    invoice_threshold: str | None = None
 
-    purchase_order: t.Optional[str] = None
+    purchase_order: str | None = None
 
-    trial_duration: t.Optional[int] = None
+    trial_duration: int | None = None

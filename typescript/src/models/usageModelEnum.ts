@@ -1,19 +1,23 @@
 // this file is @generated
 
-export enum UsageModelEnum {
-  PerUnit = "PER_UNIT",
-  Tiered = "TIERED",
-  Volume = "VOLUME",
-  Package = "PACKAGE",
-  Matrix = "MATRIX",
-}
+export const UsageModelEnum = {
+  PerUnit: "PER_UNIT",
+  Tiered: "TIERED",
+  Volume: "VOLUME",
+  Package: "PACKAGE",
+  Matrix: "MATRIX",
+} as const;
+export type UsageModelEnum =
+  | (typeof UsageModelEnum)[keyof typeof UsageModelEnum]
+  | (string & {});
 
+/** Converts `UsageModelEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UsageModelEnumSerializer = {
-  _fromJsonObject(object: any): UsageModelEnum {
-    return object;
+  parse(json: any): UsageModelEnum {
+    return json;
   },
 
-  _toJsonObject(self: UsageModelEnum): any {
-    return self;
+  serialize(value: UsageModelEnum): any {
+    return value;
   },
 };

@@ -2,12 +2,13 @@
 
 export type CustomPropertyDefinitionId = string;
 
+/** Converts `CustomPropertyDefinitionId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomPropertyDefinitionIdSerializer = {
-  _fromJsonObject(object: any): CustomPropertyDefinitionId {
-    return object;
+  parse(json: any): CustomPropertyDefinitionId {
+    return json;
   },
 
-  _toJsonObject(self: CustomPropertyDefinitionId): any {
-    return self;
+  serialize(value: CustomPropertyDefinitionId): any {
+    return value;
   },
 };

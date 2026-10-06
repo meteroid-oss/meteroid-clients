@@ -1,2 +1,4 @@
 # this file is @generated
-PriceComponentId = str
+import typing as t
+
+PriceComponentId: t.TypeAlias = str

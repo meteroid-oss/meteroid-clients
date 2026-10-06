@@ -1,93 +1,245 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class MetricDimension {
-    @JsonProperty private String key;
-    @JsonProperty private List<String> values;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class MetricDimension {
+    @JsonProperty("key")
+    private String key;
 
-    public MetricDimension() {}
+    @JsonProperty("values")
+    private List<String> values;
 
-    public MetricDimension key(String key) {
-        this.key = key;
-        return this;
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    private MetricDimension() {}
+
+    private MetricDimension(Builder builder) {
+        this.key = builder.key;
+        this.values = Utils.copyList(builder.values);
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get key
+     * A builder of {@code MetricDimension}.
      *
-     * @return key
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getKey() {
-        return key;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    /**
+     * A builder starting from this value.
+     *
+     * @return a new builder
+     */
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.key = key;
+        builder.values = Utils.mutableList(values);
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
-    public MetricDimension values(List<String> values) {
-        this.values = values;
-        return this;
+    /**
+     * The {@code key} property.
+     *
+     * @return the value, never null
+     */
+    public String key() {
+        return Utils.required(key, "key");
     }
 
-    public MetricDimension addValuesItem(String valuesItem) {
-        if (this.values == null) {
-            this.values = new ArrayList<>();
+    /**
+     * The {@code values} property.
+     *
+     * @return the value, never null
+     */
+    public List<String> values() {
+        return Utils.required(values, "values");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.values.add(valuesItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MetricDimension that = (MetricDimension) o;
+        return Objects.equals(key, that.key)
+                && Objects.equals(values, that.values)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, values, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "MetricDimension{"
+                + "key="
+                + key
+                + ", values="
+                + values
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link MetricDimension}. */
+    public static final class Builder {
+        private String key;
+        private List<String> values;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code key} property.
+         *
+         * @param key the value
+         * @return this builder
+         */
+        public Builder key(String key) {
+            this.key = key;
+            return this;
+        }
+
+        /**
+         * The {@code values} property.
+         *
+         * @param values the value
+         * @return this builder
+         */
+        public Builder values(List<String> values) {
+            this.values = Utils.mutableList(values);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code values}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addValuesItem(String item) {
+            if (this.values == null) {
+                this.values = new ArrayList<>();
+            }
+            this.values.add(item);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code MetricDimension}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public MetricDimension build() {
+            Utils.checkRequired(key, "key");
+            Utils.checkRequired(values, "values");
+            return new MetricDimension(this);
+        }
     }
 
     /**
-     * Get values
+     * Parse {@code json} as {@code MetricDimension}.
      *
-     * @return values
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<String> getValues() {
-        return values;
-    }
-
-    public void setValues(List<String> values) {
-        this.values = values;
+    public static MetricDimension fromJson(String json) {
+        return Utils.parse(json, MetricDimension.class);
     }
 
     /**
-     * Create an instance of MetricDimension given an JSON string
+     * This value as JSON.
      *
-     * @param jsonString JSON string
-     * @return An instance of MetricDimension
-     * @throws JsonProcessingException if the JSON string is invalid with respect to MetricDimension
+     * @return the JSON text
      */
-    public static MetricDimension fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, MetricDimension.class);
-    }
-
-    /**
-     * Convert an instance of MetricDimension to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

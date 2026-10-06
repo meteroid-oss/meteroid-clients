@@ -1,43 +1,56 @@
-"""Meteroid Billing SDK for Python.
-
-The main entry points are :class:`meteroid.Meteroid` (sync) and
-:class:`meteroid.MeteroidAsync` (asyncio).
-
-Example
--------
-::
-
-    from meteroid import Meteroid
-
-    client = Meteroid("your-api-key")
-    customers = client.customers.list_customers()
-    print(f"Found {len(customers.data)} customers")
-"""
-
-from . import models
+# ruff: noqa: I001  (the import order depends on the client name)
 from ._version import __version__
-from .api import Meteroid, MeteroidAsync, MeteroidOptions
-from .errors import (
-    ApiException,
-    MeteroidError,
-    ModelParseError,
-    NetworkException,
-    ResponseDecodeError,
+from .api import (
+    APIResponse,
+    AsyncMeteroid,
+    AsyncPage,
+    AsyncPaginator,
+    AsyncStream,
+    Meteroid,
+    Stream,
+    SyncPage,
 )
-from .webhooks import InvalidWebhookSecretError, Webhook, WebhookVerificationError
+from .errors import (
+    MeteroidError,
+    APIConnectionError,
+    APIError,
+    APIResponseValidationError,
+    APIStatusError,
+    APITimeoutError,
+    AuthenticationError,
+    BadRequestError,
+    ConflictError,
+    InternalServerError,
+    ModelParseError,
+    NotFoundError,
+    PermissionDeniedError,
+    RateLimitError,
+    UnprocessableEntityError,
+)
 
 __all__ = [
-    "ApiException",
-    "InvalidWebhookSecretError",
     "Meteroid",
-    "MeteroidAsync",
     "MeteroidError",
-    "MeteroidOptions",
+    "APIConnectionError",
+    "APIError",
+    "APIResponse",
+    "APIResponseValidationError",
+    "APIStatusError",
+    "APITimeoutError",
+    "AsyncMeteroid",
+    "AsyncPage",
+    "AsyncPaginator",
+    "AsyncStream",
+    "AuthenticationError",
+    "BadRequestError",
+    "ConflictError",
+    "InternalServerError",
     "ModelParseError",
-    "NetworkException",
-    "ResponseDecodeError",
-    "Webhook",
-    "WebhookVerificationError",
+    "NotFoundError",
+    "PermissionDeniedError",
+    "RateLimitError",
+    "Stream",
+    "SyncPage",
+    "UnprocessableEntityError",
     "__version__",
-    "models",
 ]

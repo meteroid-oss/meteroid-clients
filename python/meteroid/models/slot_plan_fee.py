@@ -1,19 +1,23 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .term_rate import TermRate
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .term_rate import TermRate
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class SlotPlanFee(BaseModel):
     """Slot-based fee (e.g., per-seat pricing)"""
 
-    rates: t.List[TermRate]
+    rates: list[TermRate]
 
     slot_unit_name: str
 
-    minimum_count: t.Optional[int] = None
+    minimum_count: int | None | Unset = UNSET
 
-    quota: t.Optional[int] = None
+    quota: int | None | Unset = UNSET

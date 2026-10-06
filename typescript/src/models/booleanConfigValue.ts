@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** A boolean config value. */
 export interface BooleanConfigValue {
   value: boolean;
 }
 
+/** Converts `BooleanConfigValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BooleanConfigValueSerializer = {
-  _fromJsonObject(object: any): BooleanConfigValue {
+  parse(json: any): BooleanConfigValue {
     return {
-      value: object["value"],
+      ...extraProperties(json, ["value"]),
+      value: json["value"],
     };
   },
 
-  _toJsonObject(self: BooleanConfigValue): any {
+  serialize(value: BooleanConfigValue): any {
     return {
-      value: self.value,
+      ...extraProperties(value, ["value"]),
+      value: value.value,
     };
   },
 };

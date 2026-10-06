@@ -1,2 +1,4 @@
 # this file is @generated
-CustomPropertyDefinitionId = str
+import typing as t
+
+CustomPropertyDefinitionId: t.TypeAlias = str

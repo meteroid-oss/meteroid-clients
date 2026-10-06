@@ -1,23 +1,27 @@
 // this file is @generated
-import { type CheckoutSession, CheckoutSessionSerializer } from "./checkoutSession";
+import { extraProperties } from "../json.js";
+import { type CheckoutSession, CheckoutSessionSerializer } from "./checkoutSession.js";
 
 export interface ListCheckoutSessionsResponse {
   sessions: CheckoutSession[];
 }
 
+/** Converts `ListCheckoutSessionsResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ListCheckoutSessionsResponseSerializer = {
-  _fromJsonObject(object: any): ListCheckoutSessionsResponse {
+  parse(json: any): ListCheckoutSessionsResponse {
     return {
-      sessions: object["sessions"].map((item: any) =>
-        CheckoutSessionSerializer._fromJsonObject(item)
+      ...extraProperties(json, ["sessions"]),
+      sessions: json["sessions"].map((item: any) =>
+        CheckoutSessionSerializer.parse(item)
       ),
     };
   },
 
-  _toJsonObject(self: ListCheckoutSessionsResponse): any {
+  serialize(value: ListCheckoutSessionsResponse): any {
     return {
-      sessions: self.sessions.map((item: any) =>
-        CheckoutSessionSerializer._toJsonObject(item)
+      ...extraProperties(value, ["sessions"]),
+      sessions: value.sessions.map((item: any) =>
+        CheckoutSessionSerializer.serialize(item)
       ),
     };
   },

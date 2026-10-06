@@ -2,12 +2,13 @@
 
 export type TenantId = string;
 
+/** Converts `TenantId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TenantIdSerializer = {
-  _fromJsonObject(object: any): TenantId {
-    return object;
+  parse(json: any): TenantId {
+    return json;
   },
 
-  _toJsonObject(self: TenantId): any {
-    return self;
+  serialize(value: TenantId): any {
+    return value;
   },
 };

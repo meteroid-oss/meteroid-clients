@@ -1,105 +1,259 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class NewProductRef {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class NewProductRef {
     @JsonProperty("fee_structure")
     private ProductFeeStructure feeStructure;
 
     @JsonProperty("fee_type")
     private ProductFeeTypeEnum feeType;
 
-    @JsonProperty private String name;
+    @JsonProperty("name")
+    private String name;
 
-    public NewProductRef() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public NewProductRef feeStructure(ProductFeeStructure feeStructure) {
-        this.feeStructure = feeStructure;
-        return this;
+    private NewProductRef() {}
+
+    private NewProductRef(Builder builder) {
+        this.feeStructure = builder.feeStructure;
+        this.feeType = builder.feeType;
+        this.name = builder.name;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get feeStructure
+     * A builder of {@code NewProductRef}.
      *
-     * @return feeStructure
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public ProductFeeStructure getFeeStructure() {
-        return feeStructure;
-    }
-
-    public void setFeeStructure(ProductFeeStructure feeStructure) {
-        this.feeStructure = feeStructure;
-    }
-
-    public NewProductRef feeType(ProductFeeTypeEnum feeType) {
-        this.feeType = feeType;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get feeType
+     * A builder starting from this value.
      *
-     * @return feeType
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public ProductFeeTypeEnum getFeeType() {
-        return feeType;
-    }
-
-    public void setFeeType(ProductFeeTypeEnum feeType) {
-        this.feeType = feeType;
-    }
-
-    public NewProductRef name(String name) {
-        this.name = name;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.feeStructure = feeStructure;
+        builder.feeType = feeType;
+        builder.name = name;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get name
+     * The {@code fee_structure} property.
      *
-     * @return name
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public ProductFeeStructure feeStructure() {
+        return Utils.required(feeStructure, "fee_structure");
     }
 
     /**
-     * Create an instance of NewProductRef given an JSON string
+     * The {@code fee_type} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of NewProductRef
-     * @throws JsonProcessingException if the JSON string is invalid with respect to NewProductRef
+     * @return the value, never null
      */
-    public static NewProductRef fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, NewProductRef.class);
+    public ProductFeeTypeEnum feeType() {
+        return Utils.required(feeType, "fee_type");
     }
 
     /**
-     * Convert an instance of NewProductRef to an JSON string
+     * The {@code name} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String name() {
+        return Utils.required(name, "name");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NewProductRef that = (NewProductRef) o;
+        return Objects.equals(feeStructure, that.feeStructure)
+                && Objects.equals(feeType, that.feeType)
+                && Objects.equals(name, that.name)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(feeStructure, feeType, name, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "NewProductRef{"
+                + "feeStructure="
+                + feeStructure
+                + ", feeType="
+                + feeType
+                + ", name="
+                + name
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link NewProductRef}. */
+    public static final class Builder {
+        private ProductFeeStructure feeStructure;
+        private ProductFeeTypeEnum feeType;
+        private String name;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code fee_structure} property.
+         *
+         * @param feeStructure the value
+         * @return this builder
+         */
+        public Builder feeStructure(ProductFeeStructure feeStructure) {
+            this.feeStructure = feeStructure;
+            return this;
+        }
+
+        /**
+         * The {@code fee_type} property.
+         *
+         * @param feeType the value
+         * @return this builder
+         */
+        public Builder feeType(ProductFeeTypeEnum feeType) {
+            this.feeType = feeType;
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code NewProductRef}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public NewProductRef build() {
+            Utils.checkRequired(feeStructure, "fee_structure");
+            Utils.checkRequired(feeType, "fee_type");
+            Utils.checkRequired(name, "name");
+            return new NewProductRef(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code NewProductRef}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static NewProductRef fromJson(String json) {
+        return Utils.parse(json, NewProductRef.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

@@ -1,19 +1,25 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from decimal import Decimal
 
 from ..serialization import BaseModel
-from .billable_metric_id import BillableMetricId
-from .reset_period import ResetPeriod
+
+if t.TYPE_CHECKING:
+    from .billable_metric_id import BillableMetricId
+    from .reset_period import ResetPeriod
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MeteredResolvedEntitlementValue(BaseModel):
+    """The `MeteredResolvedEntitlementValue` object."""
+
     enabled: bool
 
     metric_id: BillableMetricId
 
     reset_period: ResetPeriod
 
-    limit: t.Optional[Decimal] = None
+    limit: Decimal | None = None

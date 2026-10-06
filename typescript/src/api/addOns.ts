@@ -1,42 +1,54 @@
 // this file is @generated
-import { type AddOn, AddOnSerializer } from "../models/addOn";
+
+import { type AddOn, AddOnSerializer } from "../models/addOn.js";
 import {
   type AddOnListResponse,
   AddOnListResponseSerializer,
-} from "../models/addOnListResponse";
+} from "../models/addOnListResponse.js";
 import {
   type CreateAddOnRequest,
   CreateAddOnRequestSerializer,
-} from "../models/createAddOnRequest";
+} from "../models/createAddOnRequest.js";
 import {
   type ResolvedEntitlementListResponse,
   ResolvedEntitlementListResponseSerializer,
-} from "../models/resolvedEntitlementListResponse";
+} from "../models/resolvedEntitlementListResponse.js";
 import {
   type UpdateAddOnRequest,
   UpdateAddOnRequestSerializer,
-} from "../models/updateAddOnRequest";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/updateAddOnRequest.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface AddOnsListAddonsOptions {
-  search?: string;
-  currency?: string;
+/** The query and header parameters of `list`. */
+export interface AddOnsListOptions {
+  search?: string | undefined;
+  currency?: string | undefined;
   /** Include archived add-ons in the results (default: false) */
-  includeArchived?: boolean;
+  includeArchived?: boolean | undefined;
   /** Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`. */
-  orderBy?: string;
+  orderBy?: string | undefined;
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
+  perPage?: number | undefined;
 }
 
+/** The add ons operations, reached through the client's `addOns`. */
 export class AddOns {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /**  */
-  public listAddons(options?: AddOnsListAddonsOptions): Promise<AddOnListResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/addons");
+  /** List add-ons */
+  public list(
+    options?: AddOnsListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<AddOnListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/addons");
 
     request.setQueryParam("search", options?.search);
     request.setQueryParam("currency", options?.currency);
@@ -44,72 +56,73 @@ export class AddOns {
     request.setQueryParam("order_by", options?.orderBy);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
-    return request.send(this.requestCtx, AddOnListResponseSerializer._fromJsonObject);
+    return request.send(
+      this.requestCtx,
+      AddOnListResponseSerializer.parse,
+      requestOptions
+    );
   }
 
-  /**  */
-  public createAddon(createAddOnRequest: CreateAddOnRequest): Promise<AddOn> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/addons");
+  /** Create an add-on */
+  public create(
+    createAddOnRequest: CreateAddOnRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<AddOn> {
+    const request = new MeteroidRequest("POST", "/api/v1/addons");
 
-    request.setBody(CreateAddOnRequestSerializer._toJsonObject(createAddOnRequest));
-    return request.send(this.requestCtx, AddOnSerializer._fromJsonObject);
+    request.setBody(CreateAddOnRequestSerializer.serialize(createAddOnRequest));
+    return request.send(this.requestCtx, AddOnSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public getAddon(addonId: string): Promise<AddOn> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/addons/{addon_id}");
+  /** Get add-on details */
+  public retrieve(addonId: string, requestOptions?: RequestOptions): APIPromise<AddOn> {
+    const request = new MeteroidRequest("GET", "/api/v1/addons/{addon_id}");
 
     request.setPathParam("addon_id", addonId);
-    return request.send(this.requestCtx, AddOnSerializer._fromJsonObject);
+    return request.send(this.requestCtx, AddOnSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public updateAddon(
+  /** Update an add-on */
+  public update(
     addonId: string,
-    updateAddOnRequest: UpdateAddOnRequest
-  ): Promise<AddOn> {
-    const request = new MeteroidRequest(HttpMethod.PATCH, "/api/v1/addons/{addon_id}");
+    updateAddOnRequest: UpdateAddOnRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<AddOn> {
+    const request = new MeteroidRequest("PATCH", "/api/v1/addons/{addon_id}");
 
     request.setPathParam("addon_id", addonId);
-    request.setBody(UpdateAddOnRequestSerializer._toJsonObject(updateAddOnRequest));
-    return request.send(this.requestCtx, AddOnSerializer._fromJsonObject);
+    request.setBody(UpdateAddOnRequestSerializer.serialize(updateAddOnRequest));
+    return request.send(this.requestCtx, AddOnSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public archiveAddon(addonId: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/addons/{addon_id}/archive"
-    );
+  /** Archive an add-on */
+  public archive(addonId: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("POST", "/api/v1/addons/{addon_id}/archive");
 
     request.setPathParam("addon_id", addonId);
-    return request.sendNoResponseBody(this.requestCtx);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
   }
 
-  /**  */
-  public listAddOnEntitlements(
-    addonId: string
-  ): Promise<ResolvedEntitlementListResponse> {
-    const request = new MeteroidRequest(
-      HttpMethod.GET,
-      "/api/v1/addons/{addon_id}/entitlements"
-    );
+  /** List add-on entitlements */
+  public listEntitlements(
+    addonId: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<ResolvedEntitlementListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/addons/{addon_id}/entitlements");
 
     request.setPathParam("addon_id", addonId);
     return request.send(
       this.requestCtx,
-      ResolvedEntitlementListResponseSerializer._fromJsonObject
+      ResolvedEntitlementListResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public unarchiveAddon(addonId: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.POST,
-      "/api/v1/addons/{addon_id}/unarchive"
-    );
+  /** Unarchive an add-on */
+  public unarchive(addonId: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("POST", "/api/v1/addons/{addon_id}/unarchive");
 
     request.setPathParam("addon_id", addonId);
-    return request.sendNoResponseBody(this.requestCtx);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
   }
 }

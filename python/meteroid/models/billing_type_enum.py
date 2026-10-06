@@ -1,10 +1,15 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class BillingTypeEnum(str, enum.Enum):
+class BillingTypeEnum(StrEnum):
+    """The values of `BillingTypeEnum`; others are kept as received."""
+
     ADVANCE = "ADVANCE"
     ARREARS = "ARREARS"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+BillingTypeEnumLiteral: t.TypeAlias = t.Literal["ADVANCE", "ARREARS"]
+"""The values of :class:`BillingTypeEnum`, which arguments take as plain strings too."""

@@ -1,36 +1,51 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class Customer {
-    @JsonProperty private String alias;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class Customer {
+    @JsonProperty("alias")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> alias = JsonField.missing();
 
     @JsonProperty("billing_address")
-    private Address billingAddress;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<Address> billingAddress = JsonField.missing();
 
     @JsonProperty("billing_email")
-    private String billingEmail;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> billingEmail = JsonField.missing();
 
     @JsonProperty("connected_account_id")
-    private String connectedAccountId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> connectedAccountId = JsonField.missing();
 
-    @JsonProperty private Currency currency;
+    @JsonProperty("currency")
+    private Currency currency;
 
     @JsonProperty("custom_properties")
     private Object customProperties;
@@ -42,9 +57,11 @@ public class Customer {
     private CustomerType customerType;
 
     @JsonProperty("first_name")
-    private String firstName;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> firstName = JsonField.missing();
 
-    @JsonProperty private String id;
+    @JsonProperty("id")
+    private String id;
 
     @JsonProperty("invoicing_emails")
     private List<String> invoicingEmails;
@@ -53,456 +70,772 @@ public class Customer {
     private String invoicingEntityId;
 
     @JsonProperty("invoicing_language")
-    private String invoicingLanguage;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> invoicingLanguage = JsonField.missing();
 
     @JsonProperty("last_name")
-    private String lastName;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> lastName = JsonField.missing();
 
     @JsonProperty("legal_number")
-    private String legalNumber;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> legalNumber = JsonField.missing();
 
-    @JsonProperty private String name;
-    @JsonProperty private String phone;
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("phone")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> phone = JsonField.missing();
 
     @JsonProperty("preferred_locales")
     private List<String> preferredLocales;
 
     @JsonProperty("shipping_address")
-    private ShippingAddress shippingAddress;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<ShippingAddress> shippingAddress = JsonField.missing();
 
     @JsonProperty("vat_number")
-    private String vatNumber;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> vatNumber = JsonField.missing();
 
-    public Customer() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public Customer alias(String alias) {
-        this.alias = alias;
-        return this;
+    private Customer() {}
+
+    private Customer(Builder builder) {
+        this.alias = builder.alias;
+        this.billingAddress = builder.billingAddress;
+        this.billingEmail = builder.billingEmail;
+        this.connectedAccountId = builder.connectedAccountId;
+        this.currency = builder.currency;
+        this.customProperties = builder.customProperties;
+        this.customTaxes = Utils.copyList(builder.customTaxes);
+        this.customerType = builder.customerType;
+        this.firstName = builder.firstName;
+        this.id = builder.id;
+        this.invoicingEmails = Utils.copyList(builder.invoicingEmails);
+        this.invoicingEntityId = builder.invoicingEntityId;
+        this.invoicingLanguage = builder.invoicingLanguage;
+        this.lastName = builder.lastName;
+        this.legalNumber = builder.legalNumber;
+        this.name = builder.name;
+        this.phone = builder.phone;
+        this.preferredLocales = Utils.copyList(builder.preferredLocales);
+        this.shippingAddress = builder.shippingAddress;
+        this.vatNumber = builder.vatNumber;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get alias
+     * A builder of {@code Customer}.
      *
-     * @return alias
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public Customer billingAddress(Address billingAddress) {
-        this.billingAddress = billingAddress;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get billingAddress
+     * A builder starting from this value.
      *
-     * @return billingAddress
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public Address getBillingAddress() {
-        return billingAddress;
-    }
-
-    public void setBillingAddress(Address billingAddress) {
-        this.billingAddress = billingAddress;
-    }
-
-    public Customer billingEmail(String billingEmail) {
-        this.billingEmail = billingEmail;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.alias = alias;
+        builder.billingAddress = billingAddress;
+        builder.billingEmail = billingEmail;
+        builder.connectedAccountId = connectedAccountId;
+        builder.currency = currency;
+        builder.customProperties = customProperties;
+        builder.customTaxes = Utils.mutableList(customTaxes);
+        builder.customerType = customerType;
+        builder.firstName = firstName;
+        builder.id = id;
+        builder.invoicingEmails = Utils.mutableList(invoicingEmails);
+        builder.invoicingEntityId = invoicingEntityId;
+        builder.invoicingLanguage = invoicingLanguage;
+        builder.lastName = lastName;
+        builder.legalNumber = legalNumber;
+        builder.name = name;
+        builder.phone = phone;
+        builder.preferredLocales = Utils.mutableList(preferredLocales);
+        builder.shippingAddress = shippingAddress;
+        builder.vatNumber = vatNumber;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get billingEmail
+     * The {@code alias} property.
      *
-     * @return billingEmail
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getBillingEmail() {
-        return billingEmail;
-    }
-
-    public void setBillingEmail(String billingEmail) {
-        this.billingEmail = billingEmail;
-    }
-
-    public Customer connectedAccountId(String connectedAccountId) {
-        this.connectedAccountId = connectedAccountId;
-        return this;
+    public Optional<String> alias() {
+        return alias.asOptional();
     }
 
     /**
-     * Get connectedAccountId
+     * The {@code billing_address} property.
      *
-     * @return connectedAccountId
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getConnectedAccountId() {
-        return connectedAccountId;
-    }
-
-    public void setConnectedAccountId(String connectedAccountId) {
-        this.connectedAccountId = connectedAccountId;
-    }
-
-    public Customer currency(Currency currency) {
-        this.currency = currency;
-        return this;
+    public Optional<Address> billingAddress() {
+        return billingAddress.asOptional();
     }
 
     /**
-     * Get currency
+     * The {@code billing_email} property.
      *
-     * @return currency
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-    public Customer customProperties(Object customProperties) {
-        this.customProperties = customProperties;
-        return this;
+    public Optional<String> billingEmail() {
+        return billingEmail.asOptional();
     }
 
     /**
-     * User-defined custom property values, keyed by definition `key`.
+     * The {@code connected_account_id} property.
      *
-     * @return customProperties
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public Object getCustomProperties() {
-        return customProperties;
-    }
-
-    public void setCustomProperties(Object customProperties) {
-        this.customProperties = customProperties;
-    }
-
-    public Customer customTaxes(List<CustomTaxRate> customTaxes) {
-        this.customTaxes = customTaxes;
-        return this;
-    }
-
-    public Customer addCustomTaxesItem(CustomTaxRate customTaxesItem) {
-        if (this.customTaxes == null) {
-            this.customTaxes = new ArrayList<>();
-        }
-        this.customTaxes.add(customTaxesItem);
-
-        return this;
+    public Optional<String> connectedAccountId() {
+        return connectedAccountId.asOptional();
     }
 
     /**
-     * Get customTaxes
+     * The {@code currency} property.
      *
-     * @return customTaxes
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public List<CustomTaxRate> getCustomTaxes() {
-        return customTaxes;
-    }
-
-    public void setCustomTaxes(List<CustomTaxRate> customTaxes) {
-        this.customTaxes = customTaxes;
-    }
-
-    public Customer customerType(CustomerType customerType) {
-        this.customerType = customerType;
-        return this;
+    public Currency currency() {
+        return Utils.required(currency, "currency");
     }
 
     /**
-     * Get customerType
+     * User-defined custom property values, keyed by definition <code>key</code>.
      *
-     * @return customerType
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public CustomerType getCustomerType() {
-        return customerType;
-    }
-
-    public void setCustomerType(CustomerType customerType) {
-        this.customerType = customerType;
-    }
-
-    public Customer firstName(String firstName) {
-        this.firstName = firstName;
-        return this;
+    public Object customProperties() {
+        return Utils.required(customProperties, "custom_properties");
     }
 
     /**
-     * Get firstName
+     * The {@code custom_taxes} property.
      *
-     * @return firstName
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public Customer id(String id) {
-        this.id = id;
-        return this;
+    public List<CustomTaxRate> customTaxes() {
+        return Utils.required(customTaxes, "custom_taxes");
     }
 
     /**
-     * Get id
+     * The {@code customer_type} property.
      *
-     * @return id
+     * @return the value, empty when unset
      */
-    @javax.annotation.Nonnull
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Customer invoicingEmails(List<String> invoicingEmails) {
-        this.invoicingEmails = invoicingEmails;
-        return this;
-    }
-
-    public Customer addInvoicingEmailsItem(String invoicingEmailsItem) {
-        if (this.invoicingEmails == null) {
-            this.invoicingEmails = new ArrayList<>();
-        }
-        this.invoicingEmails.add(invoicingEmailsItem);
-
-        return this;
+    public Optional<CustomerType> customerType() {
+        return Optional.ofNullable(customerType);
     }
 
     /**
-     * Get invoicingEmails
+     * The {@code first_name} property.
      *
-     * @return invoicingEmails
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public List<String> getInvoicingEmails() {
-        return invoicingEmails;
-    }
-
-    public void setInvoicingEmails(List<String> invoicingEmails) {
-        this.invoicingEmails = invoicingEmails;
-    }
-
-    public Customer invoicingEntityId(String invoicingEntityId) {
-        this.invoicingEntityId = invoicingEntityId;
-        return this;
+    public Optional<String> firstName() {
+        return firstName.asOptional();
     }
 
     /**
-     * Get invoicingEntityId
+     * The {@code id} property.
      *
-     * @return invoicingEntityId
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getInvoicingEntityId() {
-        return invoicingEntityId;
+    public String id() {
+        return Utils.required(id, "id");
     }
 
-    public void setInvoicingEntityId(String invoicingEntityId) {
-        this.invoicingEntityId = invoicingEntityId;
+    /**
+     * The {@code invoicing_emails} property.
+     *
+     * @return the value, never null
+     */
+    public List<String> invoicingEmails() {
+        return Utils.required(invoicingEmails, "invoicing_emails");
     }
 
+    /**
+     * The {@code invoicing_entity_id} property.
+     *
+     * @return the value, never null
+     */
+    public String invoicingEntityId() {
+        return Utils.required(invoicingEntityId, "invoicing_entity_id");
+    }
+
+    /**
+     * Deprecated: the first entry of <code>preferred_locales</code>.
+     *
+     * @return the value, empty when unset or null
+     * @deprecated the API deprecates this property.
+     */
     @Deprecated
-    public Customer invoicingLanguage(String invoicingLanguage) {
-        this.invoicingLanguage = invoicingLanguage;
-        return this;
+    public Optional<String> invoicingLanguage() {
+        return invoicingLanguage.asOptional();
     }
 
     /**
-     * Deprecated: the first entry of `preferred_locales`.
+     * The {@code last_name} property.
      *
-     * @return invoicingLanguage
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    @Deprecated
-    public String getInvoicingLanguage() {
-        return invoicingLanguage;
-    }
-
-    @Deprecated
-    public void setInvoicingLanguage(String invoicingLanguage) {
-        this.invoicingLanguage = invoicingLanguage;
-    }
-
-    public Customer lastName(String lastName) {
-        this.lastName = lastName;
-        return this;
+    public Optional<String> lastName() {
+        return lastName.asOptional();
     }
 
     /**
-     * Get lastName
+     * BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB).
      *
-     * @return lastName
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Customer legalNumber(String legalNumber) {
-        this.legalNumber = legalNumber;
-        return this;
+    public Optional<String> legalNumber() {
+        return legalNumber.asOptional();
     }
 
     /**
-     * BT-47 — the buyer&#x27;s national register identifier (SIREN&#x2f;SIRET, HRB).
+     * The {@code name} property.
      *
-     * @return legalNumber
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getLegalNumber() {
-        return legalNumber;
-    }
-
-    public void setLegalNumber(String legalNumber) {
-        this.legalNumber = legalNumber;
-    }
-
-    public Customer name(String name) {
-        this.name = name;
-        return this;
+    public String name() {
+        return Utils.required(name, "name");
     }
 
     /**
-     * Get name
+     * The {@code phone} property.
      *
-     * @return name
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Customer phone(String phone) {
-        this.phone = phone;
-        return this;
+    public Optional<String> phone() {
+        return phone.asOptional();
     }
 
     /**
-     * Get phone
+     * Preferred document languages, most-preferred first (BCP-47 tags, e.g. <code>["fr-FR", "en"]
+     * </code>); overrides the invoicing entity default.
      *
-     * @return phone
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getPhone() {
-        return phone;
+    public List<String> preferredLocales() {
+        return Utils.required(preferredLocales, "preferred_locales");
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    /**
+     * The {@code shipping_address} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<ShippingAddress> shippingAddress() {
+        return shippingAddress.asOptional();
     }
 
-    public Customer preferredLocales(List<String> preferredLocales) {
-        this.preferredLocales = preferredLocales;
-        return this;
+    /**
+     * The {@code vat_number} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<String> vatNumber() {
+        return vatNumber.asOptional();
     }
 
-    public Customer addPreferredLocalesItem(String preferredLocalesItem) {
-        if (this.preferredLocales == null) {
-            this.preferredLocales = new ArrayList<>();
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.preferredLocales.add(preferredLocalesItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Customer that = (Customer) o;
+        return Objects.equals(alias, that.alias)
+                && Objects.equals(billingAddress, that.billingAddress)
+                && Objects.equals(billingEmail, that.billingEmail)
+                && Objects.equals(connectedAccountId, that.connectedAccountId)
+                && Objects.equals(currency, that.currency)
+                && Objects.equals(customProperties, that.customProperties)
+                && Objects.equals(customTaxes, that.customTaxes)
+                && Objects.equals(customerType, that.customerType)
+                && Objects.equals(firstName, that.firstName)
+                && Objects.equals(id, that.id)
+                && Objects.equals(invoicingEmails, that.invoicingEmails)
+                && Objects.equals(invoicingEntityId, that.invoicingEntityId)
+                && Objects.equals(invoicingLanguage, that.invoicingLanguage)
+                && Objects.equals(lastName, that.lastName)
+                && Objects.equals(legalNumber, that.legalNumber)
+                && Objects.equals(name, that.name)
+                && Objects.equals(phone, that.phone)
+                && Objects.equals(preferredLocales, that.preferredLocales)
+                && Objects.equals(shippingAddress, that.shippingAddress)
+                && Objects.equals(vatNumber, that.vatNumber)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                alias,
+                billingAddress,
+                billingEmail,
+                connectedAccountId,
+                currency,
+                customProperties,
+                customTaxes,
+                customerType,
+                firstName,
+                id,
+                invoicingEmails,
+                invoicingEntityId,
+                invoicingLanguage,
+                lastName,
+                legalNumber,
+                name,
+                phone,
+                preferredLocales,
+                shippingAddress,
+                vatNumber,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{"
+                + "alias="
+                + alias
+                + ", billingAddress="
+                + billingAddress
+                + ", billingEmail="
+                + billingEmail
+                + ", connectedAccountId="
+                + connectedAccountId
+                + ", currency="
+                + currency
+                + ", customProperties="
+                + customProperties
+                + ", customTaxes="
+                + customTaxes
+                + ", customerType="
+                + customerType
+                + ", firstName="
+                + firstName
+                + ", id="
+                + id
+                + ", invoicingEmails="
+                + invoicingEmails
+                + ", invoicingEntityId="
+                + invoicingEntityId
+                + ", invoicingLanguage="
+                + invoicingLanguage
+                + ", lastName="
+                + lastName
+                + ", legalNumber="
+                + legalNumber
+                + ", name="
+                + name
+                + ", phone="
+                + phone
+                + ", preferredLocales="
+                + preferredLocales
+                + ", shippingAddress="
+                + shippingAddress
+                + ", vatNumber="
+                + vatNumber
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link Customer}. */
+    public static final class Builder {
+        private JsonField<String> alias = JsonField.missing();
+        private JsonField<Address> billingAddress = JsonField.missing();
+        private JsonField<String> billingEmail = JsonField.missing();
+        private JsonField<String> connectedAccountId = JsonField.missing();
+        private Currency currency;
+        private Object customProperties;
+        private List<CustomTaxRate> customTaxes;
+        private CustomerType customerType;
+        private JsonField<String> firstName = JsonField.missing();
+        private String id;
+        private List<String> invoicingEmails;
+        private String invoicingEntityId;
+        private JsonField<String> invoicingLanguage = JsonField.missing();
+        private JsonField<String> lastName = JsonField.missing();
+        private JsonField<String> legalNumber = JsonField.missing();
+        private String name;
+        private JsonField<String> phone = JsonField.missing();
+        private List<String> preferredLocales;
+        private JsonField<ShippingAddress> shippingAddress = JsonField.missing();
+        private JsonField<String> vatNumber = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code alias} property.
+         *
+         * @param alias the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder alias(String alias) {
+            this.alias = JsonField.ofNullable(alias);
+            return this;
+        }
+
+        /**
+         * The {@code billing_address} property.
+         *
+         * @param billingAddress the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder billingAddress(Address billingAddress) {
+            this.billingAddress = JsonField.ofNullable(billingAddress);
+            return this;
+        }
+
+        /**
+         * The {@code billing_email} property.
+         *
+         * @param billingEmail the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder billingEmail(String billingEmail) {
+            this.billingEmail = JsonField.ofNullable(billingEmail);
+            return this;
+        }
+
+        /**
+         * The {@code connected_account_id} property.
+         *
+         * @param connectedAccountId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder connectedAccountId(String connectedAccountId) {
+            this.connectedAccountId = JsonField.ofNullable(connectedAccountId);
+            return this;
+        }
+
+        /**
+         * The {@code currency} property.
+         *
+         * @param currency the value
+         * @return this builder
+         */
+        public Builder currency(Currency currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        /**
+         * User-defined custom property values, keyed by definition <code>key</code>.
+         *
+         * @param customProperties the value
+         * @return this builder
+         */
+        public Builder customProperties(Object customProperties) {
+            this.customProperties = customProperties;
+            return this;
+        }
+
+        /**
+         * The {@code custom_taxes} property.
+         *
+         * @param customTaxes the value
+         * @return this builder
+         */
+        public Builder customTaxes(List<CustomTaxRate> customTaxes) {
+            this.customTaxes = Utils.mutableList(customTaxes);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code custom_taxes}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addCustomTaxesItem(CustomTaxRate item) {
+            if (this.customTaxes == null) {
+                this.customTaxes = new ArrayList<>();
+            }
+            this.customTaxes.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code customer_type} property.
+         *
+         * @param customerType the value
+         * @return this builder
+         */
+        public Builder customerType(CustomerType customerType) {
+            this.customerType = customerType;
+            return this;
+        }
+
+        /**
+         * The {@code first_name} property.
+         *
+         * @param firstName the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder firstName(String firstName) {
+            this.firstName = JsonField.ofNullable(firstName);
+            return this;
+        }
+
+        /**
+         * The {@code id} property.
+         *
+         * @param id the value
+         * @return this builder
+         */
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * The {@code invoicing_emails} property.
+         *
+         * @param invoicingEmails the value
+         * @return this builder
+         */
+        public Builder invoicingEmails(List<String> invoicingEmails) {
+            this.invoicingEmails = Utils.mutableList(invoicingEmails);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code invoicing_emails}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addInvoicingEmailsItem(String item) {
+            if (this.invoicingEmails == null) {
+                this.invoicingEmails = new ArrayList<>();
+            }
+            this.invoicingEmails.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code invoicing_entity_id} property.
+         *
+         * @param invoicingEntityId the value
+         * @return this builder
+         */
+        public Builder invoicingEntityId(String invoicingEntityId) {
+            this.invoicingEntityId = invoicingEntityId;
+            return this;
+        }
+
+        /**
+         * Deprecated: the first entry of <code>preferred_locales</code>.
+         *
+         * @param invoicingLanguage the value, null to send an explicit {@code null}
+         * @return this builder
+         * @deprecated the API deprecates this property.
+         */
+        @Deprecated
+        public Builder invoicingLanguage(String invoicingLanguage) {
+            this.invoicingLanguage = JsonField.ofNullable(invoicingLanguage);
+            return this;
+        }
+
+        /**
+         * The {@code last_name} property.
+         *
+         * @param lastName the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder lastName(String lastName) {
+            this.lastName = JsonField.ofNullable(lastName);
+            return this;
+        }
+
+        /**
+         * BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB).
+         *
+         * @param legalNumber the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder legalNumber(String legalNumber) {
+            this.legalNumber = JsonField.ofNullable(legalNumber);
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code phone} property.
+         *
+         * @param phone the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder phone(String phone) {
+            this.phone = JsonField.ofNullable(phone);
+            return this;
+        }
+
+        /**
+         * Preferred document languages, most-preferred first (BCP-47 tags, e.g. <code>
+         * ["fr-FR", "en"]</code>); overrides the invoicing entity default.
+         *
+         * @param preferredLocales the value
+         * @return this builder
+         */
+        public Builder preferredLocales(List<String> preferredLocales) {
+            this.preferredLocales = Utils.mutableList(preferredLocales);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code preferred_locales}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addPreferredLocalesItem(String item) {
+            if (this.preferredLocales == null) {
+                this.preferredLocales = new ArrayList<>();
+            }
+            this.preferredLocales.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code shipping_address} property.
+         *
+         * @param shippingAddress the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder shippingAddress(ShippingAddress shippingAddress) {
+            this.shippingAddress = JsonField.ofNullable(shippingAddress);
+            return this;
+        }
+
+        /**
+         * The {@code vat_number} property.
+         *
+         * @param vatNumber the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder vatNumber(String vatNumber) {
+            this.vatNumber = JsonField.ofNullable(vatNumber);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code Customer}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public Customer build() {
+            Utils.checkRequired(currency, "currency");
+            Utils.checkRequired(customProperties, "custom_properties");
+            Utils.checkRequired(customTaxes, "custom_taxes");
+            Utils.checkRequired(id, "id");
+            Utils.checkRequired(invoicingEmails, "invoicing_emails");
+            Utils.checkRequired(invoicingEntityId, "invoicing_entity_id");
+            Utils.checkRequired(name, "name");
+            Utils.checkRequired(preferredLocales, "preferred_locales");
+            return new Customer(this);
+        }
     }
 
     /**
-     * Preferred document languages, most-preferred first (BCP-47 tags, e.g. `[&quot;fr-FR&quot;,
-     * &quot;en&quot;]`); overrides the invoicing entity default.
+     * Parse {@code json} as {@code Customer}.
      *
-     * @return preferredLocales
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<String> getPreferredLocales() {
-        return preferredLocales;
-    }
-
-    public void setPreferredLocales(List<String> preferredLocales) {
-        this.preferredLocales = preferredLocales;
-    }
-
-    public Customer shippingAddress(ShippingAddress shippingAddress) {
-        this.shippingAddress = shippingAddress;
-        return this;
+    public static Customer fromJson(String json) {
+        return Utils.parse(json, Customer.class);
     }
 
     /**
-     * Get shippingAddress
+     * This value as JSON.
      *
-     * @return shippingAddress
+     * @return the JSON text
      */
-    @javax.annotation.Nullable
-    public ShippingAddress getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public void setShippingAddress(ShippingAddress shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
-
-    public Customer vatNumber(String vatNumber) {
-        this.vatNumber = vatNumber;
-        return this;
-    }
-
-    /**
-     * Get vatNumber
-     *
-     * @return vatNumber
-     */
-    @javax.annotation.Nullable
-    public String getVatNumber() {
-        return vatNumber;
-    }
-
-    public void setVatNumber(String vatNumber) {
-        this.vatNumber = vatNumber;
-    }
-
-    /**
-     * Create an instance of Customer given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of Customer
-     * @throws JsonProcessingException if the JSON string is invalid with respect to Customer
-     */
-    public static Customer fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, Customer.class);
-    }
-
-    /**
-     * Convert an instance of Customer to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

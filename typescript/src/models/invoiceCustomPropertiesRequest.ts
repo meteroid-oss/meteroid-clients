@@ -1,4 +1,5 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /**
  * Merge update of an invoice's custom property values (send a key with `null` to remove it).
  * Allowed at any status — custom properties stay editable after the invoice is finalized.
@@ -7,16 +8,19 @@ export interface InvoiceCustomPropertiesRequest {
   customProperties: unknown;
 }
 
+/** Converts `InvoiceCustomPropertiesRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const InvoiceCustomPropertiesRequestSerializer = {
-  _fromJsonObject(object: any): InvoiceCustomPropertiesRequest {
+  parse(json: any): InvoiceCustomPropertiesRequest {
     return {
-      customProperties: object["custom_properties"],
+      ...extraProperties(json, ["custom_properties"]),
+      customProperties: json["custom_properties"],
     };
   },
 
-  _toJsonObject(self: InvoiceCustomPropertiesRequest): any {
+  serialize(value: InvoiceCustomPropertiesRequest): any {
     return {
-      custom_properties: self.customProperties,
+      ...extraProperties(value, ["customProperties"]),
+      custom_properties: value.customProperties,
     };
   },
 };

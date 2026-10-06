@@ -2,12 +2,13 @@
 
 export type EventId = string;
 
+/** Converts `EventId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const EventIdSerializer = {
-  _fromJsonObject(object: any): EventId {
-    return object;
+  parse(json: any): EventId {
+    return json;
   },
 
-  _toJsonObject(self: EventId): any {
-    return self;
+  serialize(value: EventId): any {
+    return value;
   },
 };

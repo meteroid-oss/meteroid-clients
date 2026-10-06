@@ -1,12 +1,18 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .ingest_failure import IngestFailure
+
+if t.TYPE_CHECKING:
+    from .ingest_failure import IngestFailure
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class IngestEventsResponse(BaseModel):
-    failures: t.Optional[t.List[IngestFailure]] = None
+    """The `IngestEventsResponse` object."""
+
+    failures: list[IngestFailure] | None = None
     """Events that failed to ingest. Omitted when no failures."""

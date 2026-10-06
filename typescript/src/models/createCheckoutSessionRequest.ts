@@ -1,155 +1,179 @@
 // this file is @generated
-import { type CouponId, CouponIdSerializer } from "./couponId";
+import { extraProperties } from "../json.js";
+import { type CouponId, CouponIdSerializer } from "./couponId.js";
 import {
   type CreateSubscriptionAddOn,
   CreateSubscriptionAddOnSerializer,
-} from "./createSubscriptionAddOn";
+} from "./createSubscriptionAddOn.js";
 import {
   type CreateSubscriptionComponents,
   CreateSubscriptionComponentsSerializer,
-} from "./createSubscriptionComponents";
+} from "./createSubscriptionComponents.js";
 import {
   type PaymentMethodsConfig,
   PaymentMethodsConfigSerializer,
-} from "./paymentMethodsConfig";
-import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId";
+} from "./paymentMethodsConfig.js";
+import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId.js";
 
 export interface CreateCheckoutSessionRequest {
-  addOns?: CreateSubscriptionAddOn[] | null;
-
+  addOns?: CreateSubscriptionAddOn[] | null | undefined;
   /** If false, invoices will stay in Draft until manually reviewed and finalized. Default is true. */
-  autoAdvanceInvoices?: boolean | null;
-
-  billingDayAnchor?: number | null;
-
-  billingStartDate?: string | null;
-
+  autoAdvanceInvoices?: boolean | null | undefined;
+  billingDayAnchor?: number | null | undefined;
+  billingStartDate?: string | null | undefined;
   /** Absolute http(s) URL offered to the customer to leave the checkout without paying. */
-  cancelUrl?: string | null;
-
+  cancelUrl?: string | null | undefined;
   /** Automatically try to charge the customer's configured payment method on finalize. Default is true. */
-  chargeAutomatically?: boolean | null;
-
-  components?: CreateSubscriptionComponents | null;
-
-  couponCode?: string | null;
-
-  couponIds?: CouponId[];
-
+  chargeAutomatically?: boolean | null | undefined;
+  components?: CreateSubscriptionComponents | null | undefined;
+  couponCode?: string | null | undefined;
+  couponIds?: CouponId[] | undefined;
   /** Customer ID or alias */
   customerId: string;
-
-  endDate?: string | null;
-
+  endDate?: string | null | undefined;
   /** Session expiry time in hours. Default is 1 hour for self-serve checkout. */
-  expiresInHours?: number | null;
-
-  invoiceMemo?: string | null;
-
-  invoiceThreshold?: string | null;
-
-  metadata?: unknown;
-
-  netTerms?: number | null;
-
-  paymentMethodsConfig?: PaymentMethodsConfig | null;
-
+  expiresInHours?: number | null | undefined;
+  invoiceMemo?: string | null | undefined;
+  invoiceThreshold?: string | null | undefined;
+  metadata?: unknown | undefined;
+  netTerms?: number | null | undefined;
+  paymentMethodsConfig?: PaymentMethodsConfig | null | undefined;
   planVersionId: PlanVersionId;
-
-  purchaseOrder?: string | null;
-
+  purchaseOrder?: string | null | undefined;
   /**
    * Absolute http(s) URL the customer is sent to after a successful checkout.
    * `checkout_session_id` is appended as a query parameter. Without it the customer stays on
    * the hosted confirmation page.
    */
-  successUrl?: string | null;
-
-  trialDurationDays?: number | null;
+  successUrl?: string | null | undefined;
+  trialDurationDays?: number | null | undefined;
 }
 
+/** Converts `CreateCheckoutSessionRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateCheckoutSessionRequestSerializer = {
-  _fromJsonObject(object: any): CreateCheckoutSessionRequest {
+  parse(json: any): CreateCheckoutSessionRequest {
     return {
+      ...extraProperties(json, [
+        "add_ons",
+        "auto_advance_invoices",
+        "billing_day_anchor",
+        "billing_start_date",
+        "cancel_url",
+        "charge_automatically",
+        "components",
+        "coupon_code",
+        "coupon_ids",
+        "customer_id",
+        "end_date",
+        "expires_in_hours",
+        "invoice_memo",
+        "invoice_threshold",
+        "metadata",
+        "net_terms",
+        "payment_methods_config",
+        "plan_version_id",
+        "purchase_order",
+        "success_url",
+        "trial_duration_days",
+      ]),
       addOns:
-        object["add_ons"] != null
-          ? object["add_ons"].map((item: any) =>
-              CreateSubscriptionAddOnSerializer._fromJsonObject(item)
+        json["add_ons"] != null
+          ? json["add_ons"].map((item: any) =>
+              CreateSubscriptionAddOnSerializer.parse(item)
             )
-          : undefined,
-      autoAdvanceInvoices: object["auto_advance_invoices"],
-      billingDayAnchor: object["billing_day_anchor"],
-      billingStartDate: object["billing_start_date"],
-      cancelUrl: object["cancel_url"],
-      chargeAutomatically: object["charge_automatically"],
+          : json["add_ons"],
+      autoAdvanceInvoices: json["auto_advance_invoices"],
+      billingDayAnchor: json["billing_day_anchor"],
+      billingStartDate: json["billing_start_date"],
+      cancelUrl: json["cancel_url"],
+      chargeAutomatically: json["charge_automatically"],
       components:
-        object["components"] != null
-          ? CreateSubscriptionComponentsSerializer._fromJsonObject(object["components"])
-          : undefined,
-      couponCode: object["coupon_code"],
+        json["components"] != null
+          ? CreateSubscriptionComponentsSerializer.parse(json["components"])
+          : json["components"],
+      couponCode: json["coupon_code"],
       couponIds:
-        object["coupon_ids"] != null
-          ? object["coupon_ids"].map((item: any) =>
-              CouponIdSerializer._fromJsonObject(item)
-            )
+        json["coupon_ids"] != null
+          ? json["coupon_ids"].map((item: any) => CouponIdSerializer.parse(item))
           : undefined,
-      customerId: object["customer_id"],
-      endDate: object["end_date"],
-      expiresInHours: object["expires_in_hours"],
-      invoiceMemo: object["invoice_memo"],
-      invoiceThreshold: object["invoice_threshold"],
-      metadata: object["metadata"],
-      netTerms: object["net_terms"],
+      customerId: json["customer_id"],
+      endDate: json["end_date"],
+      expiresInHours: json["expires_in_hours"],
+      invoiceMemo: json["invoice_memo"],
+      invoiceThreshold: json["invoice_threshold"],
+      metadata: json["metadata"],
+      netTerms: json["net_terms"],
       paymentMethodsConfig:
-        object["payment_methods_config"] != null
-          ? PaymentMethodsConfigSerializer._fromJsonObject(
-              object["payment_methods_config"]
-            )
-          : undefined,
-      planVersionId: PlanVersionIdSerializer._fromJsonObject(object["plan_version_id"]),
-      purchaseOrder: object["purchase_order"],
-      successUrl: object["success_url"],
-      trialDurationDays: object["trial_duration_days"],
+        json["payment_methods_config"] != null
+          ? PaymentMethodsConfigSerializer.parse(json["payment_methods_config"])
+          : json["payment_methods_config"],
+      planVersionId: PlanVersionIdSerializer.parse(json["plan_version_id"]),
+      purchaseOrder: json["purchase_order"],
+      successUrl: json["success_url"],
+      trialDurationDays: json["trial_duration_days"],
     };
   },
 
-  _toJsonObject(self: CreateCheckoutSessionRequest): any {
+  serialize(value: CreateCheckoutSessionRequest): any {
     return {
+      ...extraProperties(value, [
+        "addOns",
+        "autoAdvanceInvoices",
+        "billingDayAnchor",
+        "billingStartDate",
+        "cancelUrl",
+        "chargeAutomatically",
+        "components",
+        "couponCode",
+        "couponIds",
+        "customerId",
+        "endDate",
+        "expiresInHours",
+        "invoiceMemo",
+        "invoiceThreshold",
+        "metadata",
+        "netTerms",
+        "paymentMethodsConfig",
+        "planVersionId",
+        "purchaseOrder",
+        "successUrl",
+        "trialDurationDays",
+      ]),
       add_ons:
-        self.addOns != null
-          ? self.addOns.map((item: any) =>
-              CreateSubscriptionAddOnSerializer._toJsonObject(item)
+        value.addOns != null
+          ? value.addOns.map((item: any) =>
+              CreateSubscriptionAddOnSerializer.serialize(item)
             )
-          : undefined,
-      auto_advance_invoices: self.autoAdvanceInvoices,
-      billing_day_anchor: self.billingDayAnchor,
-      billing_start_date: self.billingStartDate,
-      cancel_url: self.cancelUrl,
-      charge_automatically: self.chargeAutomatically,
+          : value.addOns,
+      auto_advance_invoices: value.autoAdvanceInvoices,
+      billing_day_anchor: value.billingDayAnchor,
+      billing_start_date: value.billingStartDate,
+      cancel_url: value.cancelUrl,
+      charge_automatically: value.chargeAutomatically,
       components:
-        self.components != null
-          ? CreateSubscriptionComponentsSerializer._toJsonObject(self.components)
-          : undefined,
-      coupon_code: self.couponCode,
+        value.components != null
+          ? CreateSubscriptionComponentsSerializer.serialize(value.components)
+          : value.components,
+      coupon_code: value.couponCode,
       coupon_ids:
-        self.couponIds != null
-          ? self.couponIds.map((item: any) => CouponIdSerializer._toJsonObject(item))
+        value.couponIds != null
+          ? value.couponIds.map((item: any) => CouponIdSerializer.serialize(item))
           : undefined,
-      customer_id: self.customerId,
-      end_date: self.endDate,
-      expires_in_hours: self.expiresInHours,
-      invoice_memo: self.invoiceMemo,
-      invoice_threshold: self.invoiceThreshold,
-      metadata: self.metadata,
-      net_terms: self.netTerms,
+      customer_id: value.customerId,
+      end_date: value.endDate,
+      expires_in_hours: value.expiresInHours,
+      invoice_memo: value.invoiceMemo,
+      invoice_threshold: value.invoiceThreshold,
+      metadata: value.metadata,
+      net_terms: value.netTerms,
       payment_methods_config:
-        self.paymentMethodsConfig != null
-          ? PaymentMethodsConfigSerializer._toJsonObject(self.paymentMethodsConfig)
-          : undefined,
-      plan_version_id: PlanVersionIdSerializer._toJsonObject(self.planVersionId),
-      purchase_order: self.purchaseOrder,
-      success_url: self.successUrl,
-      trial_duration_days: self.trialDurationDays,
+        value.paymentMethodsConfig != null
+          ? PaymentMethodsConfigSerializer.serialize(value.paymentMethodsConfig)
+          : value.paymentMethodsConfig,
+      plan_version_id: PlanVersionIdSerializer.serialize(value.planVersionId),
+      purchase_order: value.purchaseOrder,
+      success_url: value.successUrl,
+      trial_duration_days: value.trialDurationDays,
     };
   },
 };

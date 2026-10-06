@@ -1,24 +1,27 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface CancelSubscriptionRequest {
   /** If not provided, the cancellation will be effective at the end of the current billing or committed period. */
-  effectiveDate?: string | null;
-
-  reason?: string | null;
+  effectiveDate?: string | null | undefined;
+  reason?: string | null | undefined;
 }
 
+/** Converts `CancelSubscriptionRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CancelSubscriptionRequestSerializer = {
-  _fromJsonObject(object: any): CancelSubscriptionRequest {
+  parse(json: any): CancelSubscriptionRequest {
     return {
-      effectiveDate: object["effective_date"],
-      reason: object["reason"],
+      ...extraProperties(json, ["effective_date", "reason"]),
+      effectiveDate: json["effective_date"],
+      reason: json["reason"],
     };
   },
 
-  _toJsonObject(self: CancelSubscriptionRequest): any {
+  serialize(value: CancelSubscriptionRequest): any {
     return {
-      effective_date: self.effectiveDate,
-      reason: self.reason,
+      ...extraProperties(value, ["effectiveDate", "reason"]),
+      effective_date: value.effectiveDate,
+      reason: value.reason,
     };
   },
 };

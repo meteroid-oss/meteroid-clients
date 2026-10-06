@@ -3,14 +3,15 @@ use serde::{Deserialize, Serialize};
 
 use super::{coupon_discount::CouponDiscount, coupon_id::CouponId, plan_id::PlanId};
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Coupon {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub archived_at: Option<String>,
+    pub archived_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub code: String,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -20,7 +21,7 @@ pub struct Coupon {
     pub discount: CouponDiscount,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub expires_at: Option<String>,
+    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub id: CouponId,
 
@@ -35,12 +36,18 @@ pub struct Coupon {
     pub redemption_limit: Option<i32>,
 
     pub reusable: bool,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Coupon {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
-        code: String,
-        created_at: String,
+        code: impl Into<String>,
+        created_at: chrono::DateTime<chrono::Utc>,
         disabled: bool,
         discount: CouponDiscount,
         id: CouponId,
@@ -50,7 +57,7 @@ impl Coupon {
     ) -> Self {
         Self {
             archived_at: None,
-            code,
+            code: code.into(),
             created_at,
             description: None,
             disabled,
@@ -62,6 +69,7 @@ impl Coupon {
             redemption_count,
             redemption_limit: None,
             reusable,
+            extra: serde_json::Map::new(),
         }
     }
 }

@@ -1,56 +1,72 @@
 // this file is @generated
-import type { BillableMetricId } from "../models/billableMetricId";
-import { type UsageResponse, UsageResponseSerializer } from "../models/usageResponse";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
 
-export interface UsageGetCustomerUsageOptions {
+import type { BillableMetricId } from "../models/billableMetricId.js";
+import { type UsageResponse, UsageResponseSerializer } from "../models/usageResponse.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
+
+/** The query and header parameters of `retrieveCustomer`. */
+export interface UsageRetrieveCustomerOptions {
   startDate: string;
   endDate: string;
-  metricId?: BillableMetricId;
+  metricId?: BillableMetricId | undefined;
 }
 
-export interface UsageGetSubscriptionUsageOptions {
-  startDate?: string;
-  endDate?: string;
-  metricId?: BillableMetricId;
+/** The query and header parameters of `retrieveSubscription`. */
+export interface UsageRetrieveSubscriptionOptions {
+  startDate?: string | undefined;
+  endDate?: string | undefined;
+  metricId?: BillableMetricId | undefined;
 }
 
-export interface UsageGetUsageSummaryOptions {
+/** The query and header parameters of `retrieveSummary`. */
+export interface UsageRetrieveSummaryOptions {
   startDate: string;
   endDate: string;
-  metricId?: BillableMetricId;
+  metricId?: BillableMetricId | undefined;
 }
 
+/** The usage operations, reached through the client's `usage`. */
 export class Usage {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /** Retrieve aggregated usage data for a customer over a specified period. */
-  public getCustomerUsage(
+  /**
+   * Get customer usage
+   *
+   * Retrieve aggregated usage data for a customer over a specified period.
+   */
+  public retrieveCustomer(
     customerId: string,
-    options: UsageGetCustomerUsageOptions
-  ): Promise<UsageResponse> {
-    const request = new MeteroidRequest(
-      HttpMethod.GET,
-      "/api/v1/usage/customer/{customer_id}"
-    );
+    options: UsageRetrieveCustomerOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<UsageResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/usage/customer/{customer_id}");
 
     request.setPathParam("customer_id", customerId);
     request.setQueryParam("start_date", options.startDate);
     request.setQueryParam("end_date", options.endDate);
     request.setQueryParam("metric_id", options?.metricId);
-    return request.send(this.requestCtx, UsageResponseSerializer._fromJsonObject);
+    return request.send(this.requestCtx, UsageResponseSerializer.parse, requestOptions);
   }
 
   /**
+   * Get subscription usage
+   *
    * Retrieve aggregated usage data for a subscription's usage-based components.
    * If start_date/end_date are omitted, defaults to the current billing period.
    */
-  public getSubscriptionUsage(
+  public retrieveSubscription(
     subscriptionId: string,
-    options?: UsageGetSubscriptionUsageOptions
-  ): Promise<UsageResponse> {
+    options?: UsageRetrieveSubscriptionOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<UsageResponse> {
     const request = new MeteroidRequest(
-      HttpMethod.GET,
+      "GET",
       "/api/v1/usage/subscription/{subscription_id}"
     );
 
@@ -58,16 +74,23 @@ export class Usage {
     request.setQueryParam("start_date", options?.startDate);
     request.setQueryParam("end_date", options?.endDate);
     request.setQueryParam("metric_id", options?.metricId);
-    return request.send(this.requestCtx, UsageResponseSerializer._fromJsonObject);
+    return request.send(this.requestCtx, UsageResponseSerializer.parse, requestOptions);
   }
 
-  /** Retrieve aggregated usage data across all customers for the tenant. */
-  public getUsageSummary(options: UsageGetUsageSummaryOptions): Promise<UsageResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/usage/summary");
+  /**
+   * Get usage summary
+   *
+   * Retrieve aggregated usage data across all customers for the tenant.
+   */
+  public retrieveSummary(
+    options: UsageRetrieveSummaryOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<UsageResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/usage/summary");
 
     request.setQueryParam("start_date", options.startDate);
     request.setQueryParam("end_date", options.endDate);
     request.setQueryParam("metric_id", options?.metricId);
-    return request.send(this.requestCtx, UsageResponseSerializer._fromJsonObject);
+    return request.send(this.requestCtx, UsageResponseSerializer.parse, requestOptions);
   }
 }

@@ -1,24 +1,27 @@
 // this file is @generated
-import { type ProductId, ProductIdSerializer } from "./productId";
+import { extraProperties } from "../json.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
 /** Minimal reference to the product a feature belongs to. */
 export interface EntitlementProductRef {
   id: ProductId;
-
   name: string;
 }
 
+/** Converts `EntitlementProductRef` values from (`parse`) and to (`serialize`) their JSON form. */
 export const EntitlementProductRefSerializer = {
-  _fromJsonObject(object: any): EntitlementProductRef {
+  parse(json: any): EntitlementProductRef {
     return {
-      id: ProductIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
+      ...extraProperties(json, ["id", "name"]),
+      id: ProductIdSerializer.parse(json["id"]),
+      name: json["name"],
     };
   },
 
-  _toJsonObject(self: EntitlementProductRef): any {
+  serialize(value: EntitlementProductRef): any {
     return {
-      id: ProductIdSerializer._toJsonObject(self.id),
-      name: self.name,
+      ...extraProperties(value, ["id", "name"]),
+      id: ProductIdSerializer.serialize(value.id),
+      name: value.name,
     };
   },
 };

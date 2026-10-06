@@ -2,12 +2,13 @@
 
 export type BatchJobChunkId = string;
 
+/** Converts `BatchJobChunkId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BatchJobChunkIdSerializer = {
-  _fromJsonObject(object: any): BatchJobChunkId {
-    return object;
+  parse(json: any): BatchJobChunkId {
+    return json;
   },
 
-  _toJsonObject(self: BatchJobChunkId): any {
-    return self;
+  serialize(value: BatchJobChunkId): any {
+    return value;
   },
 };

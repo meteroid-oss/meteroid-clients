@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface CapacityThreshold {
   includedAmount: number;
-
   perUnitOverage: string;
-
   price: string;
 }
 
+/** Converts `CapacityThreshold` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CapacityThresholdSerializer = {
-  _fromJsonObject(object: any): CapacityThreshold {
+  parse(json: any): CapacityThreshold {
     return {
-      includedAmount: object["included_amount"],
-      perUnitOverage: object["per_unit_overage"],
-      price: object["price"],
+      ...extraProperties(json, ["included_amount", "per_unit_overage", "price"]),
+      includedAmount: json["included_amount"],
+      perUnitOverage: json["per_unit_overage"],
+      price: json["price"],
     };
   },
 
-  _toJsonObject(self: CapacityThreshold): any {
+  serialize(value: CapacityThreshold): any {
     return {
-      included_amount: self.includedAmount,
-      per_unit_overage: self.perUnitOverage,
-      price: self.price,
+      ...extraProperties(value, ["includedAmount", "perUnitOverage", "price"]),
+      included_amount: value.includedAmount,
+      per_unit_overage: value.perUnitOverage,
+      price: value.price,
     };
   },
 };

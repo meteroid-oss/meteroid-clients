@@ -1,16 +1,20 @@
 // this file is @generated
 
-export enum ExtraRecurringBillingTypeEnum {
-  Advance = "ADVANCE",
-  Arrears = "ARREARS",
-}
+export const ExtraRecurringBillingTypeEnum = {
+  Advance: "ADVANCE",
+  Arrears: "ARREARS",
+} as const;
+export type ExtraRecurringBillingTypeEnum =
+  | (typeof ExtraRecurringBillingTypeEnum)[keyof typeof ExtraRecurringBillingTypeEnum]
+  | (string & {});
 
+/** Converts `ExtraRecurringBillingTypeEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ExtraRecurringBillingTypeEnumSerializer = {
-  _fromJsonObject(object: any): ExtraRecurringBillingTypeEnum {
-    return object;
+  parse(json: any): ExtraRecurringBillingTypeEnum {
+    return json;
   },
 
-  _toJsonObject(self: ExtraRecurringBillingTypeEnum): any {
-    return self;
+  serialize(value: ExtraRecurringBillingTypeEnum): any {
+    return value;
   },
 };

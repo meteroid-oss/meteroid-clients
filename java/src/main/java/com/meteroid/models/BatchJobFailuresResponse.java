@@ -1,97 +1,245 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class BatchJobFailuresResponse {
-    @JsonProperty private List<BatchJobItemFailureResponse> data;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class BatchJobFailuresResponse {
+    @JsonProperty("data")
+    private List<BatchJobItemFailureResponse> data;
 
     @JsonProperty("total_count")
     private Long totalCount;
 
-    public BatchJobFailuresResponse() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public BatchJobFailuresResponse data(List<BatchJobItemFailureResponse> data) {
-        this.data = data;
-        return this;
+    private BatchJobFailuresResponse() {}
+
+    private BatchJobFailuresResponse(Builder builder) {
+        this.data = Utils.copyList(builder.data);
+        this.totalCount = builder.totalCount;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
-    public BatchJobFailuresResponse addDataItem(BatchJobItemFailureResponse dataItem) {
-        if (this.data == null) {
-            this.data = new ArrayList<>();
+    /**
+     * A builder of {@code BatchJobFailuresResponse}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * A builder starting from this value.
+     *
+     * @return a new builder
+     */
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.data = Utils.mutableList(data);
+        builder.totalCount = totalCount;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
+    }
+
+    /**
+     * The {@code data} property.
+     *
+     * @return the value, never null
+     */
+    public List<BatchJobItemFailureResponse> data() {
+        return Utils.required(data, "data");
+    }
+
+    /**
+     * The {@code total_count} property.
+     *
+     * @return the value, never null
+     */
+    public Long totalCount() {
+        return Utils.required(totalCount, "total_count");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.data.add(dataItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BatchJobFailuresResponse that = (BatchJobFailuresResponse) o;
+        return Objects.equals(data, that.data)
+                && Objects.equals(totalCount, that.totalCount)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(data, totalCount, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "BatchJobFailuresResponse{"
+                + "data="
+                + data
+                + ", totalCount="
+                + totalCount
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link BatchJobFailuresResponse}. */
+    public static final class Builder {
+        private List<BatchJobItemFailureResponse> data;
+        private Long totalCount;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code data} property.
+         *
+         * @param data the value
+         * @return this builder
+         */
+        public Builder data(List<BatchJobItemFailureResponse> data) {
+            this.data = Utils.mutableList(data);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code data}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addDataItem(BatchJobItemFailureResponse item) {
+            if (this.data == null) {
+                this.data = new ArrayList<>();
+            }
+            this.data.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code total_count} property.
+         *
+         * @param totalCount the value
+         * @return this builder
+         */
+        public Builder totalCount(Long totalCount) {
+            this.totalCount = totalCount;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code BatchJobFailuresResponse}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public BatchJobFailuresResponse build() {
+            Utils.checkRequired(data, "data");
+            Utils.checkRequired(totalCount, "total_count");
+            return new BatchJobFailuresResponse(this);
+        }
     }
 
     /**
-     * Get data
+     * Parse {@code json} as {@code BatchJobFailuresResponse}.
      *
-     * @return data
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<BatchJobItemFailureResponse> getData() {
-        return data;
-    }
-
-    public void setData(List<BatchJobItemFailureResponse> data) {
-        this.data = data;
-    }
-
-    public BatchJobFailuresResponse totalCount(Long totalCount) {
-        this.totalCount = totalCount;
-        return this;
+    public static BatchJobFailuresResponse fromJson(String json) {
+        return Utils.parse(json, BatchJobFailuresResponse.class);
     }
 
     /**
-     * Get totalCount
+     * This value as JSON.
      *
-     * @return totalCount
+     * @return the JSON text
      */
-    @javax.annotation.Nonnull
-    public Long getTotalCount() {
-        return totalCount;
-    }
-
-    public void setTotalCount(Long totalCount) {
-        this.totalCount = totalCount;
-    }
-
-    /**
-     * Create an instance of BatchJobFailuresResponse given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of BatchJobFailuresResponse
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     BatchJobFailuresResponse
-     */
-    public static BatchJobFailuresResponse fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, BatchJobFailuresResponse.class);
-    }
-
-    /**
-     * Convert an instance of BatchJobFailuresResponse to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

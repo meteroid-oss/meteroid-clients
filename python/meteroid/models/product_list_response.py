@@ -1,14 +1,20 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .pagination_response import PaginationResponse
-from .product import Product
+
+if t.TYPE_CHECKING:
+    from .pagination_response import PaginationResponse
+    from .product import Product
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class ProductListResponse(BaseModel):
-    data: t.List[Product]
+    """The `ProductListResponse` object."""
+
+    data: list[Product]
 
     pagination_meta: PaginationResponse

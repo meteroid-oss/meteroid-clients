@@ -1,17 +1,20 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 from decimal import Decimal
 
-from ..serialization import BaseModel
+from ..serialization import UNSET, BaseModel, Unset
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class TierRow(BaseModel):
+    """The `TierRow` object."""
+
     first_unit: int
 
     rate: Decimal
 
-    flat_cap: t.Optional[Decimal] = None
+    flat_cap: Decimal | None | Unset = UNSET
 
-    flat_fee: t.Optional[Decimal] = None
+    flat_fee: Decimal | None | Unset = UNSET

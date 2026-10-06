@@ -1,9 +1,9 @@
 // this file is @generated
-import { type MatrixPricing, MatrixPricingSerializer } from "./matrixPricing";
-import { type PackagePricing, PackagePricingSerializer } from "./packagePricing";
-import { type PerUnitPricing, PerUnitPricingSerializer } from "./perUnitPricing";
-import { type TieredPricing, TieredPricingSerializer } from "./tieredPricing";
-import { type VolumePricing, VolumePricingSerializer } from "./volumePricing";
+import { type MatrixPricing, MatrixPricingSerializer } from "./matrixPricing.js";
+import { type PackagePricing, PackagePricingSerializer } from "./packagePricing.js";
+import { type PerUnitPricing, PerUnitPricingSerializer } from "./perUnitPricing.js";
+import { type TieredPricing, TieredPricingSerializer } from "./tieredPricing.js";
+import { type VolumePricing, VolumePricingSerializer } from "./volumePricing.js";
 
 export interface UsagePricingModelPerUnit extends PerUnitPricing {
   type: "PER_UNIT";
@@ -28,70 +28,70 @@ export type UsagePricingModel =
   | UsagePricingModelPackage
   | UsagePricingModelMatrix;
 
+/** Converts `UsagePricingModel` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UsagePricingModelSerializer = {
-  _fromJsonObject(object: any): UsagePricingModel {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): UsagePricingModel {
+    switch (json["type"]) {
       case "PER_UNIT":
         return {
-          ...PerUnitPricingSerializer._fromJsonObject(object),
+          ...PerUnitPricingSerializer.parse(json),
           type: "PER_UNIT",
         };
       case "TIERED":
         return {
-          ...TieredPricingSerializer._fromJsonObject(object),
+          ...TieredPricingSerializer.parse(json),
           type: "TIERED",
         };
       case "VOLUME":
         return {
-          ...VolumePricingSerializer._fromJsonObject(object),
+          ...VolumePricingSerializer.parse(json),
           type: "VOLUME",
         };
       case "PACKAGE":
         return {
-          ...PackagePricingSerializer._fromJsonObject(object),
+          ...PackagePricingSerializer.parse(json),
           type: "PACKAGE",
         };
       case "MATRIX":
         return {
-          ...MatrixPricingSerializer._fromJsonObject(object),
+          ...MatrixPricingSerializer.parse(json),
           type: "MATRIX",
         };
       default:
-        throw new Error(`Unexpected type for UsagePricingModel: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: UsagePricingModel): any {
-    switch (self.type) {
+  serialize(value: UsagePricingModel): any {
+    switch (value.type) {
       case "PER_UNIT":
         return {
-          ...PerUnitPricingSerializer._toJsonObject(self),
+          ...PerUnitPricingSerializer.serialize(value),
           type: "PER_UNIT",
         };
       case "TIERED":
         return {
-          ...TieredPricingSerializer._toJsonObject(self),
+          ...TieredPricingSerializer.serialize(value),
           type: "TIERED",
         };
       case "VOLUME":
         return {
-          ...VolumePricingSerializer._toJsonObject(self),
+          ...VolumePricingSerializer.serialize(value),
           type: "VOLUME",
         };
       case "PACKAGE":
         return {
-          ...PackagePricingSerializer._toJsonObject(self),
+          ...PackagePricingSerializer.serialize(value),
           type: "PACKAGE",
         };
       case "MATRIX":
         return {
-          ...MatrixPricingSerializer._toJsonObject(self),
+          ...MatrixPricingSerializer.serialize(value),
           type: "MATRIX",
         };
       default:
-        throw new Error(`Unexpected type for UsagePricingModel`);
+        return value;
     }
   },
 };

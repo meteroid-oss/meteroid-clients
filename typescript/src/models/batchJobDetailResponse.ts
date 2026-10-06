@@ -1,86 +1,109 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type BatchJobId, BatchJobIdSerializer } from "./batchJobId";
-import { type BatchJobStatus, BatchJobStatusSerializer } from "./batchJobStatus";
-import { type BatchJobType, BatchJobTypeSerializer } from "./batchJobType";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type BatchJobId, BatchJobIdSerializer } from "./batchJobId.js";
+import { type BatchJobStatus, BatchJobStatusSerializer } from "./batchJobStatus.js";
+import { type BatchJobType, BatchJobTypeSerializer } from "./batchJobType.js";
 
 export interface BatchJobDetailResponse {
-  completedAt?: Date | null;
-
+  completedAt?: Date | null | undefined;
   createdAt: Date;
-
   createdBy: string;
-
-  errorCsvUrl?: string | null;
-
+  errorCsvUrl?: string | null | undefined;
   failedItems: number;
-
   failureCount: number;
-
   hasErrorCsv: boolean;
-
   hasOutput: boolean;
-
   id: BatchJobId;
-
-  inputFileName?: string | null;
-
-  inputFileUrl?: string | null;
-
+  inputFileName?: string | null | undefined;
+  inputFileUrl?: string | null | undefined;
   jobType: BatchJobType;
-
-  outputUrl?: string | null;
-
+  outputUrl?: string | null | undefined;
   processedItems: number;
-
   status: BatchJobStatus;
-
-  totalItems?: number | null;
+  totalItems?: number | null | undefined;
 }
 
+/** Converts `BatchJobDetailResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BatchJobDetailResponseSerializer = {
-  _fromJsonObject(object: any): BatchJobDetailResponse {
+  parse(json: any): BatchJobDetailResponse {
     return {
+      ...extraProperties(json, [
+        "completed_at",
+        "created_at",
+        "created_by",
+        "error_csv_url",
+        "failed_items",
+        "failure_count",
+        "has_error_csv",
+        "has_output",
+        "id",
+        "input_file_name",
+        "input_file_url",
+        "job_type",
+        "output_url",
+        "processed_items",
+        "status",
+        "total_items",
+      ]),
       completedAt:
-        object["completed_at"] != null
-          ? parseDateTime(object["completed_at"])
-          : undefined,
-      createdAt: parseDateTime(object["created_at"]),
-      createdBy: object["created_by"],
-      errorCsvUrl: object["error_csv_url"],
-      failedItems: object["failed_items"],
-      failureCount: object["failure_count"],
-      hasErrorCsv: object["has_error_csv"],
-      hasOutput: object["has_output"],
-      id: BatchJobIdSerializer._fromJsonObject(object["id"]),
-      inputFileName: object["input_file_name"],
-      inputFileUrl: object["input_file_url"],
-      jobType: BatchJobTypeSerializer._fromJsonObject(object["job_type"]),
-      outputUrl: object["output_url"],
-      processedItems: object["processed_items"],
-      status: BatchJobStatusSerializer._fromJsonObject(object["status"]),
-      totalItems: object["total_items"],
+        json["completed_at"] != null
+          ? parseDateTime(json["completed_at"])
+          : json["completed_at"],
+      createdAt: parseDateTime(json["created_at"]),
+      createdBy: json["created_by"],
+      errorCsvUrl: json["error_csv_url"],
+      failedItems: json["failed_items"],
+      failureCount: json["failure_count"],
+      hasErrorCsv: json["has_error_csv"],
+      hasOutput: json["has_output"],
+      id: BatchJobIdSerializer.parse(json["id"]),
+      inputFileName: json["input_file_name"],
+      inputFileUrl: json["input_file_url"],
+      jobType: BatchJobTypeSerializer.parse(json["job_type"]),
+      outputUrl: json["output_url"],
+      processedItems: json["processed_items"],
+      status: BatchJobStatusSerializer.parse(json["status"]),
+      totalItems: json["total_items"],
     };
   },
 
-  _toJsonObject(self: BatchJobDetailResponse): any {
+  serialize(value: BatchJobDetailResponse): any {
     return {
-      completed_at: self.completedAt,
-      created_at: self.createdAt,
-      created_by: self.createdBy,
-      error_csv_url: self.errorCsvUrl,
-      failed_items: self.failedItems,
-      failure_count: self.failureCount,
-      has_error_csv: self.hasErrorCsv,
-      has_output: self.hasOutput,
-      id: BatchJobIdSerializer._toJsonObject(self.id),
-      input_file_name: self.inputFileName,
-      input_file_url: self.inputFileUrl,
-      job_type: BatchJobTypeSerializer._toJsonObject(self.jobType),
-      output_url: self.outputUrl,
-      processed_items: self.processedItems,
-      status: BatchJobStatusSerializer._toJsonObject(self.status),
-      total_items: self.totalItems,
+      ...extraProperties(value, [
+        "completedAt",
+        "createdAt",
+        "createdBy",
+        "errorCsvUrl",
+        "failedItems",
+        "failureCount",
+        "hasErrorCsv",
+        "hasOutput",
+        "id",
+        "inputFileName",
+        "inputFileUrl",
+        "jobType",
+        "outputUrl",
+        "processedItems",
+        "status",
+        "totalItems",
+      ]),
+      completed_at: value.completedAt,
+      created_at: value.createdAt,
+      created_by: value.createdBy,
+      error_csv_url: value.errorCsvUrl,
+      failed_items: value.failedItems,
+      failure_count: value.failureCount,
+      has_error_csv: value.hasErrorCsv,
+      has_output: value.hasOutput,
+      id: BatchJobIdSerializer.serialize(value.id),
+      input_file_name: value.inputFileName,
+      input_file_url: value.inputFileUrl,
+      job_type: BatchJobTypeSerializer.serialize(value.jobType),
+      output_url: value.outputUrl,
+      processed_items: value.processedItems,
+      status: BatchJobStatusSerializer.serialize(value.status),
+      total_items: value.totalItems,
     };
   },
 };

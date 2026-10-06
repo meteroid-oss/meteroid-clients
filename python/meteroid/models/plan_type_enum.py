@@ -1,11 +1,16 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class PlanTypeEnum(str, enum.Enum):
+class PlanTypeEnum(StrEnum):
+    """The values of `PlanTypeEnum`; others are kept as received."""
+
     STANDARD = "STANDARD"
     FREE = "FREE"
     CUSTOM = "CUSTOM"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+PlanTypeEnumLiteral: t.TypeAlias = t.Literal["STANDARD", "FREE", "CUSTOM"]
+"""The values of :class:`PlanTypeEnum`, which arguments take as plain strings too."""

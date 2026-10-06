@@ -1,13 +1,19 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Every revenue line counts toward the floor. */
 export interface AllComponentsScope {}
 
+/** Converts `AllComponentsScope` values from (`parse`) and to (`serialize`) their JSON form. */
 export const AllComponentsScopeSerializer = {
-  _fromJsonObject(object: any): AllComponentsScope {
-    return {};
+  parse(json: any): AllComponentsScope {
+    return {
+      ...extraProperties(json, []),
+    };
   },
 
-  _toJsonObject(self: AllComponentsScope): any {
-    return {};
+  serialize(value: AllComponentsScope): any {
+    return {
+      ...extraProperties(value, []),
+    };
   },
 };

@@ -1,9 +1,9 @@
 // this file is @generated
-import { type FixedDiscount, FixedDiscountSerializer } from "./fixedDiscount";
+import { type FixedDiscount, FixedDiscountSerializer } from "./fixedDiscount.js";
 import {
   type PercentageDiscount,
   PercentageDiscountSerializer,
-} from "./percentageDiscount";
+} from "./percentageDiscount.js";
 
 export interface CouponDiscountPercentage extends PercentageDiscount {
   type: "PERCENTAGE";
@@ -14,40 +14,40 @@ export interface CouponDiscountFixed extends FixedDiscount {
 
 export type CouponDiscount = CouponDiscountPercentage | CouponDiscountFixed;
 
+/** Converts `CouponDiscount` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CouponDiscountSerializer = {
-  _fromJsonObject(object: any): CouponDiscount {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): CouponDiscount {
+    switch (json["type"]) {
       case "PERCENTAGE":
         return {
-          ...PercentageDiscountSerializer._fromJsonObject(object),
+          ...PercentageDiscountSerializer.parse(json),
           type: "PERCENTAGE",
         };
       case "FIXED":
         return {
-          ...FixedDiscountSerializer._fromJsonObject(object),
+          ...FixedDiscountSerializer.parse(json),
           type: "FIXED",
         };
       default:
-        throw new Error(`Unexpected type for CouponDiscount: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: CouponDiscount): any {
-    switch (self.type) {
+  serialize(value: CouponDiscount): any {
+    switch (value.type) {
       case "PERCENTAGE":
         return {
-          ...PercentageDiscountSerializer._toJsonObject(self),
+          ...PercentageDiscountSerializer.serialize(value),
           type: "PERCENTAGE",
         };
       case "FIXED":
         return {
-          ...FixedDiscountSerializer._toJsonObject(self),
+          ...FixedDiscountSerializer.serialize(value),
           type: "FIXED",
         };
       default:
-        throw new Error(`Unexpected type for CouponDiscount`);
+        return value;
     }
   },
 };

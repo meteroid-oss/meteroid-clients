@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface CouponLineItem {
   couponId: string;
-
   name: string;
-
   total: number;
 }
 
+/** Converts `CouponLineItem` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CouponLineItemSerializer = {
-  _fromJsonObject(object: any): CouponLineItem {
+  parse(json: any): CouponLineItem {
     return {
-      couponId: object["coupon_id"],
-      name: object["name"],
-      total: object["total"],
+      ...extraProperties(json, ["coupon_id", "name", "total"]),
+      couponId: json["coupon_id"],
+      name: json["name"],
+      total: json["total"],
     };
   },
 
-  _toJsonObject(self: CouponLineItem): any {
+  serialize(value: CouponLineItem): any {
     return {
-      coupon_id: self.couponId,
-      name: self.name,
-      total: self.total,
+      ...extraProperties(value, ["couponId", "name", "total"]),
+      coupon_id: value.couponId,
+      name: value.name,
+      total: value.total,
     };
   },
 };

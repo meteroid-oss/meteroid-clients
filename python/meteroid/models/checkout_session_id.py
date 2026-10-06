@@ -1,2 +1,4 @@
 # this file is @generated
-CheckoutSessionId = str
+import typing as t
+
+CheckoutSessionId: t.TypeAlias = str

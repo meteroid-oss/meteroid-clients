@@ -1,8 +1,12 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class SubscriptionStatusEnum(str, enum.Enum):
+class SubscriptionStatusEnum(StrEnum):
+    """The values of `SubscriptionStatusEnum`; others are kept as received."""
+
     PENDING_ACTIVATION = "PENDING_ACTIVATION"
     PENDING_CHARGE = "PENDING_CHARGE"
     TRIAL_ACTIVE = "TRIAL_ACTIVE"
@@ -16,5 +20,19 @@ class SubscriptionStatusEnum(str, enum.Enum):
     SUPERSEDED = "SUPERSEDED"
     ERRORED = "ERRORED"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+SubscriptionStatusEnumLiteral: t.TypeAlias = t.Literal[
+    "PENDING_ACTIVATION",
+    "PENDING_CHARGE",
+    "TRIAL_ACTIVE",
+    "ACTIVE",
+    "TRIAL_EXPIRED",
+    "PAUSED",
+    "SUSPENDED",
+    "CANCELLED",
+    "ABORTED",
+    "COMPLETED",
+    "SUPERSEDED",
+    "ERRORED",
+]
+"""The values of :class:`SubscriptionStatusEnum`, which arguments take as plain strings too."""

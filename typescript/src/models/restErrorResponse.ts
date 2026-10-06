@@ -1,24 +1,27 @@
 // this file is @generated
-import { type ErrorCode, ErrorCodeSerializer } from "./errorCode";
+import { extraProperties } from "../json.js";
+import { type ErrorCode, ErrorCodeSerializer } from "./errorCode.js";
 
 export interface RestErrorResponse {
   code: ErrorCode;
-
   message: string;
 }
 
+/** Converts `RestErrorResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const RestErrorResponseSerializer = {
-  _fromJsonObject(object: any): RestErrorResponse {
+  parse(json: any): RestErrorResponse {
     return {
-      code: ErrorCodeSerializer._fromJsonObject(object["code"]),
-      message: object["message"],
+      ...extraProperties(json, ["code", "message"]),
+      code: ErrorCodeSerializer.parse(json["code"]),
+      message: json["message"],
     };
   },
 
-  _toJsonObject(self: RestErrorResponse): any {
+  serialize(value: RestErrorResponse): any {
     return {
-      code: ErrorCodeSerializer._toJsonObject(self.code),
-      message: self.message,
+      ...extraProperties(value, ["code", "message"]),
+      code: ErrorCodeSerializer.serialize(value.code),
+      message: value.message,
     };
   },
 };

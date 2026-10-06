@@ -1,20 +1,24 @@
 // this file is @generated
-import { type Subscription, SubscriptionSerializer } from "./subscription";
+import { extraProperties } from "../json.js";
+import { type Subscription, SubscriptionSerializer } from "./subscription.js";
 
 export interface CancelSubscriptionResponse {
   subscription: Subscription;
 }
 
+/** Converts `CancelSubscriptionResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CancelSubscriptionResponseSerializer = {
-  _fromJsonObject(object: any): CancelSubscriptionResponse {
+  parse(json: any): CancelSubscriptionResponse {
     return {
-      subscription: SubscriptionSerializer._fromJsonObject(object["subscription"]),
+      ...extraProperties(json, ["subscription"]),
+      subscription: SubscriptionSerializer.parse(json["subscription"]),
     };
   },
 
-  _toJsonObject(self: CancelSubscriptionResponse): any {
+  serialize(value: CancelSubscriptionResponse): any {
     return {
-      subscription: SubscriptionSerializer._toJsonObject(self.subscription),
+      ...extraProperties(value, ["subscription"]),
+      subscription: SubscriptionSerializer.serialize(value.subscription),
     };
   },
 };

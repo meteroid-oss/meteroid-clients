@@ -1,44 +1,80 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type EventId, EventIdSerializer } from "./eventId";
-import { type EventType, EventTypeSerializer } from "./eventType";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties, pickProperties } from "../json.js";
+import { type EventId, EventIdSerializer } from "./eventId.js";
+import { type EventType, EventTypeSerializer } from "./eventType.js";
 import {
   type InvoiceDocumentsEventData,
   InvoiceDocumentsEventDataSerializer,
-} from "./invoiceDocumentsEventData";
+} from "./invoiceDocumentsEventData.js";
 
-export interface InvoiceDocumentsEvent {
-  flattenInvoicedocumentseventdata: InvoiceDocumentsEventData;
-
+export interface InvoiceDocumentsEvent extends InvoiceDocumentsEventData {
   id: EventId;
-
   timestamp: Date;
-
   type: EventType;
 }
 
+/** Converts `InvoiceDocumentsEvent` values from (`parse`) and to (`serialize`) their JSON form. */
 export const InvoiceDocumentsEventSerializer = {
-  _fromJsonObject(object: any): InvoiceDocumentsEvent {
+  parse(json: any): InvoiceDocumentsEvent {
     return {
-      flattenInvoicedocumentseventdata:
-        InvoiceDocumentsEventDataSerializer._fromJsonObject(
-          object["__flatten_invoicedocumentseventdata"]
-        ),
-      id: EventIdSerializer._fromJsonObject(object["id"]),
-      timestamp: parseDateTime(object["timestamp"]),
-      type: EventTypeSerializer._fromJsonObject(object["type"]),
+      ...extraProperties(json, [
+        "id",
+        "timestamp",
+        "type",
+        "customer_id",
+        "einvoicing_error",
+        "einvoicing_findings",
+        "einvoicing_profile",
+        "einvoicing_status",
+        "invoice_id",
+        "pdf_document_id",
+        "xml_document_id",
+      ]),
+      ...pickProperties(InvoiceDocumentsEventDataSerializer.parse(json), [
+        "customerId",
+        "einvoicingError",
+        "einvoicingFindings",
+        "einvoicingProfile",
+        "einvoicingStatus",
+        "invoiceId",
+        "pdfDocumentId",
+        "xmlDocumentId",
+      ]),
+      id: EventIdSerializer.parse(json["id"]),
+      timestamp: parseDateTime(json["timestamp"]),
+      type: EventTypeSerializer.parse(json["type"]),
     };
   },
 
-  _toJsonObject(self: InvoiceDocumentsEvent): any {
+  serialize(value: InvoiceDocumentsEvent): any {
     return {
-      __flatten_invoicedocumentseventdata:
-        InvoiceDocumentsEventDataSerializer._toJsonObject(
-          self.flattenInvoicedocumentseventdata
-        ),
-      id: EventIdSerializer._toJsonObject(self.id),
-      timestamp: self.timestamp,
-      type: EventTypeSerializer._toJsonObject(self.type),
+      ...extraProperties(value, [
+        "id",
+        "timestamp",
+        "type",
+        "customerId",
+        "einvoicingError",
+        "einvoicingFindings",
+        "einvoicingProfile",
+        "einvoicingStatus",
+        "invoiceId",
+        "pdfDocumentId",
+        "xmlDocumentId",
+      ]),
+      ...pickProperties(InvoiceDocumentsEventDataSerializer.serialize(value), [
+        "customer_id",
+        "einvoicing_error",
+        "einvoicing_findings",
+        "einvoicing_profile",
+        "einvoicing_status",
+        "invoice_id",
+        "pdf_document_id",
+        "xml_document_id",
+      ]),
+      id: EventIdSerializer.serialize(value.id),
+      timestamp: value.timestamp,
+      type: EventTypeSerializer.serialize(value.type),
     };
   },
 };

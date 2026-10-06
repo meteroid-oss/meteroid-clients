@@ -1,33 +1,37 @@
 // this file is @generated
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
-import { type BillingType, BillingTypeSerializer } from "./billingType";
+import { extraProperties } from "../json.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
+import { type BillingType, BillingTypeSerializer } from "./billingType.js";
 /** Extra recurring fee */
 export interface ExtraRecurringPlanFee {
   billingType: BillingType;
-
   cadence: BillingPeriodEnum;
-
   quantity: number;
-
   unitPrice: string;
 }
 
+/** Converts `ExtraRecurringPlanFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ExtraRecurringPlanFeeSerializer = {
-  _fromJsonObject(object: any): ExtraRecurringPlanFee {
+  parse(json: any): ExtraRecurringPlanFee {
     return {
-      billingType: BillingTypeSerializer._fromJsonObject(object["billing_type"]),
-      cadence: BillingPeriodEnumSerializer._fromJsonObject(object["cadence"]),
-      quantity: object["quantity"],
-      unitPrice: object["unit_price"],
+      ...extraProperties(json, ["billing_type", "cadence", "quantity", "unit_price"]),
+      billingType: BillingTypeSerializer.parse(json["billing_type"]),
+      cadence: BillingPeriodEnumSerializer.parse(json["cadence"]),
+      quantity: json["quantity"],
+      unitPrice: json["unit_price"],
     };
   },
 
-  _toJsonObject(self: ExtraRecurringPlanFee): any {
+  serialize(value: ExtraRecurringPlanFee): any {
     return {
-      billing_type: BillingTypeSerializer._toJsonObject(self.billingType),
-      cadence: BillingPeriodEnumSerializer._toJsonObject(self.cadence),
-      quantity: self.quantity,
-      unit_price: self.unitPrice,
+      ...extraProperties(value, ["billingType", "cadence", "quantity", "unitPrice"]),
+      billing_type: BillingTypeSerializer.serialize(value.billingType),
+      cadence: BillingPeriodEnumSerializer.serialize(value.cadence),
+      quantity: value.quantity,
+      unit_price: value.unitPrice,
     };
   },
 };

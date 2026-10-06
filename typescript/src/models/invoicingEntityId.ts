@@ -2,12 +2,13 @@
 
 export type InvoicingEntityId = string;
 
+/** Converts `InvoicingEntityId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const InvoicingEntityIdSerializer = {
-  _fromJsonObject(object: any): InvoicingEntityId {
-    return object;
+  parse(json: any): InvoicingEntityId {
+    return json;
   },
 
-  _toJsonObject(self: InvoicingEntityId): any {
-    return self;
+  serialize(value: InvoicingEntityId): any {
+    return value;
   },
 };

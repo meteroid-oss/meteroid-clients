@@ -2,8 +2,8 @@
 import {
   type AllComponentsScope,
   AllComponentsScopeSerializer,
-} from "./allComponentsScope";
-import { type ProductsScope, ProductsScopeSerializer } from "./productsScope";
+} from "./allComponentsScope.js";
+import { type ProductsScope, ProductsScopeSerializer } from "./productsScope.js";
 
 export interface MinimumCommitmentScopeAllComponents extends AllComponentsScope {
   type: "all_components";
@@ -16,40 +16,40 @@ export type MinimumCommitmentScope =
   | MinimumCommitmentScopeAllComponents
   | MinimumCommitmentScopeProducts;
 
+/** Converts `MinimumCommitmentScope` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MinimumCommitmentScopeSerializer = {
-  _fromJsonObject(object: any): MinimumCommitmentScope {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): MinimumCommitmentScope {
+    switch (json["type"]) {
       case "all_components":
         return {
-          ...AllComponentsScopeSerializer._fromJsonObject(object),
+          ...AllComponentsScopeSerializer.parse(json),
           type: "all_components",
         };
       case "products":
         return {
-          ...ProductsScopeSerializer._fromJsonObject(object),
+          ...ProductsScopeSerializer.parse(json),
           type: "products",
         };
       default:
-        throw new Error(`Unexpected type for MinimumCommitmentScope: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: MinimumCommitmentScope): any {
-    switch (self.type) {
+  serialize(value: MinimumCommitmentScope): any {
+    switch (value.type) {
       case "all_components":
         return {
-          ...AllComponentsScopeSerializer._toJsonObject(self),
+          ...AllComponentsScopeSerializer.serialize(value),
           type: "all_components",
         };
       case "products":
         return {
-          ...ProductsScopeSerializer._toJsonObject(self),
+          ...ProductsScopeSerializer.serialize(value),
           type: "products",
         };
       default:
-        throw new Error(`Unexpected type for MinimumCommitmentScope`);
+        return value;
     }
   },
 };

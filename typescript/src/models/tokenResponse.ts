@@ -1,35 +1,47 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Token response as per OAuth 2.0 spec */
 export interface TokenResponse {
   accessToken: string;
-
   expiresIn: number;
-
-  refreshToken?: string | null;
-
-  scope?: string | null;
-
+  refreshToken?: string | null | undefined;
+  scope?: string | null | undefined;
   tokenType: string;
 }
 
+/** Converts `TokenResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TokenResponseSerializer = {
-  _fromJsonObject(object: any): TokenResponse {
+  parse(json: any): TokenResponse {
     return {
-      accessToken: object["access_token"],
-      expiresIn: object["expires_in"],
-      refreshToken: object["refresh_token"],
-      scope: object["scope"],
-      tokenType: object["token_type"],
+      ...extraProperties(json, [
+        "access_token",
+        "expires_in",
+        "refresh_token",
+        "scope",
+        "token_type",
+      ]),
+      accessToken: json["access_token"],
+      expiresIn: json["expires_in"],
+      refreshToken: json["refresh_token"],
+      scope: json["scope"],
+      tokenType: json["token_type"],
     };
   },
 
-  _toJsonObject(self: TokenResponse): any {
+  serialize(value: TokenResponse): any {
     return {
-      access_token: self.accessToken,
-      expires_in: self.expiresIn,
-      refresh_token: self.refreshToken,
-      scope: self.scope,
-      token_type: self.tokenType,
+      ...extraProperties(value, [
+        "accessToken",
+        "expiresIn",
+        "refreshToken",
+        "scope",
+        "tokenType",
+      ]),
+      access_token: value.accessToken,
+      expires_in: value.expiresIn,
+      refresh_token: value.refreshToken,
+      scope: value.scope,
+      token_type: value.tokenType,
     };
   },
 };

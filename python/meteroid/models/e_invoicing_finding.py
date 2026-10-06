@@ -1,11 +1,12 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
 from ..serialization import BaseModel
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class EInvoicingFinding(BaseModel):
     """One rule the document did not satisfy, in the standard's own vocabulary."""
 
@@ -17,4 +18,4 @@ class EInvoicingFinding(BaseModel):
     term: str
     """The business term path it is about — "BG-8/BT-55"."""
 
-    hint: t.Optional[str] = None
+    hint: str | None = None

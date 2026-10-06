@@ -1,24 +1,30 @@
 // this file is @generated
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
+import { extraProperties } from "../json.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
 
 export interface TermRate {
   price: string;
-
   term: BillingPeriodEnum;
 }
 
+/** Converts `TermRate` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TermRateSerializer = {
-  _fromJsonObject(object: any): TermRate {
+  parse(json: any): TermRate {
     return {
-      price: object["price"],
-      term: BillingPeriodEnumSerializer._fromJsonObject(object["term"]),
+      ...extraProperties(json, ["price", "term"]),
+      price: json["price"],
+      term: BillingPeriodEnumSerializer.parse(json["term"]),
     };
   },
 
-  _toJsonObject(self: TermRate): any {
+  serialize(value: TermRate): any {
     return {
-      price: self.price,
-      term: BillingPeriodEnumSerializer._toJsonObject(self.term),
+      ...extraProperties(value, ["price", "term"]),
+      price: value.price,
+      term: BillingPeriodEnumSerializer.serialize(value.term),
     };
   },
 };

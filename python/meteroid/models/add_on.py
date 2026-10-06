@@ -1,18 +1,24 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .add_on_id import AddOnId
-from .entitlement import Entitlement
-from .price_id import PriceId
-from .product_fee_type_enum import ProductFeeTypeEnum
-from .product_id import ProductId
+
+if t.TYPE_CHECKING:
+    from .add_on_id import AddOnId
+    from .entitlement import Entitlement
+    from .price_id import PriceId
+    from .product_fee_type_enum import ProductFeeTypeEnum
+    from .product_id import ProductId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class AddOn(BaseModel):
+    """The `AddOn` object."""
+
     created_at: datetime
 
     id: AddOnId
@@ -25,12 +31,12 @@ class AddOn(BaseModel):
 
     self_serviceable: bool
 
-    archived_at: t.Optional[datetime] = None
+    archived_at: datetime | None = None
 
-    description: t.Optional[str] = None
+    description: str | None = None
 
-    entitlements: t.Optional[t.List[Entitlement]] = None
+    entitlements: list[Entitlement] | None = None
 
-    fee_type: t.Optional[ProductFeeTypeEnum] = None
+    fee_type: ProductFeeTypeEnum | None = None
 
-    max_instances_per_subscription: t.Optional[int] = None
+    max_instances_per_subscription: int | None = None

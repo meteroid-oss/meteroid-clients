@@ -1,35 +1,60 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum PlanStatusEnum {
-    #[default]
-    #[serde(rename = "DRAFT")]
     Draft,
-
-    #[serde(rename = "ACTIVE")]
     Active,
-
-    #[serde(rename = "INACTIVE")]
     Inactive,
-
-    #[serde(rename = "ARCHIVED")]
     Archived,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for PlanStatusEnum {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl PlanStatusEnum {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Draft => "DRAFT",
             Self::Active => "ACTIVE",
             Self::Inactive => "INACTIVE",
             Self::Archived => "ARCHIVED",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for PlanStatusEnum {
+    fn from(value: &str) -> Self {
+        match value {
+            "DRAFT" => Self::Draft,
+            "ACTIVE" => Self::Active,
+            "INACTIVE" => Self::Inactive,
+            "ARCHIVED" => Self::Archived,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for PlanStatusEnum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for PlanStatusEnum {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for PlanStatusEnum {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

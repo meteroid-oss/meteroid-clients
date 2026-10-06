@@ -1,40 +1,40 @@
 // this file is @generated
-import { type AddOnId, AddOnIdSerializer } from "./addOnId";
+import { extraProperties } from "../json.js";
+import { type AddOnId, AddOnIdSerializer } from "./addOnId.js";
 import {
   type SubscriptionAddOnCustomization,
   SubscriptionAddOnCustomizationSerializer,
-} from "./subscriptionAddOnCustomization";
+} from "./subscriptionAddOnCustomization.js";
 
 export interface CreateSubscriptionAddOn {
   addOnId: AddOnId;
-
-  customization?: SubscriptionAddOnCustomization | null;
-
-  quantity?: number;
+  customization?: SubscriptionAddOnCustomization | null | undefined;
+  quantity?: number | undefined;
 }
 
+/** Converts `CreateSubscriptionAddOn` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateSubscriptionAddOnSerializer = {
-  _fromJsonObject(object: any): CreateSubscriptionAddOn {
+  parse(json: any): CreateSubscriptionAddOn {
     return {
-      addOnId: AddOnIdSerializer._fromJsonObject(object["add_on_id"]),
+      ...extraProperties(json, ["add_on_id", "customization", "quantity"]),
+      addOnId: AddOnIdSerializer.parse(json["add_on_id"]),
       customization:
-        object["customization"] != null
-          ? SubscriptionAddOnCustomizationSerializer._fromJsonObject(
-              object["customization"]
-            )
-          : undefined,
-      quantity: object["quantity"],
+        json["customization"] != null
+          ? SubscriptionAddOnCustomizationSerializer.parse(json["customization"])
+          : json["customization"],
+      quantity: json["quantity"],
     };
   },
 
-  _toJsonObject(self: CreateSubscriptionAddOn): any {
+  serialize(value: CreateSubscriptionAddOn): any {
     return {
-      add_on_id: AddOnIdSerializer._toJsonObject(self.addOnId),
+      ...extraProperties(value, ["addOnId", "customization", "quantity"]),
+      add_on_id: AddOnIdSerializer.serialize(value.addOnId),
       customization:
-        self.customization != null
-          ? SubscriptionAddOnCustomizationSerializer._toJsonObject(self.customization)
-          : undefined,
-      quantity: self.quantity,
+        value.customization != null
+          ? SubscriptionAddOnCustomizationSerializer.serialize(value.customization)
+          : value.customization,
+      quantity: value.quantity,
     };
   },
 };

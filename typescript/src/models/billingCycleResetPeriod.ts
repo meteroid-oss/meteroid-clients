@@ -1,13 +1,19 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Resets each time your subscription renews — anchored to your billing cycle. */
 export interface BillingCycleResetPeriod {}
 
+/** Converts `BillingCycleResetPeriod` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BillingCycleResetPeriodSerializer = {
-  _fromJsonObject(object: any): BillingCycleResetPeriod {
-    return {};
+  parse(json: any): BillingCycleResetPeriod {
+    return {
+      ...extraProperties(json, []),
+    };
   },
 
-  _toJsonObject(self: BillingCycleResetPeriod): any {
-    return {};
+  serialize(value: BillingCycleResetPeriod): any {
+    return {
+      ...extraProperties(value, []),
+    };
   },
 };

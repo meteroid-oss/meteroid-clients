@@ -1,23 +1,29 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .credit_note_id import CreditNoteId
-from .credit_note_status import CreditNoteStatus
-from .credit_type import CreditType
-from .currency import Currency
-from .customer_id import CustomerId
-from .invoice_id import InvoiceId
-from .invoice_line_item import InvoiceLineItem
-from .plan_version_id import PlanVersionId
-from .subscription_id import SubscriptionId
-from .tax_breakdown_item import TaxBreakdownItem
+
+if t.TYPE_CHECKING:
+    from .credit_note_id import CreditNoteId
+    from .credit_note_status import CreditNoteStatus
+    from .credit_type import CreditType
+    from .currency import Currency
+    from .customer_id import CustomerId
+    from .invoice_id import InvoiceId
+    from .invoice_line_item import InvoiceLineItem
+    from .plan_version_id import PlanVersionId
+    from .subscription_id import SubscriptionId
+    from .tax_breakdown_item import TaxBreakdownItem
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CreditNote(BaseModel):
+    """The `CreditNote` object."""
+
     created_at: datetime
 
     credit_note_number: str
@@ -39,7 +45,7 @@ class CreditNote(BaseModel):
 
     invoice_number: str
 
-    line_items: t.List[InvoiceLineItem]
+    line_items: list[InvoiceLineItem]
 
     refunded_amount_cents: int
 
@@ -49,20 +55,20 @@ class CreditNote(BaseModel):
 
     tax_amount: int
 
-    tax_breakdown: t.List[TaxBreakdownItem]
+    tax_breakdown: list[TaxBreakdownItem]
 
     total: int
 
-    finalized_at: t.Optional[datetime] = None
+    finalized_at: datetime | None = None
 
-    memo: t.Optional[str] = None
+    memo: str | None = None
 
-    plan_version_id: t.Optional[PlanVersionId] = None
+    plan_version_id: PlanVersionId | None = None
 
-    reason: t.Optional[str] = None
+    reason: str | None = None
 
-    subscription_id: t.Optional[SubscriptionId] = None
+    subscription_id: SubscriptionId | None = None
 
-    updated_at: t.Optional[datetime] = None
+    updated_at: datetime | None = None
 
-    voided_at: t.Optional[datetime] = None
+    voided_at: datetime | None = None

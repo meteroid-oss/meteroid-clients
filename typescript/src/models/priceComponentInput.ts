@@ -1,35 +1,37 @@
 // this file is @generated
-import { type Fee, FeeSerializer } from "./fee";
-import { type ProductId, ProductIdSerializer } from "./productId";
+import { extraProperties } from "../json.js";
+import { type Fee, FeeSerializer } from "./fee.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
 
 export interface PriceComponentInput {
   fee: Fee;
-
   name: string;
-
-  productId?: ProductId | null;
+  productId?: ProductId | null | undefined;
 }
 
+/** Converts `PriceComponentInput` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PriceComponentInputSerializer = {
-  _fromJsonObject(object: any): PriceComponentInput {
+  parse(json: any): PriceComponentInput {
     return {
-      fee: FeeSerializer._fromJsonObject(object["fee"]),
-      name: object["name"],
+      ...extraProperties(json, ["fee", "name", "product_id"]),
+      fee: FeeSerializer.parse(json["fee"]),
+      name: json["name"],
       productId:
-        object["product_id"] != null
-          ? ProductIdSerializer._fromJsonObject(object["product_id"])
-          : undefined,
+        json["product_id"] != null
+          ? ProductIdSerializer.parse(json["product_id"])
+          : json["product_id"],
     };
   },
 
-  _toJsonObject(self: PriceComponentInput): any {
+  serialize(value: PriceComponentInput): any {
     return {
-      fee: FeeSerializer._toJsonObject(self.fee),
-      name: self.name,
+      ...extraProperties(value, ["fee", "name", "productId"]),
+      fee: FeeSerializer.serialize(value.fee),
+      name: value.name,
       product_id:
-        self.productId != null
-          ? ProductIdSerializer._toJsonObject(self.productId)
-          : undefined,
+        value.productId != null
+          ? ProductIdSerializer.serialize(value.productId)
+          : value.productId,
     };
   },
 };

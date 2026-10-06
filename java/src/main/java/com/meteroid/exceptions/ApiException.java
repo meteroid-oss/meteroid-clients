@@ -1,99 +1,100 @@
 package com.meteroid.exceptions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.meteroid.Utils;
-import com.meteroid.models.OAuthErrorResponse;
-import com.meteroid.models.RestErrorResponse;
+import okhttp3.Headers;
 
 import java.util.Optional;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-
 /**
- * Thrown when the API responds with a non-2xx status.
- *
- * <p>The HTTP status ({@link #getCode()}) and the raw response body ({@link #getResponseBody()})
- * are always available. On top of that, the body is parsed as a {@link RestErrorResponse} first
- * ({@link #getError()}) and, failing that, as an {@link OAuthErrorResponse} ({@link
- * #getOAuthError()}). At most one of the two is present; neither is when the body matches none of
- * the API's error schemas.
- *
- * <p>The typed parse is strict: a body carrying an error code this version of the SDK doesn't
- * know (e.g. a new {@code ErrorCode} added server-side) does not parse, and only the status and
- * raw body are available.
+ * An error response of the API. Common statuses have their own subclass, such as {@link
+ * NotFoundException} or {@link RateLimitException}. Failures to get a response are {@link
+ * ApiConnectionException}s instead.
  */
-@Getter
-public class ApiException extends Exception {
-    private static final ObjectMapper DEFAULT_MAPPER = Utils.getObjectMapper();
+public class ApiException extends MeteroidException {
+    private static final long serialVersionUID = 1L;
 
-    String message;
-    String responseBody;
-    int code;
+    /** The HTTP status. */
+    private final int statusCode;
 
-    @Getter(AccessLevel.NONE)
-    private final transient RestErrorResponse error;
+    /** The response body. */
+    private final String body;
 
-    @Getter(AccessLevel.NONE)
-    private final transient OAuthErrorResponse oauthError;
+    private final transient Headers headers;
+    private final transient Object error;
 
-    public ApiException(final String message, final int code, final String responseBody) {
-        this(message, code, responseBody, DEFAULT_MAPPER);
+    /**
+     * An exception for an error response.
+     *
+     * @param message the message, with the status and the start of the body
+     * @param statusCode the HTTP status
+     * @param headers the response headers
+     * @param body the response body
+     * @param error the body parsed as the schema the operation declares for this status, else as
+     *     JSON, or null
+     */
+    public ApiException(
+            String message, int statusCode, Headers headers, String body, Object error) {
+        super(message);
+        this.statusCode = statusCode;
+        this.headers = headers == null ? Headers.of() : headers;
+        this.body = body == null ? "" : body;
+        this.error = error;
     }
 
     /**
-     * Same as {@link #ApiException(String, int, String)}, parsing the body with the given mapper.
+     * The HTTP status.
+     *
+     * @return the status code
      */
-    public ApiException(
-            final String message,
-            final int code,
-            final String responseBody,
-            final ObjectMapper objectMapper) {
-        this.message = message;
-        this.code = code;
-        this.responseBody = responseBody;
-        this.error = parseRestError(objectMapper, responseBody);
-        this.oauthError = this.error == null ? parseOAuthError(objectMapper, responseBody) : null;
+    public int statusCode() {
+        return statusCode;
     }
 
-    /** The parsed API error, if the body is a {@link RestErrorResponse}. */
-    public Optional<RestErrorResponse> getError() {
+    /**
+     * The response body, as received.
+     *
+     * @return the body, empty when there was none
+     */
+    public String body() {
+        return body;
+    }
+
+    /**
+     * The response headers.
+     *
+     * @return the headers
+     */
+    public Headers headers() {
+        return headers;
+    }
+
+    /**
+     * The request id to quote to support, if the response has one.
+     *
+     * @return the {@code x-request-id} or {@code request-id} header
+     */
+    public Optional<String> requestId() {
+        String id = headers.get("x-request-id");
+        return Optional.ofNullable(id != null ? id : headers.get("request-id"));
+    }
+
+    /**
+     * The body parsed as the schema the operation declares for this status, else as a {@code
+     * JsonNode}.
+     *
+     * @return the parsed body, empty when it is not JSON
+     */
+    public Optional<Object> error() {
         return Optional.ofNullable(error);
     }
 
-    /** The parsed OAuth 2.0 error (RFC 6749 §5.2), if the body is an {@link OAuthErrorResponse}. */
-    public Optional<OAuthErrorResponse> getOAuthError() {
-        return Optional.ofNullable(oauthError);
-    }
-
-    private static RestErrorResponse parseRestError(ObjectMapper mapper, String body) {
-        if (body == null || body.isEmpty()) {
-            return null;
-        }
-        try {
-            RestErrorResponse parsed = mapper.readValue(body, RestErrorResponse.class);
-            // Unknown properties are ignored by the mapper, so enforce the required fields here.
-            if (parsed == null || parsed.getCode() == null || parsed.getMessage() == null) {
-                return null;
-            }
-            return parsed;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static OAuthErrorResponse parseOAuthError(ObjectMapper mapper, String body) {
-        if (body == null || body.isEmpty()) {
-            return null;
-        }
-        try {
-            OAuthErrorResponse parsed = mapper.readValue(body, OAuthErrorResponse.class);
-            if (parsed == null || parsed.getError() == null) {
-                return null;
-            }
-            return parsed;
-        } catch (Exception e) {
-            return null;
-        }
+    /**
+     * The body as a {@code type}, if it parsed as one.
+     *
+     * @param <T> the error model
+     * @param type the class of the error model
+     * @return the parsed body, empty when it is not a {@code type}
+     */
+    public <T> Optional<T> error(Class<T> type) {
+        return type.isInstance(error) ? Optional.of(type.cast(error)) : Optional.empty();
     }
 }

@@ -1,22 +1,31 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class PaginationResponse {
-    @JsonProperty private Integer page;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class PaginationResponse {
+    @JsonProperty("page")
+    private Integer page;
 
     @JsonProperty("per_page")
     private Integer perPage;
@@ -27,102 +36,254 @@ public class PaginationResponse {
     @JsonProperty("total_pages")
     private Integer totalPages;
 
-    public PaginationResponse() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public PaginationResponse page(Integer page) {
-        this.page = page;
-        return this;
+    private PaginationResponse() {}
+
+    private PaginationResponse(Builder builder) {
+        this.page = builder.page;
+        this.perPage = builder.perPage;
+        this.totalItems = builder.totalItems;
+        this.totalPages = builder.totalPages;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get page
+     * A builder of {@code PaginationResponse}.
      *
-     * @return page
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public Integer getPage() {
-        return page;
-    }
-
-    public void setPage(Integer page) {
-        this.page = page;
-    }
-
-    public PaginationResponse perPage(Integer perPage) {
-        this.perPage = perPage;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get perPage
+     * A builder starting from this value.
      *
-     * @return perPage
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public Integer getPerPage() {
-        return perPage;
-    }
-
-    public void setPerPage(Integer perPage) {
-        this.perPage = perPage;
-    }
-
-    public PaginationResponse totalItems(Long totalItems) {
-        this.totalItems = totalItems;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.page = page;
+        builder.perPage = perPage;
+        builder.totalItems = totalItems;
+        builder.totalPages = totalPages;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get totalItems
+     * The {@code page} property.
      *
-     * @return totalItems
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public Long getTotalItems() {
-        return totalItems;
-    }
-
-    public void setTotalItems(Long totalItems) {
-        this.totalItems = totalItems;
-    }
-
-    public PaginationResponse totalPages(Integer totalPages) {
-        this.totalPages = totalPages;
-        return this;
+    public Integer page() {
+        return Utils.required(page, "page");
     }
 
     /**
-     * Get totalPages
+     * The {@code per_page} property.
      *
-     * @return totalPages
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public Integer getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
+    public Integer perPage() {
+        return Utils.required(perPage, "per_page");
     }
 
     /**
-     * Create an instance of PaginationResponse given an JSON string
+     * The {@code total_items} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of PaginationResponse
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     PaginationResponse
+     * @return the value, never null
      */
-    public static PaginationResponse fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, PaginationResponse.class);
+    public Long totalItems() {
+        return Utils.required(totalItems, "total_items");
     }
 
     /**
-     * Convert an instance of PaginationResponse to an JSON string
+     * The {@code total_pages} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Integer totalPages() {
+        return Utils.required(totalPages, "total_pages");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PaginationResponse that = (PaginationResponse) o;
+        return Objects.equals(page, that.page)
+                && Objects.equals(perPage, that.perPage)
+                && Objects.equals(totalItems, that.totalItems)
+                && Objects.equals(totalPages, that.totalPages)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(page, perPage, totalItems, totalPages, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "PaginationResponse{"
+                + "page="
+                + page
+                + ", perPage="
+                + perPage
+                + ", totalItems="
+                + totalItems
+                + ", totalPages="
+                + totalPages
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link PaginationResponse}. */
+    public static final class Builder {
+        private Integer page;
+        private Integer perPage;
+        private Long totalItems;
+        private Integer totalPages;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code page} property.
+         *
+         * @param page the value
+         * @return this builder
+         */
+        public Builder page(Integer page) {
+            this.page = page;
+            return this;
+        }
+
+        /**
+         * The {@code per_page} property.
+         *
+         * @param perPage the value
+         * @return this builder
+         */
+        public Builder perPage(Integer perPage) {
+            this.perPage = perPage;
+            return this;
+        }
+
+        /**
+         * The {@code total_items} property.
+         *
+         * @param totalItems the value
+         * @return this builder
+         */
+        public Builder totalItems(Long totalItems) {
+            this.totalItems = totalItems;
+            return this;
+        }
+
+        /**
+         * The {@code total_pages} property.
+         *
+         * @param totalPages the value
+         * @return this builder
+         */
+        public Builder totalPages(Integer totalPages) {
+            this.totalPages = totalPages;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code PaginationResponse}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public PaginationResponse build() {
+            Utils.checkRequired(page, "page");
+            Utils.checkRequired(perPage, "per_page");
+            Utils.checkRequired(totalItems, "total_items");
+            Utils.checkRequired(totalPages, "total_pages");
+            return new PaginationResponse(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code PaginationResponse}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static PaginationResponse fromJson(String json) {
+        return Utils.parse(json, PaginationResponse.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

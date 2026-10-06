@@ -1,2 +1,4 @@
 # this file is @generated
-FeatureId = str
+import typing as t
+
+FeatureId: t.TypeAlias = str

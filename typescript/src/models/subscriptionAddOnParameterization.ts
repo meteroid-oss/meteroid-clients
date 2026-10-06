@@ -1,34 +1,47 @@
 // this file is @generated
-import { type BillingPeriodEnum, BillingPeriodEnumSerializer } from "./billingPeriodEnum";
+import { extraProperties } from "../json.js";
+import {
+  type BillingPeriodEnum,
+  BillingPeriodEnumSerializer,
+} from "./billingPeriodEnum.js";
 
 export interface SubscriptionAddOnParameterization {
-  billingPeriod?: BillingPeriodEnum | null;
-
-  committedCapacity?: number | null;
-
-  initialSlotCount?: number | null;
+  billingPeriod?: BillingPeriodEnum | null | undefined;
+  committedCapacity?: number | null | undefined;
+  initialSlotCount?: number | null | undefined;
 }
 
+/** Converts `SubscriptionAddOnParameterization` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionAddOnParameterizationSerializer = {
-  _fromJsonObject(object: any): SubscriptionAddOnParameterization {
+  parse(json: any): SubscriptionAddOnParameterization {
     return {
+      ...extraProperties(json, [
+        "billing_period",
+        "committed_capacity",
+        "initial_slot_count",
+      ]),
       billingPeriod:
-        object["billing_period"] != null
-          ? BillingPeriodEnumSerializer._fromJsonObject(object["billing_period"])
-          : undefined,
-      committedCapacity: object["committed_capacity"],
-      initialSlotCount: object["initial_slot_count"],
+        json["billing_period"] != null
+          ? BillingPeriodEnumSerializer.parse(json["billing_period"])
+          : json["billing_period"],
+      committedCapacity: json["committed_capacity"],
+      initialSlotCount: json["initial_slot_count"],
     };
   },
 
-  _toJsonObject(self: SubscriptionAddOnParameterization): any {
+  serialize(value: SubscriptionAddOnParameterization): any {
     return {
+      ...extraProperties(value, [
+        "billingPeriod",
+        "committedCapacity",
+        "initialSlotCount",
+      ]),
       billing_period:
-        self.billingPeriod != null
-          ? BillingPeriodEnumSerializer._toJsonObject(self.billingPeriod)
-          : undefined,
-      committed_capacity: self.committedCapacity,
-      initial_slot_count: self.initialSlotCount,
+        value.billingPeriod != null
+          ? BillingPeriodEnumSerializer.serialize(value.billingPeriod)
+          : value.billingPeriod,
+      committed_capacity: value.committedCapacity,
+      initial_slot_count: value.initialSlotCount,
     };
   },
 };

@@ -1,49 +1,64 @@
 // this file is @generated
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
+import { extraProperties } from "../json.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
 
 export interface CustomerEventData {
-  alias?: string | null;
-
-  billingEmail?: string | null;
-
+  alias?: string | null | undefined;
+  billingEmail?: string | null | undefined;
   currency: string;
-
   /** User-defined custom property values, keyed by definition key. */
   customProperties: unknown;
-
   customerId: CustomerId;
-
   invoicingEmails: string[];
-
   name: string;
-
-  phone?: string | null;
+  phone?: string | null | undefined;
 }
 
+/** Converts `CustomerEventData` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomerEventDataSerializer = {
-  _fromJsonObject(object: any): CustomerEventData {
+  parse(json: any): CustomerEventData {
     return {
-      alias: object["alias"],
-      billingEmail: object["billing_email"],
-      currency: object["currency"],
-      customProperties: object["custom_properties"],
-      customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
-      invoicingEmails: object["invoicing_emails"],
-      name: object["name"],
-      phone: object["phone"],
+      ...extraProperties(json, [
+        "alias",
+        "billing_email",
+        "currency",
+        "custom_properties",
+        "customer_id",
+        "invoicing_emails",
+        "name",
+        "phone",
+      ]),
+      alias: json["alias"],
+      billingEmail: json["billing_email"],
+      currency: json["currency"],
+      customProperties: json["custom_properties"],
+      customerId: CustomerIdSerializer.parse(json["customer_id"]),
+      invoicingEmails: json["invoicing_emails"],
+      name: json["name"],
+      phone: json["phone"],
     };
   },
 
-  _toJsonObject(self: CustomerEventData): any {
+  serialize(value: CustomerEventData): any {
     return {
-      alias: self.alias,
-      billing_email: self.billingEmail,
-      currency: self.currency,
-      custom_properties: self.customProperties,
-      customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
-      invoicing_emails: self.invoicingEmails,
-      name: self.name,
-      phone: self.phone,
+      ...extraProperties(value, [
+        "alias",
+        "billingEmail",
+        "currency",
+        "customProperties",
+        "customerId",
+        "invoicingEmails",
+        "name",
+        "phone",
+      ]),
+      alias: value.alias,
+      billing_email: value.billingEmail,
+      currency: value.currency,
+      custom_properties: value.customProperties,
+      customer_id: CustomerIdSerializer.serialize(value.customerId),
+      invoicing_emails: value.invoicingEmails,
+      name: value.name,
+      phone: value.phone,
     };
   },
 };

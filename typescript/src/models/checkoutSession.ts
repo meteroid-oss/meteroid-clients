@@ -1,120 +1,148 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type CheckoutSessionId, CheckoutSessionIdSerializer } from "./checkoutSessionId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import {
+  type CheckoutSessionId,
+  CheckoutSessionIdSerializer,
+} from "./checkoutSessionId.js";
 import {
   type CheckoutSessionStatus,
   CheckoutSessionStatusSerializer,
-} from "./checkoutSessionStatus";
-import { type CheckoutType, CheckoutTypeSerializer } from "./checkoutType";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
+} from "./checkoutSessionStatus.js";
+import { type CheckoutType, CheckoutTypeSerializer } from "./checkoutType.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
 import {
   type PaymentMethodsConfig,
   PaymentMethodsConfigSerializer,
-} from "./paymentMethodsConfig";
-import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId";
-import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
+} from "./paymentMethodsConfig.js";
+import { type PlanVersionId, PlanVersionIdSerializer } from "./planVersionId.js";
+import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId.js";
 
 export interface CheckoutSession {
-  billingDayAnchor?: number | null;
-
-  billingStartDate?: string | null;
-
-  cancelUrl?: string | null;
-
+  billingDayAnchor?: number | null | undefined;
+  billingStartDate?: string | null | undefined;
+  cancelUrl?: string | null | undefined;
   checkoutType: CheckoutType;
-
-  checkoutUrl?: string | null;
-
-  completedAt?: Date | null;
-
-  couponCode?: string | null;
-
+  checkoutUrl?: string | null | undefined;
+  completedAt?: Date | null | undefined;
+  couponCode?: string | null | undefined;
   createdAt: Date;
-
   customerId: CustomerId;
-
   /** When the session expires. None means the session never expires. */
-  expiresAt?: Date | null;
-
+  expiresAt?: Date | null | undefined;
   id: CheckoutSessionId;
-
-  netTerms?: number | null;
-
-  paymentMethodsConfig?: PaymentMethodsConfig | null;
-
+  netTerms?: number | null | undefined;
+  paymentMethodsConfig?: PaymentMethodsConfig | null | undefined;
   planVersionId: PlanVersionId;
-
   status: CheckoutSessionStatus;
-
-  subscriptionId?: SubscriptionId | null;
-
-  successUrl?: string | null;
-
-  trialDurationDays?: number | null;
+  subscriptionId?: SubscriptionId | null | undefined;
+  successUrl?: string | null | undefined;
+  trialDurationDays?: number | null | undefined;
 }
 
+/** Converts `CheckoutSession` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CheckoutSessionSerializer = {
-  _fromJsonObject(object: any): CheckoutSession {
+  parse(json: any): CheckoutSession {
     return {
-      billingDayAnchor: object["billing_day_anchor"],
-      billingStartDate: object["billing_start_date"],
-      cancelUrl: object["cancel_url"],
-      checkoutType: CheckoutTypeSerializer._fromJsonObject(object["checkout_type"]),
-      checkoutUrl: object["checkout_url"],
+      ...extraProperties(json, [
+        "billing_day_anchor",
+        "billing_start_date",
+        "cancel_url",
+        "checkout_type",
+        "checkout_url",
+        "completed_at",
+        "coupon_code",
+        "created_at",
+        "customer_id",
+        "expires_at",
+        "id",
+        "net_terms",
+        "payment_methods_config",
+        "plan_version_id",
+        "status",
+        "subscription_id",
+        "success_url",
+        "trial_duration_days",
+      ]),
+      billingDayAnchor: json["billing_day_anchor"],
+      billingStartDate: json["billing_start_date"],
+      cancelUrl: json["cancel_url"],
+      checkoutType: CheckoutTypeSerializer.parse(json["checkout_type"]),
+      checkoutUrl: json["checkout_url"],
       completedAt:
-        object["completed_at"] != null
-          ? parseDateTime(object["completed_at"])
-          : undefined,
-      couponCode: object["coupon_code"],
-      createdAt: parseDateTime(object["created_at"]),
-      customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
+        json["completed_at"] != null
+          ? parseDateTime(json["completed_at"])
+          : json["completed_at"],
+      couponCode: json["coupon_code"],
+      createdAt: parseDateTime(json["created_at"]),
+      customerId: CustomerIdSerializer.parse(json["customer_id"]),
       expiresAt:
-        object["expires_at"] != null ? parseDateTime(object["expires_at"]) : undefined,
-      id: CheckoutSessionIdSerializer._fromJsonObject(object["id"]),
-      netTerms: object["net_terms"],
+        json["expires_at"] != null
+          ? parseDateTime(json["expires_at"])
+          : json["expires_at"],
+      id: CheckoutSessionIdSerializer.parse(json["id"]),
+      netTerms: json["net_terms"],
       paymentMethodsConfig:
-        object["payment_methods_config"] != null
-          ? PaymentMethodsConfigSerializer._fromJsonObject(
-              object["payment_methods_config"]
-            )
-          : undefined,
-      planVersionId: PlanVersionIdSerializer._fromJsonObject(object["plan_version_id"]),
-      status: CheckoutSessionStatusSerializer._fromJsonObject(object["status"]),
+        json["payment_methods_config"] != null
+          ? PaymentMethodsConfigSerializer.parse(json["payment_methods_config"])
+          : json["payment_methods_config"],
+      planVersionId: PlanVersionIdSerializer.parse(json["plan_version_id"]),
+      status: CheckoutSessionStatusSerializer.parse(json["status"]),
       subscriptionId:
-        object["subscription_id"] != null
-          ? SubscriptionIdSerializer._fromJsonObject(object["subscription_id"])
-          : undefined,
-      successUrl: object["success_url"],
-      trialDurationDays: object["trial_duration_days"],
+        json["subscription_id"] != null
+          ? SubscriptionIdSerializer.parse(json["subscription_id"])
+          : json["subscription_id"],
+      successUrl: json["success_url"],
+      trialDurationDays: json["trial_duration_days"],
     };
   },
 
-  _toJsonObject(self: CheckoutSession): any {
+  serialize(value: CheckoutSession): any {
     return {
-      billing_day_anchor: self.billingDayAnchor,
-      billing_start_date: self.billingStartDate,
-      cancel_url: self.cancelUrl,
-      checkout_type: CheckoutTypeSerializer._toJsonObject(self.checkoutType),
-      checkout_url: self.checkoutUrl,
-      completed_at: self.completedAt,
-      coupon_code: self.couponCode,
-      created_at: self.createdAt,
-      customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
-      expires_at: self.expiresAt,
-      id: CheckoutSessionIdSerializer._toJsonObject(self.id),
-      net_terms: self.netTerms,
+      ...extraProperties(value, [
+        "billingDayAnchor",
+        "billingStartDate",
+        "cancelUrl",
+        "checkoutType",
+        "checkoutUrl",
+        "completedAt",
+        "couponCode",
+        "createdAt",
+        "customerId",
+        "expiresAt",
+        "id",
+        "netTerms",
+        "paymentMethodsConfig",
+        "planVersionId",
+        "status",
+        "subscriptionId",
+        "successUrl",
+        "trialDurationDays",
+      ]),
+      billing_day_anchor: value.billingDayAnchor,
+      billing_start_date: value.billingStartDate,
+      cancel_url: value.cancelUrl,
+      checkout_type: CheckoutTypeSerializer.serialize(value.checkoutType),
+      checkout_url: value.checkoutUrl,
+      completed_at: value.completedAt,
+      coupon_code: value.couponCode,
+      created_at: value.createdAt,
+      customer_id: CustomerIdSerializer.serialize(value.customerId),
+      expires_at: value.expiresAt,
+      id: CheckoutSessionIdSerializer.serialize(value.id),
+      net_terms: value.netTerms,
       payment_methods_config:
-        self.paymentMethodsConfig != null
-          ? PaymentMethodsConfigSerializer._toJsonObject(self.paymentMethodsConfig)
-          : undefined,
-      plan_version_id: PlanVersionIdSerializer._toJsonObject(self.planVersionId),
-      status: CheckoutSessionStatusSerializer._toJsonObject(self.status),
+        value.paymentMethodsConfig != null
+          ? PaymentMethodsConfigSerializer.serialize(value.paymentMethodsConfig)
+          : value.paymentMethodsConfig,
+      plan_version_id: PlanVersionIdSerializer.serialize(value.planVersionId),
+      status: CheckoutSessionStatusSerializer.serialize(value.status),
       subscription_id:
-        self.subscriptionId != null
-          ? SubscriptionIdSerializer._toJsonObject(self.subscriptionId)
-          : undefined,
-      success_url: self.successUrl,
-      trial_duration_days: self.trialDurationDays,
+        value.subscriptionId != null
+          ? SubscriptionIdSerializer.serialize(value.subscriptionId)
+          : value.subscriptionId,
+      success_url: value.successUrl,
+      trial_duration_days: value.trialDurationDays,
     };
   },
 };

@@ -1,2 +1,4 @@
 # this file is @generated
-OAuthAppId = str
+import typing as t
+
+OAuthAppId: t.TypeAlias = str

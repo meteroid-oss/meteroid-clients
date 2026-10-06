@@ -1,73 +1,89 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type Entitlement, EntitlementSerializer } from "./entitlement";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type Entitlement, EntitlementSerializer } from "./entitlement.js";
 import {
   type EntitlementProductRef,
   EntitlementProductRefSerializer,
-} from "./entitlementProductRef";
-import { type FeatureId, FeatureIdSerializer } from "./featureId";
-import { type FeatureStatus, FeatureStatusSerializer } from "./featureStatus";
-import { type FeatureType, FeatureTypeSerializer } from "./featureType";
+} from "./entitlementProductRef.js";
+import { type FeatureId, FeatureIdSerializer } from "./featureId.js";
+import { type FeatureStatus, FeatureStatusSerializer } from "./featureStatus.js";
+import { type FeatureType, FeatureTypeSerializer } from "./featureType.js";
 
 export interface Feature {
   /** Unique key used to reference this feature in your code. Cannot be changed after creation. */
   code: string;
-
   createdAt: Date;
-
-  description?: string | null;
-
-  entitlement?: Entitlement | null;
-
+  description?: string | null | undefined;
+  entitlement?: Entitlement | null | undefined;
   featureType: FeatureType;
-
   id: FeatureId;
-
   name: string;
-
-  product?: EntitlementProductRef | null;
-
+  product?: EntitlementProductRef | null | undefined;
   status: FeatureStatus;
 }
 
+/** Converts `Feature` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FeatureSerializer = {
-  _fromJsonObject(object: any): Feature {
+  parse(json: any): Feature {
     return {
-      code: object["code"],
-      createdAt: parseDateTime(object["created_at"]),
-      description: object["description"],
+      ...extraProperties(json, [
+        "code",
+        "created_at",
+        "description",
+        "entitlement",
+        "feature_type",
+        "id",
+        "name",
+        "product",
+        "status",
+      ]),
+      code: json["code"],
+      createdAt: parseDateTime(json["created_at"]),
+      description: json["description"],
       entitlement:
-        object["entitlement"] != null
-          ? EntitlementSerializer._fromJsonObject(object["entitlement"])
-          : undefined,
-      featureType: FeatureTypeSerializer._fromJsonObject(object["feature_type"]),
-      id: FeatureIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
+        json["entitlement"] != null
+          ? EntitlementSerializer.parse(json["entitlement"])
+          : json["entitlement"],
+      featureType: FeatureTypeSerializer.parse(json["feature_type"]),
+      id: FeatureIdSerializer.parse(json["id"]),
+      name: json["name"],
       product:
-        object["product"] != null
-          ? EntitlementProductRefSerializer._fromJsonObject(object["product"])
-          : undefined,
-      status: FeatureStatusSerializer._fromJsonObject(object["status"]),
+        json["product"] != null
+          ? EntitlementProductRefSerializer.parse(json["product"])
+          : json["product"],
+      status: FeatureStatusSerializer.parse(json["status"]),
     };
   },
 
-  _toJsonObject(self: Feature): any {
+  serialize(value: Feature): any {
     return {
-      code: self.code,
-      created_at: self.createdAt,
-      description: self.description,
+      ...extraProperties(value, [
+        "code",
+        "createdAt",
+        "description",
+        "entitlement",
+        "featureType",
+        "id",
+        "name",
+        "product",
+        "status",
+      ]),
+      code: value.code,
+      created_at: value.createdAt,
+      description: value.description,
       entitlement:
-        self.entitlement != null
-          ? EntitlementSerializer._toJsonObject(self.entitlement)
-          : undefined,
-      feature_type: FeatureTypeSerializer._toJsonObject(self.featureType),
-      id: FeatureIdSerializer._toJsonObject(self.id),
-      name: self.name,
+        value.entitlement != null
+          ? EntitlementSerializer.serialize(value.entitlement)
+          : value.entitlement,
+      feature_type: FeatureTypeSerializer.serialize(value.featureType),
+      id: FeatureIdSerializer.serialize(value.id),
+      name: value.name,
       product:
-        self.product != null
-          ? EntitlementProductRefSerializer._toJsonObject(self.product)
-          : undefined,
-      status: FeatureStatusSerializer._toJsonObject(self.status),
+        value.product != null
+          ? EntitlementProductRefSerializer.serialize(value.product)
+          : value.product,
+      status: FeatureStatusSerializer.serialize(value.status),
     };
   },
 };

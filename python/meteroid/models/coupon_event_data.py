@@ -1,15 +1,21 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .coupon_discount import CouponDiscount
-from .coupon_id import CouponId
+
+if t.TYPE_CHECKING:
+    from .coupon_discount import CouponDiscount
+    from .coupon_id import CouponId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CouponEventData(BaseModel):
+    """The `CouponEventData` object."""
+
     code: str
 
     coupon_id: CouponId
@@ -24,8 +30,8 @@ class CouponEventData(BaseModel):
 
     reusable: bool
 
-    expires_at: t.Optional[datetime] = None
+    expires_at: datetime | None = None
 
-    recurring_value: t.Optional[int] = None
+    recurring_value: int | None = None
 
-    redemption_limit: t.Optional[int] = None
+    redemption_limit: int | None = None

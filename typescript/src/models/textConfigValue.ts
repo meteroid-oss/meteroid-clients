@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** A text config value. */
 export interface TextConfigValue {
   value: string;
 }
 
+/** Converts `TextConfigValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TextConfigValueSerializer = {
-  _fromJsonObject(object: any): TextConfigValue {
+  parse(json: any): TextConfigValue {
     return {
-      value: object["value"],
+      ...extraProperties(json, ["value"]),
+      value: json["value"],
     };
   },
 
-  _toJsonObject(self: TextConfigValue): any {
+  serialize(value: TextConfigValue): any {
     return {
-      value: self.value,
+      ...extraProperties(value, ["value"]),
+      value: value.value,
     };
   },
 };

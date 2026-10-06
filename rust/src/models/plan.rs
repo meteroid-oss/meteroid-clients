@@ -8,14 +8,15 @@ use super::{
     product_family::ProductFamily, trial_config::TrialConfig,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Plan {
     pub available_parameters: AvailableParameters,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_cycles: Option<i32>,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     pub currency: String,
 
@@ -54,15 +55,21 @@ pub struct Plan {
     pub version: i32,
 
     pub version_id: PlanVersionId,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Plan {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         available_parameters: AvailableParameters,
-        created_at: String,
-        currency: String,
+        created_at: chrono::DateTime<chrono::Utc>,
+        currency: impl Into<String>,
         id: PlanId,
-        name: String,
+        name: impl Into<String>,
         net_terms: i32,
         plan_type: PlanTypeEnum,
         price_components: Vec<PriceComponent>,
@@ -75,12 +82,12 @@ impl Plan {
             available_parameters,
             billing_cycles: None,
             created_at,
-            currency,
+            currency: currency.into(),
             description: None,
             entitlements: None,
             id,
             minimum_commitment: None,
-            name,
+            name: name.into(),
             net_terms,
             period_start_day: None,
             plan_type,
@@ -91,6 +98,7 @@ impl Plan {
             trial: None,
             version,
             version_id,
+            extra: serde_json::Map::new(),
         }
     }
 }

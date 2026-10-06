@@ -1,16 +1,20 @@
 // this file is @generated
 /** Onboarding mode for connected accounts */
-export enum OnboardingMode {
-  Express = "express",
-  Full = "full",
-}
+export const OnboardingMode = {
+  Express: "express",
+  Full: "full",
+} as const;
+export type OnboardingMode =
+  | (typeof OnboardingMode)[keyof typeof OnboardingMode]
+  | (string & {});
 
+/** Converts `OnboardingMode` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OnboardingModeSerializer = {
-  _fromJsonObject(object: any): OnboardingMode {
-    return object;
+  parse(json: any): OnboardingMode {
+    return json;
   },
 
-  _toJsonObject(self: OnboardingMode): any {
-    return self;
+  serialize(value: OnboardingMode): any {
+    return value;
   },
 };

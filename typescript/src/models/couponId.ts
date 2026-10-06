@@ -2,12 +2,13 @@
 
 export type CouponId = string;
 
+/** Converts `CouponId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CouponIdSerializer = {
-  _fromJsonObject(object: any): CouponId {
-    return object;
+  parse(json: any): CouponId {
+    return json;
   },
 
-  _toJsonObject(self: CouponId): any {
-    return self;
+  serialize(value: CouponId): any {
+    return value;
   },
 };

@@ -1,53 +1,32 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum SubscriptionStatusEnum {
-    #[default]
-    #[serde(rename = "PENDING_ACTIVATION")]
     PendingActivation,
-
-    #[serde(rename = "PENDING_CHARGE")]
     PendingCharge,
-
-    #[serde(rename = "TRIAL_ACTIVE")]
     TrialActive,
-
-    #[serde(rename = "ACTIVE")]
     Active,
-
-    #[serde(rename = "TRIAL_EXPIRED")]
     TrialExpired,
-
-    #[serde(rename = "PAUSED")]
     Paused,
-
-    #[serde(rename = "SUSPENDED")]
     Suspended,
-
-    #[serde(rename = "CANCELLED")]
     Cancelled,
-
-    #[serde(rename = "ABORTED")]
     Aborted,
-
-    #[serde(rename = "COMPLETED")]
     Completed,
-
-    #[serde(rename = "SUPERSEDED")]
     Superseded,
-
-    #[serde(rename = "ERRORED")]
     Errored,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for SubscriptionStatusEnum {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl SubscriptionStatusEnum {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::PendingActivation => "PENDING_ACTIVATION",
             Self::PendingCharge => "PENDING_CHARGE",
             Self::TrialActive => "TRIAL_ACTIVE",
@@ -60,8 +39,46 @@ impl fmt::Display for SubscriptionStatusEnum {
             Self::Completed => "COMPLETED",
             Self::Superseded => "SUPERSEDED",
             Self::Errored => "ERRORED",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for SubscriptionStatusEnum {
+    fn from(value: &str) -> Self {
+        match value {
+            "PENDING_ACTIVATION" => Self::PendingActivation,
+            "PENDING_CHARGE" => Self::PendingCharge,
+            "TRIAL_ACTIVE" => Self::TrialActive,
+            "ACTIVE" => Self::Active,
+            "TRIAL_EXPIRED" => Self::TrialExpired,
+            "PAUSED" => Self::Paused,
+            "SUSPENDED" => Self::Suspended,
+            "CANCELLED" => Self::Cancelled,
+            "ABORTED" => Self::Aborted,
+            "COMPLETED" => Self::Completed,
+            "SUPERSEDED" => Self::Superseded,
+            "ERRORED" => Self::Errored,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for SubscriptionStatusEnum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for SubscriptionStatusEnum {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for SubscriptionStatusEnum {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

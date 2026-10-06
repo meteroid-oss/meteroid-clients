@@ -1,14 +1,20 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .entitlement_product_ref import EntitlementProductRef
-from .feature_id import FeatureId
+
+if t.TYPE_CHECKING:
+    from .entitlement_product_ref import EntitlementProductRef
+    from .feature_id import FeatureId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class FeatureRef(BaseModel):
+    """The `FeatureRef` object."""
+
     code: str
     """Unique key used to reference this feature in your code. Cannot be changed after creation."""
 
@@ -16,4 +22,4 @@ class FeatureRef(BaseModel):
 
     name: str
 
-    product: t.Optional[EntitlementProductRef] = None
+    product: EntitlementProductRef | None = None

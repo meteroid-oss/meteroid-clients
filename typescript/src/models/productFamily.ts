@@ -1,24 +1,27 @@
 // this file is @generated
-import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId";
+import { extraProperties } from "../json.js";
+import { type ProductFamilyId, ProductFamilyIdSerializer } from "./productFamilyId.js";
 
 export interface ProductFamily {
   id: ProductFamilyId;
-
   name: string;
 }
 
+/** Converts `ProductFamily` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductFamilySerializer = {
-  _fromJsonObject(object: any): ProductFamily {
+  parse(json: any): ProductFamily {
     return {
-      id: ProductFamilyIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
+      ...extraProperties(json, ["id", "name"]),
+      id: ProductFamilyIdSerializer.parse(json["id"]),
+      name: json["name"],
     };
   },
 
-  _toJsonObject(self: ProductFamily): any {
+  serialize(value: ProductFamily): any {
     return {
-      id: ProductFamilyIdSerializer._toJsonObject(self.id),
-      name: self.name,
+      ...extraProperties(value, ["id", "name"]),
+      id: ProductFamilyIdSerializer.serialize(value.id),
+      name: value.name,
     };
   },
 };

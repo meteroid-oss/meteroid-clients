@@ -1,20 +1,26 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .billable_metric_id import BillableMetricId
-from .billing_metric_aggregate_enum import BillingMetricAggregateEnum
-from .metric_filter import MetricFilter
-from .metric_segmentation_matrix import MetricSegmentationMatrix
-from .product_family_id import ProductFamilyId
-from .product_id import ProductId
-from .unit_conversion import UnitConversion
+
+if t.TYPE_CHECKING:
+    from .billable_metric_id import BillableMetricId
+    from .billing_metric_aggregate_enum import BillingMetricAggregateEnum
+    from .metric_filter import MetricFilter
+    from .metric_segmentation_matrix import MetricSegmentationMatrix
+    from .product_family_id import ProductFamilyId
+    from .product_id import ProductId
+    from .unit_conversion import UnitConversion
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Metric(BaseModel):
+    """The `Metric` object."""
+
     aggregation_type: BillingMetricAggregateEnum
 
     code: str
@@ -27,18 +33,18 @@ class Metric(BaseModel):
 
     product_family_id: ProductFamilyId
 
-    aggregation_key: t.Optional[str] = None
+    aggregation_key: str | None = None
 
-    archived_at: t.Optional[datetime] = None
+    archived_at: datetime | None = None
 
-    description: t.Optional[str] = None
+    description: str | None = None
 
-    filters: t.Optional[t.List[MetricFilter]] = None
+    filters: list[MetricFilter] | None = None
 
-    product_id: t.Optional[ProductId] = None
+    product_id: ProductId | None = None
 
-    segmentation_matrix: t.Optional[MetricSegmentationMatrix] = None
+    segmentation_matrix: MetricSegmentationMatrix | None = None
 
-    unit_conversion: t.Optional[UnitConversion] = None
+    unit_conversion: UnitConversion | None = None
 
-    usage_group_key: t.Optional[str] = None
+    usage_group_key: str | None = None

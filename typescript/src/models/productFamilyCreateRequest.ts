@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface ProductFamilyCreateRequest {
   name: string;
 }
 
+/** Converts `ProductFamilyCreateRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductFamilyCreateRequestSerializer = {
-  _fromJsonObject(object: any): ProductFamilyCreateRequest {
+  parse(json: any): ProductFamilyCreateRequest {
     return {
-      name: object["name"],
+      ...extraProperties(json, ["name"]),
+      name: json["name"],
     };
   },
 
-  _toJsonObject(self: ProductFamilyCreateRequest): any {
+  serialize(value: ProductFamilyCreateRequest): any {
     return {
-      name: self.name,
+      ...extraProperties(value, ["name"]),
+      name: value.name,
     };
   },
 };

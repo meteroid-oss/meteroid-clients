@@ -6,14 +6,15 @@ use super::{
     product_fee_type_enum::ProductFeeTypeEnum, product_id::ProductId,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Product {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub archived_at: Option<String>,
+    pub archived_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub catalog: bool,
 
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -27,16 +28,22 @@ pub struct Product {
     pub name: String,
 
     pub product_family_id: ProductFamilyId,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Product {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         catalog: bool,
-        created_at: String,
+        created_at: chrono::DateTime<chrono::Utc>,
         fee_structure: ProductFeeStructure,
         fee_type: ProductFeeTypeEnum,
         id: ProductId,
-        name: String,
+        name: impl Into<String>,
         product_family_id: ProductFamilyId,
     ) -> Self {
         Self {
@@ -47,8 +54,9 @@ impl Product {
             fee_structure,
             fee_type,
             id,
-            name,
+            name: name.into(),
             product_family_id,
+            extra: serde_json::Map::new(),
         }
     }
 }

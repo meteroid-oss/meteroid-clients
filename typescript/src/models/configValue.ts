@@ -2,10 +2,13 @@
 import {
   type BooleanConfigValue,
   BooleanConfigValueSerializer,
-} from "./booleanConfigValue";
-import { type JsonConfigValue, JsonConfigValueSerializer } from "./jsonConfigValue";
-import { type NumberConfigValue, NumberConfigValueSerializer } from "./numberConfigValue";
-import { type TextConfigValue, TextConfigValueSerializer } from "./textConfigValue";
+} from "./booleanConfigValue.js";
+import { type JsonConfigValue, JsonConfigValueSerializer } from "./jsonConfigValue.js";
+import {
+  type NumberConfigValue,
+  NumberConfigValueSerializer,
+} from "./numberConfigValue.js";
+import { type TextConfigValue, TextConfigValueSerializer } from "./textConfigValue.js";
 
 export interface ConfigValueNumber extends NumberConfigValue {
   kind: "NUMBER";
@@ -30,60 +33,60 @@ export type ConfigValue =
   | ConfigValueText
   | ConfigValueJson;
 
+/** Converts `ConfigValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ConfigValueSerializer = {
-  _fromJsonObject(object: any): ConfigValue {
-    const kind = object["kind"];
-
-    switch (kind) {
+  parse(json: any): ConfigValue {
+    switch (json["kind"]) {
       case "NUMBER":
         return {
-          ...NumberConfigValueSerializer._fromJsonObject(object),
+          ...NumberConfigValueSerializer.parse(json),
           kind: "NUMBER",
         };
       case "BOOLEAN":
         return {
-          ...BooleanConfigValueSerializer._fromJsonObject(object),
+          ...BooleanConfigValueSerializer.parse(json),
           kind: "BOOLEAN",
         };
       case "TEXT":
         return {
-          ...TextConfigValueSerializer._fromJsonObject(object),
+          ...TextConfigValueSerializer.parse(json),
           kind: "TEXT",
         };
       case "JSON":
         return {
-          ...JsonConfigValueSerializer._fromJsonObject(object),
+          ...JsonConfigValueSerializer.parse(json),
           kind: "JSON",
         };
       default:
-        throw new Error(`Unexpected kind for ConfigValue: ${kind}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: ConfigValue): any {
-    switch (self.kind) {
+  serialize(value: ConfigValue): any {
+    switch (value.kind) {
       case "NUMBER":
         return {
-          ...NumberConfigValueSerializer._toJsonObject(self),
+          ...NumberConfigValueSerializer.serialize(value),
           kind: "NUMBER",
         };
       case "BOOLEAN":
         return {
-          ...BooleanConfigValueSerializer._toJsonObject(self),
+          ...BooleanConfigValueSerializer.serialize(value),
           kind: "BOOLEAN",
         };
       case "TEXT":
         return {
-          ...TextConfigValueSerializer._toJsonObject(self),
+          ...TextConfigValueSerializer.serialize(value),
           kind: "TEXT",
         };
       case "JSON":
         return {
-          ...JsonConfigValueSerializer._toJsonObject(self),
+          ...JsonConfigValueSerializer.serialize(value),
           kind: "JSON",
         };
       default:
-        throw new Error(`Unexpected kind for ConfigValue`);
+        return value;
     }
   },
 };

@@ -1,7 +1,7 @@
 // this file is @generated
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct Event {
     /// Billable metric code. Max 512 characters.
     pub code: String,
@@ -19,16 +19,28 @@ pub struct Event {
     /// RFC 3339 timestamp. Defaults to ingestion time if omitted.
     /// Must be between 24 hours ago and 1 hour from now. Set `allow_backfilling` to remove the past limit.
     pub timestamp: String,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl Event {
-    pub fn new(code: String, customer_id: String, event_id: String, timestamp: String) -> Self {
+    /// Creates a value from its required fields.
+    #[must_use]
+    pub fn new(
+        code: impl Into<String>,
+        customer_id: impl Into<String>,
+        event_id: impl Into<String>,
+        timestamp: impl Into<String>,
+    ) -> Self {
         Self {
-            code,
-            customer_id,
-            event_id,
+            code: code.into(),
+            customer_id: customer_id.into(),
+            event_id: event_id.into(),
             properties: None,
-            timestamp,
+            timestamp: timestamp.into(),
+            extra: serde_json::Map::new(),
         }
     }
 }

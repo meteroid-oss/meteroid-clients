@@ -1,61 +1,54 @@
 // this file is @generated
-import { type AddOnId, AddOnIdSerializer } from "./addOnId";
+import { extraProperties } from "../json.js";
+import { type AddOnId, AddOnIdSerializer } from "./addOnId.js";
 import {
   type SubscriptionAddOnId,
   SubscriptionAddOnIdSerializer,
-} from "./subscriptionAddOnId";
-import { type SubscriptionFee, SubscriptionFeeSerializer } from "./subscriptionFee";
+} from "./subscriptionAddOnId.js";
+import { type SubscriptionFee, SubscriptionFeeSerializer } from "./subscriptionFee.js";
 import {
   type SubscriptionFeeBillingPeriodEnum,
   SubscriptionFeeBillingPeriodEnumSerializer,
-} from "./subscriptionFeeBillingPeriodEnum";
+} from "./subscriptionFeeBillingPeriodEnum.js";
 
 export interface SubscriptionAddOn {
-  addOnId?: AddOnId;
-
+  addOnId?: AddOnId | undefined;
   fee: SubscriptionFee;
-
-  id?: SubscriptionAddOnId;
-
+  id?: SubscriptionAddOnId | undefined;
   name: string;
-
   period: SubscriptionFeeBillingPeriodEnum;
-
   quantity: number;
 }
 
+/** Converts `SubscriptionAddOn` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionAddOnSerializer = {
-  _fromJsonObject(object: any): SubscriptionAddOn {
+  parse(json: any): SubscriptionAddOn {
     return {
+      ...extraProperties(json, ["add_on_id", "fee", "id", "name", "period", "quantity"]),
       addOnId:
-        object["add_on_id"] != null
-          ? AddOnIdSerializer._fromJsonObject(object["add_on_id"])
+        json["add_on_id"] != null
+          ? AddOnIdSerializer.parse(json["add_on_id"])
           : undefined,
-      fee: SubscriptionFeeSerializer._fromJsonObject(object["fee"]),
+      fee: SubscriptionFeeSerializer.parse(json["fee"]),
       id:
-        object["id"] != null
-          ? SubscriptionAddOnIdSerializer._fromJsonObject(object["id"])
-          : undefined,
-      name: object["name"],
-      period: SubscriptionFeeBillingPeriodEnumSerializer._fromJsonObject(
-        object["period"]
-      ),
-      quantity: object["quantity"],
+        json["id"] != null ? SubscriptionAddOnIdSerializer.parse(json["id"]) : undefined,
+      name: json["name"],
+      period: SubscriptionFeeBillingPeriodEnumSerializer.parse(json["period"]),
+      quantity: json["quantity"],
     };
   },
 
-  _toJsonObject(self: SubscriptionAddOn): any {
+  serialize(value: SubscriptionAddOn): any {
     return {
+      ...extraProperties(value, ["addOnId", "fee", "id", "name", "period", "quantity"]),
       add_on_id:
-        self.addOnId != null ? AddOnIdSerializer._toJsonObject(self.addOnId) : undefined,
-      fee: SubscriptionFeeSerializer._toJsonObject(self.fee),
+        value.addOnId != null ? AddOnIdSerializer.serialize(value.addOnId) : undefined,
+      fee: SubscriptionFeeSerializer.serialize(value.fee),
       id:
-        self.id != null
-          ? SubscriptionAddOnIdSerializer._toJsonObject(self.id)
-          : undefined,
-      name: self.name,
-      period: SubscriptionFeeBillingPeriodEnumSerializer._toJsonObject(self.period),
-      quantity: self.quantity,
+        value.id != null ? SubscriptionAddOnIdSerializer.serialize(value.id) : undefined,
+      name: value.name,
+      period: SubscriptionFeeBillingPeriodEnumSerializer.serialize(value.period),
+      quantity: value.quantity,
     };
   },
 };

@@ -1,2 +1,4 @@
 # this file is @generated
-CreditNoteId = str
+import typing as t
+
+CreditNoteId: t.TypeAlias = str

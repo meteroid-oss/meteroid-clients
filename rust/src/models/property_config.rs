@@ -20,15 +20,22 @@ pub struct PropertyConfig {
     /// Allowed choices for `SINGLE_SELECT` / `MULTI_SELECT`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<Vec<SelectOption>>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl PropertyConfig {
+    /// Creates a value with every field unset.
+    #[must_use]
     pub fn new() -> Self {
         Self {
             max: None,
             max_length: None,
             min: None,
             options: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

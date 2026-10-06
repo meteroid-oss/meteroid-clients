@@ -1,20 +1,24 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Token introspection request */
 export interface IntrospectionRequest {
   /** The token to introspect */
   token: string;
 }
 
+/** Converts `IntrospectionRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const IntrospectionRequestSerializer = {
-  _fromJsonObject(object: any): IntrospectionRequest {
+  parse(json: any): IntrospectionRequest {
     return {
-      token: object["token"],
+      ...extraProperties(json, ["token"]),
+      token: json["token"],
     };
   },
 
-  _toJsonObject(self: IntrospectionRequest): any {
+  serialize(value: IntrospectionRequest): any {
     return {
-      token: self.token,
+      ...extraProperties(value, ["token"]),
+      token: value.token,
     };
   },
 };

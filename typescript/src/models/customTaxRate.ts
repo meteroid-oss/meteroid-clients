@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface CustomTaxRate {
   name: string;
-
   rate: string;
-
   taxCode: string;
 }
 
+/** Converts `CustomTaxRate` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomTaxRateSerializer = {
-  _fromJsonObject(object: any): CustomTaxRate {
+  parse(json: any): CustomTaxRate {
     return {
-      name: object["name"],
-      rate: object["rate"],
-      taxCode: object["tax_code"],
+      ...extraProperties(json, ["name", "rate", "tax_code"]),
+      name: json["name"],
+      rate: json["rate"],
+      taxCode: json["tax_code"],
     };
   },
 
-  _toJsonObject(self: CustomTaxRate): any {
+  serialize(value: CustomTaxRate): any {
     return {
-      name: self.name,
-      rate: self.rate,
-      tax_code: self.taxCode,
+      ...extraProperties(value, ["name", "rate", "taxCode"]),
+      name: value.name,
+      rate: value.rate,
+      tax_code: value.taxCode,
     };
   },
 };

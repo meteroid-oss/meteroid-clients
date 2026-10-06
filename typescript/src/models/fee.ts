@@ -1,13 +1,13 @@
 // this file is @generated
-import { type CapacityPlanFee, CapacityPlanFeeSerializer } from "./capacityPlanFee";
+import { type CapacityPlanFee, CapacityPlanFeeSerializer } from "./capacityPlanFee.js";
 import {
   type ExtraRecurringPlanFee,
   ExtraRecurringPlanFeeSerializer,
-} from "./extraRecurringPlanFee";
-import { type OneTimePlanFee, OneTimePlanFeeSerializer } from "./oneTimePlanFee";
-import { type RatePlanFee, RatePlanFeeSerializer } from "./ratePlanFee";
-import { type SlotPlanFee, SlotPlanFeeSerializer } from "./slotPlanFee";
-import { type UsagePlanFee, UsagePlanFeeSerializer } from "./usagePlanFee";
+} from "./extraRecurringPlanFee.js";
+import { type OneTimePlanFee, OneTimePlanFeeSerializer } from "./oneTimePlanFee.js";
+import { type RatePlanFee, RatePlanFeeSerializer } from "./ratePlanFee.js";
+import { type SlotPlanFee, SlotPlanFeeSerializer } from "./slotPlanFee.js";
+import { type UsagePlanFee, UsagePlanFeeSerializer } from "./usagePlanFee.js";
 
 export interface FeeRate extends RatePlanFee {
   type: "RATE";
@@ -36,80 +36,80 @@ export type Fee =
   | FeeExtraRecurring
   | FeeOneTime;
 
+/** Converts `Fee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FeeSerializer = {
-  _fromJsonObject(object: any): Fee {
-    const type = object["type"];
-
-    switch (type) {
+  parse(json: any): Fee {
+    switch (json["type"]) {
       case "RATE":
         return {
-          ...RatePlanFeeSerializer._fromJsonObject(object),
+          ...RatePlanFeeSerializer.parse(json),
           type: "RATE",
         };
       case "SLOT":
         return {
-          ...SlotPlanFeeSerializer._fromJsonObject(object),
+          ...SlotPlanFeeSerializer.parse(json),
           type: "SLOT",
         };
       case "CAPACITY":
         return {
-          ...CapacityPlanFeeSerializer._fromJsonObject(object),
+          ...CapacityPlanFeeSerializer.parse(json),
           type: "CAPACITY",
         };
       case "USAGE":
         return {
-          ...UsagePlanFeeSerializer._fromJsonObject(object),
+          ...UsagePlanFeeSerializer.parse(json),
           type: "USAGE",
         };
       case "EXTRA_RECURRING":
         return {
-          ...ExtraRecurringPlanFeeSerializer._fromJsonObject(object),
+          ...ExtraRecurringPlanFeeSerializer.parse(json),
           type: "EXTRA_RECURRING",
         };
       case "ONE_TIME":
         return {
-          ...OneTimePlanFeeSerializer._fromJsonObject(object),
+          ...OneTimePlanFeeSerializer.parse(json),
           type: "ONE_TIME",
         };
       default:
-        throw new Error(`Unexpected type for Fee: ${type}`);
+        // A variant added to the API after this SDK was generated, kept as received.
+        return json;
     }
   },
 
-  _toJsonObject(self: Fee): any {
-    switch (self.type) {
+  serialize(value: Fee): any {
+    switch (value.type) {
       case "RATE":
         return {
-          ...RatePlanFeeSerializer._toJsonObject(self),
+          ...RatePlanFeeSerializer.serialize(value),
           type: "RATE",
         };
       case "SLOT":
         return {
-          ...SlotPlanFeeSerializer._toJsonObject(self),
+          ...SlotPlanFeeSerializer.serialize(value),
           type: "SLOT",
         };
       case "CAPACITY":
         return {
-          ...CapacityPlanFeeSerializer._toJsonObject(self),
+          ...CapacityPlanFeeSerializer.serialize(value),
           type: "CAPACITY",
         };
       case "USAGE":
         return {
-          ...UsagePlanFeeSerializer._toJsonObject(self),
+          ...UsagePlanFeeSerializer.serialize(value),
           type: "USAGE",
         };
       case "EXTRA_RECURRING":
         return {
-          ...ExtraRecurringPlanFeeSerializer._toJsonObject(self),
+          ...ExtraRecurringPlanFeeSerializer.serialize(value),
           type: "EXTRA_RECURRING",
         };
       case "ONE_TIME":
         return {
-          ...OneTimePlanFeeSerializer._toJsonObject(self),
+          ...OneTimePlanFeeSerializer.serialize(value),
           type: "ONE_TIME",
         };
       default:
-        throw new Error(`Unexpected type for Fee`);
+        return value;
     }
   },
 };

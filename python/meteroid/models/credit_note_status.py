@@ -1,11 +1,16 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class CreditNoteStatus(str, enum.Enum):
+class CreditNoteStatus(StrEnum):
+    """The values of `CreditNoteStatus`; others are kept as received."""
+
     DRAFT = "DRAFT"
     FINALIZED = "FINALIZED"
     VOIDED = "VOIDED"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+CreditNoteStatusLiteral: t.TypeAlias = t.Literal["DRAFT", "FINALIZED", "VOIDED"]
+"""The values of :class:`CreditNoteStatus`, which arguments take as plain strings too."""

@@ -1,32 +1,31 @@
 // this file is @generated
-import { type MetricSummary, MetricSummarySerializer } from "./metricSummary";
+import { extraProperties } from "../json.js";
+import { type MetricSummary, MetricSummarySerializer } from "./metricSummary.js";
 import {
   type PaginationResponse,
   PaginationResponseSerializer,
-} from "./paginationResponse";
+} from "./paginationResponse.js";
 
 export interface MetricListResponse {
   data: MetricSummary[];
-
   paginationMeta: PaginationResponse;
 }
 
+/** Converts `MetricListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricListResponseSerializer = {
-  _fromJsonObject(object: any): MetricListResponse {
+  parse(json: any): MetricListResponse {
     return {
-      data: object["data"].map((item: any) =>
-        MetricSummarySerializer._fromJsonObject(item)
-      ),
-      paginationMeta: PaginationResponseSerializer._fromJsonObject(
-        object["pagination_meta"]
-      ),
+      ...extraProperties(json, ["data", "pagination_meta"]),
+      data: json["data"].map((item: any) => MetricSummarySerializer.parse(item)),
+      paginationMeta: PaginationResponseSerializer.parse(json["pagination_meta"]),
     };
   },
 
-  _toJsonObject(self: MetricListResponse): any {
+  serialize(value: MetricListResponse): any {
     return {
-      data: self.data.map((item: any) => MetricSummarySerializer._toJsonObject(item)),
-      pagination_meta: PaginationResponseSerializer._toJsonObject(self.paginationMeta),
+      ...extraProperties(value, ["data", "paginationMeta"]),
+      data: value.data.map((item: any) => MetricSummarySerializer.serialize(item)),
+      pagination_meta: PaginationResponseSerializer.serialize(value.paginationMeta),
     };
   },
 };

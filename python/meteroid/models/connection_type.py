@@ -1,12 +1,15 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class ConnectionType(str, enum.Enum):
+class ConnectionType(StrEnum):
     """Type of connection between platform and connected account"""
 
     STANDARD = "standard"
     EXPRESS = "express"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+ConnectionTypeLiteral: t.TypeAlias = t.Literal["standard", "express"]
+"""The values of :class:`ConnectionType`, which arguments take as plain strings too."""

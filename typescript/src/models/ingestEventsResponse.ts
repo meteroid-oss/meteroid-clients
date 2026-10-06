@@ -1,28 +1,30 @@
 // this file is @generated
-import { type IngestFailure, IngestFailureSerializer } from "./ingestFailure";
+import { extraProperties } from "../json.js";
+import { type IngestFailure, IngestFailureSerializer } from "./ingestFailure.js";
 
 export interface IngestEventsResponse {
   /** Events that failed to ingest. Omitted when no failures. */
-  failures?: IngestFailure[];
+  failures?: IngestFailure[] | undefined;
 }
 
+/** Converts `IngestEventsResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const IngestEventsResponseSerializer = {
-  _fromJsonObject(object: any): IngestEventsResponse {
+  parse(json: any): IngestEventsResponse {
     return {
+      ...extraProperties(json, ["failures"]),
       failures:
-        object["failures"] != null
-          ? object["failures"].map((item: any) =>
-              IngestFailureSerializer._fromJsonObject(item)
-            )
+        json["failures"] != null
+          ? json["failures"].map((item: any) => IngestFailureSerializer.parse(item))
           : undefined,
     };
   },
 
-  _toJsonObject(self: IngestEventsResponse): any {
+  serialize(value: IngestEventsResponse): any {
     return {
+      ...extraProperties(value, ["failures"]),
       failures:
-        self.failures != null
-          ? self.failures.map((item: any) => IngestFailureSerializer._toJsonObject(item))
+        value.failures != null
+          ? value.failures.map((item: any) => IngestFailureSerializer.serialize(item))
           : undefined,
     };
   },

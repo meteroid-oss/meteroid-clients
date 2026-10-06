@@ -1,11 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .effective_entitlement import EffectiveEntitlement
+
+if t.TYPE_CHECKING:
+    from .effective_entitlement import EffectiveEntitlement
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class EffectiveEntitlementListResponse(BaseModel):
-    data: t.List[EffectiveEntitlement]
+    """The `EffectiveEntitlementListResponse` object."""
+
+    data: list[EffectiveEntitlement]

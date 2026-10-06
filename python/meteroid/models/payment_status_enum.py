@@ -1,8 +1,12 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class PaymentStatusEnum(str, enum.Enum):
+class PaymentStatusEnum(StrEnum):
+    """The values of `PaymentStatusEnum`; others are kept as received."""
+
     READY = "READY"
     PENDING = "PENDING"
     SETTLED = "SETTLED"
@@ -10,5 +14,8 @@ class PaymentStatusEnum(str, enum.Enum):
     FAILED = "FAILED"
     REFUNDED = "REFUNDED"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+PaymentStatusEnumLiteral: t.TypeAlias = t.Literal[
+    "READY", "PENDING", "SETTLED", "CANCELLED", "FAILED", "REFUNDED"
+]
+"""The values of :class:`PaymentStatusEnum`, which arguments take as plain strings too."""

@@ -1,39 +1,80 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type CustomerEventData, CustomerEventDataSerializer } from "./customerEventData";
-import { type EventId, EventIdSerializer } from "./eventId";
-import { type EventType, EventTypeSerializer } from "./eventType";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties, pickProperties } from "../json.js";
+import {
+  type CustomerEventData,
+  CustomerEventDataSerializer,
+} from "./customerEventData.js";
+import { type EventId, EventIdSerializer } from "./eventId.js";
+import { type EventType, EventTypeSerializer } from "./eventType.js";
 /** Event-specific webhook schemas for type-safe webhook payloads */
-export interface CustomerEvent {
-  flattenCustomereventdata: CustomerEventData;
-
+export interface CustomerEvent extends CustomerEventData {
   id: EventId;
-
   timestamp: Date;
-
   type: EventType;
 }
 
+/** Converts `CustomerEvent` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomerEventSerializer = {
-  _fromJsonObject(object: any): CustomerEvent {
+  parse(json: any): CustomerEvent {
     return {
-      flattenCustomereventdata: CustomerEventDataSerializer._fromJsonObject(
-        object["__flatten_customereventdata"]
-      ),
-      id: EventIdSerializer._fromJsonObject(object["id"]),
-      timestamp: parseDateTime(object["timestamp"]),
-      type: EventTypeSerializer._fromJsonObject(object["type"]),
+      ...extraProperties(json, [
+        "id",
+        "timestamp",
+        "type",
+        "alias",
+        "billing_email",
+        "currency",
+        "custom_properties",
+        "customer_id",
+        "invoicing_emails",
+        "name",
+        "phone",
+      ]),
+      ...pickProperties(CustomerEventDataSerializer.parse(json), [
+        "alias",
+        "billingEmail",
+        "currency",
+        "customProperties",
+        "customerId",
+        "invoicingEmails",
+        "name",
+        "phone",
+      ]),
+      id: EventIdSerializer.parse(json["id"]),
+      timestamp: parseDateTime(json["timestamp"]),
+      type: EventTypeSerializer.parse(json["type"]),
     };
   },
 
-  _toJsonObject(self: CustomerEvent): any {
+  serialize(value: CustomerEvent): any {
     return {
-      __flatten_customereventdata: CustomerEventDataSerializer._toJsonObject(
-        self.flattenCustomereventdata
-      ),
-      id: EventIdSerializer._toJsonObject(self.id),
-      timestamp: self.timestamp,
-      type: EventTypeSerializer._toJsonObject(self.type),
+      ...extraProperties(value, [
+        "id",
+        "timestamp",
+        "type",
+        "alias",
+        "billingEmail",
+        "currency",
+        "customProperties",
+        "customerId",
+        "invoicingEmails",
+        "name",
+        "phone",
+      ]),
+      ...pickProperties(CustomerEventDataSerializer.serialize(value), [
+        "alias",
+        "billing_email",
+        "currency",
+        "custom_properties",
+        "customer_id",
+        "invoicing_emails",
+        "name",
+        "phone",
+      ]),
+      id: EventIdSerializer.serialize(value.id),
+      timestamp: value.timestamp,
+      type: EventTypeSerializer.serialize(value.type),
     };
   },
 };

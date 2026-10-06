@@ -1,35 +1,37 @@
 // this file is @generated
-import { type ResetPeriod, ResetPeriodSerializer } from "./resetPeriod";
+import { extraProperties } from "../json.js";
+import { type ResetPeriod, ResetPeriodSerializer } from "./resetPeriod.js";
 
 export interface MeteredEntitlementValue {
   /** Per-entitlement kill switch. `false` means disabled. */
-  enabled?: boolean;
-
+  enabled?: boolean | undefined;
   /** Cap on usage. Null means unlimited. */
-  limit?: string | null;
-
-  resetPeriod?: ResetPeriod;
+  limit?: string | null | undefined;
+  resetPeriod?: ResetPeriod | undefined;
 }
 
+/** Converts `MeteredEntitlementValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MeteredEntitlementValueSerializer = {
-  _fromJsonObject(object: any): MeteredEntitlementValue {
+  parse(json: any): MeteredEntitlementValue {
     return {
-      enabled: object["enabled"],
-      limit: object["limit"],
+      ...extraProperties(json, ["enabled", "limit", "reset_period"]),
+      enabled: json["enabled"],
+      limit: json["limit"],
       resetPeriod:
-        object["reset_period"] != null
-          ? ResetPeriodSerializer._fromJsonObject(object["reset_period"])
+        json["reset_period"] != null
+          ? ResetPeriodSerializer.parse(json["reset_period"])
           : undefined,
     };
   },
 
-  _toJsonObject(self: MeteredEntitlementValue): any {
+  serialize(value: MeteredEntitlementValue): any {
     return {
-      enabled: self.enabled,
-      limit: self.limit,
+      ...extraProperties(value, ["enabled", "limit", "resetPeriod"]),
+      enabled: value.enabled,
+      limit: value.limit,
       reset_period:
-        self.resetPeriod != null
-          ? ResetPeriodSerializer._toJsonObject(self.resetPeriod)
+        value.resetPeriod != null
+          ? ResetPeriodSerializer.serialize(value.resetPeriod)
           : undefined,
     };
   },

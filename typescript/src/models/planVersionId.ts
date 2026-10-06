@@ -2,12 +2,13 @@
 
 export type PlanVersionId = string;
 
+/** Converts `PlanVersionId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PlanVersionIdSerializer = {
-  _fromJsonObject(object: any): PlanVersionId {
-    return object;
+  parse(json: any): PlanVersionId {
+    return json;
   },
 
-  _toJsonObject(self: PlanVersionId): any {
-    return self;
+  serialize(value: PlanVersionId): any {
+    return value;
   },
 };

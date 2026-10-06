@@ -1,0 +1,31 @@
+// this file is @generated
+import { Meteroid } from "../../src/index.js";
+
+/** The response a mock client answers with. */
+export interface MockResponse {
+  status: number;
+  contentType: string | null;
+  body: string;
+}
+
+/** A client answering every request with `response`, and the method and path of each request. */
+export function mock(response: MockResponse): { client: Meteroid; requests: string[] } {
+  const requests: string[] = [];
+  const fetch = async (
+    input: string | URL | Request,
+    init?: RequestInit
+  ): Promise<Response> => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    requests.push(`${init?.method ?? "GET"} ${url.pathname}`);
+    const headers: Record<string, string> = {};
+    if (response.contentType !== null) {
+      headers["content-type"] = response.contentType;
+    }
+    return new Response(response.status === 204 ? null : response.body, {
+      status: response.status,
+      headers,
+    });
+  };
+  const client = new Meteroid({ baseURL: "http://localhost", fetch, maxRetries: 0 });
+  return { client, requests };
+}

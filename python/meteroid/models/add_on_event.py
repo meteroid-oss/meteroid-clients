@@ -1,17 +1,23 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .add_on_event_data import AddOnEventData
-from .event_id import EventId
-from .event_type import EventType
+
+if t.TYPE_CHECKING:
+    from .add_on_event_data import AddOnEventData
+    from .event_id import EventId
+    from .event_type import EventType
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class AddOnEvent(BaseModel):
-    _FLATTENED: t.ClassVar[t.Tuple[str, ...]] = ("add_on_event_data",)
+    """The `AddOnEvent` object."""
+
+    _FLATTENED: t.ClassVar[tuple[str, ...]] = ("add_on_event_data",)
 
     add_on_event_data: AddOnEventData
 

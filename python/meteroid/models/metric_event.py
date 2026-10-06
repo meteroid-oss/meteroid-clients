@@ -1,17 +1,23 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
 from ..serialization import BaseModel
-from .event_id import EventId
-from .event_type import EventType
-from .metric_event_data import MetricEventData
+
+if t.TYPE_CHECKING:
+    from .event_id import EventId
+    from .event_type import EventType
+    from .metric_event_data import MetricEventData
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MetricEvent(BaseModel):
-    _FLATTENED: t.ClassVar[t.Tuple[str, ...]] = ("metric_event_data",)
+    """The `MetricEvent` object."""
+
+    _FLATTENED: t.ClassVar[tuple[str, ...]] = ("metric_event_data",)
 
     metric_event_data: MetricEventData
 

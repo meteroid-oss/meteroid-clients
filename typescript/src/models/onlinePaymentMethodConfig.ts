@@ -1,29 +1,33 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type OnlineMethodsConfig,
   OnlineMethodsConfigSerializer,
-} from "./onlineMethodsConfig";
+} from "./onlineMethodsConfig.js";
 
 export interface OnlinePaymentMethodConfig {
-  config?: OnlineMethodsConfig | null;
+  config?: OnlineMethodsConfig | null | undefined;
 }
 
+/** Converts `OnlinePaymentMethodConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OnlinePaymentMethodConfigSerializer = {
-  _fromJsonObject(object: any): OnlinePaymentMethodConfig {
+  parse(json: any): OnlinePaymentMethodConfig {
     return {
+      ...extraProperties(json, ["config"]),
       config:
-        object["config"] != null
-          ? OnlineMethodsConfigSerializer._fromJsonObject(object["config"])
-          : undefined,
+        json["config"] != null
+          ? OnlineMethodsConfigSerializer.parse(json["config"])
+          : json["config"],
     };
   },
 
-  _toJsonObject(self: OnlinePaymentMethodConfig): any {
+  serialize(value: OnlinePaymentMethodConfig): any {
     return {
+      ...extraProperties(value, ["config"]),
       config:
-        self.config != null
-          ? OnlineMethodsConfigSerializer._toJsonObject(self.config)
-          : undefined,
+        value.config != null
+          ? OnlineMethodsConfigSerializer.serialize(value.config)
+          : value.config,
     };
   },
 };

@@ -1,2 +1,4 @@
 # this file is @generated
-BankAccountId = str
+import typing as t
+
+BankAccountId: t.TypeAlias = str

@@ -1,170 +1,198 @@
 // this file is @generated
-import { type Customer, CustomerSerializer } from "../models/customer";
+
+import { type Customer, CustomerSerializer } from "../models/customer.js";
 import {
   type CustomerCreateRequest,
   CustomerCreateRequestSerializer,
-} from "../models/customerCreateRequest";
+} from "../models/customerCreateRequest.js";
 import {
   type CustomerListResponse,
   CustomerListResponseSerializer,
-} from "../models/customerListResponse";
+} from "../models/customerListResponse.js";
 import {
   type CustomerPatchRequest,
   CustomerPatchRequestSerializer,
-} from "../models/customerPatchRequest";
+} from "../models/customerPatchRequest.js";
 import {
   type CustomerPortalTokenRequest,
   CustomerPortalTokenRequestSerializer,
-} from "../models/customerPortalTokenRequest";
+} from "../models/customerPortalTokenRequest.js";
 import {
   type CustomerPortalTokenResponse,
   CustomerPortalTokenResponseSerializer,
-} from "../models/customerPortalTokenResponse";
+} from "../models/customerPortalTokenResponse.js";
 import {
   type CustomerUpdateRequest,
   CustomerUpdateRequestSerializer,
-} from "../models/customerUpdateRequest";
+} from "../models/customerUpdateRequest.js";
 import {
   type EffectiveEntitlementListResponse,
   EffectiveEntitlementListResponseSerializer,
-} from "../models/effectiveEntitlementListResponse";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/effectiveEntitlementListResponse.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface CustomersListCustomersOptions {
+/** The query and header parameters of `list`. */
+export interface CustomersListOptions {
   /** Sort order. Format: `column.direction`. Allowed columns: `name`, `email`, `alias`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`. */
-  orderBy?: string;
+  orderBy?: string | undefined;
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
-  search?: string;
-  archived?: boolean;
+  perPage?: number | undefined;
+  search?: string | undefined;
+  archived?: boolean | undefined;
 }
 
+/** The customers operations, reached through the client's `customers`. */
 export class Customers {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
   /** List customers with optional pagination and search filtering. */
-  public listCustomers(
-    options?: CustomersListCustomersOptions
-  ): Promise<CustomerListResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/customers");
+  public list(
+    options?: CustomersListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<CustomerListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/customers");
 
     request.setQueryParam("order_by", options?.orderBy);
     request.setQueryParam("page", options?.page);
     request.setQueryParam("per_page", options?.perPage);
     request.setQueryParam("search", options?.search);
     request.setQueryParam("archived", options?.archived);
-    return request.send(this.requestCtx, CustomerListResponseSerializer._fromJsonObject);
-  }
-
-  /**  */
-  public createCustomer(customerCreateRequest: CustomerCreateRequest): Promise<Customer> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/customers");
-
-    request.setBody(CustomerCreateRequestSerializer._toJsonObject(customerCreateRequest));
-    return request.send(this.requestCtx, CustomerSerializer._fromJsonObject);
-  }
-
-  /** Retrieve a single customer by ID or alias. */
-  public getCustomer(idOrAlias: string): Promise<Customer> {
-    const request = new MeteroidRequest(
-      HttpMethod.GET,
-      "/api/v1/customers/{id_or_alias}"
+    return request.send(
+      this.requestCtx,
+      CustomerListResponseSerializer.parse,
+      requestOptions
     );
-
-    request.setPathParam("id_or_alias", idOrAlias);
-    return request.send(this.requestCtx, CustomerSerializer._fromJsonObject);
   }
 
-  /**  */
-  public updateCustomer(
+  /** Create customer */
+  public create(
+    customerCreateRequest: CustomerCreateRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Customer> {
+    const request = new MeteroidRequest("POST", "/api/v1/customers");
+
+    request.setBody(CustomerCreateRequestSerializer.serialize(customerCreateRequest));
+    return request.send(this.requestCtx, CustomerSerializer.parse, requestOptions);
+  }
+
+  /**
+   * Get customer
+   *
+   * Retrieve a single customer by ID or alias.
+   */
+  public retrieve(
     idOrAlias: string,
-    customerUpdateRequest: CustomerUpdateRequest
-  ): Promise<Customer> {
-    const request = new MeteroidRequest(
-      HttpMethod.PUT,
-      "/api/v1/customers/{id_or_alias}"
-    );
+    requestOptions?: RequestOptions
+  ): APIPromise<Customer> {
+    const request = new MeteroidRequest("GET", "/api/v1/customers/{id_or_alias}");
 
     request.setPathParam("id_or_alias", idOrAlias);
-    request.setBody(CustomerUpdateRequestSerializer._toJsonObject(customerUpdateRequest));
-    return request.send(this.requestCtx, CustomerSerializer._fromJsonObject);
+    return request.send(this.requestCtx, CustomerSerializer.parse, requestOptions);
   }
 
-  /** No linked entity will be deleted. You need to terminate all active subscriptions before archiving a customer, or the call will fail. */
-  public archiveCustomer(idOrAlias: string): Promise<void> {
-    const request = new MeteroidRequest(
-      HttpMethod.DELETE,
-      "/api/v1/customers/{id_or_alias}"
-    );
-
-    request.setPathParam("id_or_alias", idOrAlias);
-    return request.sendNoResponseBody(this.requestCtx);
-  }
-
-  /** Partially update a customer. Only provided fields will be updated. */
-  public patchCustomer(
+  /** Update customer */
+  public replace(
     idOrAlias: string,
-    customerPatchRequest: CustomerPatchRequest
-  ): Promise<Customer> {
-    const request = new MeteroidRequest(
-      HttpMethod.PATCH,
-      "/api/v1/customers/{id_or_alias}"
-    );
+    customerUpdateRequest: CustomerUpdateRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Customer> {
+    const request = new MeteroidRequest("PUT", "/api/v1/customers/{id_or_alias}");
 
     request.setPathParam("id_or_alias", idOrAlias);
-    request.setBody(CustomerPatchRequestSerializer._toJsonObject(customerPatchRequest));
-    return request.send(this.requestCtx, CustomerSerializer._fromJsonObject);
+    request.setBody(CustomerUpdateRequestSerializer.serialize(customerUpdateRequest));
+    return request.send(this.requestCtx, CustomerSerializer.parse, requestOptions);
   }
 
-  /**  */
-  public getEffectiveEntitlements(
-    idOrAlias: string
-  ): Promise<EffectiveEntitlementListResponse> {
+  /**
+   * Archive a customer
+   *
+   * No linked entity will be deleted. You need to terminate all active subscriptions before archiving a customer, or the call will fail.
+   */
+  public archive(idOrAlias: string, requestOptions?: RequestOptions): APIPromise<void> {
+    const request = new MeteroidRequest("DELETE", "/api/v1/customers/{id_or_alias}");
+
+    request.setPathParam("id_or_alias", idOrAlias);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
+  }
+
+  /**
+   * Patch customer
+   *
+   * Partially update a customer. Only provided fields will be updated.
+   */
+  public update(
+    idOrAlias: string,
+    customerPatchRequest: CustomerPatchRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<Customer> {
+    const request = new MeteroidRequest("PATCH", "/api/v1/customers/{id_or_alias}");
+
+    request.setPathParam("id_or_alias", idOrAlias);
+    request.setBody(CustomerPatchRequestSerializer.serialize(customerPatchRequest));
+    return request.send(this.requestCtx, CustomerSerializer.parse, requestOptions);
+  }
+
+  /** List customer entitlements */
+  public listEntitlements(
+    idOrAlias: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<EffectiveEntitlementListResponse> {
     const request = new MeteroidRequest(
-      HttpMethod.GET,
+      "GET",
       "/api/v1/customers/{id_or_alias}/entitlements"
     );
 
     request.setPathParam("id_or_alias", idOrAlias);
     return request.send(
       this.requestCtx,
-      EffectiveEntitlementListResponseSerializer._fromJsonObject
+      EffectiveEntitlementListResponseSerializer.parse,
+      requestOptions
     );
   }
 
   /**
+   * Generate a portal token for a customer
+   *
    * Generates a JWT token that grants access to the customer portal.
    * The token can be used to access invoices, payment methods, and other portal features.
    */
   public createPortalToken(
     idOrAlias: string,
-    customerPortalTokenRequest: CustomerPortalTokenRequest
-  ): Promise<CustomerPortalTokenResponse> {
+    customerPortalTokenRequest: CustomerPortalTokenRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<CustomerPortalTokenResponse> {
     const request = new MeteroidRequest(
-      HttpMethod.POST,
+      "POST",
       "/api/v1/customers/{id_or_alias}/portal-token"
     );
 
     request.setPathParam("id_or_alias", idOrAlias);
     request.setBody(
-      CustomerPortalTokenRequestSerializer._toJsonObject(customerPortalTokenRequest)
+      CustomerPortalTokenRequestSerializer.serialize(customerPortalTokenRequest)
     );
     return request.send(
       this.requestCtx,
-      CustomerPortalTokenResponseSerializer._fromJsonObject
+      CustomerPortalTokenResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public unarchiveCustomer(idOrAlias: string): Promise<void> {
+  /** Restore an archived customer */
+  public unarchive(idOrAlias: string, requestOptions?: RequestOptions): APIPromise<void> {
     const request = new MeteroidRequest(
-      HttpMethod.POST,
+      "POST",
       "/api/v1/customers/{id_or_alias}/unarchive"
     );
 
     request.setPathParam("id_or_alias", idOrAlias);
-    return request.sendNoResponseBody(this.requestCtx);
+    return request.sendNoResponseBody(this.requestCtx, requestOptions);
   }
 }

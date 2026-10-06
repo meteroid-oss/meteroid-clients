@@ -1,19 +1,23 @@
 // this file is @generated
 
-export enum CheckoutSessionStatus {
-  Created = "CREATED",
-  AwaitingPayment = "AWAITING_PAYMENT",
-  Completed = "COMPLETED",
-  Expired = "EXPIRED",
-  Cancelled = "CANCELLED",
-}
+export const CheckoutSessionStatus = {
+  Created: "CREATED",
+  AwaitingPayment: "AWAITING_PAYMENT",
+  Completed: "COMPLETED",
+  Expired: "EXPIRED",
+  Cancelled: "CANCELLED",
+} as const;
+export type CheckoutSessionStatus =
+  | (typeof CheckoutSessionStatus)[keyof typeof CheckoutSessionStatus]
+  | (string & {});
 
+/** Converts `CheckoutSessionStatus` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CheckoutSessionStatusSerializer = {
-  _fromJsonObject(object: any): CheckoutSessionStatus {
-    return object;
+  parse(json: any): CheckoutSessionStatus {
+    return json;
   },
 
-  _toJsonObject(self: CheckoutSessionStatus): any {
-    return self;
+  serialize(value: CheckoutSessionStatus): any {
+    return value;
   },
 };

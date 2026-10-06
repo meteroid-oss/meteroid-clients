@@ -1,8 +1,9 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type MetricFilterOperator,
   MetricFilterOperatorSerializer,
-} from "./metricFilterOperator";
+} from "./metricFilterOperator.js";
 /**
  * A pre-aggregation filter: only events whose `property` matches feed the metric's
  * aggregation. Distinct from a segmentation dimension (which splits pricing). Multiple
@@ -10,26 +11,27 @@ import {
  */
 export interface MetricFilter {
   op: MetricFilterOperator;
-
   property: string;
-
   values: string[];
 }
 
+/** Converts `MetricFilter` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricFilterSerializer = {
-  _fromJsonObject(object: any): MetricFilter {
+  parse(json: any): MetricFilter {
     return {
-      op: MetricFilterOperatorSerializer._fromJsonObject(object["op"]),
-      property: object["property"],
-      values: object["values"],
+      ...extraProperties(json, ["op", "property", "values"]),
+      op: MetricFilterOperatorSerializer.parse(json["op"]),
+      property: json["property"],
+      values: json["values"],
     };
   },
 
-  _toJsonObject(self: MetricFilter): any {
+  serialize(value: MetricFilter): any {
     return {
-      op: MetricFilterOperatorSerializer._toJsonObject(self.op),
-      property: self.property,
-      values: self.values,
+      ...extraProperties(value, ["op", "property", "values"]),
+      op: MetricFilterOperatorSerializer.serialize(value.op),
+      property: value.property,
+      values: value.values,
     };
   },
 };

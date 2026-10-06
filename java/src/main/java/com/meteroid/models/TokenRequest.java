@@ -1,193 +1,393 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/**
+ * Token request (from POST body, application/x-www-form-urlencoded)
+ *
+ * <p>Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class TokenRequest {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class TokenRequest {
     @JsonProperty("client_id")
-    private String clientId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> clientId = JsonField.missing();
 
     @JsonProperty("client_secret")
-    private String clientSecret;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> clientSecret = JsonField.missing();
 
-    @JsonProperty private String code;
+    @JsonProperty("code")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> code = JsonField.missing();
 
     @JsonProperty("code_verifier")
-    private String codeVerifier;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> codeVerifier = JsonField.missing();
 
     @JsonProperty("grant_type")
     private String grantType;
 
     @JsonProperty("redirect_uri")
-    private String redirectUri;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> redirectUri = JsonField.missing();
 
     @JsonProperty("refresh_token")
-    private String refreshToken;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> refreshToken = JsonField.missing();
 
-    public TokenRequest() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public TokenRequest clientId(String clientId) {
-        this.clientId = clientId;
-        return this;
+    private TokenRequest() {}
+
+    private TokenRequest(Builder builder) {
+        this.clientId = builder.clientId;
+        this.clientSecret = builder.clientSecret;
+        this.code = builder.code;
+        this.codeVerifier = builder.codeVerifier;
+        this.grantType = builder.grantType;
+        this.redirectUri = builder.redirectUri;
+        this.refreshToken = builder.refreshToken;
+        this.additionalProperties.putAll(builder.additionalProperties);
+    }
+
+    /**
+     * A builder of {@code TokenRequest}.
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * A builder starting from this value.
+     *
+     * @return a new builder
+     */
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.clientId = clientId;
+        builder.clientSecret = clientSecret;
+        builder.code = code;
+        builder.codeVerifier = codeVerifier;
+        builder.grantType = grantType;
+        builder.redirectUri = redirectUri;
+        builder.refreshToken = refreshToken;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
      * Client ID (if not using HTTP Basic auth)
      *
-     * @return clientId
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public TokenRequest clientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-        return this;
+    public Optional<String> clientId() {
+        return clientId.asOptional();
     }
 
     /**
      * Client secret (if not using HTTP Basic auth)
      *
-     * @return clientSecret
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
-
-    public TokenRequest code(String code) {
-        this.code = code;
-        return this;
+    public Optional<String> clientSecret() {
+        return clientSecret.asOptional();
     }
 
     /**
      * Authorization code (for authorization_code grant)
      *
-     * @return code
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public TokenRequest codeVerifier(String codeVerifier) {
-        this.codeVerifier = codeVerifier;
-        return this;
+    public Optional<String> code() {
+        return code.asOptional();
     }
 
     /**
      * PKCE code verifier (for authorization_code grant with PKCE)
      *
-     * @return codeVerifier
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getCodeVerifier() {
-        return codeVerifier;
-    }
-
-    public void setCodeVerifier(String codeVerifier) {
-        this.codeVerifier = codeVerifier;
-    }
-
-    public TokenRequest grantType(String grantType) {
-        this.grantType = grantType;
-        return this;
+    public Optional<String> codeVerifier() {
+        return codeVerifier.asOptional();
     }
 
     /**
-     * Grant type: &quot;authorization_code&quot; or &quot;refresh_token&quot;
+     * Grant type: "authorization_code" or "refresh_token"
      *
-     * @return grantType
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getGrantType() {
-        return grantType;
-    }
-
-    public void setGrantType(String grantType) {
-        this.grantType = grantType;
-    }
-
-    public TokenRequest redirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
-        return this;
+    public String grantType() {
+        return Utils.required(grantType, "grant_type");
     }
 
     /**
-     * Redirect URI (for authorization_code grant, must match the one used in &#x2f;authorize)
+     * Redirect URI (for authorization_code grant, must match the one used in /authorize)
      *
-     * @return redirectUri
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getRedirectUri() {
-        return redirectUri;
-    }
-
-    public void setRedirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
-    }
-
-    public TokenRequest refreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-        return this;
+    public Optional<String> redirectUri() {
+        return redirectUri.asOptional();
     }
 
     /**
      * Refresh token (for refresh_token grant)
      *
-     * @return refreshToken
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public Optional<String> refreshToken() {
+        return refreshToken.asOptional();
     }
 
     /**
-     * Create an instance of TokenRequest given an JSON string
+     * Properties this version of the SDK does not know, kept as received and sent back.
      *
-     * @param jsonString JSON string
-     * @return An instance of TokenRequest
-     * @throws JsonProcessingException if the JSON string is invalid with respect to TokenRequest
+     * @return the properties by name, unmodifiable
      */
-    public static TokenRequest fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, TokenRequest.class);
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TokenRequest that = (TokenRequest) o;
+        return Objects.equals(clientId, that.clientId)
+                && Objects.equals(clientSecret, that.clientSecret)
+                && Objects.equals(code, that.code)
+                && Objects.equals(codeVerifier, that.codeVerifier)
+                && Objects.equals(grantType, that.grantType)
+                && Objects.equals(redirectUri, that.redirectUri)
+                && Objects.equals(refreshToken, that.refreshToken)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                clientId,
+                clientSecret,
+                code,
+                codeVerifier,
+                grantType,
+                redirectUri,
+                refreshToken,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "TokenRequest{"
+                + "clientId="
+                + clientId
+                + ", clientSecret="
+                + clientSecret
+                + ", code="
+                + code
+                + ", codeVerifier="
+                + codeVerifier
+                + ", grantType="
+                + grantType
+                + ", redirectUri="
+                + redirectUri
+                + ", refreshToken="
+                + refreshToken
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link TokenRequest}. */
+    public static final class Builder {
+        private JsonField<String> clientId = JsonField.missing();
+        private JsonField<String> clientSecret = JsonField.missing();
+        private JsonField<String> code = JsonField.missing();
+        private JsonField<String> codeVerifier = JsonField.missing();
+        private String grantType;
+        private JsonField<String> redirectUri = JsonField.missing();
+        private JsonField<String> refreshToken = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * Client ID (if not using HTTP Basic auth)
+         *
+         * @param clientId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder clientId(String clientId) {
+            this.clientId = JsonField.ofNullable(clientId);
+            return this;
+        }
+
+        /**
+         * Client secret (if not using HTTP Basic auth)
+         *
+         * @param clientSecret the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder clientSecret(String clientSecret) {
+            this.clientSecret = JsonField.ofNullable(clientSecret);
+            return this;
+        }
+
+        /**
+         * Authorization code (for authorization_code grant)
+         *
+         * @param code the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder code(String code) {
+            this.code = JsonField.ofNullable(code);
+            return this;
+        }
+
+        /**
+         * PKCE code verifier (for authorization_code grant with PKCE)
+         *
+         * @param codeVerifier the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder codeVerifier(String codeVerifier) {
+            this.codeVerifier = JsonField.ofNullable(codeVerifier);
+            return this;
+        }
+
+        /**
+         * Grant type: "authorization_code" or "refresh_token"
+         *
+         * @param grantType the value
+         * @return this builder
+         */
+        public Builder grantType(String grantType) {
+            this.grantType = grantType;
+            return this;
+        }
+
+        /**
+         * Redirect URI (for authorization_code grant, must match the one used in /authorize)
+         *
+         * @param redirectUri the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder redirectUri(String redirectUri) {
+            this.redirectUri = JsonField.ofNullable(redirectUri);
+            return this;
+        }
+
+        /**
+         * Refresh token (for refresh_token grant)
+         *
+         * @param refreshToken the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder refreshToken(String refreshToken) {
+            this.refreshToken = JsonField.ofNullable(refreshToken);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code TokenRequest}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public TokenRequest build() {
+            Utils.checkRequired(grantType, "grant_type");
+            return new TokenRequest(this);
+        }
     }
 
     /**
-     * Convert an instance of TokenRequest to an JSON string
+     * Parse {@code json} as {@code TokenRequest}.
      *
-     * @return JSON string
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public static TokenRequest fromJson(String json) {
+        return Utils.parse(json, TokenRequest.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

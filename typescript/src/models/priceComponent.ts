@@ -1,41 +1,41 @@
 // this file is @generated
-import { type Fee, FeeSerializer } from "./fee";
-import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId";
-import { type ProductId, ProductIdSerializer } from "./productId";
+import { extraProperties } from "../json.js";
+import { type Fee, FeeSerializer } from "./fee.js";
+import { type PriceComponentId, PriceComponentIdSerializer } from "./priceComponentId.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
 
 export interface PriceComponent {
-  fee?: Fee | null;
-
+  fee?: Fee | null | undefined;
   id: PriceComponentId;
-
   name: string;
-
-  productId?: ProductId | null;
+  productId?: ProductId | null | undefined;
 }
 
+/** Converts `PriceComponent` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PriceComponentSerializer = {
-  _fromJsonObject(object: any): PriceComponent {
+  parse(json: any): PriceComponent {
     return {
-      fee:
-        object["fee"] != null ? FeeSerializer._fromJsonObject(object["fee"]) : undefined,
-      id: PriceComponentIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
+      ...extraProperties(json, ["fee", "id", "name", "product_id"]),
+      fee: json["fee"] != null ? FeeSerializer.parse(json["fee"]) : json["fee"],
+      id: PriceComponentIdSerializer.parse(json["id"]),
+      name: json["name"],
       productId:
-        object["product_id"] != null
-          ? ProductIdSerializer._fromJsonObject(object["product_id"])
-          : undefined,
+        json["product_id"] != null
+          ? ProductIdSerializer.parse(json["product_id"])
+          : json["product_id"],
     };
   },
 
-  _toJsonObject(self: PriceComponent): any {
+  serialize(value: PriceComponent): any {
     return {
-      fee: self.fee != null ? FeeSerializer._toJsonObject(self.fee) : undefined,
-      id: PriceComponentIdSerializer._toJsonObject(self.id),
-      name: self.name,
+      ...extraProperties(value, ["fee", "id", "name", "productId"]),
+      fee: value.fee != null ? FeeSerializer.serialize(value.fee) : value.fee,
+      id: PriceComponentIdSerializer.serialize(value.id),
+      name: value.name,
       product_id:
-        self.productId != null
-          ? ProductIdSerializer._toJsonObject(self.productId)
-          : undefined,
+        value.productId != null
+          ? ProductIdSerializer.serialize(value.productId)
+          : value.productId,
     };
   },
 };

@@ -1,224 +1,435 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CreateCouponRequest {
-    @JsonProperty private String code;
-    @JsonProperty private String description;
-    @JsonProperty private CouponDiscount discount;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CreateCouponRequest {
+    @JsonProperty("code")
+    private String code;
+
+    @JsonProperty("description")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> description = JsonField.missing();
+
+    @JsonProperty("discount")
+    private CouponDiscount discount;
 
     @JsonProperty("expires_at")
-    private OffsetDateTime expiresAt;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<OffsetDateTime> expiresAt = JsonField.missing();
 
     @JsonProperty("plan_ids")
     private List<String> planIds;
 
     @JsonProperty("recurring_value")
-    private Integer recurringValue;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<Integer> recurringValue = JsonField.missing();
 
     @JsonProperty("redemption_limit")
-    private Integer redemptionLimit;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<Integer> redemptionLimit = JsonField.missing();
 
-    @JsonProperty private Boolean reusable;
+    @JsonProperty("reusable")
+    private Boolean reusable;
 
-    public CreateCouponRequest() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public CreateCouponRequest code(String code) {
-        this.code = code;
-        return this;
+    private CreateCouponRequest() {}
+
+    private CreateCouponRequest(Builder builder) {
+        this.code = builder.code;
+        this.description = builder.description;
+        this.discount = builder.discount;
+        this.expiresAt = builder.expiresAt;
+        this.planIds = Utils.copyList(builder.planIds);
+        this.recurringValue = builder.recurringValue;
+        this.redemptionLimit = builder.redemptionLimit;
+        this.reusable = builder.reusable;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get code
+     * A builder of {@code CreateCouponRequest}.
      *
-     * @return code
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public CreateCouponRequest description(String description) {
-        this.description = description;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get description
+     * A builder starting from this value.
      *
-     * @return description
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public CreateCouponRequest discount(CouponDiscount discount) {
-        this.discount = discount;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.code = code;
+        builder.description = description;
+        builder.discount = discount;
+        builder.expiresAt = expiresAt;
+        builder.planIds = Utils.mutableList(planIds);
+        builder.recurringValue = recurringValue;
+        builder.redemptionLimit = redemptionLimit;
+        builder.reusable = reusable;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get discount
+     * The {@code code} property.
      *
-     * @return discount
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public CouponDiscount getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(CouponDiscount discount) {
-        this.discount = discount;
-    }
-
-    public CreateCouponRequest expiresAt(OffsetDateTime expiresAt) {
-        this.expiresAt = expiresAt;
-        return this;
+    public String code() {
+        return Utils.required(code, "code");
     }
 
     /**
-     * Get expiresAt
+     * The {@code description} property.
      *
-     * @return expiresAt
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public OffsetDateTime getExpiresAt() {
-        return expiresAt;
+    public Optional<String> description() {
+        return description.asOptional();
     }
 
-    public void setExpiresAt(OffsetDateTime expiresAt) {
-        this.expiresAt = expiresAt;
+    /**
+     * The {@code discount} property.
+     *
+     * @return the value, never null
+     */
+    public CouponDiscount discount() {
+        return Utils.required(discount, "discount");
     }
 
-    public CreateCouponRequest planIds(List<String> planIds) {
-        this.planIds = planIds;
-        return this;
+    /**
+     * The {@code expires_at} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<OffsetDateTime> expiresAt() {
+        return expiresAt.asOptional();
     }
 
-    public CreateCouponRequest addPlanIdsItem(String planIdsItem) {
-        if (this.planIds == null) {
-            this.planIds = new ArrayList<>();
+    /**
+     * The {@code plan_ids} property.
+     *
+     * @return the value, empty when unset
+     */
+    public Optional<List<String>> planIds() {
+        return Optional.ofNullable(planIds);
+    }
+
+    /**
+     * The {@code recurring_value} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<Integer> recurringValue() {
+        return recurringValue.asOptional();
+    }
+
+    /**
+     * The {@code redemption_limit} property.
+     *
+     * @return the value, empty when unset or null
+     */
+    public Optional<Integer> redemptionLimit() {
+        return redemptionLimit.asOptional();
+    }
+
+    /**
+     * The {@code reusable} property.
+     *
+     * @return the value, empty when unset
+     */
+    public Optional<Boolean> reusable() {
+        return Optional.ofNullable(reusable);
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.planIds.add(planIdsItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CreateCouponRequest that = (CreateCouponRequest) o;
+        return Objects.equals(code, that.code)
+                && Objects.equals(description, that.description)
+                && Objects.equals(discount, that.discount)
+                && Objects.equals(expiresAt, that.expiresAt)
+                && Objects.equals(planIds, that.planIds)
+                && Objects.equals(recurringValue, that.recurringValue)
+                && Objects.equals(redemptionLimit, that.redemptionLimit)
+                && Objects.equals(reusable, that.reusable)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                code,
+                description,
+                discount,
+                expiresAt,
+                planIds,
+                recurringValue,
+                redemptionLimit,
+                reusable,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CreateCouponRequest{"
+                + "code="
+                + code
+                + ", description="
+                + description
+                + ", discount="
+                + discount
+                + ", expiresAt="
+                + expiresAt
+                + ", planIds="
+                + planIds
+                + ", recurringValue="
+                + recurringValue
+                + ", redemptionLimit="
+                + redemptionLimit
+                + ", reusable="
+                + reusable
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CreateCouponRequest}. */
+    public static final class Builder {
+        private String code;
+        private JsonField<String> description = JsonField.missing();
+        private CouponDiscount discount;
+        private JsonField<OffsetDateTime> expiresAt = JsonField.missing();
+        private List<String> planIds;
+        private JsonField<Integer> recurringValue = JsonField.missing();
+        private JsonField<Integer> redemptionLimit = JsonField.missing();
+        private Boolean reusable;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code code} property.
+         *
+         * @param code the value
+         * @return this builder
+         */
+        public Builder code(String code) {
+            this.code = code;
+            return this;
+        }
+
+        /**
+         * The {@code description} property.
+         *
+         * @param description the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder description(String description) {
+            this.description = JsonField.ofNullable(description);
+            return this;
+        }
+
+        /**
+         * The {@code discount} property.
+         *
+         * @param discount the value
+         * @return this builder
+         */
+        public Builder discount(CouponDiscount discount) {
+            this.discount = discount;
+            return this;
+        }
+
+        /**
+         * The {@code expires_at} property.
+         *
+         * @param expiresAt the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder expiresAt(OffsetDateTime expiresAt) {
+            this.expiresAt = JsonField.ofNullable(expiresAt);
+            return this;
+        }
+
+        /**
+         * The {@code plan_ids} property.
+         *
+         * @param planIds the value
+         * @return this builder
+         */
+        public Builder planIds(List<String> planIds) {
+            this.planIds = Utils.mutableList(planIds);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code plan_ids}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addPlanIdsItem(String item) {
+            if (this.planIds == null) {
+                this.planIds = new ArrayList<>();
+            }
+            this.planIds.add(item);
+            return this;
+        }
+
+        /**
+         * The {@code recurring_value} property.
+         *
+         * @param recurringValue the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder recurringValue(Integer recurringValue) {
+            this.recurringValue = JsonField.ofNullable(recurringValue);
+            return this;
+        }
+
+        /**
+         * The {@code redemption_limit} property.
+         *
+         * @param redemptionLimit the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder redemptionLimit(Integer redemptionLimit) {
+            this.redemptionLimit = JsonField.ofNullable(redemptionLimit);
+            return this;
+        }
+
+        /**
+         * The {@code reusable} property.
+         *
+         * @param reusable the value
+         * @return this builder
+         */
+        public Builder reusable(Boolean reusable) {
+            this.reusable = reusable;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CreateCouponRequest}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CreateCouponRequest build() {
+            Utils.checkRequired(code, "code");
+            Utils.checkRequired(discount, "discount");
+            return new CreateCouponRequest(this);
+        }
     }
 
     /**
-     * Get planIds
+     * Parse {@code json} as {@code CreateCouponRequest}.
      *
-     * @return planIds
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nullable
-    public List<String> getPlanIds() {
-        return planIds;
-    }
-
-    public void setPlanIds(List<String> planIds) {
-        this.planIds = planIds;
-    }
-
-    public CreateCouponRequest recurringValue(Integer recurringValue) {
-        this.recurringValue = recurringValue;
-        return this;
+    public static CreateCouponRequest fromJson(String json) {
+        return Utils.parse(json, CreateCouponRequest.class);
     }
 
     /**
-     * Get recurringValue
+     * This value as JSON.
      *
-     * @return recurringValue
+     * @return the JSON text
      */
-    @javax.annotation.Nullable
-    public Integer getRecurringValue() {
-        return recurringValue;
-    }
-
-    public void setRecurringValue(Integer recurringValue) {
-        this.recurringValue = recurringValue;
-    }
-
-    public CreateCouponRequest redemptionLimit(Integer redemptionLimit) {
-        this.redemptionLimit = redemptionLimit;
-        return this;
-    }
-
-    /**
-     * Get redemptionLimit
-     *
-     * @return redemptionLimit
-     */
-    @javax.annotation.Nullable
-    public Integer getRedemptionLimit() {
-        return redemptionLimit;
-    }
-
-    public void setRedemptionLimit(Integer redemptionLimit) {
-        this.redemptionLimit = redemptionLimit;
-    }
-
-    public CreateCouponRequest reusable(Boolean reusable) {
-        this.reusable = reusable;
-        return this;
-    }
-
-    /**
-     * Get reusable
-     *
-     * @return reusable
-     */
-    @javax.annotation.Nullable
-    public Boolean getReusable() {
-        return reusable;
-    }
-
-    public void setReusable(Boolean reusable) {
-        this.reusable = reusable;
-    }
-
-    /**
-     * Create an instance of CreateCouponRequest given an JSON string
-     *
-     * @param jsonString JSON string
-     * @return An instance of CreateCouponRequest
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     CreateCouponRequest
-     */
-    public static CreateCouponRequest fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CreateCouponRequest.class);
-    }
-
-    /**
-     * Convert an instance of CreateCouponRequest to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

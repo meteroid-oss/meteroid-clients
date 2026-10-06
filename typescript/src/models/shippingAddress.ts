@@ -1,28 +1,33 @@
 // this file is @generated
-import { type Address, AddressSerializer } from "./address";
+import { extraProperties } from "../json.js";
+import { type Address, AddressSerializer } from "./address.js";
 
 export interface ShippingAddress {
-  address?: Address | null;
-
+  address?: Address | null | undefined;
   sameAsBilling: boolean;
 }
 
+/** Converts `ShippingAddress` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ShippingAddressSerializer = {
-  _fromJsonObject(object: any): ShippingAddress {
+  parse(json: any): ShippingAddress {
     return {
+      ...extraProperties(json, ["address", "same_as_billing"]),
       address:
-        object["address"] != null
-          ? AddressSerializer._fromJsonObject(object["address"])
-          : undefined,
-      sameAsBilling: object["same_as_billing"],
+        json["address"] != null
+          ? AddressSerializer.parse(json["address"])
+          : json["address"],
+      sameAsBilling: json["same_as_billing"],
     };
   },
 
-  _toJsonObject(self: ShippingAddress): any {
+  serialize(value: ShippingAddress): any {
     return {
+      ...extraProperties(value, ["address", "sameAsBilling"]),
       address:
-        self.address != null ? AddressSerializer._toJsonObject(self.address) : undefined,
-      same_as_billing: self.sameAsBilling,
+        value.address != null
+          ? AddressSerializer.serialize(value.address)
+          : value.address,
+      same_as_billing: value.sameAsBilling,
     };
   },
 };

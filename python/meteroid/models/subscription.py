@@ -1,21 +1,27 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
-from datetime import datetime
+from datetime import date, datetime
 
 from ..serialization import BaseModel
-from .billing_period_enum import BillingPeriodEnum
-from .currency import Currency
-from .customer_id import CustomerId
-from .payment_methods_config import PaymentMethodsConfig
-from .plan_id import PlanId
-from .plan_version_id import PlanVersionId
-from .subscription_id import SubscriptionId
-from .subscription_status_enum import SubscriptionStatusEnum
+
+if t.TYPE_CHECKING:
+    from .billing_period_enum import BillingPeriodEnum
+    from .currency import Currency
+    from .customer_id import CustomerId
+    from .payment_methods_config import PaymentMethodsConfig
+    from .plan_id import PlanId
+    from .plan_version_id import PlanVersionId
+    from .subscription_id import SubscriptionId
+    from .subscription_status_enum import SubscriptionStatusEnum
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Subscription(BaseModel):
+    """The `Subscription` object."""
+
     auto_advance_invoices: bool
     """If false, invoices will stay in Draft until manually reviewed and finalized. Default to true."""
 
@@ -29,7 +35,7 @@ class Subscription(BaseModel):
 
     currency: Currency
 
-    current_period_start: str
+    current_period_start: date
     """Current billing period start date"""
 
     custom_properties: t.Any
@@ -58,33 +64,33 @@ class Subscription(BaseModel):
 
     plan_version_id: PlanVersionId
 
-    start_date: str
+    start_date: date
     """When the subscription contract starts (benefits apply from this date)"""
 
     status: SubscriptionStatusEnum
 
-    activated_at: t.Optional[datetime] = None
+    activated_at: datetime | None = None
     """When the subscription was activated (first payment or activation condition met)"""
 
-    billing_start_date: t.Optional[str] = None
+    billing_start_date: date | None = None
     """When billing started (after any trial period)"""
 
-    current_period_end: t.Optional[str] = None
+    current_period_end: date | None = None
     """Current billing period end date"""
 
-    customer_alias: t.Optional[str] = None
+    customer_alias: str | None = None
 
-    end_date: t.Optional[str] = None
+    end_date: date | None = None
     """When the subscription ends (if set)"""
 
-    invoice_memo: t.Optional[str] = None
+    invoice_memo: str | None = None
     """Default memo for invoices"""
 
-    payment_methods_config: t.Optional[PaymentMethodsConfig] = None
+    payment_methods_config: PaymentMethodsConfig | None = None
 
-    plan_description: t.Optional[str] = None
+    plan_description: str | None = None
 
-    purchase_order: t.Optional[str] = None
+    purchase_order: str | None = None
 
-    trial_duration: t.Optional[int] = None
+    trial_duration: int | None = None
     """Trial duration in days"""

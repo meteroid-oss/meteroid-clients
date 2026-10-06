@@ -1,8 +1,10 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class OAuthErrorCode(str, enum.Enum):
+class OAuthErrorCode(StrEnum):
     """OAuth 2.0 error codes as per RFC 6749"""
 
     INVALID_REQUEST = "invalid_request"
@@ -16,5 +18,17 @@ class OAuthErrorCode(str, enum.Enum):
     INVALID_CLIENT = "invalid_client"
     UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+OAuthErrorCodeLiteral: t.TypeAlias = t.Literal[
+    "invalid_request",
+    "unauthorized_client",
+    "access_denied",
+    "unsupported_response_type",
+    "invalid_scope",
+    "server_error",
+    "temporarily_unavailable",
+    "invalid_grant",
+    "invalid_client",
+    "unsupported_grant_type",
+]
+"""The values of :class:`OAuthErrorCode`, which arguments take as plain strings too."""

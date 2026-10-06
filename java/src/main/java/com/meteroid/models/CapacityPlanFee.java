@@ -1,116 +1,279 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/**
+ * Capacity-based fee with included committed usage and overage
+ *
+ * <p>Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CapacityPlanFee {
-    @JsonProperty private BillingPeriodEnum cadence;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CapacityPlanFee {
+    @JsonProperty("cadence")
+    private BillingPeriodEnum cadence;
 
     @JsonProperty("metric_id")
     private String metricId;
 
-    @JsonProperty private List<CapacityThreshold> thresholds;
+    @JsonProperty("thresholds")
+    private List<CapacityThreshold> thresholds;
 
-    public CapacityPlanFee() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public CapacityPlanFee cadence(BillingPeriodEnum cadence) {
-        this.cadence = cadence;
-        return this;
+    private CapacityPlanFee() {}
+
+    private CapacityPlanFee(Builder builder) {
+        this.cadence = builder.cadence;
+        this.metricId = builder.metricId;
+        this.thresholds = Utils.copyList(builder.thresholds);
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get cadence
+     * A builder of {@code CapacityPlanFee}.
      *
-     * @return cadence
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public BillingPeriodEnum getCadence() {
-        return cadence;
-    }
-
-    public void setCadence(BillingPeriodEnum cadence) {
-        this.cadence = cadence;
-    }
-
-    public CapacityPlanFee metricId(String metricId) {
-        this.metricId = metricId;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get metricId
+     * A builder starting from this value.
      *
-     * @return metricId
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getMetricId() {
-        return metricId;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.cadence = cadence;
+        builder.metricId = metricId;
+        builder.thresholds = Utils.mutableList(thresholds);
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
-    public void setMetricId(String metricId) {
-        this.metricId = metricId;
+    /**
+     * The {@code cadence} property.
+     *
+     * @return the value, never null
+     */
+    public BillingPeriodEnum cadence() {
+        return Utils.required(cadence, "cadence");
     }
 
-    public CapacityPlanFee thresholds(List<CapacityThreshold> thresholds) {
-        this.thresholds = thresholds;
-        return this;
+    /**
+     * The {@code metric_id} property.
+     *
+     * @return the value, never null
+     */
+    public String metricId() {
+        return Utils.required(metricId, "metric_id");
     }
 
-    public CapacityPlanFee addThresholdsItem(CapacityThreshold thresholdsItem) {
-        if (this.thresholds == null) {
-            this.thresholds = new ArrayList<>();
+    /**
+     * The {@code thresholds} property.
+     *
+     * @return the value, never null
+     */
+    public List<CapacityThreshold> thresholds() {
+        return Utils.required(thresholds, "thresholds");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        this.thresholds.add(thresholdsItem);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CapacityPlanFee that = (CapacityPlanFee) o;
+        return Objects.equals(cadence, that.cadence)
+                && Objects.equals(metricId, that.metricId)
+                && Objects.equals(thresholds, that.thresholds)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
 
-        return this;
+    @Override
+    public int hashCode() {
+        return Objects.hash(cadence, metricId, thresholds, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CapacityPlanFee{"
+                + "cadence="
+                + cadence
+                + ", metricId="
+                + metricId
+                + ", thresholds="
+                + thresholds
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CapacityPlanFee}. */
+    public static final class Builder {
+        private BillingPeriodEnum cadence;
+        private String metricId;
+        private List<CapacityThreshold> thresholds;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code cadence} property.
+         *
+         * @param cadence the value
+         * @return this builder
+         */
+        public Builder cadence(BillingPeriodEnum cadence) {
+            this.cadence = cadence;
+            return this;
+        }
+
+        /**
+         * The {@code metric_id} property.
+         *
+         * @param metricId the value
+         * @return this builder
+         */
+        public Builder metricId(String metricId) {
+            this.metricId = metricId;
+            return this;
+        }
+
+        /**
+         * The {@code thresholds} property.
+         *
+         * @param thresholds the value
+         * @return this builder
+         */
+        public Builder thresholds(List<CapacityThreshold> thresholds) {
+            this.thresholds = Utils.mutableList(thresholds);
+            return this;
+        }
+
+        /**
+         * Adds an item to {@code thresholds}.
+         *
+         * @param item the item
+         * @return this builder
+         */
+        public Builder addThresholdsItem(CapacityThreshold item) {
+            if (this.thresholds == null) {
+                this.thresholds = new ArrayList<>();
+            }
+            this.thresholds.add(item);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CapacityPlanFee}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CapacityPlanFee build() {
+            Utils.checkRequired(cadence, "cadence");
+            Utils.checkRequired(metricId, "metric_id");
+            Utils.checkRequired(thresholds, "thresholds");
+            return new CapacityPlanFee(this);
+        }
     }
 
     /**
-     * Get thresholds
+     * Parse {@code json} as {@code CapacityPlanFee}.
      *
-     * @return thresholds
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
      */
-    @javax.annotation.Nonnull
-    public List<CapacityThreshold> getThresholds() {
-        return thresholds;
-    }
-
-    public void setThresholds(List<CapacityThreshold> thresholds) {
-        this.thresholds = thresholds;
+    public static CapacityPlanFee fromJson(String json) {
+        return Utils.parse(json, CapacityPlanFee.class);
     }
 
     /**
-     * Create an instance of CapacityPlanFee given an JSON string
+     * This value as JSON.
      *
-     * @param jsonString JSON string
-     * @return An instance of CapacityPlanFee
-     * @throws JsonProcessingException if the JSON string is invalid with respect to CapacityPlanFee
+     * @return the JSON text
      */
-    public static CapacityPlanFee fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, CapacityPlanFee.class);
-    }
-
-    /**
-     * Convert an instance of CapacityPlanFee to an JSON string
-     *
-     * @return JSON string
-     */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String toJson() {
+        return Utils.json(this);
     }
 }

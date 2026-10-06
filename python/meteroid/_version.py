@@ -1,6 +1,6 @@
-"""Single source of truth for the SDK version.
+from importlib.metadata import PackageNotFoundError, version
 
-Kept in sync with ``.version`` / ``pyproject.toml`` by ``scripts/bump_version.js``.
-"""
-
-__version__ = "0.26.0"
+try:
+    __version__ = version("meteroid")
+except PackageNotFoundError:
+    __version__ = "0+uninstalled"

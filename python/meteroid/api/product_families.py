@@ -1,117 +1,273 @@
 # this file is @generated
+"""Product families API."""
+
+from __future__ import annotations
+
 import typing as t
 
+from .. import models as _models
 from ..models import (
     ProductFamily,
     ProductFamilyCreateRequest,
     ProductFamilyListResponse,
 )
-from .common import ApiBaseAsync, ApiBaseSync, decode_response, serialize_query_params
+from ..serialization import UNSET, Unset, to_json_value
+from ._response import async_to_raw_response_wrapper, to_raw_response_wrapper
+from .common import (
+    ApiBaseAsync,
+    ApiBaseSync,
+    ApiRequest,
+    Timeout,
+    decode_response,
+    serialize_query_params,
+)
 
 
-class ProductFamiliesAsync(ApiBaseAsync):
-    """product families API."""
+class AsyncProductFamilies(ApiBaseAsync):
+    """Product families API, for asyncio."""
 
-    async def list_product_families(
+    @property
+    def with_raw_response(self) -> AsyncProductFamiliesWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return AsyncProductFamiliesWithRawResponse(self)
+
+    async def list(
         self,
         *,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
-        search: t.Optional[str] = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        search: str | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductFamilyListResponse:
-        """:param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
+        """List product families
+
+        :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/product_families",
-            query_params=serialize_query_params(
-                {
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
-                    "search": search,
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/product_families",
+                query_params=serialize_query_params(
+                    {
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                        "search": search,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductFamilyListResponse)
 
-    async def create_product_family(
+    async def create(
         self,
-        product_family_create_request: ProductFamilyCreateRequest,
+        *,
+        name: str,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductFamily:
-        response = await self._request_asyncio(
-            method="post",
-            path="/api/v1/product_families",
-            json_body=product_family_create_request.to_dict(),
+        """Create product family"""
+        response = await self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/product_families",
+                json_body=to_json_value(
+                    ProductFamilyCreateRequest(
+                        name=name,
+                    ),
+                    ProductFamilyCreateRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductFamily)
 
-    async def get_product_family_by_id_or_alias(
+    async def retrieve(
         self,
         id_or_alias: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductFamily:
-        """Retrieve a single product family by ID or alias."""
-        response = await self._request_asyncio(
-            method="get",
-            path="/api/v1/product_families/{id_or_alias}",
-            path_params={
-                "id_or_alias": id_or_alias,
-            },
+        """Get product family
+
+        Retrieve a single product family by ID or alias."""
+        response = await self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/product_families/{id_or_alias}",
+                path_params={
+                    "id_or_alias": id_or_alias,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductFamily)
+
+
+class AsyncProductFamiliesWithRawResponse:
+    """The methods of :class:`AsyncProductFamilies`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: AsyncProductFamilies) -> None:
+        self.list = async_to_raw_response_wrapper(resource.list)
+        self.create = async_to_raw_response_wrapper(resource.create)
+        self.retrieve = async_to_raw_response_wrapper(resource.retrieve)
 
 
 class ProductFamilies(ApiBaseSync):
-    """product families API."""
+    """Product families API."""
 
-    def list_product_families(
+    @property
+    def with_raw_response(self) -> ProductFamiliesWithRawResponse:
+        """These methods, returning an :class:`APIResponse` with the status and headers."""
+        return ProductFamiliesWithRawResponse(self)
+
+    def list(
         self,
         *,
-        order_by: t.Optional[str] = None,
-        page: t.Optional[int] = None,
-        per_page: t.Optional[int] = None,
-        search: t.Optional[str] = None,
+        order_by: str | None = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        search: str | None = None,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductFamilyListResponse:
-        """:param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
+        """List product families
+
+        :param order_by: Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`.
         :param page: Page number (0-indexed)
         :param per_page: Number of items per page"""
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/product_families",
-            query_params=serialize_query_params(
-                {
-                    "order_by": order_by,
-                    "page": page,
-                    "per_page": per_page,
-                    "search": search,
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/product_families",
+                query_params=serialize_query_params(
+                    {
+                        "order_by": order_by,
+                        "page": page,
+                        "per_page": per_page,
+                        "search": search,
+                    },
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
                 },
-            ),
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductFamilyListResponse)
 
-    def create_product_family(
+    def create(
         self,
-        product_family_create_request: ProductFamilyCreateRequest,
+        *,
+        name: str,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductFamily:
-        response = self._request_sync(
-            method="post",
-            path="/api/v1/product_families",
-            json_body=product_family_create_request.to_dict(),
+        """Create product family"""
+        response = self._request(
+            ApiRequest(
+                method="post",
+                path="/api/v1/product_families",
+                json_body=to_json_value(
+                    ProductFamilyCreateRequest(
+                        name=name,
+                    ),
+                    ProductFamilyCreateRequest,
+                ),
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductFamily)
 
-    def get_product_family_by_id_or_alias(
+    def retrieve(
         self,
         id_or_alias: str,
+        *,
+        extra_headers: t.Mapping[str, str] | None = None,
+        extra_query: t.Mapping[str, object] | None = None,
+        extra_body: t.Mapping[str, object] | None = None,
+        timeout: Timeout | Unset = UNSET,
+        max_retries: int | None = None,
     ) -> ProductFamily:
-        """Retrieve a single product family by ID or alias."""
-        response = self._request_sync(
-            method="get",
-            path="/api/v1/product_families/{id_or_alias}",
-            path_params={
-                "id_or_alias": id_or_alias,
-            },
+        """Get product family
+
+        Retrieve a single product family by ID or alias."""
+        response = self._request(
+            ApiRequest(
+                method="get",
+                path="/api/v1/product_families/{id_or_alias}",
+                path_params={
+                    "id_or_alias": id_or_alias,
+                },
+                error_types={
+                    "default": _models.RestErrorResponse,
+                },
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                max_retries=max_retries,
+            )
         )
         return decode_response(response, ProductFamily)
+
+
+class ProductFamiliesWithRawResponse:
+    """The methods of :class:`ProductFamilies`, returning an :class:`APIResponse`."""
+
+    def __init__(self, resource: ProductFamilies) -> None:
+        self.list = to_raw_response_wrapper(resource.list)
+        self.create = to_raw_response_wrapper(resource.create)
+        self.retrieve = to_raw_response_wrapper(resource.retrieve)

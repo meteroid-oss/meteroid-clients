@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use super::{billable_metric_id::BillableMetricId, reset_period::ResetPeriod};
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MeteredEntitlementSpec {
     pub enabled: bool,
 
@@ -13,15 +14,22 @@ pub struct MeteredEntitlementSpec {
     pub metric_id: BillableMetricId,
 
     pub reset_period: ResetPeriod,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl MeteredEntitlementSpec {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(enabled: bool, metric_id: BillableMetricId, reset_period: ResetPeriod) -> Self {
         Self {
             enabled,
             limit: None,
             metric_id,
             reset_period,
+            extra: serde_json::Map::new(),
         }
     }
 }

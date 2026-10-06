@@ -1,13 +1,20 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class SubscriptionFeeBillingPeriodEnum(str, enum.Enum):
+class SubscriptionFeeBillingPeriodEnum(StrEnum):
+    """The values of `SubscriptionFeeBillingPeriodEnum`; others are kept as received."""
+
     ONE_TIME = "ONE_TIME"
     MONTHLY = "MONTHLY"
     QUARTERLY = "QUARTERLY"
     SEMIANNUAL = "SEMIANNUAL"
     ANNUAL = "ANNUAL"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+SubscriptionFeeBillingPeriodEnumLiteral: t.TypeAlias = t.Literal[
+    "ONE_TIME", "MONTHLY", "QUARTERLY", "SEMIANNUAL", "ANNUAL"
+]
+"""The values of :class:`SubscriptionFeeBillingPeriodEnum`, which arguments take as plain strings too."""

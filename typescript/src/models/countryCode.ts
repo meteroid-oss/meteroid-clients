@@ -2,12 +2,13 @@
 
 export type CountryCode = string;
 
+/** Converts `CountryCode` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CountryCodeSerializer = {
-  _fromJsonObject(object: any): CountryCode {
-    return object;
+  parse(json: any): CountryCode {
+    return json;
   },
 
-  _toJsonObject(self: CountryCode): any {
-    return self;
+  serialize(value: CountryCode): any {
+    return value;
   },
 };

@@ -7,7 +7,7 @@ use super::{
     shipping_address::ShippingAddress,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct CustomerCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alias: Option<String>,
@@ -80,9 +80,15 @@ pub struct CustomerCreateRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat_number: Option<String>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CustomerCreateRequest {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         currency: Currency,
         custom_taxes: Vec<CustomTaxRate>,
@@ -111,6 +117,7 @@ impl CustomerCreateRequest {
             preferred_locales: None,
             shipping_address: None,
             vat_number: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

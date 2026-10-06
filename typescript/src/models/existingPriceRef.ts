@@ -1,20 +1,24 @@
 // this file is @generated
-import { type PriceId, PriceIdSerializer } from "./priceId";
+import { extraProperties } from "../json.js";
+import { type PriceId, PriceIdSerializer } from "./priceId.js";
 
 export interface ExistingPriceRef {
   id: PriceId;
 }
 
+/** Converts `ExistingPriceRef` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ExistingPriceRefSerializer = {
-  _fromJsonObject(object: any): ExistingPriceRef {
+  parse(json: any): ExistingPriceRef {
     return {
-      id: PriceIdSerializer._fromJsonObject(object["id"]),
+      ...extraProperties(json, ["id"]),
+      id: PriceIdSerializer.parse(json["id"]),
     };
   },
 
-  _toJsonObject(self: ExistingPriceRef): any {
+  serialize(value: ExistingPriceRef): any {
     return {
-      id: PriceIdSerializer._toJsonObject(self.id),
+      ...extraProperties(value, ["id"]),
+      id: PriceIdSerializer.serialize(value.id),
     };
   },
 };

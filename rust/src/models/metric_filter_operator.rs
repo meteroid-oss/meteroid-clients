@@ -1,38 +1,63 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 /// Operator of a pre-aggregation [`MetricFilter`]. `EQUAL`/`NOT_EQUAL` are the single-value
 /// forms of `IN`/`NOT_IN`. Negation (`NOT_EQUAL`/`NOT_IN`) is presence-required: an event
 /// missing the property is excluded.
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum MetricFilterOperator {
-    #[default]
-    #[serde(rename = "EQUAL")]
     Equal,
-
-    #[serde(rename = "NOT_EQUAL")]
     NotEqual,
-
-    #[serde(rename = "IN")]
     In,
-
-    #[serde(rename = "NOT_IN")]
     NotIn,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for MetricFilterOperator {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl MetricFilterOperator {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Equal => "EQUAL",
             Self::NotEqual => "NOT_EQUAL",
             Self::In => "IN",
             Self::NotIn => "NOT_IN",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for MetricFilterOperator {
+    fn from(value: &str) -> Self {
+        match value {
+            "EQUAL" => Self::Equal,
+            "NOT_EQUAL" => Self::NotEqual,
+            "IN" => Self::In,
+            "NOT_IN" => Self::NotIn,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for MetricFilterOperator {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for MetricFilterOperator {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for MetricFilterOperator {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

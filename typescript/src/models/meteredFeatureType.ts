@@ -1,20 +1,24 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
 
 export interface MeteredFeatureType {
   metricId: BillableMetricId;
 }
 
+/** Converts `MeteredFeatureType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MeteredFeatureTypeSerializer = {
-  _fromJsonObject(object: any): MeteredFeatureType {
+  parse(json: any): MeteredFeatureType {
     return {
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
+      ...extraProperties(json, ["metric_id"]),
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
     };
   },
 
-  _toJsonObject(self: MeteredFeatureType): any {
+  serialize(value: MeteredFeatureType): any {
     return {
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
+      ...extraProperties(value, ["metricId"]),
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
     };
   },
 };

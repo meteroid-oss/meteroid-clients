@@ -1,39 +1,63 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum InvoicePaymentStatus {
-    #[default]
-    #[serde(rename = "UNPAID")]
     Unpaid,
-
-    #[serde(rename = "PARTIALLY_PAID")]
     PartiallyPaid,
-
-    #[serde(rename = "PAID")]
     Paid,
-
-    #[serde(rename = "ERRORED")]
     Errored,
-
-    #[serde(rename = "PROCESSING")]
     Processing,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for InvoicePaymentStatus {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl InvoicePaymentStatus {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Unpaid => "UNPAID",
             Self::PartiallyPaid => "PARTIALLY_PAID",
             Self::Paid => "PAID",
             Self::Errored => "ERRORED",
             Self::Processing => "PROCESSING",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for InvoicePaymentStatus {
+    fn from(value: &str) -> Self {
+        match value {
+            "UNPAID" => Self::Unpaid,
+            "PARTIALLY_PAID" => Self::PartiallyPaid,
+            "PAID" => Self::Paid,
+            "ERRORED" => Self::Errored,
+            "PROCESSING" => Self::Processing,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for InvoicePaymentStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for InvoicePaymentStatus {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for InvoicePaymentStatus {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

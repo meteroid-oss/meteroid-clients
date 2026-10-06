@@ -1,17 +1,21 @@
 // this file is @generated
 
-export enum CreditNoteStatus {
-  Draft = "DRAFT",
-  Finalized = "FINALIZED",
-  Voided = "VOIDED",
-}
+export const CreditNoteStatus = {
+  Draft: "DRAFT",
+  Finalized: "FINALIZED",
+  Voided: "VOIDED",
+} as const;
+export type CreditNoteStatus =
+  | (typeof CreditNoteStatus)[keyof typeof CreditNoteStatus]
+  | (string & {});
 
+/** Converts `CreditNoteStatus` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreditNoteStatusSerializer = {
-  _fromJsonObject(object: any): CreditNoteStatus {
-    return object;
+  parse(json: any): CreditNoteStatus {
+    return json;
   },
 
-  _toJsonObject(self: CreditNoteStatus): any {
-    return self;
+  serialize(value: CreditNoteStatus): any {
+    return value;
   },
 };

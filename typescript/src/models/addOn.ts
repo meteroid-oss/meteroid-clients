@@ -1,85 +1,101 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type AddOnId, AddOnIdSerializer } from "./addOnId";
-import { type Entitlement, EntitlementSerializer } from "./entitlement";
-import { type PriceId, PriceIdSerializer } from "./priceId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type AddOnId, AddOnIdSerializer } from "./addOnId.js";
+import { type Entitlement, EntitlementSerializer } from "./entitlement.js";
+import { type PriceId, PriceIdSerializer } from "./priceId.js";
 import {
   type ProductFeeTypeEnum,
   ProductFeeTypeEnumSerializer,
-} from "./productFeeTypeEnum";
-import { type ProductId, ProductIdSerializer } from "./productId";
+} from "./productFeeTypeEnum.js";
+import { type ProductId, ProductIdSerializer } from "./productId.js";
 
 export interface AddOn {
-  archivedAt?: Date | null;
-
+  archivedAt?: Date | null | undefined;
   createdAt: Date;
-
-  description?: string | null;
-
-  entitlements?: Entitlement[];
-
-  feeType?: ProductFeeTypeEnum | null;
-
+  description?: string | null | undefined;
+  entitlements?: Entitlement[] | undefined;
+  feeType?: ProductFeeTypeEnum | null | undefined;
   id: AddOnId;
-
-  maxInstancesPerSubscription?: number | null;
-
+  maxInstancesPerSubscription?: number | null | undefined;
   name: string;
-
   priceId: PriceId;
-
   productId: ProductId;
-
   selfServiceable: boolean;
 }
 
+/** Converts `AddOn` values from (`parse`) and to (`serialize`) their JSON form. */
 export const AddOnSerializer = {
-  _fromJsonObject(object: any): AddOn {
+  parse(json: any): AddOn {
     return {
+      ...extraProperties(json, [
+        "archived_at",
+        "created_at",
+        "description",
+        "entitlements",
+        "fee_type",
+        "id",
+        "max_instances_per_subscription",
+        "name",
+        "price_id",
+        "product_id",
+        "self_serviceable",
+      ]),
       archivedAt:
-        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
-      createdAt: parseDateTime(object["created_at"]),
-      description: object["description"],
+        json["archived_at"] != null
+          ? parseDateTime(json["archived_at"])
+          : json["archived_at"],
+      createdAt: parseDateTime(json["created_at"]),
+      description: json["description"],
       entitlements:
-        object["entitlements"] != null
-          ? object["entitlements"].map((item: any) =>
-              EntitlementSerializer._fromJsonObject(item)
-            )
+        json["entitlements"] != null
+          ? json["entitlements"].map((item: any) => EntitlementSerializer.parse(item))
           : undefined,
       feeType:
-        object["fee_type"] != null
-          ? ProductFeeTypeEnumSerializer._fromJsonObject(object["fee_type"])
-          : undefined,
-      id: AddOnIdSerializer._fromJsonObject(object["id"]),
-      maxInstancesPerSubscription: object["max_instances_per_subscription"],
-      name: object["name"],
-      priceId: PriceIdSerializer._fromJsonObject(object["price_id"]),
-      productId: ProductIdSerializer._fromJsonObject(object["product_id"]),
-      selfServiceable: object["self_serviceable"],
+        json["fee_type"] != null
+          ? ProductFeeTypeEnumSerializer.parse(json["fee_type"])
+          : json["fee_type"],
+      id: AddOnIdSerializer.parse(json["id"]),
+      maxInstancesPerSubscription: json["max_instances_per_subscription"],
+      name: json["name"],
+      priceId: PriceIdSerializer.parse(json["price_id"]),
+      productId: ProductIdSerializer.parse(json["product_id"]),
+      selfServiceable: json["self_serviceable"],
     };
   },
 
-  _toJsonObject(self: AddOn): any {
+  serialize(value: AddOn): any {
     return {
-      archived_at: self.archivedAt,
-      created_at: self.createdAt,
-      description: self.description,
+      ...extraProperties(value, [
+        "archivedAt",
+        "createdAt",
+        "description",
+        "entitlements",
+        "feeType",
+        "id",
+        "maxInstancesPerSubscription",
+        "name",
+        "priceId",
+        "productId",
+        "selfServiceable",
+      ]),
+      archived_at: value.archivedAt,
+      created_at: value.createdAt,
+      description: value.description,
       entitlements:
-        self.entitlements != null
-          ? self.entitlements.map((item: any) =>
-              EntitlementSerializer._toJsonObject(item)
-            )
+        value.entitlements != null
+          ? value.entitlements.map((item: any) => EntitlementSerializer.serialize(item))
           : undefined,
       fee_type:
-        self.feeType != null
-          ? ProductFeeTypeEnumSerializer._toJsonObject(self.feeType)
-          : undefined,
-      id: AddOnIdSerializer._toJsonObject(self.id),
-      max_instances_per_subscription: self.maxInstancesPerSubscription,
-      name: self.name,
-      price_id: PriceIdSerializer._toJsonObject(self.priceId),
-      product_id: ProductIdSerializer._toJsonObject(self.productId),
-      self_serviceable: self.selfServiceable,
+        value.feeType != null
+          ? ProductFeeTypeEnumSerializer.serialize(value.feeType)
+          : value.feeType,
+      id: AddOnIdSerializer.serialize(value.id),
+      max_instances_per_subscription: value.maxInstancesPerSubscription,
+      name: value.name,
+      price_id: PriceIdSerializer.serialize(value.priceId),
+      product_id: ProductIdSerializer.serialize(value.productId),
+      self_serviceable: value.selfServiceable,
     };
   },
 };

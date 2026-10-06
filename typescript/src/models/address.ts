@@ -1,46 +1,59 @@
 // this file is @generated
-import { type CountryCode, CountryCodeSerializer } from "./countryCode";
+import { extraProperties } from "../json.js";
+import { type CountryCode, CountryCodeSerializer } from "./countryCode.js";
 
 export interface Address {
-  city?: string | null;
-
-  country?: CountryCode | null;
-
-  line1?: string | null;
-
-  line2?: string | null;
-
-  state?: string | null;
-
-  zipCode?: string | null;
+  city?: string | null | undefined;
+  country?: CountryCode | null | undefined;
+  line1?: string | null | undefined;
+  line2?: string | null | undefined;
+  state?: string | null | undefined;
+  zipCode?: string | null | undefined;
 }
 
+/** Converts `Address` values from (`parse`) and to (`serialize`) their JSON form. */
 export const AddressSerializer = {
-  _fromJsonObject(object: any): Address {
+  parse(json: any): Address {
     return {
-      city: object["city"],
+      ...extraProperties(json, [
+        "city",
+        "country",
+        "line1",
+        "line2",
+        "state",
+        "zip_code",
+      ]),
+      city: json["city"],
       country:
-        object["country"] != null
-          ? CountryCodeSerializer._fromJsonObject(object["country"])
-          : undefined,
-      line1: object["line1"],
-      line2: object["line2"],
-      state: object["state"],
-      zipCode: object["zip_code"],
+        json["country"] != null
+          ? CountryCodeSerializer.parse(json["country"])
+          : json["country"],
+      line1: json["line1"],
+      line2: json["line2"],
+      state: json["state"],
+      zipCode: json["zip_code"],
     };
   },
 
-  _toJsonObject(self: Address): any {
+  serialize(value: Address): any {
     return {
-      city: self.city,
+      ...extraProperties(value, [
+        "city",
+        "country",
+        "line1",
+        "line2",
+        "state",
+        "zipCode",
+      ]),
+      city: value.city,
       country:
-        self.country != null
-          ? CountryCodeSerializer._toJsonObject(self.country)
-          : undefined,
-      line1: self.line1,
-      line2: self.line2,
-      state: self.state,
-      zip_code: self.zipCode,
+        value.country != null
+          ? CountryCodeSerializer.serialize(value.country)
+          : value.country,
+      line1: value.line1,
+      line2: value.line2,
+      state: value.state,
+      zip_code: value.zipCode,
     };
   },
 };

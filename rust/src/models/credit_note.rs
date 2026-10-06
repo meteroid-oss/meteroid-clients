@@ -8,15 +8,16 @@ use super::{
     subscription_id::SubscriptionId, tax_breakdown_item::TaxBreakdownItem,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CreditNote {
-    pub created_at: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 
     pub credit_note_number: String,
 
     pub credit_type: CreditType,
 
-    pub credited_amount_cents: i32,
+    pub credited_amount_cents: i64,
 
     pub currency: Currency,
 
@@ -26,7 +27,7 @@ pub struct CreditNote {
     pub customer_id: CustomerId,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub finalized_at: Option<String>,
+    pub finalized_at: Option<chrono::DateTime<chrono::Utc>>,
 
     pub id: CreditNoteId,
 
@@ -45,51 +46,57 @@ pub struct CreditNote {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 
-    pub refunded_amount_cents: i32,
+    pub refunded_amount_cents: i64,
 
     pub status: CreditNoteStatus,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<SubscriptionId>,
 
-    pub subtotal: i32,
+    pub subtotal: i64,
 
-    pub tax_amount: i32,
+    pub tax_amount: i64,
 
     pub tax_breakdown: Vec<TaxBreakdownItem>,
 
-    pub total: i32,
+    pub total: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<String>,
+    pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub voided_at: Option<String>,
+    pub voided_at: Option<chrono::DateTime<chrono::Utc>>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl CreditNote {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
-        created_at: String,
-        credit_note_number: String,
+        created_at: chrono::DateTime<chrono::Utc>,
+        credit_note_number: impl Into<String>,
         credit_type: CreditType,
-        credited_amount_cents: i32,
+        credited_amount_cents: i64,
         currency: Currency,
         custom_properties: serde_json::Value,
         customer_id: CustomerId,
         id: CreditNoteId,
         invoice_id: InvoiceId,
-        invoice_number: String,
+        invoice_number: impl Into<String>,
         line_items: Vec<InvoiceLineItem>,
-        refunded_amount_cents: i32,
+        refunded_amount_cents: i64,
         status: CreditNoteStatus,
-        subtotal: i32,
-        tax_amount: i32,
+        subtotal: i64,
+        tax_amount: i64,
         tax_breakdown: Vec<TaxBreakdownItem>,
-        total: i32,
+        total: i64,
     ) -> Self {
         Self {
             created_at,
-            credit_note_number,
+            credit_note_number: credit_note_number.into(),
             credit_type,
             credited_amount_cents,
             currency,
@@ -98,7 +105,7 @@ impl CreditNote {
             finalized_at: None,
             id,
             invoice_id,
-            invoice_number,
+            invoice_number: invoice_number.into(),
             line_items,
             memo: None,
             plan_version_id: None,
@@ -112,6 +119,7 @@ impl CreditNote {
             total,
             updated_at: None,
             voided_at: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

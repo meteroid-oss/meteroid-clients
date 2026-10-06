@@ -1,27 +1,33 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 from datetime import datetime
 
-from ..serialization import BaseModel
-from .coupon_discount import CouponDiscount
-from .plan_id import PlanId
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .coupon_discount import CouponDiscount
+    from .plan_id import PlanId
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CreateCouponRequest(BaseModel):
+    """The `CreateCouponRequest` object."""
+
     code: str
 
     discount: CouponDiscount
 
-    description: t.Optional[str] = None
+    description: str | None | Unset = UNSET
 
-    expires_at: t.Optional[datetime] = None
+    expires_at: datetime | None | Unset = UNSET
 
-    plan_ids: t.Optional[t.List[PlanId]] = None
+    plan_ids: list[PlanId] | None = None
 
-    recurring_value: t.Optional[int] = None
+    recurring_value: int | None | Unset = UNSET
 
-    redemption_limit: t.Optional[int] = None
+    redemption_limit: int | None | Unset = UNSET
 
-    reusable: t.Optional[bool] = None
+    reusable: bool | None = None

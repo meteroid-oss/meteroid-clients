@@ -1,32 +1,33 @@
 // this file is @generated
-import { type TermRate, TermRateSerializer } from "./termRate";
+import { extraProperties } from "../json.js";
+import { type TermRate, TermRateSerializer } from "./termRate.js";
 /** Slot-based fee (e.g., per-seat pricing) */
 export interface SlotPlanFee {
-  minimumCount?: number | null;
-
-  quota?: number | null;
-
+  minimumCount?: number | null | undefined;
+  quota?: number | null | undefined;
   rates: TermRate[];
-
   slotUnitName: string;
 }
 
+/** Converts `SlotPlanFee` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SlotPlanFeeSerializer = {
-  _fromJsonObject(object: any): SlotPlanFee {
+  parse(json: any): SlotPlanFee {
     return {
-      minimumCount: object["minimum_count"],
-      quota: object["quota"],
-      rates: object["rates"].map((item: any) => TermRateSerializer._fromJsonObject(item)),
-      slotUnitName: object["slot_unit_name"],
+      ...extraProperties(json, ["minimum_count", "quota", "rates", "slot_unit_name"]),
+      minimumCount: json["minimum_count"],
+      quota: json["quota"],
+      rates: json["rates"].map((item: any) => TermRateSerializer.parse(item)),
+      slotUnitName: json["slot_unit_name"],
     };
   },
 
-  _toJsonObject(self: SlotPlanFee): any {
+  serialize(value: SlotPlanFee): any {
     return {
-      minimum_count: self.minimumCount,
-      quota: self.quota,
-      rates: self.rates.map((item: any) => TermRateSerializer._toJsonObject(item)),
-      slot_unit_name: self.slotUnitName,
+      ...extraProperties(value, ["minimumCount", "quota", "rates", "slotUnitName"]),
+      minimum_count: value.minimumCount,
+      quota: value.quota,
+      rates: value.rates.map((item: any) => TermRateSerializer.serialize(item)),
+      slot_unit_name: value.slotUnitName,
     };
   },
 };

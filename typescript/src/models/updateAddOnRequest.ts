@@ -1,40 +1,54 @@
 // this file is @generated
-import { type PriceId, PriceIdSerializer } from "./priceId";
+import { extraProperties } from "../json.js";
+import { type PriceId, PriceIdSerializer } from "./priceId.js";
 
 export interface UpdateAddOnRequest {
-  description?: string | null;
-
-  maxInstancesPerSubscription?: number | null;
-
-  name?: string | null;
-
-  priceId?: PriceId | null;
-
-  selfServiceable?: boolean | null;
+  description?: string | null | undefined;
+  maxInstancesPerSubscription?: number | null | undefined;
+  name?: string | null | undefined;
+  priceId?: PriceId | null | undefined;
+  selfServiceable?: boolean | null | undefined;
 }
 
+/** Converts `UpdateAddOnRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UpdateAddOnRequestSerializer = {
-  _fromJsonObject(object: any): UpdateAddOnRequest {
+  parse(json: any): UpdateAddOnRequest {
     return {
-      description: object["description"],
-      maxInstancesPerSubscription: object["max_instances_per_subscription"],
-      name: object["name"],
+      ...extraProperties(json, [
+        "description",
+        "max_instances_per_subscription",
+        "name",
+        "price_id",
+        "self_serviceable",
+      ]),
+      description: json["description"],
+      maxInstancesPerSubscription: json["max_instances_per_subscription"],
+      name: json["name"],
       priceId:
-        object["price_id"] != null
-          ? PriceIdSerializer._fromJsonObject(object["price_id"])
-          : undefined,
-      selfServiceable: object["self_serviceable"],
+        json["price_id"] != null
+          ? PriceIdSerializer.parse(json["price_id"])
+          : json["price_id"],
+      selfServiceable: json["self_serviceable"],
     };
   },
 
-  _toJsonObject(self: UpdateAddOnRequest): any {
+  serialize(value: UpdateAddOnRequest): any {
     return {
-      description: self.description,
-      max_instances_per_subscription: self.maxInstancesPerSubscription,
-      name: self.name,
+      ...extraProperties(value, [
+        "description",
+        "maxInstancesPerSubscription",
+        "name",
+        "priceId",
+        "selfServiceable",
+      ]),
+      description: value.description,
+      max_instances_per_subscription: value.maxInstancesPerSubscription,
+      name: value.name,
       price_id:
-        self.priceId != null ? PriceIdSerializer._toJsonObject(self.priceId) : undefined,
-      self_serviceable: self.selfServiceable,
+        value.priceId != null
+          ? PriceIdSerializer.serialize(value.priceId)
+          : value.priceId,
+      self_serviceable: value.selfServiceable,
     };
   },
 };

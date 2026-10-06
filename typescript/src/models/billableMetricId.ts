@@ -2,12 +2,13 @@
 
 export type BillableMetricId = string;
 
+/** Converts `BillableMetricId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BillableMetricIdSerializer = {
-  _fromJsonObject(object: any): BillableMetricId {
-    return object;
+  parse(json: any): BillableMetricId {
+    return json;
   },
 
-  _toJsonObject(self: BillableMetricId): any {
-    return self;
+  serialize(value: BillableMetricId): any {
+    return value;
   },
 };

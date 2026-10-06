@@ -1,43 +1,42 @@
 // this file is @generated
-import { type SelectOption, SelectOptionSerializer } from "./selectOption";
+import { extraProperties } from "../json.js";
+import { type SelectOption, SelectOptionSerializer } from "./selectOption.js";
 /** Type-specific configuration. Only the fields relevant to `property_type` are interpreted. */
 export interface PropertyConfig {
-  max?: number | null;
-
+  max?: number | null | undefined;
   /** Maximum length for `TEXT`. */
-  maxLength?: number | null;
-
+  maxLength?: number | null | undefined;
   /** Inclusive numeric bounds for `NUMBER`. */
-  min?: number | null;
-
+  min?: number | null | undefined;
   /** Allowed choices for `SINGLE_SELECT` / `MULTI_SELECT`. */
-  options?: SelectOption[] | null;
+  options?: SelectOption[] | null | undefined;
 }
 
+/** Converts `PropertyConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PropertyConfigSerializer = {
-  _fromJsonObject(object: any): PropertyConfig {
+  parse(json: any): PropertyConfig {
     return {
-      max: object["max"],
-      maxLength: object["max_length"],
-      min: object["min"],
+      ...extraProperties(json, ["max", "max_length", "min", "options"]),
+      max: json["max"],
+      maxLength: json["max_length"],
+      min: json["min"],
       options:
-        object["options"] != null
-          ? object["options"].map((item: any) =>
-              SelectOptionSerializer._fromJsonObject(item)
-            )
-          : undefined,
+        json["options"] != null
+          ? json["options"].map((item: any) => SelectOptionSerializer.parse(item))
+          : json["options"],
     };
   },
 
-  _toJsonObject(self: PropertyConfig): any {
+  serialize(value: PropertyConfig): any {
     return {
-      max: self.max,
-      max_length: self.maxLength,
-      min: self.min,
+      ...extraProperties(value, ["max", "maxLength", "min", "options"]),
+      max: value.max,
+      max_length: value.maxLength,
+      min: value.min,
       options:
-        self.options != null
-          ? self.options.map((item: any) => SelectOptionSerializer._toJsonObject(item))
-          : undefined,
+        value.options != null
+          ? value.options.map((item: any) => SelectOptionSerializer.serialize(item))
+          : value.options,
     };
   },
 };

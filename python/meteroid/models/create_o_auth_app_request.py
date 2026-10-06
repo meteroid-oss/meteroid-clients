@@ -1,14 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
-from ..serialization import BaseModel
+from ..serialization import UNSET, BaseModel, Unset
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CreateOAuthAppRequest(BaseModel):
+    """The `CreateOAuthAppRequest` object."""
+
     name: str
 
-    redirect_uris: t.List[str]
+    redirect_uris: list[str]
 
-    scopes: t.Optional[t.List[str]] = None
+    scopes: list[str] | None | Unset = UNSET

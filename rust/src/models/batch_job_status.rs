@@ -1,38 +1,27 @@
 // this file is @generated
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
 pub enum BatchJobStatus {
-    #[default]
-    #[serde(rename = "PENDING")]
     Pending,
-
-    #[serde(rename = "CHUNKING")]
     Chunking,
-
-    #[serde(rename = "PROCESSING")]
     Processing,
-
-    #[serde(rename = "COMPLETED")]
     Completed,
-
-    #[serde(rename = "COMPLETED_WITH_ERRORS")]
     CompletedWithErrors,
-
-    #[serde(rename = "FAILED")]
     Failed,
-
-    #[serde(rename = "CANCELLED")]
     Cancelled,
+    /// A value this version of the SDK does not know yet.
+    Unknown(String),
 }
 
-impl fmt::Display for BatchJobStatus {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
+impl BatchJobStatus {
+    /// The value as sent on the wire.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Pending => "PENDING",
             Self::Chunking => "CHUNKING",
             Self::Processing => "PROCESSING",
@@ -40,8 +29,41 @@ impl fmt::Display for BatchJobStatus {
             Self::CompletedWithErrors => "COMPLETED_WITH_ERRORS",
             Self::Failed => "FAILED",
             Self::Cancelled => "CANCELLED",
-        };
-        f.write_str(value)
+            Self::Unknown(value) => value,
+        }
+    }
+}
+
+impl From<&str> for BatchJobStatus {
+    fn from(value: &str) -> Self {
+        match value {
+            "PENDING" => Self::Pending,
+            "CHUNKING" => Self::Chunking,
+            "PROCESSING" => Self::Processing,
+            "COMPLETED" => Self::Completed,
+            "COMPLETED_WITH_ERRORS" => Self::CompletedWithErrors,
+            "FAILED" => Self::Failed,
+            "CANCELLED" => Self::Cancelled,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+}
+
+impl fmt::Display for BatchJobStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl Serialize for BatchJobStatus {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for BatchJobStatus {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        String::deserialize(deserializer).map(|value| Self::from(value.as_str()))
     }
 }
 

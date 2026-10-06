@@ -1,20 +1,24 @@
 // this file is @generated
-import { type CheckoutSession, CheckoutSessionSerializer } from "./checkoutSession";
+import { extraProperties } from "../json.js";
+import { type CheckoutSession, CheckoutSessionSerializer } from "./checkoutSession.js";
 
 export interface GetCheckoutSessionResponse {
   session: CheckoutSession;
 }
 
+/** Converts `GetCheckoutSessionResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const GetCheckoutSessionResponseSerializer = {
-  _fromJsonObject(object: any): GetCheckoutSessionResponse {
+  parse(json: any): GetCheckoutSessionResponse {
     return {
-      session: CheckoutSessionSerializer._fromJsonObject(object["session"]),
+      ...extraProperties(json, ["session"]),
+      session: CheckoutSessionSerializer.parse(json["session"]),
     };
   },
 
-  _toJsonObject(self: GetCheckoutSessionResponse): any {
+  serialize(value: GetCheckoutSessionResponse): any {
     return {
-      session: CheckoutSessionSerializer._toJsonObject(self.session),
+      ...extraProperties(value, ["session"]),
+      session: CheckoutSessionSerializer.serialize(value.session),
     };
   },
 };

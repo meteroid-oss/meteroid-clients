@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Component names — matched against `ReplacePlanRequest::components[].name`. */
 export interface ComponentsScope {
   componentNames: string[];
 }
 
+/** Converts `ComponentsScope` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ComponentsScopeSerializer = {
-  _fromJsonObject(object: any): ComponentsScope {
+  parse(json: any): ComponentsScope {
     return {
-      componentNames: object["component_names"],
+      ...extraProperties(json, ["component_names"]),
+      componentNames: json["component_names"],
     };
   },
 
-  _toJsonObject(self: ComponentsScope): any {
+  serialize(value: ComponentsScope): any {
     return {
-      component_names: self.componentNames,
+      ...extraProperties(value, ["componentNames"]),
+      component_names: value.componentNames,
     };
   },
 };

@@ -2,12 +2,13 @@
 
 export type ProductFamilyId = string;
 
+/** Converts `ProductFamilyId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductFamilyIdSerializer = {
-  _fromJsonObject(object: any): ProductFamilyId {
-    return object;
+  parse(json: any): ProductFamilyId {
+    return json;
   },
 
-  _toJsonObject(self: ProductFamilyId): any {
-    return self;
+  serialize(value: ProductFamilyId): any {
+    return value;
   },
 };

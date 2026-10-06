@@ -1,16 +1,20 @@
 // this file is @generated
 /** Company vs. individual (B2C). Defaults to `COMPANY`. */
-export enum CustomerType {
-  Company = "COMPANY",
-  Individual = "INDIVIDUAL",
-}
+export const CustomerType = {
+  Company: "COMPANY",
+  Individual: "INDIVIDUAL",
+} as const;
+export type CustomerType =
+  | (typeof CustomerType)[keyof typeof CustomerType]
+  | (string & {});
 
+/** Converts `CustomerType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CustomerTypeSerializer = {
-  _fromJsonObject(object: any): CustomerType {
-    return object;
+  parse(json: any): CustomerType {
+    return json;
   },
 
-  _toJsonObject(self: CustomerType): any {
-    return self;
+  serialize(value: CustomerType): any {
+    return value;
   },
 };

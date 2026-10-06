@@ -1,18 +1,20 @@
 // this file is @generated
 
-export enum InvoiceType {
-  Recurring = "RECURRING",
-  OneOff = "ONE_OFF",
-  Adjustment = "ADJUSTMENT",
-  UsageThreshold = "USAGE_THRESHOLD",
-}
+export const InvoiceType = {
+  Recurring: "RECURRING",
+  OneOff: "ONE_OFF",
+  Adjustment: "ADJUSTMENT",
+  UsageThreshold: "USAGE_THRESHOLD",
+} as const;
+export type InvoiceType = (typeof InvoiceType)[keyof typeof InvoiceType] | (string & {});
 
+/** Converts `InvoiceType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const InvoiceTypeSerializer = {
-  _fromJsonObject(object: any): InvoiceType {
-    return object;
+  parse(json: any): InvoiceType {
+    return json;
   },
 
-  _toJsonObject(self: InvoiceType): any {
-    return self;
+  serialize(value: InvoiceType): any {
+    return value;
   },
 };

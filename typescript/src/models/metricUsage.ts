@@ -1,41 +1,53 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
-import { type GroupedUsage, GroupedUsageSerializer } from "./groupedUsage";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
+import { type GroupedUsage, GroupedUsageSerializer } from "./groupedUsage.js";
 
 export interface MetricUsage {
   groupedUsage: GroupedUsage[];
-
   metricCode: string;
-
   metricId: BillableMetricId;
-
   metricName: string;
-
   totalValue: string;
 }
 
+/** Converts `MetricUsage` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricUsageSerializer = {
-  _fromJsonObject(object: any): MetricUsage {
+  parse(json: any): MetricUsage {
     return {
-      groupedUsage: object["grouped_usage"].map((item: any) =>
-        GroupedUsageSerializer._fromJsonObject(item)
+      ...extraProperties(json, [
+        "grouped_usage",
+        "metric_code",
+        "metric_id",
+        "metric_name",
+        "total_value",
+      ]),
+      groupedUsage: json["grouped_usage"].map((item: any) =>
+        GroupedUsageSerializer.parse(item)
       ),
-      metricCode: object["metric_code"],
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
-      metricName: object["metric_name"],
-      totalValue: object["total_value"],
+      metricCode: json["metric_code"],
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
+      metricName: json["metric_name"],
+      totalValue: json["total_value"],
     };
   },
 
-  _toJsonObject(self: MetricUsage): any {
+  serialize(value: MetricUsage): any {
     return {
-      grouped_usage: self.groupedUsage.map((item: any) =>
-        GroupedUsageSerializer._toJsonObject(item)
+      ...extraProperties(value, [
+        "groupedUsage",
+        "metricCode",
+        "metricId",
+        "metricName",
+        "totalValue",
+      ]),
+      grouped_usage: value.groupedUsage.map((item: any) =>
+        GroupedUsageSerializer.serialize(item)
       ),
-      metric_code: self.metricCode,
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
-      metric_name: self.metricName,
-      total_value: self.totalValue,
+      metric_code: value.metricCode,
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
+      metric_name: value.metricName,
+      total_value: value.totalValue,
     };
   },
 };

@@ -1,4 +1,5 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /**
  * Only lines for the listed products count. A product is the identity shared by plan
  * components, overrides and ad-hoc extras, so a subscription's billed set is matched uniformly.
@@ -7,16 +8,19 @@ export interface ProductsScope {
   productIds: string[];
 }
 
+/** Converts `ProductsScope` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ProductsScopeSerializer = {
-  _fromJsonObject(object: any): ProductsScope {
+  parse(json: any): ProductsScope {
     return {
-      productIds: object["product_ids"],
+      ...extraProperties(json, ["product_ids"]),
+      productIds: json["product_ids"],
     };
   },
 
-  _toJsonObject(self: ProductsScope): any {
+  serialize(value: ProductsScope): any {
     return {
-      product_ids: self.productIds,
+      ...extraProperties(value, ["productIds"]),
+      product_ids: value.productIds,
     };
   },
 };

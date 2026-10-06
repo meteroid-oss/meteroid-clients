@@ -1,24 +1,27 @@
 // this file is @generated
-import { type OAuthApp, OAuthAppSerializer } from "./oAuthApp";
+import { extraProperties } from "../json.js";
+import { type OAuthApp, OAuthAppSerializer } from "./oAuthApp.js";
 /** Result of creating an OAuth app (includes the plain-text secret) */
 export interface OAuthAppWithSecret {
   app: OAuthApp;
-
   clientSecret: string;
 }
 
+/** Converts `OAuthAppWithSecret` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OAuthAppWithSecretSerializer = {
-  _fromJsonObject(object: any): OAuthAppWithSecret {
+  parse(json: any): OAuthAppWithSecret {
     return {
-      app: OAuthAppSerializer._fromJsonObject(object["app"]),
-      clientSecret: object["client_secret"],
+      ...extraProperties(json, ["app", "client_secret"]),
+      app: OAuthAppSerializer.parse(json["app"]),
+      clientSecret: json["client_secret"],
     };
   },
 
-  _toJsonObject(self: OAuthAppWithSecret): any {
+  serialize(value: OAuthAppWithSecret): any {
     return {
-      app: OAuthAppSerializer._toJsonObject(self.app),
-      client_secret: self.clientSecret,
+      ...extraProperties(value, ["app", "clientSecret"]),
+      app: OAuthAppSerializer.serialize(value.app),
+      client_secret: value.clientSecret,
     };
   },
 };

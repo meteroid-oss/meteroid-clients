@@ -1,146 +1,321 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class SubscriptionComponent {
-    @JsonProperty private SubscriptionFee fee;
-    @JsonProperty private String name;
-    @JsonProperty private SubscriptionFeeBillingPeriodEnum period;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class SubscriptionComponent {
+    @JsonProperty("fee")
+    private SubscriptionFee fee;
+
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("period")
+    private SubscriptionFeeBillingPeriodEnum period;
 
     @JsonProperty("price_component_id")
-    private String priceComponentId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> priceComponentId = JsonField.missing();
 
     @JsonProperty("product_id")
-    private String productId;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> productId = JsonField.missing();
 
-    public SubscriptionComponent() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public SubscriptionComponent fee(SubscriptionFee fee) {
-        this.fee = fee;
-        return this;
+    private SubscriptionComponent() {}
+
+    private SubscriptionComponent(Builder builder) {
+        this.fee = builder.fee;
+        this.name = builder.name;
+        this.period = builder.period;
+        this.priceComponentId = builder.priceComponentId;
+        this.productId = builder.productId;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get fee
+     * A builder of {@code SubscriptionComponent}.
      *
-     * @return fee
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public SubscriptionFee getFee() {
-        return fee;
-    }
-
-    public void setFee(SubscriptionFee fee) {
-        this.fee = fee;
-    }
-
-    public SubscriptionComponent name(String name) {
-        this.name = name;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get name
+     * A builder starting from this value.
      *
-     * @return name
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public SubscriptionComponent period(SubscriptionFeeBillingPeriodEnum period) {
-        this.period = period;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.fee = fee;
+        builder.name = name;
+        builder.period = period;
+        builder.priceComponentId = priceComponentId;
+        builder.productId = productId;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get period
+     * The {@code fee} property.
      *
-     * @return period
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public SubscriptionFeeBillingPeriodEnum getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(SubscriptionFeeBillingPeriodEnum period) {
-        this.period = period;
-    }
-
-    public SubscriptionComponent priceComponentId(String priceComponentId) {
-        this.priceComponentId = priceComponentId;
-        return this;
+    public SubscriptionFee fee() {
+        return Utils.required(fee, "fee");
     }
 
     /**
-     * Get priceComponentId
+     * The {@code name} property.
      *
-     * @return priceComponentId
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getPriceComponentId() {
-        return priceComponentId;
-    }
-
-    public void setPriceComponentId(String priceComponentId) {
-        this.priceComponentId = priceComponentId;
-    }
-
-    public SubscriptionComponent productId(String productId) {
-        this.productId = productId;
-        return this;
+    public String name() {
+        return Utils.required(name, "name");
     }
 
     /**
-     * Get productId
+     * The {@code period} property.
      *
-     * @return productId
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public SubscriptionFeeBillingPeriodEnum period() {
+        return Utils.required(period, "period");
     }
 
     /**
-     * Create an instance of SubscriptionComponent given an JSON string
+     * The {@code price_component_id} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of SubscriptionComponent
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     SubscriptionComponent
+     * @return the value, empty when unset or null
      */
-    public static SubscriptionComponent fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, SubscriptionComponent.class);
+    public Optional<String> priceComponentId() {
+        return priceComponentId.asOptional();
     }
 
     /**
-     * Convert an instance of SubscriptionComponent to an JSON string
+     * The {@code product_id} property.
      *
-     * @return JSON string
+     * @return the value, empty when unset or null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Optional<String> productId() {
+        return productId.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SubscriptionComponent that = (SubscriptionComponent) o;
+        return Objects.equals(fee, that.fee)
+                && Objects.equals(name, that.name)
+                && Objects.equals(period, that.period)
+                && Objects.equals(priceComponentId, that.priceComponentId)
+                && Objects.equals(productId, that.productId)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fee, name, period, priceComponentId, productId, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "SubscriptionComponent{"
+                + "fee="
+                + fee
+                + ", name="
+                + name
+                + ", period="
+                + period
+                + ", priceComponentId="
+                + priceComponentId
+                + ", productId="
+                + productId
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link SubscriptionComponent}. */
+    public static final class Builder {
+        private SubscriptionFee fee;
+        private String name;
+        private SubscriptionFeeBillingPeriodEnum period;
+        private JsonField<String> priceComponentId = JsonField.missing();
+        private JsonField<String> productId = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code fee} property.
+         *
+         * @param fee the value
+         * @return this builder
+         */
+        public Builder fee(SubscriptionFee fee) {
+            this.fee = fee;
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code period} property.
+         *
+         * @param period the value
+         * @return this builder
+         */
+        public Builder period(SubscriptionFeeBillingPeriodEnum period) {
+            this.period = period;
+            return this;
+        }
+
+        /**
+         * The {@code price_component_id} property.
+         *
+         * @param priceComponentId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder priceComponentId(String priceComponentId) {
+            this.priceComponentId = JsonField.ofNullable(priceComponentId);
+            return this;
+        }
+
+        /**
+         * The {@code product_id} property.
+         *
+         * @param productId the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder productId(String productId) {
+            this.productId = JsonField.ofNullable(productId);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code SubscriptionComponent}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public SubscriptionComponent build() {
+            Utils.checkRequired(fee, "fee");
+            Utils.checkRequired(name, "name");
+            Utils.checkRequired(period, "period");
+            return new SubscriptionComponent(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code SubscriptionComponent}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static SubscriptionComponent fromJson(String json) {
+        return Utils.parse(json, SubscriptionComponent.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

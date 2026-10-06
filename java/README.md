@@ -1,299 +1,137 @@
 # Meteroid Java SDK
 
-Official Java SDK for the [Meteroid](https://meteroid.com) billing platform.
+Meteroid billing API client
 
-## Requirements
-
-- Java 11 or later
-
-## Installation
-
-### Gradle
-
-```groovy
-dependencies {
-    implementation 'com.meteroid:meteroid-java:0.26.0'
-}
+```kotlin
+implementation("com.meteroid:meteroid:0.26.0")
 ```
-
-### Maven
 
 ```xml
 <dependency>
-    <groupId>com.meteroid</groupId>
-    <artifactId>meteroid-java</artifactId>
-    <version>0.26.0</version>
+  <groupId>com.meteroid</groupId>
+  <artifactId>meteroid</artifactId>
+  <version>0.26.0</version>
 </dependency>
 ```
 
-## Quick Start
-
-```java
-import com.meteroid.Meteroid;
-import com.meteroid.MeteroidOptions;
-import com.meteroid.models.*;
-
-// Initialize the client
-Meteroid meteroid = new Meteroid("your-api-key");
-
-// Or with custom options
-MeteroidOptions options = new MeteroidOptions();
-options.setServerUrl("https://api.meteroid.com");
-Meteroid meteroid = new Meteroid("your-api-key", options);
-```
+Requires Java 11 or later. Every method of the API is listed in [api.md](api.md).
 
 ## Usage
 
-### Customers
-
 ```java
-// List customers
-CustomerListResponse customers = meteroid.getCustomers().listCustomers();
+import com.meteroid.Meteroid;
 
-// List with options
-CustomersListCustomersOptions options = new CustomersListCustomersOptions();
-options.page = 1;
-options.perPage = 20;
-options.search = "acme";
-CustomerListResponse customers = meteroid.getCustomers().listCustomers(options);
-
-// Create a customer
-CustomerCreateRequest request = new CustomerCreateRequest()
-    .name("Acme Corp")
-    .alias("acme-corp")
-    .billingEmail("billing@acme.com");
-Customer customer = meteroid.getCustomers().createCustomer(request);
-
-// Get a customer by ID or alias
-Customer customer = meteroid.getCustomers().getCustomer("acme-corp");
-
-// Update a customer
-CustomerUpdateRequest updateRequest = new CustomerUpdateRequest()
-    .name("Acme Corporation");
-Customer updated = meteroid.getCustomers().updateCustomer("acme-corp", updateRequest);
-
-// Archive a customer (all subscriptions must be terminated first)
-meteroid.getCustomers().archiveCustomer("acme-corp");
-
-// Generate a customer portal token
-CustomerPortalTokenResponse token = meteroid.getCustomers().createPortalToken("acme-corp");
-```
-
-### Subscriptions
-
-```java
-// List subscriptions
-SubscriptionListResponse subscriptions = meteroid.getSubscriptions().listSubscriptions();
-
-// Create a subscription
-SubscriptionCreateRequest request = new SubscriptionCreateRequest()
-    .customerIdOrAlias("cust_123")
-    .planId("plan_456")
-    .billingDayAnchor(1);
-SubscriptionDetails subscription = meteroid.getSubscriptions().createSubscription(request);
-
-// Get subscription details
-SubscriptionDetails details = meteroid.getSubscriptions().subscriptionDetails("sub_789");
-
-// Cancel a subscription
-CancelSubscriptionRequest cancelRequest = new CancelSubscriptionRequest()
-    .reason("Customer requested");
-meteroid.getSubscriptions().cancelSubscription("sub_789", cancelRequest);
-```
-
-### Plans
-
-```java
-// List plans
-PlanListResponse plans = meteroid.getPlans().listPlans();
-
-// Get a plan by ID or alias
-Plan plan = meteroid.getPlans().getPlanDetails("plan_123");
-```
-
-### Invoices
-
-```java
-// List invoices
-InvoiceListResponse invoices = meteroid.getInvoices().listInvoices();
-
-// Get an invoice
-Invoice invoice = meteroid.getInvoices().getInvoiceById("inv_123");
-
-// Download invoice as PDF
-byte[] pdfBytes = meteroid.getInvoices().downloadInvoicePdf("inv_123");
-```
-
-### Product Families
-
-```java
-// List product families
-ProductFamilyListResponse families = meteroid.getProductFamilies().listProductFamilies();
-
-// Create a product family
-ProductFamilyCreateRequest request = new ProductFamilyCreateRequest()
-    .name("SaaS Products");
-ProductFamily family = meteroid.getProductFamilies().createProductFamily(request);
-```
-
-### Events (Usage Tracking)
-
-```java
-// Ingest usage events
-IngestEventsRequest request = new IngestEventsRequest()
-    .events(Arrays.asList(
-        new Event()
-            .code("api_call")
-            .customerId("cust_123")
-            .timestamp(Instant.now().toString())
-            .properties(Map.of("endpoint", "/users", "method", "GET"))
-    ));
-IngestEventsResponse response = meteroid.getEvents().ingestEvents(request);
-```
-
-### Checkout Sessions
-
-```java
-// Create a checkout session
-CreateCheckoutSessionRequest request = new CreateCheckoutSessionRequest()
-    .customerId("cust_123")
-    .planVersionId("pv_456");
-CreateCheckoutSessionResponse session = meteroid.getCheckoutSessions().createCheckoutSession(request);
-
-// Get a checkout session
-GetCheckoutSessionResponse session = meteroid.getCheckoutSessions().getCheckoutSession("cs_789");
-
-// Cancel a checkout session
-meteroid.getCheckoutSessions().cancelCheckoutSession("cs_789");
-```
-
-## Webhook Verification
-
-The SDK provides utilities for verifying webhook signatures using the [Standard Webhooks](https://www.standardwebhooks.com/) specification. Meteroid uses Svix for webhook delivery, so the SDK supports both `svix-*` headers and `webhook-*` headers.
-
-**Supported headers:**
-
-- `webhook-id`, `webhook-timestamp`, `webhook-signature` (Standard Webhooks)
-- `svix-id`, `svix-timestamp`, `svix-signature` (Svix-branded), used only when the matching `webhook-*` header is absent
-
-```java
-import com.meteroid.Webhook;
-import com.standardwebhooks.exceptions.WebhookVerificationException;
-
-// Initialize with your webhook signing secret
-Webhook webhook = new Webhook("whsec_your_secret_here");
-
-// In your webhook endpoint handler:
-try {
-    // payload is the raw request body as a string
-    // headers are the HTTP headers from the request
-    webhook.verify(payload, headers);
-
-    // Signature is valid, process the webhook
-    // ...
-} catch (WebhookVerificationException e) {
-    // Invalid signature - reject the request
-    return ResponseEntity.status(401).body("Invalid signature");
+try (Meteroid client = Meteroid.fromEnv()) {
+    var addOn = client.addOns().retrieve("addon_id");
+    System.out.println(addOn);
 }
 ```
 
-### Using with Spring Boot
+The client can also be configured in code:
 
 ```java
-@RestController
-public class WebhookController {
-    private final Webhook webhook = new Webhook("whsec_your_secret");
+import com.meteroid.MeteroidOptions;
 
-    @PostMapping("/webhooks/meteroid")
-    public ResponseEntity<String> handleWebhook(
-            @RequestBody String payload,
-            @RequestHeader Map<String, String> headerMap) {
+Meteroid client = new Meteroid(
+        MeteroidOptions.builder()
+                .apiKey("your-api-key")
+                .baseUrl("https://api.example.com")
+                .timeout(Duration.ofSeconds(20))
+                .maxRetries(3)
+                .build());
+```
 
-        try {
-            // Convert headers to the expected format
-            Map<String, List<String>> headers = new HashMap<>();
-            headerMap.forEach((k, v) -> headers.put(k.toLowerCase(), List.of(v)));
+Without an API key, the client reads `METEROID_API_KEY`, and `METEROID_BASE_URL`
+overrides the server of the API, `Meteroid.DEFAULT_BASE_URL`; explicit settings win. An API
+without a server has no default: the client then throws an `IllegalStateException` until one of
+them sets the base URL. The client is `AutoCloseable`: closing it
+releases its threads and connections. `httpClient(OkHttpClient)` shares your own OkHttp client
+(left open on close), and `addInterceptor` wraps every attempt for logging, caching or signing.
+Requests are logged through `System.Logger` (`com.meteroid`) at `DEBUG`, or at `INFO` with
+`debug(true)`.
 
-            webhook.verify(payload, headers);
+Required path, query and header parameters are method arguments; optional ones go in an
+immutable `...Options` built with `builder()`. Every method has overloads taking a
+`RequestOptions` last, for the headers, timeout, retries or idempotency key of one call:
 
-            // Process the webhook event
-            JsonNode event = objectMapper.readTree(payload);
-            String eventType = event.get("type").asText();
+```java
+var addOn = client.addOns().retrieve("addon_id", RequestOptions.builder().timeout(Duration.ofSeconds(5)).maxRetries(0).build());
+```
 
-            switch (eventType) {
-                case "customer.created":
-                    handleCustomerCreated(event);
-                    break;
-                case "invoice.finalized":
-                    handleInvoiceFinalized(event);
-                    break;
-                // ... handle other event types
-            }
+## Models
 
-            return ResponseEntity.ok("OK");
-        } catch (WebhookVerificationException e) {
-            return ResponseEntity.status(401).body("Invalid signature");
-        }
+Models are immutable: `Model.builder()...build()` checks required properties, and
+`model.toBuilder()...build()` changes a copy:
+
+```java
+import com.meteroid.models.CreateOnboardingLinkRequest;
+
+var onboardingLinkResponse = client.connect().createOnboardingLink("id", CreateOnboardingLinkRequest.builder().redirectUrl("redirect_url").build());
+```
+
+Required properties are read directly (`model.id()`), others as an `Optional`. For an optional
+property that accepts `null`, passing `null` to the builder sends `null`, while leaving it unset
+leaves it out. Properties this SDK version does not know are kept in `additionalProperties()` and
+sent back.
+
+Enums keep values added to the API later: `isKnown()` tells them apart, `value()` is an enum to
+`switch` on with `_UNKNOWN` for them, `known()` throws on them, and `asString()` is the raw value.
+Unions keep unknown variants too (`isUnrecognized()`). A union tells its variants apart with
+`isCircle()` and `asCircle()`, or with a visitor whose `visitUnknown` throws unless overridden:
+
+```java
+String description = shape.accept(new Shape.Visitor<String>() {
+    @Override
+    public String visitCircle(Circle circle) {
+        return "circle of radius " + circle.radius();
     }
-}
+
+    @Override
+    public String visitSquare(Square square) {
+        return "square of side " + square.side();
+    }
+});
 ```
 
-## Error Handling
+## Async and raw responses
 
-The SDK throws `ApiException` for API errors. The status code and raw body are always available; the body is also parsed as a `RestErrorResponse` (`getError()`) or, failing that, an `OAuthErrorResponse` (`getOAuthError()`):
+`client.async()` has the same methods returning `CompletableFuture`s, sharing the client's
+connections and retries. `withRawResponse()`, on either client, returns `ApiResponse`s with the
+status code and headers along with the body:
 
 ```java
-import com.meteroid.exceptions.ApiException;
+var response = client.withRawResponse().addOns().retrieve("addon_id");
+response.statusCode();
+response.requestId();
+response.body();
+```
+
+## Errors
+
+Every exception the SDK throws is a `MeteroidException`:
+
+- `ApiException` for an error response, with `statusCode()`, `headers()`, `body()`,
+  `requestId()` and `error(Type.class)` parsing the body as the error the API declares. Common
+  statuses have a subclass: `BadRequestException`, `AuthenticationException`,
+  `PermissionDeniedException`, `NotFoundException`, `ConflictException`,
+  `UnprocessableEntityException`, `RateLimitException` and `InternalServerException`.
+- `ApiConnectionException` when no response came, and its subclass `ApiTimeoutException`.
+- `InvalidDataException` when a response is not what the API describes, such as a required
+  property it left out.
+
+```java
+import com.meteroid.exceptions.NotFoundException;
 
 try {
-    Customer customer = meteroid.getCustomers().getCustomer("nonexistent");
-} catch (ApiException e) {
-    System.out.println("Status code: " + e.getCode());
-    System.out.println("Error message: " + e.getMessage());
-    System.out.println("Response body: " + e.getResponseBody());
-    e.getError().ifPresent(err ->
-            System.out.println("Error code: " + err.getCode() + ", message: " + err.getMessage()));
-} catch (IOException e) {
-    System.out.println("Network error: " + e.getMessage());
+    client.addOns().retrieve("addon_id");
+} catch (NotFoundException e) {
+    System.out.println(e.statusCode() + " " + e.requestId());
 }
 ```
 
-## Configuration
+Connection errors, timeouts, 408, 429 and 5xx responses are retried with jittered backoff,
+honoring `Retry-After` and `retry-after-ms` up to a minute (the backoff otherwise), when the method
+is idempotent or the request carries an `Idempotency-Key` (POST requests get one automatically).
 
-### Custom Server URL
-
-```java
-MeteroidOptions options = new MeteroidOptions();
-options.setServerUrl("https://meteroid-api.example.com");
-Meteroid meteroid = new Meteroid("your-api-key", options);
-```
-
-### Retry Configuration
-
-The SDK automatically retries requests on 5xx server errors with delays of 50ms, 100ms, and 200ms.
-
-## Building from Source
-
-```bash
-# Build the project
-./gradlew build
-
-# Run tests
-./gradlew test
-```
-
-## Code Generation
-
-The API client code is generated from the OpenAPI specification. To regenerate:
-
-```bash
-# Build the codegen Docker image (from repo root)
-cd codegen && docker build -t meteroid-codegen:latest .
-
-# Run code generation (from repo root)
-./regen_openapi.py
-```
-
-## License
-
-Apache License 2.0
+- Source: https://github.com/meteroid-oss/meteroid-clients
+- License: Apache-2.0

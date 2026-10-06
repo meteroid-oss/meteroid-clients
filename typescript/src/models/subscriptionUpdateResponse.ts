@@ -1,23 +1,27 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type SubscriptionDetails,
   SubscriptionDetailsSerializer,
-} from "./subscriptionDetails";
+} from "./subscriptionDetails.js";
 
 export interface SubscriptionUpdateResponse {
   subscription: SubscriptionDetails;
 }
 
+/** Converts `SubscriptionUpdateResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionUpdateResponseSerializer = {
-  _fromJsonObject(object: any): SubscriptionUpdateResponse {
+  parse(json: any): SubscriptionUpdateResponse {
     return {
-      subscription: SubscriptionDetailsSerializer._fromJsonObject(object["subscription"]),
+      ...extraProperties(json, ["subscription"]),
+      subscription: SubscriptionDetailsSerializer.parse(json["subscription"]),
     };
   },
 
-  _toJsonObject(self: SubscriptionUpdateResponse): any {
+  serialize(value: SubscriptionUpdateResponse): any {
     return {
-      subscription: SubscriptionDetailsSerializer._toJsonObject(self.subscription),
+      ...extraProperties(value, ["subscription"]),
+      subscription: SubscriptionDetailsSerializer.serialize(value.subscription),
     };
   },
 };

@@ -1,19 +1,23 @@
 // this file is @generated
 
-export enum TaxExemptionType {
-  ReverseCharge = "REVERSE_CHARGE",
-  TaxExempt = "TAX_EXEMPT",
-  NotRegistered = "NOT_REGISTERED",
-  Export = "EXPORT",
-  NoVatTerritory = "NO_VAT_TERRITORY",
-}
+export const TaxExemptionType = {
+  ReverseCharge: "REVERSE_CHARGE",
+  TaxExempt: "TAX_EXEMPT",
+  NotRegistered: "NOT_REGISTERED",
+  Export: "EXPORT",
+  NoVatTerritory: "NO_VAT_TERRITORY",
+} as const;
+export type TaxExemptionType =
+  | (typeof TaxExemptionType)[keyof typeof TaxExemptionType]
+  | (string & {});
 
+/** Converts `TaxExemptionType` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TaxExemptionTypeSerializer = {
-  _fromJsonObject(object: any): TaxExemptionType {
-    return object;
+  parse(json: any): TaxExemptionType {
+    return json;
   },
 
-  _toJsonObject(self: TaxExemptionType): any {
-    return self;
+  serialize(value: TaxExemptionType): any {
+    return value;
   },
 };

@@ -1,154 +1,492 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
+/**
+ * One of the variants below, told apart by {@code type}. A value this version of the SDK does not
+ * know parses as {@link Unrecognized}, which keeps its properties.
+ */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "type",
-        visible = true)
+        visible = true,
+        defaultImpl = FeatureType.Unrecognized.class)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = FeatureType.Boolean.class, name = "BOOLEAN"),
     @JsonSubTypes.Type(value = FeatureType.Metered.class, name = "METERED"),
     @JsonSubTypes.Type(value = FeatureType.Config.class, name = "CONFIG")
 })
-@ToString
-@EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
 public abstract class FeatureType {
-    /** Get the discriminator value identifying this variant. */
-    public abstract String getType();
+
+    private FeatureType() {}
 
     /**
-     * Convert an instance of FeatureType to a JSON string.
+     * The discriminator value identifying this variant.
      *
-     * @return JSON string
+     * @return the {@code type} value
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    @JsonProperty("type")
+    public abstract String type();
+
+    /**
+     * Whether this is the {@code BOOLEAN} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isBoolean() {
+        return this instanceof Boolean;
     }
 
     /**
-     * Create an instance of FeatureType from a JSON string.
+     * This value as the {@code BOOLEAN} variant.
      *
-     * @param jsonString JSON string
-     * @return An instance of FeatureType
-     * @throws JsonProcessingException if the JSON string is invalid
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
      */
-    public static FeatureType fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, FeatureType.class);
+    public final Boolean asBoolean() {
+        if (this instanceof Boolean) {
+            return (Boolean) this;
+        }
+        throw new IllegalStateException("not the BOOLEAN variant: " + type());
     }
 
-    // Variant classes
     /**
-     * Variant: BOOLEAN
+     * Whether this is the {@code METERED} variant.
      *
-     * <p>This variant wraps BooleanFeatureType.
+     * @return whether it is
      */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    public final boolean isMetered() {
+        return this instanceof Metered;
+    }
+
+    /**
+     * This value as the {@code METERED} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Metered asMetered() {
+        if (this instanceof Metered) {
+            return (Metered) this;
+        }
+        throw new IllegalStateException("not the METERED variant: " + type());
+    }
+
+    /**
+     * Whether this is the {@code CONFIG} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isConfig() {
+        return this instanceof Config;
+    }
+
+    /**
+     * This value as the {@code CONFIG} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Config asConfig() {
+        if (this instanceof Config) {
+            return (Config) this;
+        }
+        throw new IllegalStateException("not the CONFIG variant: " + type());
+    }
+
+    /**
+     * Whether this is a variant this version of the SDK does not know.
+     *
+     * @return whether it is
+     */
+    public final boolean isUnrecognized() {
+        return this instanceof Unrecognized;
+    }
+
+    /**
+     * This value as a variant this version of the SDK does not know.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Unrecognized asUnrecognized() {
+        if (this instanceof Unrecognized) {
+            return (Unrecognized) this;
+        }
+        throw new IllegalStateException("not a known variant: " + type());
+    }
+
+    /**
+     * Calls the method of {@code visitor} for this variant.
+     *
+     * @param <R> the result type
+     * @param visitor the visitor
+     * @return the result of the visitor
+     */
+    public abstract <R> R accept(Visitor<R> visitor);
+
+    /**
+     * A function of each variant, called by {@link #accept}.
+     *
+     * @param <R> the result type
+     */
+    public interface Visitor<R> {
+        /**
+         * Visits the {@code BOOLEAN} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitBoolean(BooleanFeatureType value);
+
+        /**
+         * Visits the {@code METERED} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitMetered(MeteredFeatureType value);
+
+        /**
+         * Visits the {@code CONFIG} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitConfig(ConfigFeatureType value);
+
+        /**
+         * Visits a variant this version of the SDK does not know.
+         *
+         * @param value the variant, with its properties
+         * @return the result
+         * @throws com.meteroid.exceptions.InvalidDataException unless overridden
+         */
+        default R visitUnknown(Unrecognized value) {
+            throw new com.meteroid.exceptions.InvalidDataException(
+                    "unknown FeatureType variant: " + value.type());
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code FeatureType}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static FeatureType fromJson(String json) {
+        return Utils.parse(json, FeatureType.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
+    }
+
+    /** The {@code BOOLEAN} variant. */
     @JsonTypeName("BOOLEAN")
-    public static class Boolean extends FeatureType {
-        @JsonUnwrapped private BooleanFeatureType data;
+    public static final class Boolean extends FeatureType {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private BooleanFeatureType data;
 
-        public Boolean() {}
+        private Boolean() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Boolean(BooleanFeatureType data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Boolean of(BooleanFeatureType data) {
+            return new Boolean(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "BOOLEAN";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public BooleanFeatureType getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public BooleanFeatureType data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Boolean data(BooleanFeatureType data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Boolean that = (Boolean) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Boolean{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBoolean(data);
         }
     }
 
-    /**
-     * Variant: METERED
-     *
-     * <p>This variant wraps MeteredFeatureType.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code METERED} variant. */
     @JsonTypeName("METERED")
-    public static class Metered extends FeatureType {
-        @JsonUnwrapped private MeteredFeatureType data;
+    public static final class Metered extends FeatureType {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private MeteredFeatureType data;
 
-        public Metered() {}
+        private Metered() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Metered(MeteredFeatureType data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Metered of(MeteredFeatureType data) {
+            return new Metered(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "METERED";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public MeteredFeatureType getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public MeteredFeatureType data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Metered data(MeteredFeatureType data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Metered that = (Metered) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Metered{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitMetered(data);
         }
     }
 
-    /**
-     * Variant: CONFIG
-     *
-     * <p>This variant wraps ConfigFeatureType.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code CONFIG} variant. */
     @JsonTypeName("CONFIG")
-    public static class Config extends FeatureType {
-        @JsonUnwrapped private ConfigFeatureType data;
+    public static final class Config extends FeatureType {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private ConfigFeatureType data;
 
-        public Config() {}
+        private Config() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Config(ConfigFeatureType data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getType() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Config of(ConfigFeatureType data) {
+            return new Config(data);
+        }
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
             return "CONFIG";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public ConfigFeatureType getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public ConfigFeatureType data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Config data(ConfigFeatureType data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Config that = (Config) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Config{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitConfig(data);
+        }
+    }
+
+    /** A variant this version of the SDK does not know. */
+    public static final class Unrecognized extends FeatureType {
+        @JsonProperty("type")
+        private String discriminator;
+
+        private final Map<String, JsonNode> properties = new LinkedHashMap<>();
+
+        private Unrecognized() {}
+
+        @Override
+        @JsonProperty("type")
+        public String type() {
+            return discriminator;
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitUnknown(this);
+        }
+
+        /**
+         * Every other property of the variant.
+         *
+         * @return the properties by name, unmodifiable
+         */
+        @JsonAnyGetter
+        public Map<String, JsonNode> properties() {
+            return Collections.unmodifiableMap(properties);
+        }
+
+        @JsonAnySetter
+        private void putProperty(String name, JsonNode value) {
+            properties.put(name, value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Unrecognized that = (Unrecognized) o;
+            return Objects.equals(discriminator, that.discriminator)
+                    && Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(discriminator, properties);
+        }
+
+        @Override
+        public String toString() {
+            return "Unrecognized{"
+                    + "discriminator="
+                    + discriminator
+                    + ", properties="
+                    + properties
+                    + "}";
         }
     }
 }

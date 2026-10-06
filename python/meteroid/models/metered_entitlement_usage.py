@@ -1,16 +1,19 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 from datetime import datetime
 from decimal import Decimal
 
 from ..serialization import BaseModel
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MeteredEntitlementUsage(BaseModel):
-    consumed: t.Optional[Decimal] = None
+    """The `MeteredEntitlementUsage` object."""
 
-    remaining: t.Optional[Decimal] = None
+    consumed: Decimal | None = None
 
-    reset_at: t.Optional[datetime] = None
+    remaining: Decimal | None = None
+
+    reset_at: datetime | None = None

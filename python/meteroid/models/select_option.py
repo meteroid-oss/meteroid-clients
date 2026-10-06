@@ -1,12 +1,15 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 
-from ..serialization import BaseModel
+from ..serialization import UNSET, BaseModel, Unset
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class SelectOption(BaseModel):
+    """The `SelectOption` object."""
+
     value: str
 
-    label: t.Optional[str] = None
+    label: str | None | Unset = UNSET

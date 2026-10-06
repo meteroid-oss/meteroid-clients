@@ -1,128 +1,284 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Unions;
+import com.meteroid.internal.Utils;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class InvoiceDocumentsEvent {
-    @JsonProperty("__flatten_invoicedocumentseventdata")
-    private InvoiceDocumentsEventData flattenInvoicedocumentseventdata;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class InvoiceDocumentsEvent {
+    @JsonProperty("id")
+    private String id;
 
-    @JsonProperty private String id;
-    @JsonProperty private OffsetDateTime timestamp;
-    @JsonProperty private EventType type;
+    @JsonProperty("timestamp")
+    private OffsetDateTime timestamp;
 
-    public InvoiceDocumentsEvent() {}
+    @JsonProperty("type")
+    private EventType type;
 
-    public InvoiceDocumentsEvent flattenInvoicedocumentseventdata(
-            InvoiceDocumentsEventData flattenInvoicedocumentseventdata) {
-        this.flattenInvoicedocumentseventdata = flattenInvoicedocumentseventdata;
-        return this;
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    private InvoiceDocumentsEvent() {}
+
+    private InvoiceDocumentsEvent(Builder builder) {
+        this.id = builder.id;
+        this.timestamp = builder.timestamp;
+        this.type = builder.type;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get flattenInvoicedocumentseventdata
+     * A builder of {@code InvoiceDocumentsEvent}.
      *
-     * @return flattenInvoicedocumentseventdata
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public InvoiceDocumentsEventData getFlattenInvoicedocumentseventdata() {
-        return flattenInvoicedocumentseventdata;
-    }
-
-    public void setFlattenInvoicedocumentseventdata(
-            InvoiceDocumentsEventData flattenInvoicedocumentseventdata) {
-        this.flattenInvoicedocumentseventdata = flattenInvoicedocumentseventdata;
-    }
-
-    public InvoiceDocumentsEvent id(String id) {
-        this.id = id;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get id
+     * A builder starting from this value.
      *
-     * @return id
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public InvoiceDocumentsEvent timestamp(OffsetDateTime timestamp) {
-        this.timestamp = timestamp;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.id = id;
+        builder.timestamp = timestamp;
+        builder.type = type;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get timestamp
+     * The properties of {@link InvoiceDocumentsEventData}, which this schema extends.
      *
-     * @return timestamp
+     * @return the properties of this part
      */
-    @javax.annotation.Nonnull
-    public OffsetDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(OffsetDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public InvoiceDocumentsEvent type(EventType type) {
-        this.type = type;
-        return this;
+    public InvoiceDocumentsEventData invoiceDocumentsEventData() {
+        return Unions.convert(additionalProperties, InvoiceDocumentsEventData.class);
     }
 
     /**
-     * Get type
+     * The {@code id} property.
      *
-     * @return type
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public EventType getType() {
-        return type;
-    }
-
-    public void setType(EventType type) {
-        this.type = type;
+    public String id() {
+        return Utils.required(id, "id");
     }
 
     /**
-     * Create an instance of InvoiceDocumentsEvent given an JSON string
+     * The {@code timestamp} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of InvoiceDocumentsEvent
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     InvoiceDocumentsEvent
+     * @return the value, never null
      */
-    public static InvoiceDocumentsEvent fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, InvoiceDocumentsEvent.class);
+    public OffsetDateTime timestamp() {
+        return Utils.required(timestamp, "timestamp");
     }
 
     /**
-     * Convert an instance of InvoiceDocumentsEvent to an JSON string
+     * The {@code type} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public EventType type() {
+        return Utils.required(type, "type");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        Map<String, JsonNode> unknown = new LinkedHashMap<>(additionalProperties);
+        unknown.keySet().retainAll(invoiceDocumentsEventData().additionalProperties().keySet());
+        return Collections.unmodifiableMap(unknown);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InvoiceDocumentsEvent that = (InvoiceDocumentsEvent) o;
+        return Objects.equals(id, that.id)
+                && Objects.equals(timestamp, that.timestamp)
+                && Objects.equals(type, that.type)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, timestamp, type, additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "InvoiceDocumentsEvent{"
+                + "id="
+                + id
+                + ", timestamp="
+                + timestamp
+                + ", type="
+                + type
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link InvoiceDocumentsEvent}. */
+    public static final class Builder {
+        private String id;
+        private OffsetDateTime timestamp;
+        private EventType type;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * Sets the properties of {@link InvoiceDocumentsEventData}, which this schema extends.
+         *
+         * @param invoiceDocumentsEventData the properties
+         * @return this builder
+         */
+        public Builder invoiceDocumentsEventData(
+                InvoiceDocumentsEventData invoiceDocumentsEventData) {
+            additionalProperties.putAll(Utils.properties(invoiceDocumentsEventData));
+            return this;
+        }
+
+        /**
+         * The {@code id} property.
+         *
+         * @param id the value
+         * @return this builder
+         */
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * The {@code timestamp} property.
+         *
+         * @param timestamp the value
+         * @return this builder
+         */
+        public Builder timestamp(OffsetDateTime timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
+        /**
+         * The {@code type} property.
+         *
+         * @param type the value
+         * @return this builder
+         */
+        public Builder type(EventType type) {
+            this.type = type;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code InvoiceDocumentsEvent}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public InvoiceDocumentsEvent build() {
+            Utils.checkRequired(id, "id");
+            Utils.checkRequired(timestamp, "timestamp");
+            Utils.checkRequired(type, "type");
+            return new InvoiceDocumentsEvent(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code InvoiceDocumentsEvent}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static InvoiceDocumentsEvent fromJson(String json) {
+        return Utils.parse(json, InvoiceDocumentsEvent.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

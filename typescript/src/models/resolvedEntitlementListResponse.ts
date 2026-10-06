@@ -1,27 +1,27 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type ResolvedEntitlement,
   ResolvedEntitlementSerializer,
-} from "./resolvedEntitlement";
+} from "./resolvedEntitlement.js";
 
 export interface ResolvedEntitlementListResponse {
   data: ResolvedEntitlement[];
 }
 
+/** Converts `ResolvedEntitlementListResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ResolvedEntitlementListResponseSerializer = {
-  _fromJsonObject(object: any): ResolvedEntitlementListResponse {
+  parse(json: any): ResolvedEntitlementListResponse {
     return {
-      data: object["data"].map((item: any) =>
-        ResolvedEntitlementSerializer._fromJsonObject(item)
-      ),
+      ...extraProperties(json, ["data"]),
+      data: json["data"].map((item: any) => ResolvedEntitlementSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: ResolvedEntitlementListResponse): any {
+  serialize(value: ResolvedEntitlementListResponse): any {
     return {
-      data: self.data.map((item: any) =>
-        ResolvedEntitlementSerializer._toJsonObject(item)
-      ),
+      ...extraProperties(value, ["data"]),
+      data: value.data.map((item: any) => ResolvedEntitlementSerializer.serialize(item)),
     };
   },
 };

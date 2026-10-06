@@ -1,32 +1,45 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/** Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class Product {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class Product {
     @JsonProperty("archived_at")
-    private OffsetDateTime archivedAt;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<OffsetDateTime> archivedAt = JsonField.missing();
 
-    @JsonProperty private Boolean catalog;
+    @JsonProperty("catalog")
+    private Boolean catalog;
 
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
 
-    @JsonProperty private String description;
+    @JsonProperty("description")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> description = JsonField.missing();
 
     @JsonProperty("fee_structure")
     private ProductFeeStructure feeStructure;
@@ -34,202 +47,406 @@ public class Product {
     @JsonProperty("fee_type")
     private ProductFeeTypeEnum feeType;
 
-    @JsonProperty private String id;
-    @JsonProperty private String name;
+    @JsonProperty("id")
+    private String id;
+
+    @JsonProperty("name")
+    private String name;
 
     @JsonProperty("product_family_id")
     private String productFamilyId;
 
-    public Product() {}
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
-    public Product archivedAt(OffsetDateTime archivedAt) {
-        this.archivedAt = archivedAt;
-        return this;
+    private Product() {}
+
+    private Product(Builder builder) {
+        this.archivedAt = builder.archivedAt;
+        this.catalog = builder.catalog;
+        this.createdAt = builder.createdAt;
+        this.description = builder.description;
+        this.feeStructure = builder.feeStructure;
+        this.feeType = builder.feeType;
+        this.id = builder.id;
+        this.name = builder.name;
+        this.productFamilyId = builder.productFamilyId;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get archivedAt
+     * A builder of {@code Product}.
      *
-     * @return archivedAt
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public OffsetDateTime getArchivedAt() {
-        return archivedAt;
-    }
-
-    public void setArchivedAt(OffsetDateTime archivedAt) {
-        this.archivedAt = archivedAt;
-    }
-
-    public Product catalog(Boolean catalog) {
-        this.catalog = catalog;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get catalog
+     * A builder starting from this value.
      *
-     * @return catalog
+     * @return a new builder
      */
-    @javax.annotation.Nonnull
-    public Boolean getCatalog() {
-        return catalog;
-    }
-
-    public void setCatalog(Boolean catalog) {
-        this.catalog = catalog;
-    }
-
-    public Product createdAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.archivedAt = archivedAt;
+        builder.catalog = catalog;
+        builder.createdAt = createdAt;
+        builder.description = description;
+        builder.feeStructure = feeStructure;
+        builder.feeType = feeType;
+        builder.id = id;
+        builder.name = name;
+        builder.productFamilyId = productFamilyId;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get createdAt
+     * The {@code archived_at} property.
      *
-     * @return createdAt
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Product description(String description) {
-        this.description = description;
-        return this;
+    public Optional<OffsetDateTime> archivedAt() {
+        return archivedAt.asOptional();
     }
 
     /**
-     * Get description
+     * The {@code catalog} property.
      *
-     * @return description
+     * @return the value, never null
      */
-    @javax.annotation.Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Product feeStructure(ProductFeeStructure feeStructure) {
-        this.feeStructure = feeStructure;
-        return this;
+    public Boolean catalog() {
+        return Utils.required(catalog, "catalog");
     }
 
     /**
-     * Get feeStructure
+     * The {@code created_at} property.
      *
-     * @return feeStructure
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public ProductFeeStructure getFeeStructure() {
-        return feeStructure;
-    }
-
-    public void setFeeStructure(ProductFeeStructure feeStructure) {
-        this.feeStructure = feeStructure;
-    }
-
-    public Product feeType(ProductFeeTypeEnum feeType) {
-        this.feeType = feeType;
-        return this;
+    public OffsetDateTime createdAt() {
+        return Utils.required(createdAt, "created_at");
     }
 
     /**
-     * Get feeType
+     * The {@code description} property.
      *
-     * @return feeType
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nonnull
-    public ProductFeeTypeEnum getFeeType() {
-        return feeType;
-    }
-
-    public void setFeeType(ProductFeeTypeEnum feeType) {
-        this.feeType = feeType;
-    }
-
-    public Product id(String id) {
-        this.id = id;
-        return this;
+    public Optional<String> description() {
+        return description.asOptional();
     }
 
     /**
-     * Get id
+     * The {@code fee_structure} property.
      *
-     * @return id
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Product name(String name) {
-        this.name = name;
-        return this;
+    public ProductFeeStructure feeStructure() {
+        return Utils.required(feeStructure, "fee_structure");
     }
 
     /**
-     * Get name
+     * The {@code fee_type} property.
      *
-     * @return name
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Product productFamilyId(String productFamilyId) {
-        this.productFamilyId = productFamilyId;
-        return this;
+    public ProductFeeTypeEnum feeType() {
+        return Utils.required(feeType, "fee_type");
     }
 
     /**
-     * Get productFamilyId
+     * The {@code id} property.
      *
-     * @return productFamilyId
+     * @return the value, never null
      */
-    @javax.annotation.Nonnull
-    public String getProductFamilyId() {
-        return productFamilyId;
-    }
-
-    public void setProductFamilyId(String productFamilyId) {
-        this.productFamilyId = productFamilyId;
+    public String id() {
+        return Utils.required(id, "id");
     }
 
     /**
-     * Create an instance of Product given an JSON string
+     * The {@code name} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of Product
-     * @throws JsonProcessingException if the JSON string is invalid with respect to Product
+     * @return the value, never null
      */
-    public static Product fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, Product.class);
+    public String name() {
+        return Utils.required(name, "name");
     }
 
     /**
-     * Convert an instance of Product to an JSON string
+     * The {@code product_family_id} property.
      *
-     * @return JSON string
+     * @return the value, never null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public String productFamilyId() {
+        return Utils.required(productFamilyId, "product_family_id");
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Product that = (Product) o;
+        return Objects.equals(archivedAt, that.archivedAt)
+                && Objects.equals(catalog, that.catalog)
+                && Objects.equals(createdAt, that.createdAt)
+                && Objects.equals(description, that.description)
+                && Objects.equals(feeStructure, that.feeStructure)
+                && Objects.equals(feeType, that.feeType)
+                && Objects.equals(id, that.id)
+                && Objects.equals(name, that.name)
+                && Objects.equals(productFamilyId, that.productFamilyId)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                archivedAt,
+                catalog,
+                createdAt,
+                description,
+                feeStructure,
+                feeType,
+                id,
+                name,
+                productFamilyId,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{"
+                + "archivedAt="
+                + archivedAt
+                + ", catalog="
+                + catalog
+                + ", createdAt="
+                + createdAt
+                + ", description="
+                + description
+                + ", feeStructure="
+                + feeStructure
+                + ", feeType="
+                + feeType
+                + ", id="
+                + id
+                + ", name="
+                + name
+                + ", productFamilyId="
+                + productFamilyId
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link Product}. */
+    public static final class Builder {
+        private JsonField<OffsetDateTime> archivedAt = JsonField.missing();
+        private Boolean catalog;
+        private OffsetDateTime createdAt;
+        private JsonField<String> description = JsonField.missing();
+        private ProductFeeStructure feeStructure;
+        private ProductFeeTypeEnum feeType;
+        private String id;
+        private String name;
+        private String productFamilyId;
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code archived_at} property.
+         *
+         * @param archivedAt the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder archivedAt(OffsetDateTime archivedAt) {
+            this.archivedAt = JsonField.ofNullable(archivedAt);
+            return this;
+        }
+
+        /**
+         * The {@code catalog} property.
+         *
+         * @param catalog the value
+         * @return this builder
+         */
+        public Builder catalog(Boolean catalog) {
+            this.catalog = catalog;
+            return this;
+        }
+
+        /**
+         * The {@code created_at} property.
+         *
+         * @param createdAt the value
+         * @return this builder
+         */
+        public Builder createdAt(OffsetDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        /**
+         * The {@code description} property.
+         *
+         * @param description the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder description(String description) {
+            this.description = JsonField.ofNullable(description);
+            return this;
+        }
+
+        /**
+         * The {@code fee_structure} property.
+         *
+         * @param feeStructure the value
+         * @return this builder
+         */
+        public Builder feeStructure(ProductFeeStructure feeStructure) {
+            this.feeStructure = feeStructure;
+            return this;
+        }
+
+        /**
+         * The {@code fee_type} property.
+         *
+         * @param feeType the value
+         * @return this builder
+         */
+        public Builder feeType(ProductFeeTypeEnum feeType) {
+            this.feeType = feeType;
+            return this;
+        }
+
+        /**
+         * The {@code id} property.
+         *
+         * @param id the value
+         * @return this builder
+         */
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * The {@code product_family_id} property.
+         *
+         * @param productFamilyId the value
+         * @return this builder
+         */
+        public Builder productFamilyId(String productFamilyId) {
+            this.productFamilyId = productFamilyId;
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code Product}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public Product build() {
+            Utils.checkRequired(catalog, "catalog");
+            Utils.checkRequired(createdAt, "created_at");
+            Utils.checkRequired(feeStructure, "fee_structure");
+            Utils.checkRequired(feeType, "fee_type");
+            Utils.checkRequired(id, "id");
+            Utils.checkRequired(name, "name");
+            Utils.checkRequired(productFamilyId, "product_family_id");
+            return new Product(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code Product}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static Product fromJson(String json) {
+        return Utils.parse(json, Product.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

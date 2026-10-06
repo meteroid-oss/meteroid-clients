@@ -1,234 +1,271 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type CouponLineItem, CouponLineItemSerializer } from "./couponLineItem";
-import { type Currency, CurrencySerializer } from "./currency";
-import { type CustomerDetails, CustomerDetailsSerializer } from "./customerDetails";
-import { type CustomerId, CustomerIdSerializer } from "./customerId";
-import { type EInvoicingStatus, EInvoicingStatusSerializer } from "./eInvoicingStatus";
-import { type InvoiceId, InvoiceIdSerializer } from "./invoiceId";
-import { type InvoiceLineItem, InvoiceLineItemSerializer } from "./invoiceLineItem";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type CouponLineItem, CouponLineItemSerializer } from "./couponLineItem.js";
+import { type Currency, CurrencySerializer } from "./currency.js";
+import { type CustomerDetails, CustomerDetailsSerializer } from "./customerDetails.js";
+import { type CustomerId, CustomerIdSerializer } from "./customerId.js";
+import { type EInvoicingStatus, EInvoicingStatusSerializer } from "./eInvoicingStatus.js";
+import { type InvoiceId, InvoiceIdSerializer } from "./invoiceId.js";
+import { type InvoiceLineItem, InvoiceLineItemSerializer } from "./invoiceLineItem.js";
 import {
   type InvoicePaymentStatus,
   InvoicePaymentStatusSerializer,
-} from "./invoicePaymentStatus";
-import { type InvoiceStatus, InvoiceStatusSerializer } from "./invoiceStatus";
-import { type InvoiceType, InvoiceTypeSerializer } from "./invoiceType";
-import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId";
-import { type TaxBreakdownItem, TaxBreakdownItemSerializer } from "./taxBreakdownItem";
-import { type Transaction, TransactionSerializer } from "./transaction";
+} from "./invoicePaymentStatus.js";
+import { type InvoiceStatus, InvoiceStatusSerializer } from "./invoiceStatus.js";
+import { type InvoiceType, InvoiceTypeSerializer } from "./invoiceType.js";
+import { type SubscriptionId, SubscriptionIdSerializer } from "./subscriptionId.js";
+import { type TaxBreakdownItem, TaxBreakdownItemSerializer } from "./taxBreakdownItem.js";
+import { type Transaction, TransactionSerializer } from "./transaction.js";
 
 export interface Invoice {
   amountDue: number;
-
   appliedCredits: number;
-
   /**
    * The period/moment this invoice is about — the subscription period start, or the invoice's
    * own date for manual/one-off. Stable and always present, distinct from `invoice_date` (the
    * emission date). Shown as "Invoice date".
    */
-  billingPeriodStart?: string | null;
-
-  childInvoiceId?: InvoiceId | null;
-
+  billingPeriodStart?: string | null | undefined;
+  childInvoiceId?: InvoiceId | null | undefined;
   coupons: CouponLineItem[];
-
   createdAt: Date;
-
   currency: Currency;
-
   /** User-defined custom property values, keyed by definition `key`. */
   customProperties: unknown;
-
   customerDetails: CustomerDetails;
-
   customerId: CustomerId;
-
-  dueDate?: string | null;
-
-  einvoicingStatus?: EInvoicingStatus | null;
-
-  finalizedAt?: Date | null;
-
+  dueDate?: string | null | undefined;
+  einvoicingStatus?: EInvoicingStatus | null | undefined;
+  finalizedAt?: Date | null | undefined;
   id: InvoiceId;
-
   invoiceDate: string;
-
   invoiceNumber: string;
-
   invoiceType: InvoiceType;
-
   lineItems: InvoiceLineItem[];
-
-  markedAsUncollectibleAt?: Date | null;
-
-  memo?: string | null;
-
+  markedAsUncollectibleAt?: Date | null | undefined;
+  memo?: string | null | undefined;
   netTerms: number;
-
-  paidAt?: Date | null;
-
-  parentInvoiceId?: InvoiceId | null;
-
+  paidAt?: Date | null | undefined;
+  parentInvoiceId?: InvoiceId | null | undefined;
   paymentStatus: InvoicePaymentStatus;
-
-  purchaseOrder?: string | null;
-
-  reference?: string | null;
-
+  purchaseOrder?: string | null | undefined;
+  reference?: string | null | undefined;
   status: InvoiceStatus;
-
-  subscriptionId?: SubscriptionId | null;
-
+  subscriptionId?: SubscriptionId | null | undefined;
   subtotal: number;
-
   subtotalRecurring: number;
-
   taxAmount: number;
-
   taxBreakdown: TaxBreakdownItem[];
-
   total: number;
-
   transactions: Transaction[];
-
-  updatedAt?: Date | null;
-
-  voidedAt?: Date | null;
+  updatedAt?: Date | null | undefined;
+  voidedAt?: Date | null | undefined;
 }
 
+/** Converts `Invoice` values from (`parse`) and to (`serialize`) their JSON form. */
 export const InvoiceSerializer = {
-  _fromJsonObject(object: any): Invoice {
+  parse(json: any): Invoice {
     return {
-      amountDue: object["amount_due"],
-      appliedCredits: object["applied_credits"],
-      billingPeriodStart: object["billing_period_start"],
+      ...extraProperties(json, [
+        "amount_due",
+        "applied_credits",
+        "billing_period_start",
+        "child_invoice_id",
+        "coupons",
+        "created_at",
+        "currency",
+        "custom_properties",
+        "customer_details",
+        "customer_id",
+        "due_date",
+        "einvoicing_status",
+        "finalized_at",
+        "id",
+        "invoice_date",
+        "invoice_number",
+        "invoice_type",
+        "line_items",
+        "marked_as_uncollectible_at",
+        "memo",
+        "net_terms",
+        "paid_at",
+        "parent_invoice_id",
+        "payment_status",
+        "purchase_order",
+        "reference",
+        "status",
+        "subscription_id",
+        "subtotal",
+        "subtotal_recurring",
+        "tax_amount",
+        "tax_breakdown",
+        "total",
+        "transactions",
+        "updated_at",
+        "voided_at",
+      ]),
+      amountDue: json["amount_due"],
+      appliedCredits: json["applied_credits"],
+      billingPeriodStart: json["billing_period_start"],
       childInvoiceId:
-        object["child_invoice_id"] != null
-          ? InvoiceIdSerializer._fromJsonObject(object["child_invoice_id"])
-          : undefined,
-      coupons: object["coupons"].map((item: any) =>
-        CouponLineItemSerializer._fromJsonObject(item)
-      ),
-      createdAt: parseDateTime(object["created_at"]),
-      currency: CurrencySerializer._fromJsonObject(object["currency"]),
-      customProperties: object["custom_properties"],
-      customerDetails: CustomerDetailsSerializer._fromJsonObject(
-        object["customer_details"]
-      ),
-      customerId: CustomerIdSerializer._fromJsonObject(object["customer_id"]),
-      dueDate: object["due_date"],
+        json["child_invoice_id"] != null
+          ? InvoiceIdSerializer.parse(json["child_invoice_id"])
+          : json["child_invoice_id"],
+      coupons: json["coupons"].map((item: any) => CouponLineItemSerializer.parse(item)),
+      createdAt: parseDateTime(json["created_at"]),
+      currency: CurrencySerializer.parse(json["currency"]),
+      customProperties: json["custom_properties"],
+      customerDetails: CustomerDetailsSerializer.parse(json["customer_details"]),
+      customerId: CustomerIdSerializer.parse(json["customer_id"]),
+      dueDate: json["due_date"],
       einvoicingStatus:
-        object["einvoicing_status"] != null
-          ? EInvoicingStatusSerializer._fromJsonObject(object["einvoicing_status"])
-          : undefined,
+        json["einvoicing_status"] != null
+          ? EInvoicingStatusSerializer.parse(json["einvoicing_status"])
+          : json["einvoicing_status"],
       finalizedAt:
-        object["finalized_at"] != null
-          ? parseDateTime(object["finalized_at"])
-          : undefined,
-      id: InvoiceIdSerializer._fromJsonObject(object["id"]),
-      invoiceDate: object["invoice_date"],
-      invoiceNumber: object["invoice_number"],
-      invoiceType: InvoiceTypeSerializer._fromJsonObject(object["invoice_type"]),
-      lineItems: object["line_items"].map((item: any) =>
-        InvoiceLineItemSerializer._fromJsonObject(item)
+        json["finalized_at"] != null
+          ? parseDateTime(json["finalized_at"])
+          : json["finalized_at"],
+      id: InvoiceIdSerializer.parse(json["id"]),
+      invoiceDate: json["invoice_date"],
+      invoiceNumber: json["invoice_number"],
+      invoiceType: InvoiceTypeSerializer.parse(json["invoice_type"]),
+      lineItems: json["line_items"].map((item: any) =>
+        InvoiceLineItemSerializer.parse(item)
       ),
       markedAsUncollectibleAt:
-        object["marked_as_uncollectible_at"] != null
-          ? parseDateTime(object["marked_as_uncollectible_at"])
-          : undefined,
-      memo: object["memo"],
-      netTerms: object["net_terms"],
-      paidAt: object["paid_at"] != null ? parseDateTime(object["paid_at"]) : undefined,
+        json["marked_as_uncollectible_at"] != null
+          ? parseDateTime(json["marked_as_uncollectible_at"])
+          : json["marked_as_uncollectible_at"],
+      memo: json["memo"],
+      netTerms: json["net_terms"],
+      paidAt: json["paid_at"] != null ? parseDateTime(json["paid_at"]) : json["paid_at"],
       parentInvoiceId:
-        object["parent_invoice_id"] != null
-          ? InvoiceIdSerializer._fromJsonObject(object["parent_invoice_id"])
-          : undefined,
-      paymentStatus: InvoicePaymentStatusSerializer._fromJsonObject(
-        object["payment_status"]
-      ),
-      purchaseOrder: object["purchase_order"],
-      reference: object["reference"],
-      status: InvoiceStatusSerializer._fromJsonObject(object["status"]),
+        json["parent_invoice_id"] != null
+          ? InvoiceIdSerializer.parse(json["parent_invoice_id"])
+          : json["parent_invoice_id"],
+      paymentStatus: InvoicePaymentStatusSerializer.parse(json["payment_status"]),
+      purchaseOrder: json["purchase_order"],
+      reference: json["reference"],
+      status: InvoiceStatusSerializer.parse(json["status"]),
       subscriptionId:
-        object["subscription_id"] != null
-          ? SubscriptionIdSerializer._fromJsonObject(object["subscription_id"])
-          : undefined,
-      subtotal: object["subtotal"],
-      subtotalRecurring: object["subtotal_recurring"],
-      taxAmount: object["tax_amount"],
-      taxBreakdown: object["tax_breakdown"].map((item: any) =>
-        TaxBreakdownItemSerializer._fromJsonObject(item)
+        json["subscription_id"] != null
+          ? SubscriptionIdSerializer.parse(json["subscription_id"])
+          : json["subscription_id"],
+      subtotal: json["subtotal"],
+      subtotalRecurring: json["subtotal_recurring"],
+      taxAmount: json["tax_amount"],
+      taxBreakdown: json["tax_breakdown"].map((item: any) =>
+        TaxBreakdownItemSerializer.parse(item)
       ),
-      total: object["total"],
-      transactions: object["transactions"].map((item: any) =>
-        TransactionSerializer._fromJsonObject(item)
+      total: json["total"],
+      transactions: json["transactions"].map((item: any) =>
+        TransactionSerializer.parse(item)
       ),
       updatedAt:
-        object["updated_at"] != null ? parseDateTime(object["updated_at"]) : undefined,
+        json["updated_at"] != null
+          ? parseDateTime(json["updated_at"])
+          : json["updated_at"],
       voidedAt:
-        object["voided_at"] != null ? parseDateTime(object["voided_at"]) : undefined,
+        json["voided_at"] != null ? parseDateTime(json["voided_at"]) : json["voided_at"],
     };
   },
 
-  _toJsonObject(self: Invoice): any {
+  serialize(value: Invoice): any {
     return {
-      amount_due: self.amountDue,
-      applied_credits: self.appliedCredits,
-      billing_period_start: self.billingPeriodStart,
+      ...extraProperties(value, [
+        "amountDue",
+        "appliedCredits",
+        "billingPeriodStart",
+        "childInvoiceId",
+        "coupons",
+        "createdAt",
+        "currency",
+        "customProperties",
+        "customerDetails",
+        "customerId",
+        "dueDate",
+        "einvoicingStatus",
+        "finalizedAt",
+        "id",
+        "invoiceDate",
+        "invoiceNumber",
+        "invoiceType",
+        "lineItems",
+        "markedAsUncollectibleAt",
+        "memo",
+        "netTerms",
+        "paidAt",
+        "parentInvoiceId",
+        "paymentStatus",
+        "purchaseOrder",
+        "reference",
+        "status",
+        "subscriptionId",
+        "subtotal",
+        "subtotalRecurring",
+        "taxAmount",
+        "taxBreakdown",
+        "total",
+        "transactions",
+        "updatedAt",
+        "voidedAt",
+      ]),
+      amount_due: value.amountDue,
+      applied_credits: value.appliedCredits,
+      billing_period_start: value.billingPeriodStart,
       child_invoice_id:
-        self.childInvoiceId != null
-          ? InvoiceIdSerializer._toJsonObject(self.childInvoiceId)
-          : undefined,
-      coupons: self.coupons.map((item: any) =>
-        CouponLineItemSerializer._toJsonObject(item)
-      ),
-      created_at: self.createdAt,
-      currency: CurrencySerializer._toJsonObject(self.currency),
-      custom_properties: self.customProperties,
-      customer_details: CustomerDetailsSerializer._toJsonObject(self.customerDetails),
-      customer_id: CustomerIdSerializer._toJsonObject(self.customerId),
-      due_date: self.dueDate,
+        value.childInvoiceId != null
+          ? InvoiceIdSerializer.serialize(value.childInvoiceId)
+          : value.childInvoiceId,
+      coupons: value.coupons.map((item: any) => CouponLineItemSerializer.serialize(item)),
+      created_at: value.createdAt,
+      currency: CurrencySerializer.serialize(value.currency),
+      custom_properties: value.customProperties,
+      customer_details: CustomerDetailsSerializer.serialize(value.customerDetails),
+      customer_id: CustomerIdSerializer.serialize(value.customerId),
+      due_date: value.dueDate,
       einvoicing_status:
-        self.einvoicingStatus != null
-          ? EInvoicingStatusSerializer._toJsonObject(self.einvoicingStatus)
-          : undefined,
-      finalized_at: self.finalizedAt,
-      id: InvoiceIdSerializer._toJsonObject(self.id),
-      invoice_date: self.invoiceDate,
-      invoice_number: self.invoiceNumber,
-      invoice_type: InvoiceTypeSerializer._toJsonObject(self.invoiceType),
-      line_items: self.lineItems.map((item: any) =>
-        InvoiceLineItemSerializer._toJsonObject(item)
+        value.einvoicingStatus != null
+          ? EInvoicingStatusSerializer.serialize(value.einvoicingStatus)
+          : value.einvoicingStatus,
+      finalized_at: value.finalizedAt,
+      id: InvoiceIdSerializer.serialize(value.id),
+      invoice_date: value.invoiceDate,
+      invoice_number: value.invoiceNumber,
+      invoice_type: InvoiceTypeSerializer.serialize(value.invoiceType),
+      line_items: value.lineItems.map((item: any) =>
+        InvoiceLineItemSerializer.serialize(item)
       ),
-      marked_as_uncollectible_at: self.markedAsUncollectibleAt,
-      memo: self.memo,
-      net_terms: self.netTerms,
-      paid_at: self.paidAt,
+      marked_as_uncollectible_at: value.markedAsUncollectibleAt,
+      memo: value.memo,
+      net_terms: value.netTerms,
+      paid_at: value.paidAt,
       parent_invoice_id:
-        self.parentInvoiceId != null
-          ? InvoiceIdSerializer._toJsonObject(self.parentInvoiceId)
-          : undefined,
-      payment_status: InvoicePaymentStatusSerializer._toJsonObject(self.paymentStatus),
-      purchase_order: self.purchaseOrder,
-      reference: self.reference,
-      status: InvoiceStatusSerializer._toJsonObject(self.status),
+        value.parentInvoiceId != null
+          ? InvoiceIdSerializer.serialize(value.parentInvoiceId)
+          : value.parentInvoiceId,
+      payment_status: InvoicePaymentStatusSerializer.serialize(value.paymentStatus),
+      purchase_order: value.purchaseOrder,
+      reference: value.reference,
+      status: InvoiceStatusSerializer.serialize(value.status),
       subscription_id:
-        self.subscriptionId != null
-          ? SubscriptionIdSerializer._toJsonObject(self.subscriptionId)
-          : undefined,
-      subtotal: self.subtotal,
-      subtotal_recurring: self.subtotalRecurring,
-      tax_amount: self.taxAmount,
-      tax_breakdown: self.taxBreakdown.map((item: any) =>
-        TaxBreakdownItemSerializer._toJsonObject(item)
+        value.subscriptionId != null
+          ? SubscriptionIdSerializer.serialize(value.subscriptionId)
+          : value.subscriptionId,
+      subtotal: value.subtotal,
+      subtotal_recurring: value.subtotalRecurring,
+      tax_amount: value.taxAmount,
+      tax_breakdown: value.taxBreakdown.map((item: any) =>
+        TaxBreakdownItemSerializer.serialize(item)
       ),
-      total: self.total,
-      transactions: self.transactions.map((item: any) =>
-        TransactionSerializer._toJsonObject(item)
+      total: value.total,
+      transactions: value.transactions.map((item: any) =>
+        TransactionSerializer.serialize(item)
       ),
-      updated_at: self.updatedAt,
-      voided_at: self.voidedAt,
+      updated_at: value.updatedAt,
+      voided_at: value.voidedAt,
     };
   },
 };

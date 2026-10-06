@@ -1,23 +1,26 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface IngestFailure {
   eventId: string;
-
   reason: string;
 }
 
+/** Converts `IngestFailure` values from (`parse`) and to (`serialize`) their JSON form. */
 export const IngestFailureSerializer = {
-  _fromJsonObject(object: any): IngestFailure {
+  parse(json: any): IngestFailure {
     return {
-      eventId: object["event_id"],
-      reason: object["reason"],
+      ...extraProperties(json, ["event_id", "reason"]),
+      eventId: json["event_id"],
+      reason: json["reason"],
     };
   },
 
-  _toJsonObject(self: IngestFailure): any {
+  serialize(value: IngestFailure): any {
     return {
-      event_id: self.eventId,
-      reason: self.reason,
+      ...extraProperties(value, ["eventId", "reason"]),
+      event_id: value.eventId,
+      reason: value.reason,
     };
   },
 };

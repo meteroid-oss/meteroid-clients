@@ -1,27 +1,29 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface CapacityPricing {
   included: number;
-
   overageRate: string;
-
   rate: string;
 }
 
+/** Converts `CapacityPricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CapacityPricingSerializer = {
-  _fromJsonObject(object: any): CapacityPricing {
+  parse(json: any): CapacityPricing {
     return {
-      included: object["included"],
-      overageRate: object["overage_rate"],
-      rate: object["rate"],
+      ...extraProperties(json, ["included", "overage_rate", "rate"]),
+      included: json["included"],
+      overageRate: json["overage_rate"],
+      rate: json["rate"],
     };
   },
 
-  _toJsonObject(self: CapacityPricing): any {
+  serialize(value: CapacityPricing): any {
     return {
-      included: self.included,
-      overage_rate: self.overageRate,
-      rate: self.rate,
+      ...extraProperties(value, ["included", "overageRate", "rate"]),
+      included: value.included,
+      overage_rate: value.overageRate,
+      rate: value.rate,
     };
   },
 };

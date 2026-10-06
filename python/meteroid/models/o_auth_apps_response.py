@@ -1,11 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
 from ..serialization import BaseModel
-from .o_auth_app import OAuthApp
+
+if t.TYPE_CHECKING:
+    from .o_auth_app import OAuthApp
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class OAuthAppsResponse(BaseModel):
-    data: t.List[OAuthApp]
+    """The `OAuthAppsResponse` object."""
+
+    data: list[OAuthApp]

@@ -1,19 +1,23 @@
 // this file is @generated
 
-export enum SubscriptionFeeBillingPeriodEnum {
-  OneTime = "ONE_TIME",
-  Monthly = "MONTHLY",
-  Quarterly = "QUARTERLY",
-  Semiannual = "SEMIANNUAL",
-  Annual = "ANNUAL",
-}
+export const SubscriptionFeeBillingPeriodEnum = {
+  OneTime: "ONE_TIME",
+  Monthly: "MONTHLY",
+  Quarterly: "QUARTERLY",
+  Semiannual: "SEMIANNUAL",
+  Annual: "ANNUAL",
+} as const;
+export type SubscriptionFeeBillingPeriodEnum =
+  | (typeof SubscriptionFeeBillingPeriodEnum)[keyof typeof SubscriptionFeeBillingPeriodEnum]
+  | (string & {});
 
+/** Converts `SubscriptionFeeBillingPeriodEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const SubscriptionFeeBillingPeriodEnumSerializer = {
-  _fromJsonObject(object: any): SubscriptionFeeBillingPeriodEnum {
-    return object;
+  parse(json: any): SubscriptionFeeBillingPeriodEnum {
+    return json;
   },
 
-  _toJsonObject(self: SubscriptionFeeBillingPeriodEnum): any {
-    return self;
+  serialize(value: SubscriptionFeeBillingPeriodEnum): any {
+    return value;
   },
 };

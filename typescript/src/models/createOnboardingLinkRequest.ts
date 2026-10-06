@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 
 export interface CreateOnboardingLinkRequest {
   redirectUrl: string;
 }
 
+/** Converts `CreateOnboardingLinkRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const CreateOnboardingLinkRequestSerializer = {
-  _fromJsonObject(object: any): CreateOnboardingLinkRequest {
+  parse(json: any): CreateOnboardingLinkRequest {
     return {
-      redirectUrl: object["redirect_url"],
+      ...extraProperties(json, ["redirect_url"]),
+      redirectUrl: json["redirect_url"],
     };
   },
 
-  _toJsonObject(self: CreateOnboardingLinkRequest): any {
+  serialize(value: CreateOnboardingLinkRequest): any {
     return {
-      redirect_url: self.redirectUrl,
+      ...extraProperties(value, ["redirectUrl"]),
+      redirect_url: value.redirectUrl,
     };
   },
 };

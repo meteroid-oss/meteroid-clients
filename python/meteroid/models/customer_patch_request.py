@@ -1,62 +1,70 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
 
-from ..serialization import BaseModel
-from .address import Address
-from .currency import Currency
-from .custom_tax_rate import CustomTaxRate
-from .customer_type import CustomerType
-from .invoicing_entity_id import InvoicingEntityId
-from .shipping_address import ShippingAddress
+from ..serialization import UNSET, BaseModel, Unset
+
+if t.TYPE_CHECKING:
+    from .address import Address
+    from .currency import Currency
+    from .custom_tax_rate import CustomTaxRate
+    from .customer_type import CustomerType
+    from .invoicing_entity_id import InvoicingEntityId
+    from .shipping_address import ShippingAddress
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class CustomerPatchRequest(BaseModel):
-    alias: t.Optional[str] = None
+    """The `CustomerPatchRequest` object."""
 
-    billing_address: t.Optional[Address] = None
+    alias: str | None | Unset = UNSET
 
-    billing_email: t.Optional[str] = None
+    billing_address: Address | None | Unset = UNSET
 
-    currency: t.Optional[Currency] = None
+    billing_email: str | None | Unset = UNSET
 
-    custom_properties: t.Optional[t.Any] = None
+    currency: Currency | None | Unset = UNSET
+
+    custom_properties: t.Any = None
     """Partial update of custom property values (merge; send a key with `null` to remove it).
     Omit to leave unchanged."""
 
-    custom_taxes: t.Optional[t.List[CustomTaxRate]] = None
+    custom_taxes: list[CustomTaxRate] | None | Unset = UNSET
 
-    customer_type: t.Optional[CustomerType] = None
+    customer_type: CustomerType | None | Unset = UNSET
 
-    exemption_reason: t.Optional[str] = None
+    exemption_reason: str | None | Unset = UNSET
     """Free-text legal exemption mention surfaced on exempt invoices."""
 
-    first_name: t.Optional[str] = None
+    first_name: str | None | Unset = UNSET
 
-    invoicing_emails: t.Optional[t.List[str]] = None
+    invoicing_emails: list[str] | None | Unset = UNSET
 
-    invoicing_entity_id: t.Optional[InvoicingEntityId] = None
+    invoicing_entity_id: InvoicingEntityId | None | Unset = UNSET
 
-    invoicing_language: t.Optional[str] = None
-    """Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent."""
+    invoicing_language: str | None | Unset = UNSET
+    """Deprecated: use `preferred_locales`. Applied only when `preferred_locales` is absent.
 
-    is_tax_exempt: t.Optional[bool] = None
+    .. deprecated:: This field is deprecated."""
 
-    last_name: t.Optional[str] = None
+    is_tax_exempt: bool | None | Unset = UNSET
 
-    legal_number: t.Optional[str] = None
+    last_name: str | None | Unset = UNSET
+
+    legal_number: str | None | Unset = UNSET
     """BT-47 — the buyer's national register identifier (SIREN/SIRET, HRB)."""
 
-    name: t.Optional[str] = None
+    name: str | None | Unset = UNSET
 
-    phone: t.Optional[str] = None
+    phone: str | None | Unset = UNSET
 
-    preferred_locales: t.Optional[t.List[str]] = None
+    preferred_locales: list[str] | None | Unset = UNSET
     """Preferred document languages, most-preferred first (BCP-47 tags, e.g.
     `["fr-FR", "en"]`); overrides the invoicing entity default. Omit to leave
     unchanged, send `[]` to reset to that default."""
 
-    shipping_address: t.Optional[ShippingAddress] = None
+    shipping_address: ShippingAddress | None | Unset = UNSET
 
-    vat_number: t.Optional[str] = None
+    vat_number: str | None | Unset = UNSET

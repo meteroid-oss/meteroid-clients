@@ -1,62 +1,79 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type BatchJobId, BatchJobIdSerializer } from "./batchJobId";
-import { type BatchJobStatus, BatchJobStatusSerializer } from "./batchJobStatus";
-import { type BatchJobType, BatchJobTypeSerializer } from "./batchJobType";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type BatchJobId, BatchJobIdSerializer } from "./batchJobId.js";
+import { type BatchJobStatus, BatchJobStatusSerializer } from "./batchJobStatus.js";
+import { type BatchJobType, BatchJobTypeSerializer } from "./batchJobType.js";
 
 export interface BatchJobResponse {
-  completedAt?: Date | null;
-
+  completedAt?: Date | null | undefined;
   createdAt: Date;
-
   createdBy: string;
-
   failedItems: number;
-
   id: BatchJobId;
-
-  inputFileName?: string | null;
-
+  inputFileName?: string | null | undefined;
   jobType: BatchJobType;
-
   processedItems: number;
-
   status: BatchJobStatus;
-
-  totalItems?: number | null;
+  totalItems?: number | null | undefined;
 }
 
+/** Converts `BatchJobResponse` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BatchJobResponseSerializer = {
-  _fromJsonObject(object: any): BatchJobResponse {
+  parse(json: any): BatchJobResponse {
     return {
+      ...extraProperties(json, [
+        "completed_at",
+        "created_at",
+        "created_by",
+        "failed_items",
+        "id",
+        "input_file_name",
+        "job_type",
+        "processed_items",
+        "status",
+        "total_items",
+      ]),
       completedAt:
-        object["completed_at"] != null
-          ? parseDateTime(object["completed_at"])
-          : undefined,
-      createdAt: parseDateTime(object["created_at"]),
-      createdBy: object["created_by"],
-      failedItems: object["failed_items"],
-      id: BatchJobIdSerializer._fromJsonObject(object["id"]),
-      inputFileName: object["input_file_name"],
-      jobType: BatchJobTypeSerializer._fromJsonObject(object["job_type"]),
-      processedItems: object["processed_items"],
-      status: BatchJobStatusSerializer._fromJsonObject(object["status"]),
-      totalItems: object["total_items"],
+        json["completed_at"] != null
+          ? parseDateTime(json["completed_at"])
+          : json["completed_at"],
+      createdAt: parseDateTime(json["created_at"]),
+      createdBy: json["created_by"],
+      failedItems: json["failed_items"],
+      id: BatchJobIdSerializer.parse(json["id"]),
+      inputFileName: json["input_file_name"],
+      jobType: BatchJobTypeSerializer.parse(json["job_type"]),
+      processedItems: json["processed_items"],
+      status: BatchJobStatusSerializer.parse(json["status"]),
+      totalItems: json["total_items"],
     };
   },
 
-  _toJsonObject(self: BatchJobResponse): any {
+  serialize(value: BatchJobResponse): any {
     return {
-      completed_at: self.completedAt,
-      created_at: self.createdAt,
-      created_by: self.createdBy,
-      failed_items: self.failedItems,
-      id: BatchJobIdSerializer._toJsonObject(self.id),
-      input_file_name: self.inputFileName,
-      job_type: BatchJobTypeSerializer._toJsonObject(self.jobType),
-      processed_items: self.processedItems,
-      status: BatchJobStatusSerializer._toJsonObject(self.status),
-      total_items: self.totalItems,
+      ...extraProperties(value, [
+        "completedAt",
+        "createdAt",
+        "createdBy",
+        "failedItems",
+        "id",
+        "inputFileName",
+        "jobType",
+        "processedItems",
+        "status",
+        "totalItems",
+      ]),
+      completed_at: value.completedAt,
+      created_at: value.createdAt,
+      created_by: value.createdBy,
+      failed_items: value.failedItems,
+      id: BatchJobIdSerializer.serialize(value.id),
+      input_file_name: value.inputFileName,
+      job_type: BatchJobTypeSerializer.serialize(value.jobType),
+      processed_items: value.processedItems,
+      status: BatchJobStatusSerializer.serialize(value.status),
+      total_items: value.totalItems,
     };
   },
 };

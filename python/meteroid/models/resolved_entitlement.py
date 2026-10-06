@@ -1,12 +1,17 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
+import typing as t
 
 from ..serialization import BaseModel
-from .feature_ref import FeatureRef
-from .resolved_entitlement_value import ResolvedEntitlementValue
+
+if t.TYPE_CHECKING:
+    from .feature_ref import FeatureRef
+    from .resolved_entitlement_value import ResolvedEntitlementValue
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class ResolvedEntitlement(BaseModel):
     """Merged entitlement value for a feature across the priority hierarchy, without usage data."""
 

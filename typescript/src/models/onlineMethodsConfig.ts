@@ -1,39 +1,42 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 import {
   type OnlineMethodConfig,
   OnlineMethodConfigSerializer,
-} from "./onlineMethodConfig";
+} from "./onlineMethodConfig.js";
 
 export interface OnlineMethodsConfig {
-  card?: OnlineMethodConfig | null;
-
-  directDebit?: OnlineMethodConfig | null;
+  card?: OnlineMethodConfig | null | undefined;
+  directDebit?: OnlineMethodConfig | null | undefined;
 }
 
+/** Converts `OnlineMethodsConfig` values from (`parse`) and to (`serialize`) their JSON form. */
 export const OnlineMethodsConfigSerializer = {
-  _fromJsonObject(object: any): OnlineMethodsConfig {
+  parse(json: any): OnlineMethodsConfig {
     return {
+      ...extraProperties(json, ["card", "direct_debit"]),
       card:
-        object["card"] != null
-          ? OnlineMethodConfigSerializer._fromJsonObject(object["card"])
-          : undefined,
+        json["card"] != null
+          ? OnlineMethodConfigSerializer.parse(json["card"])
+          : json["card"],
       directDebit:
-        object["direct_debit"] != null
-          ? OnlineMethodConfigSerializer._fromJsonObject(object["direct_debit"])
-          : undefined,
+        json["direct_debit"] != null
+          ? OnlineMethodConfigSerializer.parse(json["direct_debit"])
+          : json["direct_debit"],
     };
   },
 
-  _toJsonObject(self: OnlineMethodsConfig): any {
+  serialize(value: OnlineMethodsConfig): any {
     return {
+      ...extraProperties(value, ["card", "directDebit"]),
       card:
-        self.card != null
-          ? OnlineMethodConfigSerializer._toJsonObject(self.card)
-          : undefined,
+        value.card != null
+          ? OnlineMethodConfigSerializer.serialize(value.card)
+          : value.card,
       direct_debit:
-        self.directDebit != null
-          ? OnlineMethodConfigSerializer._toJsonObject(self.directDebit)
-          : undefined,
+        value.directDebit != null
+          ? OnlineMethodConfigSerializer.serialize(value.directDebit)
+          : value.directDebit,
     };
   },
 };

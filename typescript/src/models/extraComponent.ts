@@ -1,29 +1,31 @@
 // this file is @generated
-import { type PriceEntry, PriceEntrySerializer } from "./priceEntry";
-import { type ProductRef, ProductRefSerializer } from "./productRef";
+import { extraProperties } from "../json.js";
+import { type PriceEntry, PriceEntrySerializer } from "./priceEntry.js";
+import { type ProductRef, ProductRefSerializer } from "./productRef.js";
 
 export interface ExtraComponent {
   name: string;
-
   priceEntry: PriceEntry;
-
   productRef: ProductRef;
 }
 
+/** Converts `ExtraComponent` values from (`parse`) and to (`serialize`) their JSON form. */
 export const ExtraComponentSerializer = {
-  _fromJsonObject(object: any): ExtraComponent {
+  parse(json: any): ExtraComponent {
     return {
-      name: object["name"],
-      priceEntry: PriceEntrySerializer._fromJsonObject(object["price_entry"]),
-      productRef: ProductRefSerializer._fromJsonObject(object["product_ref"]),
+      ...extraProperties(json, ["name", "price_entry", "product_ref"]),
+      name: json["name"],
+      priceEntry: PriceEntrySerializer.parse(json["price_entry"]),
+      productRef: ProductRefSerializer.parse(json["product_ref"]),
     };
   },
 
-  _toJsonObject(self: ExtraComponent): any {
+  serialize(value: ExtraComponent): any {
     return {
-      name: self.name,
-      price_entry: PriceEntrySerializer._toJsonObject(self.priceEntry),
-      product_ref: ProductRefSerializer._toJsonObject(self.productRef),
+      ...extraProperties(value, ["name", "priceEntry", "productRef"]),
+      name: value.name,
+      price_entry: PriceEntrySerializer.serialize(value.priceEntry),
+      product_ref: ProductRefSerializer.serialize(value.productRef),
     };
   },
 };

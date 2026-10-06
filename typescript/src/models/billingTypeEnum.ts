@@ -1,16 +1,20 @@
 // this file is @generated
 
-export enum BillingTypeEnum {
-  Advance = "ADVANCE",
-  Arrears = "ARREARS",
-}
+export const BillingTypeEnum = {
+  Advance: "ADVANCE",
+  Arrears: "ARREARS",
+} as const;
+export type BillingTypeEnum =
+  | (typeof BillingTypeEnum)[keyof typeof BillingTypeEnum]
+  | (string & {});
 
+/** Converts `BillingTypeEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const BillingTypeEnumSerializer = {
-  _fromJsonObject(object: any): BillingTypeEnum {
-    return object;
+  parse(json: any): BillingTypeEnum {
+    return json;
   },
 
-  _toJsonObject(self: BillingTypeEnum): any {
-    return self;
+  serialize(value: BillingTypeEnum): any {
+    return value;
   },
 };

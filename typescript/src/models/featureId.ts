@@ -2,12 +2,13 @@
 
 export type FeatureId = string;
 
+/** Converts `FeatureId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const FeatureIdSerializer = {
-  _fromJsonObject(object: any): FeatureId {
-    return object;
+  parse(json: any): FeatureId {
+    return json;
   },
 
-  _toJsonObject(self: FeatureId): any {
-    return self;
+  serialize(value: FeatureId): any {
+    return value;
   },
 };

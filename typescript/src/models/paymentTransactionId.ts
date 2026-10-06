@@ -2,12 +2,13 @@
 
 export type PaymentTransactionId = string;
 
+/** Converts `PaymentTransactionId` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PaymentTransactionIdSerializer = {
-  _fromJsonObject(object: any): PaymentTransactionId {
-    return object;
+  parse(json: any): PaymentTransactionId {
+    return json;
   },
 
-  _toJsonObject(self: PaymentTransactionId): any {
-    return self;
+  serialize(value: PaymentTransactionId): any {
+    return value;
   },
 };

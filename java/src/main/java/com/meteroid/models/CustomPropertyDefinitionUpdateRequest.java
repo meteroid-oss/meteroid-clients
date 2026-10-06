@@ -1,170 +1,362 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.JsonField;
+import com.meteroid.internal.Utils;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-@ToString
-@EqualsAndHashCode
+/**
+ * Update of a definition. <code>key</code>, <code>entity_type</code> and <code>property_type</code>
+ * are immutable and cannot be changed here. Any field left absent is unchanged.
+ *
+ * <p>Immutable: build one with {@link #builder()}, change a copy with {@link #toBuilder()}.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class CustomPropertyDefinitionUpdateRequest {
-    @JsonProperty private PropertyConfig config;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+public final class CustomPropertyDefinitionUpdateRequest {
+    @JsonProperty("config")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<PropertyConfig> config = JsonField.missing();
 
     @JsonProperty("default_value")
     private Object defaultValue;
 
-    @JsonProperty private String description;
+    @JsonProperty("description")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> description = JsonField.missing();
 
     @JsonProperty("display_order")
-    private Integer displayOrder;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<Integer> displayOrder = JsonField.missing();
 
-    @JsonProperty private String name;
-    @JsonProperty private Boolean required;
+    @JsonProperty("name")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<String> name = JsonField.missing();
 
-    public CustomPropertyDefinitionUpdateRequest() {}
+    @JsonProperty("required")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private JsonField<Boolean> required = JsonField.missing();
 
-    public CustomPropertyDefinitionUpdateRequest config(PropertyConfig config) {
-        this.config = config;
-        return this;
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    private CustomPropertyDefinitionUpdateRequest() {}
+
+    private CustomPropertyDefinitionUpdateRequest(Builder builder) {
+        this.config = builder.config;
+        this.defaultValue = builder.defaultValue;
+        this.description = builder.description;
+        this.displayOrder = builder.displayOrder;
+        this.name = builder.name;
+        this.required = builder.required;
+        this.additionalProperties.putAll(builder.additionalProperties);
     }
 
     /**
-     * Get config
+     * A builder of {@code CustomPropertyDefinitionUpdateRequest}.
      *
-     * @return config
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public PropertyConfig getConfig() {
-        return config;
-    }
-
-    public void setConfig(PropertyConfig config) {
-        this.config = config;
-    }
-
-    public CustomPropertyDefinitionUpdateRequest defaultValue(Object defaultValue) {
-        this.defaultValue = defaultValue;
-        return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Get defaultValue
+     * A builder starting from this value.
      *
-     * @return defaultValue
+     * @return a new builder
      */
-    @javax.annotation.Nullable
-    public Object getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(Object defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public CustomPropertyDefinitionUpdateRequest description(String description) {
-        this.description = description;
-        return this;
+    public Builder toBuilder() {
+        Builder builder = new Builder();
+        builder.config = config;
+        builder.defaultValue = defaultValue;
+        builder.description = description;
+        builder.displayOrder = displayOrder;
+        builder.name = name;
+        builder.required = required;
+        builder.additionalProperties.putAll(additionalProperties);
+        return builder;
     }
 
     /**
-     * Get description
+     * The {@code config} property.
      *
-     * @return description
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public CustomPropertyDefinitionUpdateRequest displayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
-        return this;
+    public Optional<PropertyConfig> config() {
+        return config.asOptional();
     }
 
     /**
-     * Get displayOrder
+     * The {@code default_value} property.
      *
-     * @return displayOrder
+     * @return the value, empty when unset
      */
-    @javax.annotation.Nullable
-    public Integer getDisplayOrder() {
-        return displayOrder;
-    }
-
-    public void setDisplayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
-    }
-
-    public CustomPropertyDefinitionUpdateRequest name(String name) {
-        this.name = name;
-        return this;
+    public Optional<Object> defaultValue() {
+        return Optional.ofNullable(defaultValue);
     }
 
     /**
-     * Get name
+     * The {@code description} property.
      *
-     * @return name
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public CustomPropertyDefinitionUpdateRequest required(Boolean required) {
-        this.required = required;
-        return this;
+    public Optional<String> description() {
+        return description.asOptional();
     }
 
     /**
-     * Get required
+     * The {@code display_order} property.
      *
-     * @return required
+     * @return the value, empty when unset or null
      */
-    @javax.annotation.Nullable
-    public Boolean getRequired() {
-        return required;
-    }
-
-    public void setRequired(Boolean required) {
-        this.required = required;
+    public Optional<Integer> displayOrder() {
+        return displayOrder.asOptional();
     }
 
     /**
-     * Create an instance of CustomPropertyDefinitionUpdateRequest given an JSON string
+     * The {@code name} property.
      *
-     * @param jsonString JSON string
-     * @return An instance of CustomPropertyDefinitionUpdateRequest
-     * @throws JsonProcessingException if the JSON string is invalid with respect to
-     *     CustomPropertyDefinitionUpdateRequest
+     * @return the value, empty when unset or null
      */
-    public static CustomPropertyDefinitionUpdateRequest fromJson(String jsonString)
-            throws JsonProcessingException {
-        return Utils.getObjectMapper()
-                .readValue(jsonString, CustomPropertyDefinitionUpdateRequest.class);
+    public Optional<String> name() {
+        return name.asOptional();
     }
 
     /**
-     * Convert an instance of CustomPropertyDefinitionUpdateRequest to an JSON string
+     * The {@code required} property.
      *
-     * @return JSON string
+     * @return the value, empty when unset or null
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    public Optional<Boolean> required() {
+        return required.asOptional();
+    }
+
+    /**
+     * Properties this version of the SDK does not know, kept as received and sent back.
+     *
+     * @return the properties by name, unmodifiable
+     */
+    public Map<String, JsonNode> additionalProperties() {
+        return Collections.unmodifiableMap(additionalProperties);
+    }
+
+    @JsonAnyGetter
+    private Map<String, JsonNode> anyProperties() {
+        return additionalProperties;
+    }
+
+    @JsonAnySetter
+    private void putAnyProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CustomPropertyDefinitionUpdateRequest that = (CustomPropertyDefinitionUpdateRequest) o;
+        return Objects.equals(config, that.config)
+                && Objects.equals(defaultValue, that.defaultValue)
+                && Objects.equals(description, that.description)
+                && Objects.equals(displayOrder, that.displayOrder)
+                && Objects.equals(name, that.name)
+                && Objects.equals(required, that.required)
+                && Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                config,
+                defaultValue,
+                description,
+                displayOrder,
+                name,
+                required,
+                additionalProperties);
+    }
+
+    @Override
+    public String toString() {
+        return "CustomPropertyDefinitionUpdateRequest{"
+                + "config="
+                + config
+                + ", defaultValue="
+                + defaultValue
+                + ", description="
+                + description
+                + ", displayOrder="
+                + displayOrder
+                + ", name="
+                + name
+                + ", required="
+                + required
+                + ", additionalProperties="
+                + additionalProperties
+                + "}";
+    }
+
+    /** Builds {@link CustomPropertyDefinitionUpdateRequest}. */
+    public static final class Builder {
+        private JsonField<PropertyConfig> config = JsonField.missing();
+        private Object defaultValue;
+        private JsonField<String> description = JsonField.missing();
+        private JsonField<Integer> displayOrder = JsonField.missing();
+        private JsonField<String> name = JsonField.missing();
+        private JsonField<Boolean> required = JsonField.missing();
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        private Builder() {}
+
+        /**
+         * The {@code config} property.
+         *
+         * @param config the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder config(PropertyConfig config) {
+            this.config = JsonField.ofNullable(config);
+            return this;
+        }
+
+        /**
+         * The {@code default_value} property.
+         *
+         * @param defaultValue the value
+         * @return this builder
+         */
+        public Builder defaultValue(Object defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        /**
+         * The {@code description} property.
+         *
+         * @param description the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder description(String description) {
+            this.description = JsonField.ofNullable(description);
+            return this;
+        }
+
+        /**
+         * The {@code display_order} property.
+         *
+         * @param displayOrder the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder displayOrder(Integer displayOrder) {
+            this.displayOrder = JsonField.ofNullable(displayOrder);
+            return this;
+        }
+
+        /**
+         * The {@code name} property.
+         *
+         * @param name the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder name(String name) {
+            this.name = JsonField.ofNullable(name);
+            return this;
+        }
+
+        /**
+         * The {@code required} property.
+         *
+         * @param required the value, null to send an explicit {@code null}
+         * @return this builder
+         */
+        public Builder required(Boolean required) {
+            this.required = JsonField.ofNullable(required);
+            return this;
+        }
+
+        /**
+         * A property the SDK does not know, sent along.
+         *
+         * @param name the property name
+         * @param value the JSON value
+         * @return this builder
+         */
+        public Builder putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+            return this;
+        }
+
+        /**
+         * Properties the SDK does not know, sent along.
+         *
+         * @param additionalProperties the properties by name
+         * @return this builder
+         */
+        public Builder putAllAdditionalProperties(Map<String, JsonNode> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
+        }
+
+        /**
+         * Leaves out a property the SDK does not know.
+         *
+         * @param name the property name
+         * @return this builder
+         */
+        public Builder removeAdditionalProperty(String name) {
+            additionalProperties.remove(name);
+            return this;
+        }
+
+        /**
+         * The {@code CustomPropertyDefinitionUpdateRequest}.
+         *
+         * @return the immutable value
+         * @throws IllegalStateException when a required property is not set
+         */
+        public CustomPropertyDefinitionUpdateRequest build() {
+            return new CustomPropertyDefinitionUpdateRequest(this);
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code CustomPropertyDefinitionUpdateRequest}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static CustomPropertyDefinitionUpdateRequest fromJson(String json) {
+        return Utils.parse(json, CustomPropertyDefinitionUpdateRequest.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
     }
 }

@@ -1,50 +1,64 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Token request (from POST body, application/x-www-form-urlencoded) */
 export interface TokenRequest {
   /** Client ID (if not using HTTP Basic auth) */
-  clientId?: string | null;
-
+  clientId?: string | null | undefined;
   /** Client secret (if not using HTTP Basic auth) */
-  clientSecret?: string | null;
-
+  clientSecret?: string | null | undefined;
   /** Authorization code (for authorization_code grant) */
-  code?: string | null;
-
+  code?: string | null | undefined;
   /** PKCE code verifier (for authorization_code grant with PKCE) */
-  codeVerifier?: string | null;
-
+  codeVerifier?: string | null | undefined;
   /** Grant type: "authorization_code" or "refresh_token" */
   grantType: string;
-
   /** Redirect URI (for authorization_code grant, must match the one used in /authorize) */
-  redirectUri?: string | null;
-
+  redirectUri?: string | null | undefined;
   /** Refresh token (for refresh_token grant) */
-  refreshToken?: string | null;
+  refreshToken?: string | null | undefined;
 }
 
+/** Converts `TokenRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const TokenRequestSerializer = {
-  _fromJsonObject(object: any): TokenRequest {
+  parse(json: any): TokenRequest {
     return {
-      clientId: object["client_id"],
-      clientSecret: object["client_secret"],
-      code: object["code"],
-      codeVerifier: object["code_verifier"],
-      grantType: object["grant_type"],
-      redirectUri: object["redirect_uri"],
-      refreshToken: object["refresh_token"],
+      ...extraProperties(json, [
+        "client_id",
+        "client_secret",
+        "code",
+        "code_verifier",
+        "grant_type",
+        "redirect_uri",
+        "refresh_token",
+      ]),
+      clientId: json["client_id"],
+      clientSecret: json["client_secret"],
+      code: json["code"],
+      codeVerifier: json["code_verifier"],
+      grantType: json["grant_type"],
+      redirectUri: json["redirect_uri"],
+      refreshToken: json["refresh_token"],
     };
   },
 
-  _toJsonObject(self: TokenRequest): any {
+  serialize(value: TokenRequest): any {
     return {
-      client_id: self.clientId,
-      client_secret: self.clientSecret,
-      code: self.code,
-      code_verifier: self.codeVerifier,
-      grant_type: self.grantType,
-      redirect_uri: self.redirectUri,
-      refresh_token: self.refreshToken,
+      ...extraProperties(value, [
+        "clientId",
+        "clientSecret",
+        "code",
+        "codeVerifier",
+        "grantType",
+        "redirectUri",
+        "refreshToken",
+      ]),
+      client_id: value.clientId,
+      client_secret: value.clientSecret,
+      code: value.code,
+      code_verifier: value.codeVerifier,
+      grant_type: value.grantType,
+      redirect_uri: value.redirectUri,
+      refresh_token: value.refreshToken,
     };
   },
 };

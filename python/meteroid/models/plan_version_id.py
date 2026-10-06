@@ -1,2 +1,4 @@
 # this file is @generated
-PlanVersionId = str
+import typing as t
+
+PlanVersionId: t.TypeAlias = str

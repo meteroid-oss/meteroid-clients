@@ -1,194 +1,597 @@
 // This file is @generated
 package com.meteroid.models;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.meteroid.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.meteroid.internal.Utils;
 
-import lombok.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A static, typed configuration value carried by a Config entitlement. Resolved synchronously
  * through the entitlement hierarchy — no metric, no usage counter.
+ *
+ * <p>One of the variants below, told apart by {@code kind}. A value this version of the SDK does
+ * not know parses as {@link Unrecognized}, which keeps its properties.
  */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "kind",
-        visible = true)
+        visible = true,
+        defaultImpl = ConfigValue.Unrecognized.class)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = ConfigValue.Number.class, name = "NUMBER"),
     @JsonSubTypes.Type(value = ConfigValue.Boolean.class, name = "BOOLEAN"),
     @JsonSubTypes.Type(value = ConfigValue.Text.class, name = "TEXT"),
     @JsonSubTypes.Type(value = ConfigValue.Json.class, name = "JSON")
 })
-@ToString
-@EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        getterVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
 public abstract class ConfigValue {
-    /** Get the discriminator value identifying this variant. */
-    public abstract String getKind();
+
+    private ConfigValue() {}
 
     /**
-     * Convert an instance of ConfigValue to a JSON string.
+     * The discriminator value identifying this variant.
      *
-     * @return JSON string
+     * @return the {@code kind} value
      */
-    public String toJson() throws JsonProcessingException {
-        return Utils.getObjectMapper().writeValueAsString(this);
+    @JsonProperty("kind")
+    public abstract String kind();
+
+    /**
+     * Whether this is the {@code NUMBER} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isNumber() {
+        return this instanceof Number;
     }
 
     /**
-     * Create an instance of ConfigValue from a JSON string.
+     * This value as the {@code NUMBER} variant.
      *
-     * @param jsonString JSON string
-     * @return An instance of ConfigValue
-     * @throws JsonProcessingException if the JSON string is invalid
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
      */
-    public static ConfigValue fromJson(String jsonString) throws JsonProcessingException {
-        return Utils.getObjectMapper().readValue(jsonString, ConfigValue.class);
+    public final Number asNumber() {
+        if (this instanceof Number) {
+            return (Number) this;
+        }
+        throw new IllegalStateException("not the NUMBER variant: " + kind());
     }
 
-    // Variant classes
     /**
-     * Variant: NUMBER
+     * Whether this is the {@code BOOLEAN} variant.
      *
-     * <p>This variant wraps NumberConfigValue.
+     * @return whether it is
      */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    public final boolean isBoolean() {
+        return this instanceof Boolean;
+    }
+
+    /**
+     * This value as the {@code BOOLEAN} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Boolean asBoolean() {
+        if (this instanceof Boolean) {
+            return (Boolean) this;
+        }
+        throw new IllegalStateException("not the BOOLEAN variant: " + kind());
+    }
+
+    /**
+     * Whether this is the {@code TEXT} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isText() {
+        return this instanceof Text;
+    }
+
+    /**
+     * This value as the {@code TEXT} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Text asText() {
+        if (this instanceof Text) {
+            return (Text) this;
+        }
+        throw new IllegalStateException("not the TEXT variant: " + kind());
+    }
+
+    /**
+     * Whether this is the {@code JSON} variant.
+     *
+     * @return whether it is
+     */
+    public final boolean isJson() {
+        return this instanceof Json;
+    }
+
+    /**
+     * This value as the {@code JSON} variant.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Json asJson() {
+        if (this instanceof Json) {
+            return (Json) this;
+        }
+        throw new IllegalStateException("not the JSON variant: " + kind());
+    }
+
+    /**
+     * Whether this is a variant this version of the SDK does not know.
+     *
+     * @return whether it is
+     */
+    public final boolean isUnrecognized() {
+        return this instanceof Unrecognized;
+    }
+
+    /**
+     * This value as a variant this version of the SDK does not know.
+     *
+     * @return the variant
+     * @throws IllegalStateException if this is another variant
+     */
+    public final Unrecognized asUnrecognized() {
+        if (this instanceof Unrecognized) {
+            return (Unrecognized) this;
+        }
+        throw new IllegalStateException("not a known variant: " + kind());
+    }
+
+    /**
+     * Calls the method of {@code visitor} for this variant.
+     *
+     * @param <R> the result type
+     * @param visitor the visitor
+     * @return the result of the visitor
+     */
+    public abstract <R> R accept(Visitor<R> visitor);
+
+    /**
+     * A function of each variant, called by {@link #accept}.
+     *
+     * @param <R> the result type
+     */
+    public interface Visitor<R> {
+        /**
+         * Visits the {@code NUMBER} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitNumber(NumberConfigValue value);
+
+        /**
+         * Visits the {@code BOOLEAN} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitBoolean(BooleanConfigValue value);
+
+        /**
+         * Visits the {@code TEXT} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitText(TextConfigValue value);
+
+        /**
+         * Visits the {@code JSON} variant.
+         *
+         * @param value the variant
+         * @return the result
+         */
+        R visitJson(JsonConfigValue value);
+
+        /**
+         * Visits a variant this version of the SDK does not know.
+         *
+         * @param value the variant, with its properties
+         * @return the result
+         * @throws com.meteroid.exceptions.InvalidDataException unless overridden
+         */
+        default R visitUnknown(Unrecognized value) {
+            throw new com.meteroid.exceptions.InvalidDataException(
+                    "unknown ConfigValue variant: " + value.kind());
+        }
+    }
+
+    /**
+     * Parse {@code json} as {@code ConfigValue}.
+     *
+     * @param json the JSON text
+     * @return the value
+     * @throws com.meteroid.exceptions.InvalidDataException if it is not valid JSON of this shape
+     */
+    public static ConfigValue fromJson(String json) {
+        return Utils.parse(json, ConfigValue.class);
+    }
+
+    /**
+     * This value as JSON.
+     *
+     * @return the JSON text
+     */
+    public String toJson() {
+        return Utils.json(this);
+    }
+
+    /** The {@code NUMBER} variant. */
     @JsonTypeName("NUMBER")
-    public static class Number extends ConfigValue {
-        @JsonUnwrapped private NumberConfigValue data;
+    public static final class Number extends ConfigValue {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "kind", allowSetters = true)
+        private NumberConfigValue data;
 
-        public Number() {}
+        private Number() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Number(NumberConfigValue data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getKind() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Number of(NumberConfigValue data) {
+            return new Number(data);
+        }
+
+        @Override
+        @JsonProperty("kind")
+        public String kind() {
             return "NUMBER";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public NumberConfigValue getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public NumberConfigValue data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Number data(NumberConfigValue data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Number that = (Number) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Number{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitNumber(data);
         }
     }
 
-    /**
-     * Variant: BOOLEAN
-     *
-     * <p>This variant wraps BooleanConfigValue.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code BOOLEAN} variant. */
     @JsonTypeName("BOOLEAN")
-    public static class Boolean extends ConfigValue {
-        @JsonUnwrapped private BooleanConfigValue data;
+    public static final class Boolean extends ConfigValue {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "kind", allowSetters = true)
+        private BooleanConfigValue data;
 
-        public Boolean() {}
+        private Boolean() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Boolean(BooleanConfigValue data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getKind() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Boolean of(BooleanConfigValue data) {
+            return new Boolean(data);
+        }
+
+        @Override
+        @JsonProperty("kind")
+        public String kind() {
             return "BOOLEAN";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public BooleanConfigValue getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public BooleanConfigValue data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Boolean data(BooleanConfigValue data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Boolean that = (Boolean) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Boolean{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBoolean(data);
         }
     }
 
-    /**
-     * Variant: TEXT
-     *
-     * <p>This variant wraps TextConfigValue.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code TEXT} variant. */
     @JsonTypeName("TEXT")
-    public static class Text extends ConfigValue {
-        @JsonUnwrapped private TextConfigValue data;
+    public static final class Text extends ConfigValue {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "kind", allowSetters = true)
+        private TextConfigValue data;
 
-        public Text() {}
+        private Text() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Text(TextConfigValue data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getKind() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Text of(TextConfigValue data) {
+            return new Text(data);
+        }
+
+        @Override
+        @JsonProperty("kind")
+        public String kind() {
             return "TEXT";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public TextConfigValue getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public TextConfigValue data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Text data(TextConfigValue data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Text that = (Text) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Text{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitText(data);
         }
     }
 
-    /**
-     * Variant: JSON
-     *
-     * <p>This variant wraps JsonConfigValue.
-     */
-    @ToString(callSuper = true)
-    @EqualsAndHashCode(callSuper = true)
+    /** The {@code JSON} variant. */
     @JsonTypeName("JSON")
-    public static class Json extends ConfigValue {
-        @JsonUnwrapped private JsonConfigValue data;
+    public static final class Json extends ConfigValue {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "kind", allowSetters = true)
+        private JsonConfigValue data;
 
-        public Json() {}
+        private Json() {}
 
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         */
         public Json(JsonConfigValue data) {
-            this.data = data;
+            this.data = Objects.requireNonNull(data, "data");
         }
 
-        @java.lang.Override
-        public String getKind() {
+        /**
+         * The variant holding {@code data}.
+         *
+         * @param data the value of the variant
+         * @return the variant
+         */
+        public static Json of(JsonConfigValue data) {
+            return new Json(data);
+        }
+
+        @Override
+        @JsonProperty("kind")
+        public String kind() {
             return "JSON";
         }
 
-        /** Get the wrapped data for this variant. */
-        @javax.annotation.Nonnull
-        public JsonConfigValue getData() {
+        /**
+         * The value of the variant.
+         *
+         * @return the value
+         */
+        public JsonConfigValue data() {
             return data;
         }
 
-        /** Set the wrapped data for this variant. */
-        public Json data(JsonConfigValue data) {
-            this.data = data;
-            return this;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Json that = (Json) o;
+            return Objects.equals(data, that.data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data);
+        }
+
+        @Override
+        public String toString() {
+            return "Json{" + "data=" + data + "}";
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitJson(data);
+        }
+    }
+
+    /** A variant this version of the SDK does not know. */
+    public static final class Unrecognized extends ConfigValue {
+        @JsonProperty("kind")
+        private String discriminator;
+
+        private final Map<String, JsonNode> properties = new LinkedHashMap<>();
+
+        private Unrecognized() {}
+
+        @Override
+        @JsonProperty("kind")
+        public String kind() {
+            return discriminator;
+        }
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitUnknown(this);
+        }
+
+        /**
+         * Every other property of the variant.
+         *
+         * @return the properties by name, unmodifiable
+         */
+        @JsonAnyGetter
+        public Map<String, JsonNode> properties() {
+            return Collections.unmodifiableMap(properties);
+        }
+
+        @JsonAnySetter
+        private void putProperty(String name, JsonNode value) {
+            properties.put(name, value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Unrecognized that = (Unrecognized) o;
+            return Objects.equals(discriminator, that.discriminator)
+                    && Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(discriminator, properties);
+        }
+
+        @Override
+        public String toString() {
+            return "Unrecognized{"
+                    + "discriminator="
+                    + discriminator
+                    + ", properties="
+                    + properties
+                    + "}";
         }
     }
 }

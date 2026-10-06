@@ -1,8 +1,10 @@
 # this file is @generated
-import enum
+import typing as t
+
+from ..serialization import StrEnum
 
 
-class ConnectionStatus(str, enum.Enum):
+class ConnectionStatus(StrEnum):
     """Status of a connected account"""
 
     PENDING = "pending"
@@ -10,5 +12,8 @@ class ConnectionStatus(str, enum.Enum):
     REVOKED = "revoked"
     SUSPENDED = "suspended"
 
-    def __str__(self) -> str:
-        return str(self.value)
+
+ConnectionStatusLiteral: t.TypeAlias = t.Literal[
+    "pending", "active", "revoked", "suspended"
+]
+"""The values of :class:`ConnectionStatus`, which arguments take as plain strings too."""

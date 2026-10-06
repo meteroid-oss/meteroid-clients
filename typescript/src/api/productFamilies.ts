@@ -1,33 +1,43 @@
 // this file is @generated
-import { type ProductFamily, ProductFamilySerializer } from "../models/productFamily";
+
+import { type ProductFamily, ProductFamilySerializer } from "../models/productFamily.js";
 import {
   type ProductFamilyCreateRequest,
   ProductFamilyCreateRequestSerializer,
-} from "../models/productFamilyCreateRequest";
+} from "../models/productFamilyCreateRequest.js";
 import {
   type ProductFamilyListResponse,
   ProductFamilyListResponseSerializer,
-} from "../models/productFamilyListResponse";
-import { HttpMethod, MeteroidRequest, type MeteroidRequestContext } from "../request";
+} from "../models/productFamilyListResponse.js";
+import type { APIPromise } from "../apiPromise.js";
+import {
+  MeteroidRequest,
+  type MeteroidRequestContext,
+  type RequestOptions,
+} from "../request.js";
 
-export interface ProductFamiliesListProductFamiliesOptions {
+/** The query and header parameters of `list`. */
+export interface ProductFamiliesListOptions {
   /** Sort order. Format: `column.direction`. Allowed columns: `name`, `created_at`. Direction: `asc` or `desc`. Default: `created_at.desc`. */
-  orderBy?: string;
+  orderBy?: string | undefined;
   /** Page number (0-indexed) */
-  page?: number;
+  page?: number | undefined;
   /** Number of items per page */
-  perPage?: number;
-  search?: string;
+  perPage?: number | undefined;
+  search?: string | undefined;
 }
 
+/** The product families operations, reached through the client's `productFamilies`. */
 export class ProductFamilies {
+  /** @internal */
   public constructor(private readonly requestCtx: MeteroidRequestContext) {}
 
-  /**  */
-  public listProductFamilies(
-    options?: ProductFamiliesListProductFamiliesOptions
-  ): Promise<ProductFamilyListResponse> {
-    const request = new MeteroidRequest(HttpMethod.GET, "/api/v1/product_families");
+  /** List product families */
+  public list(
+    options?: ProductFamiliesListOptions,
+    requestOptions?: RequestOptions
+  ): APIPromise<ProductFamilyListResponse> {
+    const request = new MeteroidRequest("GET", "/api/v1/product_families");
 
     request.setQueryParam("order_by", options?.orderBy);
     request.setQueryParam("page", options?.page);
@@ -35,30 +45,36 @@ export class ProductFamilies {
     request.setQueryParam("search", options?.search);
     return request.send(
       this.requestCtx,
-      ProductFamilyListResponseSerializer._fromJsonObject
+      ProductFamilyListResponseSerializer.parse,
+      requestOptions
     );
   }
 
-  /**  */
-  public createProductFamily(
-    productFamilyCreateRequest: ProductFamilyCreateRequest
-  ): Promise<ProductFamily> {
-    const request = new MeteroidRequest(HttpMethod.POST, "/api/v1/product_families");
+  /** Create product family */
+  public create(
+    productFamilyCreateRequest: ProductFamilyCreateRequest,
+    requestOptions?: RequestOptions
+  ): APIPromise<ProductFamily> {
+    const request = new MeteroidRequest("POST", "/api/v1/product_families");
 
     request.setBody(
-      ProductFamilyCreateRequestSerializer._toJsonObject(productFamilyCreateRequest)
+      ProductFamilyCreateRequestSerializer.serialize(productFamilyCreateRequest)
     );
-    return request.send(this.requestCtx, ProductFamilySerializer._fromJsonObject);
+    return request.send(this.requestCtx, ProductFamilySerializer.parse, requestOptions);
   }
 
-  /** Retrieve a single product family by ID or alias. */
-  public getProductFamilyByIdOrAlias(idOrAlias: string): Promise<ProductFamily> {
-    const request = new MeteroidRequest(
-      HttpMethod.GET,
-      "/api/v1/product_families/{id_or_alias}"
-    );
+  /**
+   * Get product family
+   *
+   * Retrieve a single product family by ID or alias.
+   */
+  public retrieve(
+    idOrAlias: string,
+    requestOptions?: RequestOptions
+  ): APIPromise<ProductFamily> {
+    const request = new MeteroidRequest("GET", "/api/v1/product_families/{id_or_alias}");
 
     request.setPathParam("id_or_alias", idOrAlias);
-    return request.send(this.requestCtx, ProductFamilySerializer._fromJsonObject);
+    return request.send(this.requestCtx, ProductFamilySerializer.parse, requestOptions);
   }
 }

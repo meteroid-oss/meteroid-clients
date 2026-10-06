@@ -1,33 +1,34 @@
 // this file is @generated
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
-import { type ResetPeriod, ResetPeriodSerializer } from "./resetPeriod";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
+import { type ResetPeriod, ResetPeriodSerializer } from "./resetPeriod.js";
 
 export interface MeteredEntitlementSpec {
   enabled: boolean;
-
-  limit?: string | null;
-
+  limit?: string | null | undefined;
   metricId: BillableMetricId;
-
   resetPeriod: ResetPeriod;
 }
 
+/** Converts `MeteredEntitlementSpec` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MeteredEntitlementSpecSerializer = {
-  _fromJsonObject(object: any): MeteredEntitlementSpec {
+  parse(json: any): MeteredEntitlementSpec {
     return {
-      enabled: object["enabled"],
-      limit: object["limit"],
-      metricId: BillableMetricIdSerializer._fromJsonObject(object["metric_id"]),
-      resetPeriod: ResetPeriodSerializer._fromJsonObject(object["reset_period"]),
+      ...extraProperties(json, ["enabled", "limit", "metric_id", "reset_period"]),
+      enabled: json["enabled"],
+      limit: json["limit"],
+      metricId: BillableMetricIdSerializer.parse(json["metric_id"]),
+      resetPeriod: ResetPeriodSerializer.parse(json["reset_period"]),
     };
   },
 
-  _toJsonObject(self: MeteredEntitlementSpec): any {
+  serialize(value: MeteredEntitlementSpec): any {
     return {
-      enabled: self.enabled,
-      limit: self.limit,
-      metric_id: BillableMetricIdSerializer._toJsonObject(self.metricId),
-      reset_period: ResetPeriodSerializer._toJsonObject(self.resetPeriod),
+      ...extraProperties(value, ["enabled", "limit", "metricId", "resetPeriod"]),
+      enabled: value.enabled,
+      limit: value.limit,
+      metric_id: BillableMetricIdSerializer.serialize(value.metricId),
+      reset_period: ResetPeriodSerializer.serialize(value.resetPeriod),
     };
   },
 };

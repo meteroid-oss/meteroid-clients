@@ -1,31 +1,37 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
 import typing as t
-from datetime import datetime
+from datetime import date, datetime
 
 from ..serialization import BaseModel
-from .coupon_line_item import CouponLineItem
-from .currency import Currency
-from .customer_details import CustomerDetails
-from .customer_id import CustomerId
-from .e_invoicing_status import EInvoicingStatus
-from .invoice_id import InvoiceId
-from .invoice_line_item import InvoiceLineItem
-from .invoice_payment_status import InvoicePaymentStatus
-from .invoice_status import InvoiceStatus
-from .invoice_type import InvoiceType
-from .subscription_id import SubscriptionId
-from .tax_breakdown_item import TaxBreakdownItem
-from .transaction import Transaction
+
+if t.TYPE_CHECKING:
+    from .coupon_line_item import CouponLineItem
+    from .currency import Currency
+    from .customer_details import CustomerDetails
+    from .customer_id import CustomerId
+    from .e_invoicing_status import EInvoicingStatus
+    from .invoice_id import InvoiceId
+    from .invoice_line_item import InvoiceLineItem
+    from .invoice_payment_status import InvoicePaymentStatus
+    from .invoice_status import InvoiceStatus
+    from .invoice_type import InvoiceType
+    from .subscription_id import SubscriptionId
+    from .tax_breakdown_item import TaxBreakdownItem
+    from .transaction import Transaction
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Invoice(BaseModel):
+    """The `Invoice` object."""
+
     amount_due: int
 
     applied_credits: int
 
-    coupons: t.List[CouponLineItem]
+    coupons: list[CouponLineItem]
 
     created_at: datetime
 
@@ -40,13 +46,13 @@ class Invoice(BaseModel):
 
     id: InvoiceId
 
-    invoice_date: str
+    invoice_date: date
 
     invoice_number: str
 
     invoice_type: InvoiceType
 
-    line_items: t.List[InvoiceLineItem]
+    line_items: list[InvoiceLineItem]
 
     net_terms: int
 
@@ -60,39 +66,39 @@ class Invoice(BaseModel):
 
     tax_amount: int
 
-    tax_breakdown: t.List[TaxBreakdownItem]
+    tax_breakdown: list[TaxBreakdownItem]
 
     total: int
 
-    transactions: t.List[Transaction]
+    transactions: list[Transaction]
 
-    billing_period_start: t.Optional[str] = None
+    billing_period_start: date | None = None
     """The period/moment this invoice is about — the subscription period start, or the invoice's
     own date for manual/one-off. Stable and always present, distinct from `invoice_date` (the
     emission date). Shown as "Invoice date"."""
 
-    child_invoice_id: t.Optional[InvoiceId] = None
+    child_invoice_id: InvoiceId | None = None
 
-    due_date: t.Optional[str] = None
+    due_date: date | None = None
 
-    einvoicing_status: t.Optional[EInvoicingStatus] = None
+    einvoicing_status: EInvoicingStatus | None = None
 
-    finalized_at: t.Optional[datetime] = None
+    finalized_at: datetime | None = None
 
-    marked_as_uncollectible_at: t.Optional[datetime] = None
+    marked_as_uncollectible_at: datetime | None = None
 
-    memo: t.Optional[str] = None
+    memo: str | None = None
 
-    paid_at: t.Optional[datetime] = None
+    paid_at: datetime | None = None
 
-    parent_invoice_id: t.Optional[InvoiceId] = None
+    parent_invoice_id: InvoiceId | None = None
 
-    purchase_order: t.Optional[str] = None
+    purchase_order: str | None = None
 
-    reference: t.Optional[str] = None
+    reference: str | None = None
 
-    subscription_id: t.Optional[SubscriptionId] = None
+    subscription_id: SubscriptionId | None = None
 
-    updated_at: t.Optional[datetime] = None
+    updated_at: datetime | None = None
 
-    voided_at: t.Optional[datetime] = None
+    voided_at: datetime | None = None

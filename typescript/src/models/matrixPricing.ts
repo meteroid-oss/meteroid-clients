@@ -1,22 +1,24 @@
 // this file is @generated
-import { type MatrixRow, MatrixRowSerializer } from "./matrixRow";
+import { extraProperties } from "../json.js";
+import { type MatrixRow, MatrixRowSerializer } from "./matrixRow.js";
 
 export interface MatrixPricing {
   rates: MatrixRow[];
 }
 
+/** Converts `MatrixPricing` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MatrixPricingSerializer = {
-  _fromJsonObject(object: any): MatrixPricing {
+  parse(json: any): MatrixPricing {
     return {
-      rates: object["rates"].map((item: any) =>
-        MatrixRowSerializer._fromJsonObject(item)
-      ),
+      ...extraProperties(json, ["rates"]),
+      rates: json["rates"].map((item: any) => MatrixRowSerializer.parse(item)),
     };
   },
 
-  _toJsonObject(self: MatrixPricing): any {
+  serialize(value: MatrixPricing): any {
     return {
-      rates: self.rates.map((item: any) => MatrixRowSerializer._toJsonObject(item)),
+      ...extraProperties(value, ["rates"]),
+      rates: value.rates.map((item: any) => MatrixRowSerializer.serialize(item)),
     };
   },
 };

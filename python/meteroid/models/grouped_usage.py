@@ -1,13 +1,16 @@
 # this file is @generated
+from __future__ import annotations
+
 import dataclasses
-import typing as t
 from decimal import Decimal
 
 from ..serialization import BaseModel
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class GroupedUsage(BaseModel):
-    dimensions: t.Dict[str, str]
+    """The `GroupedUsage` object."""
+
+    dimensions: dict[str, str]
 
     value: Decimal

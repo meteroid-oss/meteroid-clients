@@ -8,7 +8,7 @@ use super::{
     subscription_activation_condition_enum::SubscriptionActivationConditionEnum,
 };
 
-#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct SubscriptionCreateRequest {
     pub activation_condition: SubscriptionActivationConditionEnum,
 
@@ -40,7 +40,7 @@ pub struct SubscriptionCreateRequest {
     pub customer_id_or_alias: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub end_date: Option<String>,
+    pub end_date: Option<chrono::NaiveDate>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invoice_memo: Option<String>,
@@ -65,21 +65,27 @@ pub struct SubscriptionCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skip_past_invoices: Option<bool>,
 
-    pub start_date: String,
+    pub start_date: chrono::NaiveDate,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trial_days: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<i32>,
+
+    /// Properties this version of the SDK does not know, sent back as received.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 impl SubscriptionCreateRequest {
+    /// Creates a value from its required fields.
+    #[must_use]
     pub fn new(
         activation_condition: SubscriptionActivationConditionEnum,
-        customer_id_or_alias: String,
+        customer_id_or_alias: impl Into<String>,
         plan_id: PlanId,
-        start_date: String,
+        start_date: chrono::NaiveDate,
     ) -> Self {
         Self {
             activation_condition,
@@ -90,7 +96,7 @@ impl SubscriptionCreateRequest {
             charge_automatically: None,
             coupon_codes: None,
             custom_properties: None,
-            customer_id_or_alias,
+            customer_id_or_alias: customer_id_or_alias.into(),
             end_date: None,
             invoice_memo: None,
             net_terms: None,
@@ -102,6 +108,7 @@ impl SubscriptionCreateRequest {
             start_date,
             trial_days: None,
             version: None,
+            extra: serde_json::Map::new(),
         }
     }
 }

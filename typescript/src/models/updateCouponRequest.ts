@@ -1,41 +1,43 @@
 // this file is @generated
-import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount";
-import { type PlanId, PlanIdSerializer } from "./planId";
+import { extraProperties } from "../json.js";
+import { type CouponDiscount, CouponDiscountSerializer } from "./couponDiscount.js";
+import { type PlanId, PlanIdSerializer } from "./planId.js";
 
 export interface UpdateCouponRequest {
-  description?: string | null;
-
-  discount?: CouponDiscount | null;
-
-  planIds?: PlanId[] | null;
+  description?: string | null | undefined;
+  discount?: CouponDiscount | null | undefined;
+  planIds?: PlanId[] | null | undefined;
 }
 
+/** Converts `UpdateCouponRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const UpdateCouponRequestSerializer = {
-  _fromJsonObject(object: any): UpdateCouponRequest {
+  parse(json: any): UpdateCouponRequest {
     return {
-      description: object["description"],
+      ...extraProperties(json, ["description", "discount", "plan_ids"]),
+      description: json["description"],
       discount:
-        object["discount"] != null
-          ? CouponDiscountSerializer._fromJsonObject(object["discount"])
-          : undefined,
+        json["discount"] != null
+          ? CouponDiscountSerializer.parse(json["discount"])
+          : json["discount"],
       planIds:
-        object["plan_ids"] != null
-          ? object["plan_ids"].map((item: any) => PlanIdSerializer._fromJsonObject(item))
-          : undefined,
+        json["plan_ids"] != null
+          ? json["plan_ids"].map((item: any) => PlanIdSerializer.parse(item))
+          : json["plan_ids"],
     };
   },
 
-  _toJsonObject(self: UpdateCouponRequest): any {
+  serialize(value: UpdateCouponRequest): any {
     return {
-      description: self.description,
+      ...extraProperties(value, ["description", "discount", "planIds"]),
+      description: value.description,
       discount:
-        self.discount != null
-          ? CouponDiscountSerializer._toJsonObject(self.discount)
-          : undefined,
+        value.discount != null
+          ? CouponDiscountSerializer.serialize(value.discount)
+          : value.discount,
       plan_ids:
-        self.planIds != null
-          ? self.planIds.map((item: any) => PlanIdSerializer._toJsonObject(item))
-          : undefined,
+        value.planIds != null
+          ? value.planIds.map((item: any) => PlanIdSerializer.serialize(item))
+          : value.planIds,
     };
   },
 };

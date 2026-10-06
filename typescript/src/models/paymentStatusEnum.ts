@@ -1,20 +1,24 @@
 // this file is @generated
 
-export enum PaymentStatusEnum {
-  Ready = "READY",
-  Pending = "PENDING",
-  Settled = "SETTLED",
-  Cancelled = "CANCELLED",
-  Failed = "FAILED",
-  Refunded = "REFUNDED",
-}
+export const PaymentStatusEnum = {
+  Ready: "READY",
+  Pending: "PENDING",
+  Settled: "SETTLED",
+  Cancelled: "CANCELLED",
+  Failed: "FAILED",
+  Refunded: "REFUNDED",
+} as const;
+export type PaymentStatusEnum =
+  | (typeof PaymentStatusEnum)[keyof typeof PaymentStatusEnum]
+  | (string & {});
 
+/** Converts `PaymentStatusEnum` values from (`parse`) and to (`serialize`) their JSON form. */
 export const PaymentStatusEnumSerializer = {
-  _fromJsonObject(object: any): PaymentStatusEnum {
-    return object;
+  parse(json: any): PaymentStatusEnum {
+    return json;
   },
 
-  _toJsonObject(self: PaymentStatusEnum): any {
-    return self;
+  serialize(value: PaymentStatusEnum): any {
+    return value;
   },
 };

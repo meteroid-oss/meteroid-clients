@@ -1,25 +1,28 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** Token revocation request */
 export interface RevocationRequest {
   /** The token to revoke */
   token: string;
-
   /** Optional hint about the token type (access_token or refresh_token) */
-  tokenTypeHint?: string | null;
+  tokenTypeHint?: string | null | undefined;
 }
 
+/** Converts `RevocationRequest` values from (`parse`) and to (`serialize`) their JSON form. */
 export const RevocationRequestSerializer = {
-  _fromJsonObject(object: any): RevocationRequest {
+  parse(json: any): RevocationRequest {
     return {
-      token: object["token"],
-      tokenTypeHint: object["token_type_hint"],
+      ...extraProperties(json, ["token", "token_type_hint"]),
+      token: json["token"],
+      tokenTypeHint: json["token_type_hint"],
     };
   },
 
-  _toJsonObject(self: RevocationRequest): any {
+  serialize(value: RevocationRequest): any {
     return {
-      token: self.token,
-      token_type_hint: self.tokenTypeHint,
+      ...extraProperties(value, ["token", "tokenTypeHint"]),
+      token: value.token,
+      token_type_hint: value.tokenTypeHint,
     };
   },
 };

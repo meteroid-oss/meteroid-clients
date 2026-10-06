@@ -1,19 +1,23 @@
 // this file is @generated
+import { extraProperties } from "../json.js";
 /** A structured (JSON) config value — the "metadata" case, several fields in one entitlement. */
 export interface JsonConfigValue {
   value: unknown;
 }
 
+/** Converts `JsonConfigValue` values from (`parse`) and to (`serialize`) their JSON form. */
 export const JsonConfigValueSerializer = {
-  _fromJsonObject(object: any): JsonConfigValue {
+  parse(json: any): JsonConfigValue {
     return {
-      value: object["value"],
+      ...extraProperties(json, ["value"]),
+      value: json["value"],
     };
   },
 
-  _toJsonObject(self: JsonConfigValue): any {
+  serialize(value: JsonConfigValue): any {
     return {
-      value: self.value,
+      ...extraProperties(value, ["value"]),
+      value: value.value,
     };
   },
 };

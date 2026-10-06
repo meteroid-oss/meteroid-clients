@@ -1,58 +1,75 @@
 // this file is @generated
-import { parseDateTime } from "../datetime";
-import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId";
+import { parseDateTime } from "../datetime.js";
+import { extraProperties } from "../json.js";
+import { type BillableMetricId, BillableMetricIdSerializer } from "./billableMetricId.js";
 import {
   type BillingMetricAggregateEnum,
   BillingMetricAggregateEnumSerializer,
-} from "./billingMetricAggregateEnum";
+} from "./billingMetricAggregateEnum.js";
 
 export interface MetricSummary {
-  aggregationKey?: string | null;
-
+  aggregationKey?: string | null | undefined;
   aggregationType: BillingMetricAggregateEnum;
-
-  archivedAt?: Date | null;
-
+  archivedAt?: Date | null | undefined;
   code: string;
-
   createdAt: Date;
-
-  description?: string | null;
-
+  description?: string | null | undefined;
   id: BillableMetricId;
-
   name: string;
 }
 
+/** Converts `MetricSummary` values from (`parse`) and to (`serialize`) their JSON form. */
 export const MetricSummarySerializer = {
-  _fromJsonObject(object: any): MetricSummary {
+  parse(json: any): MetricSummary {
     return {
-      aggregationKey: object["aggregation_key"],
-      aggregationType: BillingMetricAggregateEnumSerializer._fromJsonObject(
-        object["aggregation_type"]
+      ...extraProperties(json, [
+        "aggregation_key",
+        "aggregation_type",
+        "archived_at",
+        "code",
+        "created_at",
+        "description",
+        "id",
+        "name",
+      ]),
+      aggregationKey: json["aggregation_key"],
+      aggregationType: BillingMetricAggregateEnumSerializer.parse(
+        json["aggregation_type"]
       ),
       archivedAt:
-        object["archived_at"] != null ? parseDateTime(object["archived_at"]) : undefined,
-      code: object["code"],
-      createdAt: parseDateTime(object["created_at"]),
-      description: object["description"],
-      id: BillableMetricIdSerializer._fromJsonObject(object["id"]),
-      name: object["name"],
+        json["archived_at"] != null
+          ? parseDateTime(json["archived_at"])
+          : json["archived_at"],
+      code: json["code"],
+      createdAt: parseDateTime(json["created_at"]),
+      description: json["description"],
+      id: BillableMetricIdSerializer.parse(json["id"]),
+      name: json["name"],
     };
   },
 
-  _toJsonObject(self: MetricSummary): any {
+  serialize(value: MetricSummary): any {
     return {
-      aggregation_key: self.aggregationKey,
-      aggregation_type: BillingMetricAggregateEnumSerializer._toJsonObject(
-        self.aggregationType
+      ...extraProperties(value, [
+        "aggregationKey",
+        "aggregationType",
+        "archivedAt",
+        "code",
+        "createdAt",
+        "description",
+        "id",
+        "name",
+      ]),
+      aggregation_key: value.aggregationKey,
+      aggregation_type: BillingMetricAggregateEnumSerializer.serialize(
+        value.aggregationType
       ),
-      archived_at: self.archivedAt,
-      code: self.code,
-      created_at: self.createdAt,
-      description: self.description,
-      id: BillableMetricIdSerializer._toJsonObject(self.id),
-      name: self.name,
+      archived_at: value.archivedAt,
+      code: value.code,
+      created_at: value.createdAt,
+      description: value.description,
+      id: BillableMetricIdSerializer.serialize(value.id),
+      name: value.name,
     };
   },
 };

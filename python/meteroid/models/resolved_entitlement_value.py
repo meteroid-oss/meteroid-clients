@@ -1,32 +1,25 @@
 # this file is @generated
-import dataclasses
+from __future__ import annotations
+
 import typing as t
 
-from ..serialization import BaseModel, TaggedUnionModel
+from ..serialization import Discriminator, UnknownVariant
 from .boolean_resolved_entitlement_value import BooleanResolvedEntitlementValue
 from .config_resolved_entitlement_value import ConfigResolvedEntitlementValue
 from .metered_resolved_entitlement_value import MeteredResolvedEntitlementValue
 
-
-@dataclasses.dataclass
-class ResolvedEntitlementValue(TaggedUnionModel):
-    _DISCRIMINATOR: t.ClassVar[str] = "type"
-    _DISCRIMINATOR_ATTR: t.ClassVar[str] = "type"
-    _CONTENT_ATTR: t.ClassVar[str] = "content"
-    _CONTENT_KEY: t.ClassVar[t.Optional[str]] = None
-    _VARIANTS: t.ClassVar[t.Mapping[str, t.Optional[t.Type[BaseModel]]]] = {
-        "BOOLEAN": BooleanResolvedEntitlementValue,
-        "METERED": MeteredResolvedEntitlementValue,
-        "CONFIG": ConfigResolvedEntitlementValue,
-    }
-
-    type: t.Literal[
-        "BOOLEAN",
-        "METERED",
-        "CONFIG",
-    ]
-    content: t.Union[
-        BooleanResolvedEntitlementValue,
-        MeteredResolvedEntitlementValue,
-        ConfigResolvedEntitlementValue,
-    ]
+ResolvedEntitlementValue: t.TypeAlias = t.Annotated[
+    BooleanResolvedEntitlementValue
+    | MeteredResolvedEntitlementValue
+    | ConfigResolvedEntitlementValue
+    | UnknownVariant,
+    Discriminator(
+        "type",
+        {
+            "BOOLEAN": BooleanResolvedEntitlementValue,
+            "METERED": MeteredResolvedEntitlementValue,
+            "CONFIG": ConfigResolvedEntitlementValue,
+        },
+    ),
+]
+"""Told apart by `type`; a variant this SDK version does not know is an `UnknownVariant`."""
